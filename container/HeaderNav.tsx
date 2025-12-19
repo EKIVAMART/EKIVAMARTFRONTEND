@@ -13,7 +13,6 @@ type MenuKey =
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
-
   const menus: Record<Exclude<MenuKey, null>, string[]> = {
     Fashion: ["Men Wear", "Women Wear", "Kids Wear", "Accessories"],
     Electronics: ["Phones", "Laptops", "TVs", "Accessories"],
