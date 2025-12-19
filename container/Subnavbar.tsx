@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  FiSearch,
-  FiHeart,
-  FiShoppingCart,
-  FiMapPin,
-} from "react-icons/fi";
+import Link from "next/link";
+import { FiSearch, FiHeart, FiShoppingCart, FiMapPin } from "react-icons/fi";
 
 /* ---------------- LOCATION SELECTOR ---------------- */
 
@@ -85,21 +81,24 @@ const Subnavbar = () => {
         <LocationSelector />
 
         {/* Icons */}
-       
+
         <div className="flex items-center gap-6">
-        <div className="flex items-center gap-1 cursor-pointer">
+          <div className="flex items-center gap-1 cursor-pointer">
             <FiHeart className="text-xl" />
             <span className="text-sm text-black">Wishlist</span>
-        </div>
+          </div>
 
-        <div className="flex items-center gap-1 cursor-pointer">
+          <div className="flex items-center gap-1 cursor-pointer">
             <FiShoppingCart className="text-xl" />
             <span className="text-sm text-black">Cart</span>
-        </div>
+          </div>
 
-        <button className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md">
+          <Link
+            href="/sign-in"
+            className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
+          >
             Sign In
-        </button>
+          </Link>
         </div>
       </div>
     </header>
