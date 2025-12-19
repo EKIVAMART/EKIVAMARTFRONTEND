@@ -1,9 +1,11 @@
+import Subnavbar from '@/container/Subnavbar'
 import React from 'react'
-
+import HeaderNav from '@/container/HeaderNav'
 const Navbar = () => {
   return (
     <div>
-       <h1>nabar</h1>
+        <Subnavbar />
+        <HeaderNav />
     </div>
   )
 }
