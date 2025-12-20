@@ -1,8 +1,10 @@
 import React from 'react'
-
+import Listfoot from '@/container/Listfoot'
 const Footer = () => {
   return (
-    <div>Footer</div>
+    <div>
+       <Listfoot />
+    </div>
   )
 }
 
