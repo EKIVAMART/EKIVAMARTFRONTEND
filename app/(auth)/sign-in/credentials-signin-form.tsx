@@ -1,6 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
 
 export default function CredentialsSignInForm() {
@@ -11,7 +12,9 @@ export default function CredentialsSignInForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
@@ -20,11 +23,26 @@ export default function CredentialsSignInForm() {
     }
 
     setSubmitting(true);
-    // Frontend-only: simulate a short delay and show a success state
-    setTimeout(() => {
+    try {
+      const res = await fetch(`/api/auth/sign-in`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error || "Sign-in failed");
+        setSubmitting(false);
+        return;
+      }
       setSubmitting(false);
       setSuccess(true);
-    }, 800);
+      // redirect to home
+      setTimeout(() => router.push("/"), 500);
+    } catch (err: any) {
+      setError(err?.message || "Unexpected error");
+      setSubmitting(false);
+    }
   };
 
   return (

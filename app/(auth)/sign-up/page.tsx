@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Mail, Lock, User } from "lucide-react";
 
 export default function SignUp() {
@@ -9,11 +10,34 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError(null);
     setSubmitting(true);
-    // frontend-only demo: simulate submit
-    setTimeout(() => setSubmitting(false), 800);
+    try {
+      const res = await fetch(`/api/auth/sign-up`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error || "Failed to create account");
+        setSubmitting(false);
+        return;
+      }
+      setSuccess(true);
+      setSubmitting(false);
+      // navigate to sign-in after short delay
+      setTimeout(() => router.push("/sign-in"), 800);
+    } catch (err: any) {
+      setError(err?.message || "Unexpected error");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -54,6 +78,16 @@ export default function SignUp() {
 
           <aside className="px-6 py-8">
             <div className="mx-auto max-w-md">
+              {error ? (
+                <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {String(error)}
+                </div>
+              ) : null}
+              {success ? (
+                <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
+                  Account created — redirecting to sign in...
+                </div>
+              ) : null}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-gray-700">
