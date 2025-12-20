@@ -72,7 +72,7 @@ const contactInfo = [
   },
   {
     icon: FiClock,
-    text: "Hours: 10:00 - 18:00, Mon - Sat",
+    text: "Hours: 24hours",
   },
 ];
 
