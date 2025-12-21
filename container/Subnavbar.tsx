@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { FiSearch, FiHeart, FiShoppingCart, FiMapPin } from "react-icons/fi";
+import { JSX, useState } from "react";
+import { useUser, useClerk, UserButton } from "@clerk/nextjs";
+import { FiHeart, FiMapPin, FiSearch, FiShoppingCart } from "react-icons/fi";
 
 /* ---------------- LOCATION SELECTOR ---------------- */
 
-const countries = [
+const countries: string[] = [
   "All",
   "Nigeria",
   "United States",
@@ -18,9 +18,9 @@ const countries = [
   "Ghana",
 ];
 
-const LocationSelector = () => {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("All");
+const LocationSelector = (): JSX.Element => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string>("All");
 
   return (
     <div className="relative hidden md:block w-48">
@@ -56,7 +56,9 @@ const LocationSelector = () => {
 
 /* ---------------- SUBNAVBAR ---------------- */
 
-const Subnavbar = () => {
+const Subnavbar = (): JSX.Element => {
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
   return (
     <header className="w-full border-b bg-white text-black">
       {/* ⬇️ 90% width container */}
@@ -93,12 +95,18 @@ const Subnavbar = () => {
             <span className="text-sm text-black">Cart</span>
           </div>
 
-          <Link
-            href="/sign-in"
-            className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
-          >
-            Sign In
-          </Link>
+          {!user ? (
+            <button
+              onClick={() => openSignIn?.()}
+              className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md"
+            >
+              Sign In
+            </button>
+          ) : (
+            <UserButton />
+          )}
+
+          
         </div>
       </div>
     </header>
