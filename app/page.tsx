@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 import Slider from "../components/Slider";
 
@@ -8,8 +7,5 @@ export default function Home() {
       <Slider />
     </main>
   );
-=======
-export default function Home() {
-  return <main></main>;
->>>>>>> 85c0b05a172ab38160e2f09de13dee07fdc2a158
+ 
 }
