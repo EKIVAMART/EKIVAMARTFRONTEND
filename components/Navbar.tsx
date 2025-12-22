@@ -1,13 +1,13 @@
-import Subnavbar from '@/container/Subnavbar'
-import React from 'react'
-import HeaderNav from '@/container/HeaderNav'
+import Subnavbar from '@/container/Subnavbar';
+import React from 'react';
+import HeaderNav from '@/container/HeaderNav';
 const Navbar = () => {
   return (
     <div>
-        <Subnavbar />
-        <HeaderNav />
+      <Subnavbar />
+      <HeaderNav />
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

@@ -1,11 +1,10 @@
-import React from 'react'
-import Listfoot from '@/container/Listfoot'
+import Listfoot from '@/container/Listfoot';
 const Footer = () => {
   return (
     <div>
-       <Listfoot />
+      <Listfoot />
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

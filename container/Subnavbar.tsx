@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { JSX, useState } from "react";
-import { useUser, useClerk, UserButton } from "@clerk/nextjs";
-import { FiHeart, FiMapPin, FiSearch, FiShoppingCart } from "react-icons/fi";
+import { JSX, useState } from 'react';
+import { useUser, useClerk, UserButton } from '@clerk/nextjs';
+import { FiHeart, FiMapPin, FiSearch, FiShoppingCart } from 'react-icons/fi';
 
 /* ---------------- LOCATION SELECTOR ---------------- */
 
 const countries: string[] = [
-  "All",
-  "Nigeria",
-  "United States",
-  "United Kingdom",
-  "Canada",
-  "Germany",
-  "France",
-  "South Africa",
-  "Ghana",
+  'All',
+  'Nigeria',
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Germany',
+  'France',
+  'South Africa',
+  'Ghana',
 ];
 
 const LocationSelector = (): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>("All");
+  const [selected, setSelected] = useState<string>('All');
 
   return (
     <div className="relative hidden md:block w-48">
@@ -105,8 +105,6 @@ const Subnavbar = (): JSX.Element => {
           ) : (
             <UserButton />
           )}
-
-          
         </div>
       </div>
     </header>

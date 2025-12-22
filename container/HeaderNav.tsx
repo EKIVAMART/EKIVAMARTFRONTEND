@@ -1,25 +1,25 @@
-"use client";
-import { useState } from "react";
-import { ChevronDown, Headphones, Grid } from "lucide-react";
+'use client';
+import { useState } from 'react';
+import { ChevronDown, Headphones, Grid } from 'lucide-react';
 
 type MenuKey =
-  | "Fashion"
-  | "Electronics"
-  | "Bags"
-  | "Footwear"
-  | "Groceries"
-  | "Beauty"
+  | 'Fashion'
+  | 'Electronics'
+  | 'Bags'
+  | 'Footwear'
+  | 'Groceries'
+  | 'Beauty'
   | null;
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
   const menus: Record<Exclude<MenuKey, null>, string[]> = {
-    Fashion: ["Men Wear", "Women Wear", "Kids Wear", "Accessories"],
-    Electronics: ["Phones", "Laptops", "TVs", "Accessories"],
-    Bags: ["Hand Bags", "Backpacks", "Travel Bags"],
-    Footwear: ["Men Shoes", "Women Shoes", "Slippers"],
-    Groceries: ["Fruits", "Vegetables", "Beverages"],
-    Beauty: ["Skincare", "Makeup", "Hair Care"],
+    Fashion: ['Men Wear', 'Women Wear', 'Kids Wear', 'Accessories'],
+    Electronics: ['Phones', 'Laptops', 'TVs', 'Accessories'],
+    Bags: ['Hand Bags', 'Backpacks', 'Travel Bags'],
+    Footwear: ['Men Shoes', 'Women Shoes', 'Slippers'],
+    Groceries: ['Fruits', 'Vegetables', 'Beverages'],
+    Beauty: ['Skincare', 'Makeup', 'Hair Care'],
   };
 
   return (
