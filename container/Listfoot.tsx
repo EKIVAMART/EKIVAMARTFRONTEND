@@ -1,58 +1,58 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { FiMapPin, FiPhone, FiMail, FiClock } from "react-icons/fi";
-import { FaInstagram, FaLinkedinIn, FaTiktok } from "react-icons/fa";
+import Image from 'next/image';
+import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
+import { FaInstagram, FaLinkedinIn, FaTiktok } from 'react-icons/fa';
 
 /* ================== DATA ARRAYS ================== */
 
 const footerLinks = [
   {
-    title: "Company",
+    title: 'Company',
     links: [
-      "About Us",
-      "Delivery Information",
-      "Privacy Policy",
-      "Terms & Conditions",
-      "Contact Us",
-      "Support Center",
-      "Careers",
+      'About Us',
+      'Delivery Information',
+      'Privacy Policy',
+      'Terms & Conditions',
+      'Contact Us',
+      'Support Center',
+      'Careers',
     ],
   },
   {
-    title: "Account",
+    title: 'Account',
     links: [
-      "About Us",
-      "Delivery Information",
-      "Privacy Policy",
-      "Terms & Conditions",
-      "Contact Us",
-      "Support Center",
-      "Careers",
+      'About Us',
+      'Delivery Information',
+      'Privacy Policy',
+      'Terms & Conditions',
+      'Contact Us',
+      'Support Center',
+      'Careers',
     ],
   },
   {
-    title: "Corporate",
+    title: 'Corporate',
     links: [
-      "About Us",
-      "Delivery Information",
-      "Privacy Policy",
-      "Terms & Conditions",
-      "Contact Us",
-      "Support Center",
-      "Careers",
+      'About Us',
+      'Delivery Information',
+      'Privacy Policy',
+      'Terms & Conditions',
+      'Contact Us',
+      'Support Center',
+      'Careers',
     ],
   },
   {
-    title: "Popular",
+    title: 'Popular',
     links: [
-      "About Us",
-      "Delivery Information",
-      "Privacy Policy",
-      "Terms & Conditions",
-      "Contact Us",
-      "Support Center",
-      "Careers",
+      'About Us',
+      'Delivery Information',
+      'Privacy Policy',
+      'Terms & Conditions',
+      'Contact Us',
+      'Support Center',
+      'Careers',
     ],
   },
 ];
@@ -60,34 +60,34 @@ const footerLinks = [
 const contactInfo = [
   {
     icon: FiMapPin,
-    text: "7 Tony Aki Str. Off Okpanam Rd, Behind Corner Int’l School Asaba, Asaba 320242, Delta",
+    text: '7 Tony Aki Str. Off Okpanam Rd, Behind Corner Int’l School Asaba, Asaba 320242, Delta',
   },
   {
     icon: FiPhone,
-    text: "Call Us: (+234)90069910407",
+    text: 'Call Us: (+234)90069910407',
   },
   {
     icon: FiMail,
-    text: "Email:faflories@outlook.com",
+    text: 'Email:faflories@outlook.com',
   },
   {
     icon: FiClock,
-    text: "Hours: 24hours",
+    text: 'Hours: 24hours',
   },
 ];
 
 const socialLinks = [
   {
     icon: FaInstagram,
-    href: "https://www.instagram.com/faflories?igsh=N3dld2VpMzNycDQy",
+    href: 'https://www.instagram.com/faflories?igsh=N3dld2VpMzNycDQy',
   },
   {
     icon: FaLinkedinIn,
-    href: "https://www.linkedin.com/company/108237871/admin/dashboard/",
+    href: 'https://www.linkedin.com/company/108237871/admin/dashboard/',
   },
   {
     icon: FaTiktok,
-    href: "https://www.tiktok.com/@faflories?_r=1&_t=ZS-92NK2t2CIlB",
+    href: 'https://www.tiktok.com/@faflories?_r=1&_t=ZS-92NK2t2CIlB',
   },
 ];
 
@@ -99,15 +99,9 @@ const Listfoot = () => {
       {/* MAIN CONTENT */}
       <div className="w-[90%] mx-auto px-4 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
-          
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
-            <Image
-              src="/logo.png"
-              alt="Faflories"
-              width={150}
-              height={40}
-            />
+            <Image src="/logo.png" alt="Faflories" width={150} height={40} />
 
             <p className="text-gray-500 text-sm max-w-sm">
               Awesome grocery store website template
@@ -153,14 +147,10 @@ const Listfoot = () => {
       {/* BOTTOM SECTION */}
       <div className="border-t">
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">
-            © 2025, Faflories
-          </p>
+          <p className="text-sm text-gray-500">© 2025, Faflories</p>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-700">
-              Follow Us
-            </span>
+            <span className="text-sm font-medium text-gray-700">Follow Us</span>
 
             <div className="flex gap-3">
               {socialLinks.map((social, index) => {
