@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown, Headphones, Grid } from 'lucide-react';
 
 type MenuKey =
@@ -36,33 +37,36 @@ export default function Header() {
         <nav className="hidden items-center gap-8 text-sm font-medium text-gray-700 md:flex">
           <span className="cursor-pointer hover:text-green-600">Home</span>
 
-          {Object.keys(menus).map((item) => (
-            <div
-              key={item}
-              className="relative"
-              onMouseEnter={() => setOpenMenu(item as MenuKey)}
-              onMouseLeave={() => setOpenMenu(null)}
-            >
-              <button className="flex items-center gap-1 hover:text-green-600">
-                {item}
-                <ChevronDown size={14} />
-              </button>
+          {Object.keys(menus).map((item) => {
+            const slug = String(item).toLowerCase();
+            return (
+              <div
+                key={item}
+                className="relative"
+                onMouseEnter={() => setOpenMenu(item as MenuKey)}
+                onMouseLeave={() => setOpenMenu(null)}
+              >
+                <Link href={`/category/${slug}`} className="flex items-center gap-1 hover:text-green-600">
+                  {item}
+                  <ChevronDown size={14} />
+                </Link>
 
-              {openMenu === item && (
-                <div className="absolute left-0 top-8 z-50 w-44 rounded-md border bg-white shadow-md">
-                  {menus[item as keyof typeof menus].map((sub) => (
-                    <a
-                      key={sub}
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600"
-                    >
-                      {sub}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                {openMenu === item && (
+                  <div className="absolute left-0 top-8 z-50 w-44 rounded-md border bg-white shadow-md">
+                    {menus[item as keyof typeof menus].map((sub) => (
+                      <Link
+                        key={sub}
+                        href={`/category/${slug}`}
+                        className="block px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600"
+                      >
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           <span className="cursor-pointer hover:text-green-600">Shop</span>
         </nav>

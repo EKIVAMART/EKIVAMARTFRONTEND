@@ -1,4 +1,4 @@
-import React from "react";
+"use client";
 import Image, { StaticImageData } from "next/image";
 
 type ProductCardProps = {
@@ -21,7 +21,7 @@ export default function ProductCard({
     author = "Tazo",
     price,
     originalPrice,
-    currency = "Rs",
+    currency = "₦",
     href = "#",
 }: ProductCardProps) {
     const fullStars = Math.floor(rating);
@@ -87,36 +87,48 @@ export default function ProductCard({
                     border-radius: 14px;
                     overflow: hidden;
                     background: #ffffff;
-                    box-shadow: 0 6px 18px rgba(22, 27, 36, 0.08);
+                    box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
                     text-decoration: none;
                     color: inherit;
-                    transition: transform .22s ease, box-shadow .22s ease;
+                    transition: transform .34s cubic-bezier(.2,.9,.2,1), box-shadow .34s ease;
+                    will-change: transform;
+                    position: relative;
                 }
-                .pc-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(22,27,36,0.12); }
+
+                .pc-card:hover {
+                    transform: translateY(-10px) scale(1.01);
+                    box-shadow: 0 22px 44px rgba(16, 24, 40, 0.14);
+                }
 
                 .pc-image-wrap{
-                    background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
-                    padding: 18px;
+                    background: linear-gradient(180deg, #fff 0%, #fbfdfc 100%);
+                    height: 240px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                }
-                .pc-image{
-                    width: 100%;
-                    max-width: 260px;
-                    height: auto;
-                    border-radius: 10px;
-                    object-fit: contain;
-                    background: #fff;
+                    position: relative;
+                    overflow: hidden;
                 }
 
-                .pc-body{ padding: 16px 18px 20px; }
-                .pc-category{ font-size: 12px; color: #6b7280; margin-bottom:6px }
-                .pc-title{ font-size: 16px; margin: 0 0 8px; font-weight: 700; color: #111827 }
+                .pc-image-inner{ width:100%; height:100%; display:flex; align-items:center; justify-content:center }
+
+                .pc-image{
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform .7s cubic-bezier(.2,.9,.3,1);
+                    border-radius: 0;
+                }
+
+                .pc-card:hover .pc-image{ transform: scale(1.08) }
+
+                .pc-body{ padding: 14px 16px 18px; display:flex; flex-direction:column; gap:8px }
+                .pc-category{ font-size: 12px; color: #6b7280; margin-bottom:2px; text-transform: capitalize }
+                .pc-title{ font-size: 16px; margin: 0; font-weight: 700; color: #0f172a; line-height:1.2 }
 
                 .pc-rating-row{ display:flex; align-items:center; justify-content:space-between; gap:10px }
                 .pc-stars{ display:flex; gap:6px; align-items:center }
-                .star{ width:16px; height:16px }
+                .star{ width:14px; height:14px }
                 .star-filled path{ fill:#f6c84c }
                 .star-half path{ fill: url(#halfGrad) }
                 .star-empty path{ fill:#e6e6e6 }
@@ -124,13 +136,16 @@ export default function ProductCard({
                 .pc-by{ font-size:13px; color:#374151 }
                 .pc-author{ color:#10b981; font-weight:600; text-decoration:none }
 
-                .pc-price-row{ display:flex; align-items:center; gap:12px; margin-top:12px }
-                .pc-price{ font-size:18px; font-weight:700; color:#059669 }
-                .pc-original{ font-size:14px; color:#9ca3af; text-decoration:line-through }
+                .pc-price-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px }
+                .pc-price{ font-size:18px; font-weight:800; color:#059669; display:flex; align-items:baseline; gap:6px }
+                .pc-currency{ font-size:14px }
+                .pc-current{ font-size:18px }
+                .pc-original{ font-size:13px; color:#9ca3af; text-decoration:line-through }
 
+                /* small screens */
                 @media (max-width:480px){
                     .pc-card{ max-width: 100%; border-radius:12px }
-                    .pc-image-wrap{ padding:14px }
+                    .pc-image-wrap{ height:180px }
                     .pc-title{ font-size:15px }
                 }
             `}</style>

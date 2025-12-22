@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -38,15 +39,30 @@ export default function Slider({
   const next = () => setIndex((i) => (i + 1) % len);
 
  
-  function onTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    if (e.touches && e.touches.length > 0) {
+      touchStartX.current = e.touches[0].clientX;
+    }
   }
 
-  function onTouchEnd(e: React.TouchEvent) {
+  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
     if (touchStartX.current === null) return;
+    if (!e.changedTouches || e.changedTouches.length === 0) {
+      touchStartX.current = null;
+      return;
+    }
 
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
+    const endX = e.changedTouches[0]?.clientX;
+    if (typeof endX !== "number") {
+      touchStartX.current = null;
+      return;
+    }
+
+    const diff = touchStartX.current - endX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) next();
+      else prev();
+    }
 
     touchStartX.current = null;
   }
@@ -65,7 +81,7 @@ export default function Slider({
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
           {images.map((src, i) => (
-            <div key={i} className="w-full flex-shrink-0 h-full relative">
+            <div key={i} className="w-full shrink-0 h-full relative">
               <img
                 src={src}
                 alt={`Slide ${i + 1}`}
