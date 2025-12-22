@@ -66,7 +66,7 @@ export default function Slider({
   }
 
   return (
-    <div className={isSingle ? "w-full mx-auto" : "w-[89%] mx-auto"}>
+    <div className={isSingle ? "w-full mx-auto" : " mx-auto"}>
       <div
         className={`relative overflow-hidden rounded-lg bg-gray-100 ${styles.noSelect}`}
         onTouchStart={onTouchStart}
