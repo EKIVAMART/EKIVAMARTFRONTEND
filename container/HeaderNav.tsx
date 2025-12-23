@@ -1,26 +1,27 @@
-'use client';
-import { useState } from 'react';
-import Link from 'next/link';
-import { ChevronDown, Headphones, Grid } from 'lucide-react';
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { ChevronDown, Headphones, Grid } from "lucide-react";
 
 type MenuKey =
-  | 'Fashion'
-  | 'Electronics'
-  | 'Bags'
-  | 'Footwear'
-  | 'Groceries'
-  | 'Beauty'
+  | "Fashion"
+  | "Electronics"
+  | "Bags"
+  | "Footwear"
+  | "Groceries"
+  | "Beauty"
   | null;
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
+
   const menus: Record<Exclude<MenuKey, null>, string[]> = {
-    Fashion: ['Men Wear', 'Women Wear', 'Kids Wear', 'Accessories'],
-    Electronics: ['Phones', 'Laptops', 'TVs', 'Accessories'],
-    Bags: ['Hand Bags', 'Backpacks', 'Travel Bags'],
-    Footwear: ['Men Shoes', 'Women Shoes', 'Slippers'],
-    Groceries: ['Fruits', 'Vegetables', 'Beverages'],
-    Beauty: ['Skincare', 'Makeup', 'Hair Care'],
+    Fashion: ["Men Wear", "Women Wear", "Kids Wear", "Accessories"],
+    Electronics: ["Phones", "Laptops", "TVs", "Accessories"],
+    Bags: ["Hand Bags", "Backpacks", "Travel Bags"],
+    Footwear: ["Men Shoes", "Women Shoes", "Slippers"],
+    Groceries: ["Fruits", "Vegetables", "Beverages"],
+    Beauty: ["Skincare", "Makeup", "Hair Care"],
   };
 
   return (
@@ -35,10 +36,14 @@ export default function Header() {
 
         {/* Center Navigation */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-gray-700 md:flex">
-          <span className="cursor-pointer hover:text-green-600">Home</span>
+          {/* ✅ Home now routes correctly */}
+          <Link href="/" className="hover:text-green-600">
+            Home
+          </Link>
 
           {Object.keys(menus).map((item) => {
-            const slug = String(item).toLowerCase();
+            const slug = item.toLowerCase();
+
             return (
               <div
                 key={item}
@@ -46,7 +51,11 @@ export default function Header() {
                 onMouseEnter={() => setOpenMenu(item as MenuKey)}
                 onMouseLeave={() => setOpenMenu(null)}
               >
-                <Link href={`/category/${slug}`} className="flex items-center gap-1 hover:text-green-600">
+                {/* ✅ CLICK STILL NAVIGATES (UNCHANGED) */}
+                <Link
+                  href={`/category/${slug}`}
+                  className="flex items-center gap-1 hover:text-green-600"
+                >
                   {item}
                   <ChevronDown size={14} />
                 </Link>
@@ -68,7 +77,9 @@ export default function Header() {
             );
           })}
 
-          <span className="cursor-pointer hover:text-green-600">Shop</span>
+          <span className="cursor-pointer hover:text-green-600">
+            Shop
+          </span>
         </nav>
 
         {/* Right */}
