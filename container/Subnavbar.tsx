@@ -61,7 +61,7 @@ const Subnavbar = (): JSX.Element => {
   const { openSignIn } = useClerk();
   return (
     <header className="w-full border-b bg-white text-black">
-      {/* ⬇️ 90% width container */}
+      {/* 90% width container */}
       <div className="mx-auto flex w-[90%] items-center justify-between gap-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-2">
