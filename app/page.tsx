@@ -9,7 +9,8 @@ export default function Home() {
     <main className="py-8 px-4">
       <Slider />
       <FeaturedCategories />
-       <HeroSubscribe />
+      <ProductsSection />
+      <HeroSubscribe />
       <Features />
     </main>
   );
