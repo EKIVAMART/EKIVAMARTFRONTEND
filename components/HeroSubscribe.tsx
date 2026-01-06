@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Mail } from "lucide-react";
+import newsletterImg from "@/public/newsletter.png";
 
 export default function HeroSubscribe() {
   return (
@@ -44,7 +45,7 @@ export default function HeroSubscribe() {
         {/* RIGHT IMAGE */}
         <div className="relative w-full max-w-md">
           <Image
-            src="/assets/newsletter.png"
+            src={newsletterImg}
             alt="Subscribe illustration"
             width={450}
             height={350}
