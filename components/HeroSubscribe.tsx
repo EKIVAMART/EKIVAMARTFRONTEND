@@ -44,14 +44,14 @@ export default function HeroSubscribe() {
 
         {/* RIGHT IMAGE */}
         <div className="relative w-full max-w-md">
-          <Image
+          {/* <Image
             // src={newsletterImg}
             alt="Subscribe illustration"
             width={450}
             height={350}
             className="w-full object-contain"
             priority
-          />
+          /> */}
         </div>
       </div>
     </section>
