@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
