@@ -28,33 +28,49 @@ const categories: Category[] = [
 const FeaturedCategories = () => {
   return (
     <section className="w-[95%] mx-auto py-8">
-  <h2 className="text-lg font-semibold mb-6 text-black">Featured Categories</h2>
+      <h2 className="text-lg font-semibold mb-6 text-black">
+        Featured Categories
+      </h2>
 
-  <div className="flex flex-wrap gap-6 justify-between">
-    {categories.map((category) => (
-      <div
-        key={category.name}
-        className="flex flex-col items-center text-center cursor-pointer"
-      >
-        <div
-          className={`w-20 h-20 rounded-full flex items-center justify-center ${category.bg}`}
-        >
-          <Image
-            src={category.icon}
-            alt={category.name}
-            width={60}
-            height={50}
-          />
-        </div>
+      <div className="flex flex-wrap gap-6 justify-between">
+        {categories.map((category) => (
+          <div
+            key={category.name}
+            className="group flex flex-col items-center text-center cursor-pointer transition-transform duration-300 hover:-translate-y-2"
+          >
+            <div
+              className={`
+                w-20 h-20 rounded-full flex items-center justify-center 
+                ${category.bg}
+                transition-all duration-300 ease-out
+                group-hover:scale-110
+                group-hover:shadow-lg
+                group-hover:ring-4
+                group-hover:ring-black/10
+              `}
+            >
+              <Image
+                src={category.icon}
+                alt={category.name}
+                width={60}
+                height={50}
+                className="transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
 
-        <p className="mt-3 text-sm font-medium text-black">
-          {category.name}
-        </p>
+            <p
+              className="
+                mt-3 text-sm font-semibold text-black
+                transition-colors duration-300
+                group-hover:text-gray-900
+              "
+            >
+              {category.name}
+            </p>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-</section>
-
+    </section>
   );
 };
 
