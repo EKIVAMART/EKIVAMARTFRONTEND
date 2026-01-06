@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Mail } from "lucide-react";
-import newsletterImg from "@/public/newsletter.png";
+// import newsletterImg from "@/public/newsletter.png";
 
 export default function HeroSubscribe() {
   return (
@@ -32,7 +32,7 @@ export default function HeroSubscribe() {
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 px-2 py-3 text-sm text-gray-600 outline-none"
+              className="flex-1 px-2 py-4 text-sm text-gray-600 outline-none"
             />
 
             {/* Button */}
@@ -45,7 +45,7 @@ export default function HeroSubscribe() {
         {/* RIGHT IMAGE */}
         <div className="relative w-full max-w-md">
           <Image
-            src={newsletterImg}
+            // src={newsletterImg}
             alt="Subscribe illustration"
             width={450}
             height={350}
