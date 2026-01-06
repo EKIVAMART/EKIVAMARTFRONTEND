@@ -4,7 +4,7 @@ import upload_area from './upload_area.svg';
 import hero_model_img from './hero_model_img.png';
 import hero_m from "./hero.png";
 import hero_2 from "./hero_2.png";
-import newsletter from "./newletetr.png"
+import newsletter from "./newsletter.png"
 import hero_product_img1 from './hero_product_img1.png';
 import hero_product_img2 from './hero_product_img2.png';
 import product_img1 from './product_img1.png';
