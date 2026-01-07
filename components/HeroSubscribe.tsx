@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
+import { assets } from "@/assets/assets";
 import { Mail } from "lucide-react";
-// import newsletterImg from "@/public/newsletter.png";
+import Image from "next/image";
 
 export default function HeroSubscribe() {
   return (
@@ -44,14 +44,14 @@ export default function HeroSubscribe() {
 
         {/* RIGHT IMAGE */}
         <div className="relative w-full max-w-md">
-          {/* <Image
-            // src={newsletterImg}
+          <Image
+            src={assets.newsletter}
             alt="Subscribe illustration"
             width={450}
             height={350}
             className="w-full object-contain"
             priority
-          /> */}
+          />
         </div>
       </div>
     </section>
