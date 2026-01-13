@@ -27,20 +27,17 @@ export default function ProductsSection() {
     <section className="py-16 px-4 bg-linear-to-br from-gray-50 to-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Featured Products
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            Popular Products
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover our curated collection of premium products designed for modern living
-          </p>
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <div className="flex gap-3 mb-12 overflow-x-auto scrollbar-hide px-4 md:px-0 md:justify-center md:flex-wrap">
           <button
             onClick={() => setActiveCategory("All")}
-            className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
               activeCategory === "All"
                 ? "bg-emerald-600 text-white shadow-lg transform scale-105"
                 : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-200"
@@ -52,7 +49,7 @@ export default function ProductsSection() {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
                 activeCategory === category
                   ? "bg-emerald-600 text-white shadow-lg transform scale-105"
                   : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-200"
@@ -63,7 +60,6 @@ export default function ProductsSection() {
           ))}
         </div>
 
-        {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <div
@@ -94,32 +90,6 @@ export default function ProductsSection() {
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 640px) {
-          .grid {
-            grid-template-columns: repeat(1, minmax(0, 1fr));
-          }
-        }
-
-        @media (min-width: 640px) and (max-width: 1023px) {
-          .grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-        }
-
-        @media (min-width: 1024px) and (max-width: 1279px) {
-          .grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-        }
-
-        @media (min-width: 1280px) {
-          .grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
-        }
-      `}</style>
     </section>
   );
 }

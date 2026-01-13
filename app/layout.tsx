@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
+        <body suppressHydrationWarning={true}>
           <Navbar />
           <main>{children}</main>
           <Footer />
