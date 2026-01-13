@@ -36,7 +36,7 @@ export default function HeroSubscribe() {
             />
 
             {/* Button */}
-            <button className="rounded-full bg-green-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-green-700">
+            <button className="rounded-full bg-green-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-green-700">
               Subscribe
             </button>
           </div>
