@@ -1,21 +1,23 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
-import { productDummyData, categories } from "@/assets/assets";
+import { categories } from "@/assets/assets";
+import { useProducts } from "@/lib/hooks";
 
 type Rating = {
   rating: number;
 };
 
 export default function ProductsSection() {
+  const products = useProducts();
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === "All") {
-      return productDummyData;
+      return products;
     }
-    return productDummyData.filter(product => product.category === activeCategory);
-  }, [activeCategory]);
+    return products.filter(product => product.category === activeCategory);
+  }, [activeCategory, products]);
 
   const calculateAverageRating = (ratings: Rating[]) => {
     if (!ratings || ratings.length === 0) return 0;

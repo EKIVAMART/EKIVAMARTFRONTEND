@@ -1,28 +1,11 @@
+'use client';
 import Link from 'next/link';
 import ProductCard from '../../../components/ProductCard';
-import { productDummyData, categories as ASSET_CATEGORIES } from '../../../assets/assets';
-import type { StaticImageData } from 'next/image';
-
-type Rating = { id?: string; rating: number };
-type Store = { name?: string } & Record<string, unknown>;
-
-interface Product {
-  id: string;
-  name: string;
-  description?: string;
-  mrp?: number;
-  price: number;
-  images?: (string | StaticImageData)[];
-  category?: string;
-  storeId?: string;
-  inStock?: boolean;
-  store?: Store;
-  rating?: Rating[] | number;
-}
-
-type Props = {
-  params: Promise<{ slug: string }> | { slug: string };
-};
+import { categories as ASSET_CATEGORIES } from '../../../assets/assets';
+import { useProducts } from '../../../lib/hooks';
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
+import type { Product, Rating } from '../../../lib/types';
 
 // groups for broad categories (map URL slug -> product categories)
 const CATEGORY_GROUPS: Record<string, string[]> = {
@@ -44,26 +27,28 @@ function averageRating(ratings: Rating[] | number | undefined): number {
   return 0;
 }
 
-export default async function CategoryPage({ params }: Props) {
-  const resolved = await params;
-  const slug = String(resolved?.slug || '').toLowerCase();
+export default function CategoryPage() {
+  const params = useParams();
+  const slug = String(params?.slug || '').toLowerCase();
 
   // try to find a matching category from asset categories (case-insensitive)
   const ASSET_CATEGORIES_LIST = (ASSET_CATEGORIES as string[]) || [];
   const matchedAssetCategory = ASSET_CATEGORIES_LIST.find((c) => c.toLowerCase() === slug);
   const active = matchedAssetCategory || slug || 'Decoration';
 
-  // determine which product categories to include
-  const group = CATEGORY_GROUPS[slug] || [];
+  const allProducts = useProducts();
 
-  const products: Product[] = (productDummyData as Product[]).filter((p) => {
-    if (!p || !p.category) return false;
-    const cat = String(p.category).toLowerCase();
-    if (cat === slug) return true;
-    if (group.length > 0) return group.map((g) => g.toLowerCase()).includes(cat);
-    // fallback: include if slug is substring of category or vice-versa
-    return cat.includes(slug) || slug.includes(cat);
-  });
+  const products: Product[] = useMemo(() => {
+    const group = CATEGORY_GROUPS[slug] || [];
+    return allProducts.filter((p) => {
+      if (!p || !p.category) return false;
+      const cat = String(p.category).toLowerCase();
+      if (cat === slug) return true;
+      if (group.length > 0) return group.map((g) => g.toLowerCase()).includes(cat);
+      // fallback: include if slug is substring of category or vice-versa
+      return cat.includes(slug) || slug.includes(cat);
+    });
+  }, [allProducts, slug]);
 
   return (
     <main className="py-6 sm:py-8">
