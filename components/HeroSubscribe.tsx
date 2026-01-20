@@ -32,7 +32,7 @@ export default function HeroSubscribe() {
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 px-2 py-4 text-sm text-gray-600 outline-none"
+              className="flex-1 px-5 py-4 text-sm text-gray-600 outline-none"
             />
 
             {/* Button */}
