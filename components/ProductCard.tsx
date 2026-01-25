@@ -1,154 +1,442 @@
-"use client";
-import Image, { StaticImageData } from "next/image";
+'use client';
+import Image, { StaticImageData } from 'next/image';
+import { Heart, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 
 type ProductCardProps = {
-    image?: string | StaticImageData;
-    category?: string;
-    title: string;
-    rating?: number;
-    author?: string;
-    price: number;
-    originalPrice?: number;
-    currency?: string;
-    href?: string;
+  image?: string | StaticImageData;
+  category?: string;
+  title: string;
+  rating?: number;
+  author?: string;
+  price: number;
+  originalPrice?: number;
+  currency?: string;
+  href?: string;
 };
 
 export default function ProductCard({
-    image = "/placeholder.png",
-    category = "Fashion",
-    title,
-    rating = 4.2,
-    author = "Tazo",
-    price,
-    originalPrice,
-    currency = "₦",
-    href = "#",
+  image = '/placeholder.png',
+  category = 'Fashion',
+  title,
+  rating = 4.2,
+  author = 'Tazo',
+  price,
+  originalPrice,
+  currency = '₦',
+  href = '#',
 }: ProductCardProps) {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating - fullStars >= 0.5;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const fullStars = Math.floor(rating);
+  const halfStar = rating - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  const discount = originalPrice
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+    : 0;
 
-    return (
-        <a className="pc-card" href={href}>
-            <div className="pc-image-wrap">
-                <div className="pc-image-inner">
-                    <Image src={image} alt={title} className="pc-image" width={260} height={260} style={{ objectFit: "contain" }} />
-                </div>
-            </div>
+  return (
+    <a className="pc-card" href={href}>
+      <div className="pc-image-wrap">
+        {/* Discount Badge
+        {discount > 0 && (
+          <div className="pc-discount-badge">
+            <span className="pc-discount-text">{discount}%</span>
+            <span className="pc-discount-label">OFF</span>
+          </div>
+        )} */}
 
-            <div className="pc-body">
-                <div className="pc-category">{category}</div>
+        {/* Wishlist Button
+        <button
+          className="pc-wishlist-btn"
+          onClick={(e) => {
+            e.preventDefault();
+            setIsWishlisted(!isWishlisted);
+          }}
+          aria-label="Add to wishlist"
+        >
+          <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
+        </button> */}
 
-                <h3 className="pc-title">{title}</h3>
+        <div className="pc-image-inner">
+          <Image
+            src={image}
+            alt={title}
+            className="pc-image"
+            width={260}
+            height={260}
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
 
-                <div className="pc-rating-row">
-                    <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
-                        {Array.from({ length: fullStars }).map((_, i) => (
-                            <svg key={"f" + i} viewBox="0 0 24 24" className="star star-filled">
-                                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-                            </svg>
-                        ))}
-                        {halfStar && (
-                            <svg viewBox="0 0 24 24" className="star star-half">
-                                <defs>
-                                    <linearGradient id="halfGrad">
-                                        <stop offset="50%" stopColor="#f6c84c" />
-                                        <stop offset="50%" stopColor="#e6e6e6" />
-                                    </linearGradient>
-                                </defs>
-                                <path fill="url(#halfGrad)" d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-                            </svg>
-                        )}
-                        {Array.from({ length: emptyStars }).map((_, i) => (
-                            <svg key={"e" + i} viewBox="0 0 24 24" className="star star-empty">
-                                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-                            </svg>
-                        ))}
-                    </div>
+        {/* Quick View Badge */}
+        <div className="pc-quick-view">
+          <ShoppingCart size={16} />
+          <span>Quick Add</span>
+        </div>
+      </div>
 
-                    <div className="pc-by">By <span className="pc-author">{author}</span></div>
-                </div>
+      <div className="pc-body">
+        <div className="pc-category">{category}</div>
 
-                <div className="pc-price-row">
-                    <div className="pc-price">
-                        <span className="pc-currency">{currency} </span>
-                        <span className="pc-current">{price}</span>
-                    </div>
-                    {originalPrice && (
-                        <div className="pc-original">{currency} {originalPrice}</div>
-                    )}
-                </div>
-            </div>
+        <h3 className="pc-title" title={title}>
+          {title}
+        </h3>
 
-            <style jsx>{`
-                .pc-card {
-                    display: block;
-                    max-width: 320px;
-                    border-radius: 14px;
-                    overflow: hidden;
-                    background: #ffffff;
-                    box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
-                    text-decoration: none;
-                    color: inherit;
-                    transition: transform .34s cubic-bezier(.2,.9,.2,1), box-shadow .34s ease;
-                    will-change: transform;
-                    position: relative;
-                }
+        <div className="pc-rating-row">
+          <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
+            {Array.from({ length: fullStars }).map((_, i) => (
+              <svg
+                key={'f' + i}
+                viewBox="0 0 24 24"
+                className="star star-filled"
+              >
+                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
+              </svg>
+            ))}
+            {halfStar && (
+              <svg viewBox="0 0 24 24" className="star star-half">
+                <defs>
+                  <linearGradient id="halfGrad">
+                    <stop offset="50%" stopColor="#16a34a" />
+                    <stop offset="50%" stopColor="#e6e6e6" />
+                  </linearGradient>
+                </defs>
+                <path
+                  fill="url(#halfGrad)"
+                  d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z"
+                />
+              </svg>
+            )}
+            {Array.from({ length: emptyStars }).map((_, i) => (
+              <svg
+                key={'e' + i}
+                viewBox="0 0 24 24"
+                className="star star-empty"
+              >
+                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
+              </svg>
+            ))}
+          </div>
+        </div>
 
-                .pc-card:hover {
-                    transform: translateY(-10px) scale(1.01);
-                    box-shadow: 0 22px 44px rgba(16, 24, 40, 0.14);
-                }
+        <div className="pc-author-section">
+          <span className="pc-seller-badge">Sold by</span>
+          <span className="pc-author">{author}</span>
+        </div>
 
-                .pc-image-wrap{
-                    background: linear-gradient(180deg, #fff 0%, #fbfdfc 100%);
-                    height: 240px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    overflow: hidden;
-                }
+        <div className="pc-price-row">
+          <div className="pc-price">
+            <span className="pc-current">
+              {currency}
+              {price.toLocaleString()}
+            </span>
+            {originalPrice && (
+              <span className="pc-original">
+                {currency}
+                {originalPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
 
-                .pc-image-inner{ width:100%; height:100%; display:flex; align-items:center; justify-content:center }
+      <style jsx>{`
+        .pc-card {
+          display: flex;
+          flex-direction: column;
+          border-radius: 16px;
+          overflow: hidden;
+          background: #ffffff;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform, box-shadow;
+          position: relative;
+          height: 100%;
+          border: 1px solid rgba(22, 163, 74, 0.1);
+        }
 
-                .pc-image{
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    transition: transform .7s cubic-bezier(.2,.9,.3,1);
-                    border-radius: 0;
-                }
+        .pc-card:hover {
+          transform: translateY(-12px);
+          box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
+          border-color: rgba(22, 163, 74, 0.3);
+        }
 
-                .pc-card:hover .pc-image{ transform: scale(1.08) }
+        .pc-image-wrap {
+          background: linear-gradient(135deg, #f8fafb 0%, #f0fdf4 100%);
+          height: 280px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
 
-                .pc-body{ padding: 14px 16px 18px; display:flex; flex-direction:column; gap:8px }
-                .pc-category{ font-size: 12px; color: #6b7280; margin-bottom:2px; text-transform: capitalize }
-                .pc-title{ font-size: 16px; margin: 0; font-weight: 700; color: #0f172a; line-height:1.2 }
+        .pc-image-inner {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+        }
 
-                .pc-rating-row{ display:flex; align-items:center; justify-content:space-between; gap:10px }
-                .pc-stars{ display:flex; gap:6px; align-items:center }
-                .star{ width:14px; height:14px }
-                .star-filled path{ fill:#f6c84c }
-                .star-half path{ fill: url(#halfGrad) }
-                .star-empty path{ fill:#e6e6e6 }
+        .pc-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          border-radius: 0;
+        }
 
-                .pc-by{ font-size:13px; color:#374151 }
-                .pc-author{ color:#10b981; font-weight:600; text-decoration:none }
+        .pc-card:hover .pc-image {
+          transform: scale(1.12) rotate(2deg);
+        }
 
-                .pc-price-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px }
-                .pc-price{ font-size:18px; font-weight:800; color:#059669; display:flex; align-items:baseline; gap:6px }
-                .pc-currency{ font-size:14px }
-                .pc-current{ font-size:18px }
-                .pc-original{ font-size:13px; color:#9ca3af; text-decoration:line-through }
+        /* Discount Badge */
+        .pc-discount-badge {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          color: white;
+          border-radius: 12px;
+          padding: 8px 12px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          font-weight: 700;
+          z-index: 10;
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+          min-width: 52px;
+        }
 
-                /* small screens */
-                @media (max-width:480px){
-                    .pc-card{ max-width: 100%; border-radius:12px }
-                    .pc-image-wrap{ height:180px }
-                    .pc-title{ font-size:15px }
-                }
-            `}</style>
-        </a>
-    );
+        .pc-discount-text {
+          font-size: 14px;
+          line-height: 1;
+        }
+
+        .pc-discount-label {
+          font-size: 9px;
+          letter-spacing: 0.5px;
+        }
+
+        /* Wishlist Button */
+        .pc-wishlist-btn {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: white;
+          border: 2px solid #16a34a;
+          color: #16a34a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 10;
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        }
+
+        .pc-wishlist-btn:hover {
+          background: #16a34a;
+          color: white;
+          transform: scale(1.1);
+        }
+
+        .pc-wishlist-btn:active {
+          transform: scale(0.95);
+        }
+
+        /* Quick View */
+        .pc-quick-view {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          color: white;
+          padding: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-weight: 600;
+          font-size: 14px;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          pointer-events: none;
+        }
+
+        .pc-card:hover .pc-quick-view {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Body */
+        .pc-body {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          flex-grow: 1;
+        }
+
+        .pc-category {
+          font-size: 11px;
+          color: #16a34a;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+          margin-bottom: 4px;
+        }
+
+        .pc-title {
+          font-size: 15px;
+          margin: 0;
+          font-weight: 700;
+          color: #1f2937;
+          line-height: 1.3;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          transition: color 0.3s ease;
+        }
+
+        .pc-card:hover .pc-title {
+          color: #16a34a;
+        }
+
+        /* Rating */
+        .pc-rating-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 6px 0;
+        }
+
+        .pc-stars {
+          display: flex;
+          gap: 4px;
+          align-items: center;
+        }
+
+        .star {
+          width: 13px;
+          height: 13px;
+        }
+
+        .star-filled path {
+          fill: #16a34a;
+        }
+
+        .star-half path {
+          fill: url(#halfGrad);
+        }
+
+        .star-empty path {
+          fill: #e5e7eb;
+        }
+
+        /* Author/Seller Section */
+        .pc-author-section {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          margin: 4px 0;
+        }
+
+        .pc-seller-badge {
+          color: #9ca3af;
+          font-weight: 500;
+        }
+
+        .pc-author {
+          color: #16a34a;
+          font-weight: 700;
+          transition: all 0.3s ease;
+        }
+
+        .pc-card:hover .pc-author {
+          color: #15803d;
+        }
+
+        /* Price */
+        .pc-price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+          margin-top: auto;
+          padding-top: 10px;
+          border-top: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .pc-price {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .pc-current {
+          font-size: 18px;
+          font-weight: 800;
+          color: #16a34a;
+          letter-spacing: -0.3px;
+        }
+
+        .pc-original {
+          font-size: 12px;
+          color: #9ca3af;
+          text-decoration: line-through;
+          font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+          .pc-card {
+            border-radius: 14px;
+          }
+
+          .pc-image-wrap {
+            height: 240px;
+          }
+
+          .pc-body {
+            padding: 14px;
+            gap: 8px;
+          }
+
+          .pc-title {
+            font-size: 14px;
+          }
+
+          .pc-discount-badge {
+            top: 10px;
+            right: 10px;
+          }
+
+          .pc-wishlist-btn {
+            top: 10px;
+            left: 10px;
+            width: 36px;
+            height: 36px;
+          }
+
+          .pc-current {
+            font-size: 16px;
+          }
+        }
+      `}</style>
+    </a>
+  );
 }

@@ -124,6 +124,13 @@ class MongoDBModels {
   }
 
   async upsertUser(clerkId: string, data: Partial<IUser>) {
+    if (!clerkId) {
+      throw new Error('clerkId is required for upsert');
+    }
+    if (!data.email) {
+      throw new Error('email is required for user creation/update');
+    }
+
     const collection = await this.users();
     return collection.updateOne(
       { clerkId },
@@ -134,15 +141,34 @@ class MongoDBModels {
         },
         $setOnInsert: {
           createdAt: new Date(),
+          cart: {},
         },
       },
       { upsert: true }
     );
   }
 
-  async deleteUserByClerkId(clerkId: string) {
+  async getUserByClerkId(clerkId: string): Promise<IUser | null> {
     const collection = await this.users();
-    return collection.deleteMany({ clerkId });
+    return collection.findOne({ clerkId });
+  }
+
+  async getUserById(id: ObjectId): Promise<IUser | null> {
+    const collection = await this.users();
+    return collection.findOne({ _id: id });
+  }
+
+  async getUserByEmail(email: string): Promise<IUser | null> {
+    const collection = await this.users();
+    return collection.findOne({ email });
+  }
+
+  async deleteUserByClerkId(clerkId: string) {
+    if (!clerkId) {
+      throw new Error('clerkId is required for deletion');
+    }
+    const collection = await this.users();
+    return collection.deleteOne({ clerkId });
   }
 
   // Product methods

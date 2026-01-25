@@ -1,8 +1,8 @@
-"use client";
-import React, { useState, useMemo } from "react";
-import ProductCard from "./ProductCard";
-import { categories } from "@/assets/assets";
-import { useProducts } from "@/lib/hooks";
+'use client';
+import React, { useState, useMemo } from 'react';
+import ProductCard from './ProductCard';
+import { useProducts } from '@/lib/hooks';
+import { ChevronRight, Zap } from 'lucide-react';
 
 type Rating = {
   rating: number;
@@ -10,14 +10,6 @@ type Rating = {
 
 export default function ProductsSection() {
   const products = useProducts();
-  const [activeCategory, setActiveCategory] = useState<string>("All");
-
-  const filteredProducts = useMemo(() => {
-    if (activeCategory === "All") {
-      return products;
-    }
-    return products.filter(product => product.category === activeCategory);
-  }, [activeCategory, products]);
 
   const calculateAverageRating = (ratings: Rating[]) => {
     if (!ratings || ratings.length === 0) return 0;
@@ -26,72 +18,241 @@ export default function ProductsSection() {
   };
 
   return (
-    <section className="py-16 px-4 bg-linear-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Popular Products
-          </h2>
-        </div>
-
-        {/* Category Tabs */}
-        <div className="flex gap-3 mb-12 overflow-x-auto scrollbar-hide px-4 md:px-0 md:justify-center md:flex-wrap">
-          <button
-            onClick={() => setActiveCategory("All")}
-            className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
-              activeCategory === "All"
-                ? "bg-emerald-600 text-white shadow-lg transform scale-105"
-                : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-200"
-            }`}
-          >
-            All Products
-          </button>
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
-                activeCategory === category
-                  ? "bg-emerald-600 text-white shadow-lg transform scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-200"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="transform transition-all duration-300 hover:scale-105"
-            >
-              <ProductCard
-                image={product.images[0]}
-                category={product.category}
-                title={product.name}
-                price={product.price}
-                originalPrice={product.mrp}
-                rating={calculateAverageRating(product.rating)}
-                author={product.store.name}
-                href={`/product/${product.id}`}
-              />
+    <section className="products-section">
+      <div className="products-container">
+        {/* Header with Icon */}
+        <div className="products-header">
+          <div className="products-header-content">
+            <div className="products-title-wrapper">
+              <Zap className="products-icon" size={32} />
+              <h2 className="products-title">Trending Now</h2>
             </div>
+            <p className="products-subtitle">
+              Discover our most popular and best-selling products
+            </p>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="products-grid">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              image={product.images[0]}
+              category={product.category}
+              title={product.name}
+              price={product.price}
+              originalPrice={product.mrp}
+              rating={calculateAverageRating(product.rating)}
+              author={product.store.name}
+              href={`/product/${product.id}`}
+            />
           ))}
         </div>
 
         {/* View More Button */}
-        <div className="text-center mt-12">
-          <button className="inline-flex items-center px-8 py-4 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-            View All Products
-            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+        <div className="view-more-container">
+          <button className="view-more-btn">
+            <span>View All Products</span>
+            <ChevronRight size={20} />
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .products-section {
+          width: 100%;
+          background: linear-gradient(135deg, #f8fafb 0%, #f0fdf4 100%);
+          padding: 60px 20px;
+          margin: 40px 0;
+        }
+
+        .products-container {
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        /* Header */
+        .products-header {
+          margin-bottom: 48px;
+          text-align: center;
+        }
+
+        .products-header-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .products-title-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .products-icon {
+          color: #16a34a;
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+
+        .products-title {
+          font-size: 42px;
+          font-weight: 800;
+          color: #1f2937;
+          margin: 0;
+          letter-spacing: -1px;
+          background: linear-gradient(135deg, #1f2937 0%, #16a34a 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .products-subtitle {
+          font-size: 16px;
+          color: #6b7280;
+          margin: 0;
+          font-weight: 500;
+          letter-spacing: 0.3px;
+        }
+
+        /* Products Grid */
+        .products-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 32px 24px;
+          margin-bottom: 50px;
+          animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* View More Button */
+        .view-more-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 40px;
+        }
+
+        .view-more-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 14px 36px;
+          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          color: white;
+          font-size: 15px;
+          font-weight: 700;
+          border: none;
+          border-radius: 50px;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+          letter-spacing: 0.3px;
+        }
+
+        .view-more-btn:hover {
+          background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+          box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4);
+          transform: translateY(-3px);
+        }
+
+        .view-more-btn:active {
+          transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+          .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 28px 20px;
+          }
+
+          .products-title {
+            font-size: 36px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .products-section {
+            padding: 40px 16px;
+            margin: 30px 0;
+          }
+
+          .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 24px 16px;
+          }
+
+          .products-title {
+            font-size: 28px;
+          }
+
+          .products-subtitle {
+            font-size: 14px;
+          }
+
+          .category-tabs-wrapper {
+            margin-bottom: 32px;
+          }
+
+          .category-tab {
+            padding: 10px 16px;
+            font-size: 13px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .products-section {
+            padding: 30px 12px;
+            margin: 20px 0;
+          }
+
+          .products-header {
+            margin-bottom: 30px;
+          }
+
+          .products-title {
+            font-size: 24px;
+          }
+
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 12px;
+          }
+
+          .category-tab {
+            padding: 8px 14px;
+            font-size: 12px;
+          }
+
+          .view-more-btn {
+            padding: 12px 28px;
+            font-size: 14px;
+          }
+        }
+      `}</style>
     </section>
   );
 }
