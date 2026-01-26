@@ -51,7 +51,7 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
     <div className="mx-auto w-full max-w-6xl">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <aside className="hidden md:block md:col-span-1">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 sticky top-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-6">
             <h3 className="font-semibold mb-3 text-gray-500">Category</h3>
             <ul className="space-y-2">
               {categories.map((c) => {
