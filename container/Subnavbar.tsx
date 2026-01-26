@@ -87,11 +87,13 @@ const Subnavbar = (): JSX.Element => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-1 cursor-pointer">
             <FiHeart className="text-xl" />
+          
             <span className="text-sm text-black">Wishlist</span>
           </div>
 
           <div className="flex items-center gap-1 cursor-pointer">
             <FiShoppingCart className="text-xl" />
+            
             <span className="text-sm text-black">Cart</span>
           </div>
 
