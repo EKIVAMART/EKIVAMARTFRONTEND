@@ -1,11 +1,29 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import Image from 'next/image';
+import { useState, use } from 'react';
+import Image, { StaticImageData } from 'next/image';
 import { productDummyData } from '@/assets/assets';
-import { Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import './product-details.css';
+
+interface Rating {
+  id: string;
+  rating: number;
+  review: string;
+  user: {
+    name: string;
+    image: string | StaticImageData;
+  };
+  productId: string;
+  createdAt: string;
+  updatedAt: string;
+  product: {
+    name: string;
+    category: string;
+    id: string;
+  };
+}
 
 interface ProductDetailsPageProps {
   params: Promise<{
@@ -25,18 +43,13 @@ export default function ProductDetailsPage({
     'description' | 'additional' | 'reviews'
   >('description');
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    setSelectedImage(0);
-  }, [id]);
 
   if (!product) {
     return (
       <div className="pd-not-found">
         <div className="pd-not-found-content">
           <h1>Product Not Found</h1>
-          <p>Sorry, the product you're looking for doesn't exist.</p>
+          <p>Sorry, the product you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/" className="pd-btn-primary">
             Back to Home
           </Link>
@@ -49,7 +62,7 @@ export default function ProductDetailsPage({
     ((product.mrp - product.price) / product.mrp) * 100
   );
   const avgRating = product.rating?.length
-    ? product.rating.reduce((sum: number, r: any) => sum + r.rating, 0) /
+    ? product.rating.reduce((sum: number, r: Rating) => sum + r.rating, 0) /
       product.rating.length
     : 4.5;
 
@@ -63,12 +76,10 @@ export default function ProductDetailsPage({
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
     setSelectedImage((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
@@ -141,7 +152,6 @@ export default function ProductDetailsPage({
                   className={`pd-thumbnail ${idx === selectedImage ? 'active' : ''}`}
                   onClick={() => {
                     setSelectedImage(idx);
-                    setCurrentImageIndex(idx);
                   }}
                   aria-label={`View image ${idx + 1}`}
                 >
@@ -339,7 +349,7 @@ export default function ProductDetailsPage({
             <div className="pd-tab-pane">
               <div className="pd-reviews-list">
                 {product.rating && product.rating.length > 0 ? (
-                  product.rating.map((review: any, idx: number) => (
+                  product.rating.map((review: Rating, idx: number) => (
                     <div key={idx} className="pd-review-item">
                       <div className="pd-review-header">
                         <Image

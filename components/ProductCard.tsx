@@ -37,26 +37,6 @@ export default function ProductCard({
   return (
     <a className="pc-card" href={href}>
       <div className="pc-image-wrap">
-        {/* Discount Badge
-        {discount > 0 && (
-          <div className="pc-discount-badge">
-            <span className="pc-discount-text">{discount}%</span>
-            <span className="pc-discount-label">OFF</span>
-          </div>
-        )} */}
-
-        {/* Wishlist Button
-        <button
-          className="pc-wishlist-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            setIsWishlisted(!isWishlisted);
-          }}
-          aria-label="Add to wishlist"
-        >
-          <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
-        </button> */}
-
         <div className="pc-image-inner">
           <Image
             src={image}
@@ -66,12 +46,6 @@ export default function ProductCard({
             height={260}
             style={{ objectFit: 'contain' }}
           />
-        </div>
-
-        {/* Quick View Badge */}
-        <div className="pc-quick-view">
-          <ShoppingCart size={16} />
-          <span>Quick Add</span>
         </div>
       </div>
 
@@ -97,7 +71,7 @@ export default function ProductCard({
               <svg viewBox="0 0 24 24" className="star star-half">
                 <defs>
                   <linearGradient id="halfGrad">
-                    <stop offset="50%" stopColor="#16a34a" />
+                    <stop offset="50%" stopColor="#fb923c" />
                     <stop offset="50%" stopColor="#e6e6e6" />
                   </linearGradient>
                 </defs>
@@ -165,7 +139,7 @@ export default function ProductCard({
 
         .pc-image-wrap {
           background: linear-gradient(135deg, #f8fafb 0%, #f0fdf4 100%);
-          height: 280px;
+          height: 240px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -286,7 +260,7 @@ export default function ProductCard({
           padding: 16px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
           flex-grow: 1;
         }
 
@@ -336,7 +310,7 @@ export default function ProductCard({
         }
 
         .star-filled path {
-          fill: #16a34a;
+          fill: #fb923c;
         }
 
         .star-half path {
@@ -377,8 +351,8 @@ export default function ProductCard({
           align-items: baseline;
           gap: 10px;
           margin-top: auto;
-          padding-top: 10px;
-          border-top: 1px solid rgba(22, 163, 74, 0.1);
+          padding-top: 0;
+          border-top: none;
         }
 
         .pc-price {
@@ -404,36 +378,88 @@ export default function ProductCard({
         /* Responsive */
         @media (max-width: 640px) {
           .pc-card {
-            border-radius: 14px;
+            border-radius: 12px;
           }
 
           .pc-image-wrap {
-            height: 240px;
+            height: 200px;
           }
 
           .pc-body {
-            padding: 14px;
-            gap: 8px;
+            padding: 12px;
+            gap: 6px;
           }
 
           .pc-title {
-            font-size: 14px;
+            font-size: 13px;
           }
 
-          .pc-discount-badge {
-            top: 10px;
-            right: 10px;
-          }
-
-          .pc-wishlist-btn {
-            top: 10px;
-            left: 10px;
-            width: 36px;
-            height: 36px;
+          .pc-category {
+            font-size: 10px;
+            margin-bottom: 2px;
           }
 
           .pc-current {
-            font-size: 16px;
+            font-size: 15px;
+          }
+
+          .pc-original {
+            font-size: 11px;
+          }
+
+          .pc-author-section {
+            font-size: 11px;
+          }
+
+          .pc-stars {
+            gap: 3px;
+          }
+
+          .star {
+            width: 12px;
+            height: 12px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .pc-image-wrap {
+            height: 180px;
+          }
+
+          .pc-body {
+            padding: 11px;
+            gap: 5px;
+          }
+
+          .pc-title {
+            font-size: 12px;
+          }
+
+          .pc-current {
+            font-size: 14px;
+          }
+        }
+
+        @media (max-width: 320px) {
+          .pc-card {
+            border-radius: 10px;
+          }
+
+          .pc-image-wrap {
+            height: 160px;
+          }
+
+          .pc-body {
+            padding: 10px;
+            gap: 4px;
+          }
+
+          .pc-title {
+            font-size: 11px;
+          }
+
+          .pc-current {
+            font-size: 13px;
           }
         }
       `}</style>
