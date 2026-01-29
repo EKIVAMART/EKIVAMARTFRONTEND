@@ -2,9 +2,9 @@ import gs_logo from './gs_logo.jpg';
 import happy_store from './happy_store.webp';
 import upload_area from './upload_area.svg';
 import hero_model_img from './hero_model_img.png';
-import hero_m from "./hero.png";
-import hero_2 from "./hero_2.png";
-import newsletter from "./newsletter.png";
+import hero_m from './hero.png';
+import hero_2 from './hero_2.png';
+import newsletter from './newsletter.png';
 import hero_product_img1 from './hero_product_img1.png';
 import hero_product_img2 from './hero_product_img2.png';
 import product_img1 from './product_img1.png';
@@ -23,7 +23,11 @@ import { ClockFadingIcon, HeadsetIcon, SendIcon } from 'lucide-react';
 import profile_pic1 from './profile_pic1.jpg';
 import profile_pic2 from './profile_pic2.jpg';
 import profile_pic3 from './profile_pic3.jpg';
-import Faq_image from "./Faq.jpg"
+import Faq_image from './Faq.jpg';
+import home_1 from './home1.jpg';
+import home_2 from './home2.jpg';
+import home_3 from './home3.jpg';
+import home_4 from './home4.jpg';
 
 export const assets = {
   upload_area,
@@ -47,6 +51,10 @@ export const assets = {
   product_img11,
   product_img12,
   newsletter,
+  home_1,
+  home_2,
+  home_3,
+  home_4,
 };
 
 export const categories = [
