@@ -120,7 +120,7 @@ export default function Header() {
         <div className="relative flex items-center gap-6" ref={browseRef}>
           <button
             onClick={() => setIsBrowseOpen(!isBrowseOpen)}
-            className="flex items-center gap-2 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+            className="flex items-center gap-4 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
           >
             <Grid size={15} />
             Browse All Categories
