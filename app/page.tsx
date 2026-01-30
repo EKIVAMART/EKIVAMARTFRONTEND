@@ -1,8 +1,9 @@
-import Slider from "../components/Slider";
-import ProductsSection from "../components/ProductsSection";
-import Features from "../components/Features";
-import HeroSubscribe from "@/components/HeroSubscribe";
- import FeaturedCategories from "@/components/FeaturedCategories";
+import Slider from '../components/Slider';
+import ProductsSection from '../components/ProductsSection';
+import SpecialCategories from '../components/SpecialCategories';
+import Features from '../components/Features';
+import HeroSubscribe from '@/components/HeroSubscribe';
+import FeaturedCategories from '@/components/FeaturedCategories';
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Slider />
       <FeaturedCategories />
       <ProductsSection />
+      <SpecialCategories />
       <HeroSubscribe />
       <Features />
     </main>

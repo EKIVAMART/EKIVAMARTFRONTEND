@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -17,8 +16,6 @@ import {
   Sparkles,
   Heart,
   Gem,
-  Menu,
-  X,
 } from 'lucide-react';
 
 // 1. Data Structure for all menus
@@ -26,35 +23,35 @@ const megaMenuData = [
   {
     title: 'Fashion',
     items: [
-      { name: 'Men', href: '/fashion/men' },
-      { name: 'Women', href: '/fashion/women' },
+      { name: 'Men', href: '/category/fashion' },
+      { name: 'Women', href: '/category/fashion' },
     ],
   },
   {
     title: 'Electronics',
     items: [
-      { name: 'Laptops', href: '/electronics/laptops' },
-      { name: 'Smart Watch Accessories', href: '/electronics/accessories' },
-      { name: 'Cameras', href: '/electronics/cameras' },
+      { name: 'Laptops', href: '/category/electronics' },
+      { name: 'Smart Watch Accessories', href: '/category/electronics' },
+      { name: 'Cameras', href: '/category/electronics' },
     ],
   },
   {
     title: 'Bags',
     items: [
-      { name: 'Men Bags', href: '/bags/men' },
-      { name: 'Women Bags', href: '/bags/women' },
+      { name: 'Men Bags', href: '/category/bags' },
+      { name: 'Women Bags', href: '/category/bags' },
     ],
   },
   {
     title: 'Footwear',
     items: [
-      { name: 'Men Footwear', href: '/footwear/men' },
-      { name: 'Women Footwear', href: '/footwear/women' },
+      { name: 'Men Footwear', href: '/category/footwear' },
+      { name: 'Women Footwear', href: '/category/footwear' },
     ],
   },
   {
     title: 'Groceries',
-    items: [],
+    items: [{ name: 'Groceries', href: '/category/groceries' }],
   },
 ];
 
@@ -63,30 +60,30 @@ const navLinks = [
   { name: 'Home', href: '/', hasDropdown: false },
   {
     name: 'Fashion',
-    href: '/fashion',
+    href: '/category/fashion',
     hasDropdown: true,
     subItems: megaMenuData[0].items,
   },
   {
     name: 'Electronics',
-    href: '/electronics',
+    href: '/category/electronics',
     hasDropdown: true,
     subItems: megaMenuData[1].items,
   },
   {
     name: 'Bags',
-    href: '/bags',
+    href: '/category/bags',
     hasDropdown: true,
     subItems: megaMenuData[2].items,
   },
   {
     name: 'Footwear',
-    href: '/footwear',
+    href: '/category/footwear',
     hasDropdown: true,
     subItems: megaMenuData[3].items,
   },
-  { name: 'Groceries', href: '/groceries', hasDropdown: false },
-  { name: 'Beauty', href: '/beauty', hasDropdown: false },
+  { name: 'Groceries', href: '/category/groceries', hasDropdown: false },
+  { name: 'Beauty', href: '/category/beauty', hasDropdown: false },
 ];
 
 export default function Header() {
@@ -117,7 +114,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full border-b bg-white relative z-[100]">
+    <header className="w-full border-b bg-white relative z-100">
       <div className="mx-auto flex w-[95%] items-center justify-between py-3">
         {/* LEFT: Browse Categories */}
         <div className="relative flex items-center gap-6" ref={browseRef}>

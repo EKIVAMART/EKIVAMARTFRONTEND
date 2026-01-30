@@ -1,27 +1,73 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import ProductCard from './ProductCard';
 import { useProducts } from '@/lib/hooks';
-import { ChevronRight } from 'lucide-react';
+import { Package, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Rating = {
   rating: number;
 };
 
-const CATEGORY_TABS = [
-  'Fashion',
-  'Electronics',
-  'Bags',
-  'Footwear',
-  'Groceries',
-  'Beauty',
-  'Wellness',
-  'Jewellery',
-];
+// Beautiful Empty State Component
+const EmptyState = ({ category }: { category: string }) => (
+  <div className="empty-state-container">
+    <div className="empty-state-content">
+      <div className="empty-state-icon">
+        <Package size={64} strokeWidth={1.5} />
+      </div>
+      <h3 className="empty-state-title">No Products Found</h3>
+      <p className="empty-state-subtitle">
+        We couldn&apos;t find any products in the{' '}
+        <span className="font-semibold text-gray-900">{category}</span> category
+        at the moment.
+      </p>
+      <div className="empty-state-decoration">
+        <Sparkles size={20} />
+      </div>
+      <p className="empty-state-hint">Check back soon for new arrivals!</p>
+    </div>
+  </div>
+);
 
 export default function ProductsSection() {
   const products = useProducts();
-  const [activeCategory, setActiveCategory] = useState('Fashion');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Get unique categories from products - limit to 7
+  const CATEGORY_TABS = useMemo(() => {
+    const uniqueCategories = [...new Set(products.map((p) => p.category))];
+    return uniqueCategories.sort().slice(0, 7);
+  }, [products]);
+
+  const [activeCategory, setActiveCategory] = useState(
+    CATEGORY_TABS[0] || 'All'
+  );
+
+  // Scroll handler for mobile
+  const handleScroll = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft <
+          container.scrollWidth - container.clientWidth - 10
+      );
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = 150;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+      setTimeout(handleScroll, 100);
+    }
+  };
 
   const calculateAverageRating = (ratings: Rating[]) => {
     if (!ratings || ratings.length === 0) return 0;
@@ -29,80 +75,97 @@ export default function ProductsSection() {
     return sum / ratings.length;
   };
 
+  // Helper function to shuffle array and get random items
+  const getRandomItems = <T,>(array: T[], count: number) => {
+    const shuffled = [...array].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  };
+
   // Filter products by active category
   const filteredProducts = useMemo(() => {
-    return products.filter(
+    const filtered = products.filter(
       (product) =>
         product.category.toLowerCase() === activeCategory.toLowerCase()
     );
+    // Return at most 10 random products from the category
+    return getRandomItems(filtered, 10);
   }, [products, activeCategory]);
-
-  // Fallback: show all products if no match found
-  const displayProducts =
-    filteredProducts.length > 0 ? filteredProducts : products;
 
   return (
     <section className="products-section">
       <div className="products-container">
-        {/* Header with Category Tabs */}
-        <div className="header-tabs-wrapper">
+        {/* Title and Navigation Wrapper */}
+        <div className="header-nav-wrapper">
+          {/* Title */}
           <div className="products-header">
-            <h2 className="text-lg font-semibold mb-6 text-black">
+            <h2 className="text-lg font-semibold text-black">
               Popular Products
             </h2>
           </div>
 
-          {/* Category Tabs */}
-          <div className="category-tabs-wrapper">
-            <div className="category-tabs-scroll">
-              {CATEGORY_TABS.map((category) => (
-                <button
-                  key={category}
-                  className={`category-tab ${
-                    activeCategory === category ? 'active' : ''
-                  }`}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category.toUpperCase()}
-                </button>
-              ))}
+          {/* Category Navigation */}
+          <div className="category-nav-wrapper">
+            {/* Left Arrow (Mobile) */}
+            <button
+              className={`scroll-button scroll-left ${canScrollLeft ? 'active' : ''}`}
+              onClick={() => scroll('left')}
+              aria-label="Scroll left"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Tab Container */}
+            <div
+              className="category-tabs-wrapper"
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+            >
+              <div className="category-tabs-scroll">
+                {CATEGORY_TABS.length > 0 &&
+                  CATEGORY_TABS.map((category) => (
+                    <button
+                      key={category}
+                      className={`category-tab ${
+                        activeCategory === category ? 'active' : ''
+                      }`}
+                      onClick={() => setActiveCategory(category)}
+                    >
+                      {category.toUpperCase()}
+                    </button>
+                  ))}
+              </div>
             </div>
+
+            {/* Right Arrow (Mobile) */}
+            <button
+              className={`scroll-button scroll-right ${canScrollRight ? 'active' : ''}`}
+              onClick={() => scroll('right')}
+              aria-label="Scroll right"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
 
         {/* Products Grid */}
-        <div className="products-grid">
-          {displayProducts.length > 0 ? (
-            displayProducts
-              .slice(0, 8)
-              .map((product) => (
-                <ProductCard
-                  key={product.id}
-                  image={product.images[0]}
-                  category={product.category}
-                  title={product.name}
-                  price={product.price}
-                  originalPrice={product.mrp}
-                  rating={calculateAverageRating(product.rating)}
-                  author={product.store.name}
-                  href={`/product/${product.id}`}
-                />
-              ))
-          ) : (
-            <div className="no-products">
-              <p>No products found in this category</p>
-            </div>
-          )}
-        </div>
-
-        {/* View More Button */}
-        {displayProducts.length > 0 && (
-          <div className="view-more-container">
-            <button className="view-more-btn">
-              <span>View All Products</span>
-              <ChevronRight size={20} />
-            </button>
+        {filteredProducts.length > 0 ? (
+          <div className="products-grid">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                image={product.images[0]}
+                category={product.category}
+                title={product.name}
+                price={product.price}
+                originalPrice={product.mrp}
+                rating={calculateAverageRating(product.rating)}
+                author={product.store.name}
+                href={`/product/${product.id}`}
+              />
+            ))}
           </div>
+        ) : (
+          <EmptyState category={activeCategory} />
         )}
       </div>
 
@@ -110,27 +173,20 @@ export default function ProductsSection() {
         .products-section {
           width: 100%;
           background: #ffffff;
-          padding: 50px 20px;
+          padding: 40px 0;
           margin: 10px 0;
         }
 
         .products-container {
           max-width: 1400px;
           margin: 0 auto;
+          width: 95%;
+          padding: 0;
         }
 
-        /* Header and Tabs Wrapper */
-        .header-tabs-wrapper {
-          display: flex;
-          align-items: flex-end;
-          justify-content: flex-start;
-          margin-bottom: 40px;
-          gap: 60px;
-        }
-
-        /* Header */
+        /* Title */
         .products-header {
-          flex-shrink: 0;
+          margin-bottom: 28px;
         }
 
         .products-title {
@@ -139,14 +195,37 @@ export default function ProductsSection() {
           color: #1f2937;
           margin: 0;
           letter-spacing: -0.5px;
-          white-space: nowrap;
+        }
+
+        /* Header and Navigation Wrapper - Desktop */
+        .header-nav-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 40px;
+          margin-bottom: 40px;
+        }
+
+        .products-header {
+          flex-shrink: 0;
+        }
+
+        /* Category Navigation Wrapper */
+        .category-nav-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          flex: 1;
+          position: relative;
+          justify-content: flex-end;
         }
 
         /* Category Tabs */
         .category-tabs-wrapper {
-          margin-left: auto;
+          flex: 0 1 auto;
           border-bottom: 2px solid #e5e7eb;
           overflow-x: auto;
+          overflow-y: hidden;
           -webkit-overflow-scrolling: touch;
           scrollbar-width: none;
         }
@@ -162,32 +241,55 @@ export default function ProductsSection() {
           margin: 0;
           list-style: none;
           min-width: min-content;
+          flex-direction: row-reverse;
         }
 
         .category-tab {
-          padding: 14px 18px;
+          padding: 14px 20px;
           background: transparent;
           border: none;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 700;
           color: #6b7280;
           cursor: pointer;
           transition: all 0.3s ease;
           text-transform: uppercase;
-          letter-spacing: 0.4px;
+          letter-spacing: 0.5px;
           position: relative;
           white-space: nowrap;
           border-bottom: 3px solid transparent;
           margin-bottom: -2px;
+          flex-shrink: 0;
         }
 
         .category-tab:hover {
-          color: #16a34a;
+          color: #3b82f6;
         }
 
         .category-tab.active {
           color: #0369a1;
           border-bottom-color: #0369a1;
+        }
+
+        /* Scroll Buttons - Hidden on Desktop */
+        .scroll-button {
+          display: none;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          color: #6b7280;
+          padding: 8px;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .scroll-button:hover:not(:disabled) {
+          color: #0369a1;
+        }
+
+        .scroll-button:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
         }
 
         /* Products Grid */
@@ -253,12 +355,8 @@ export default function ProductsSection() {
           transform: translateY(-1px);
         }
 
-        /* Responsive */
+        /* Responsive - Tablet */
         @media (max-width: 1200px) {
-          .header-tabs-wrapper {
-            gap: 30px;
-          }
-
           .products-grid {
             grid-template-columns: repeat(4, 1fr);
             gap: 24px 18px;
@@ -269,75 +367,115 @@ export default function ProductsSection() {
           }
 
           .category-tab {
-            padding: 12px 14px;
-            font-size: 11px;
+            padding: 12px 16px;
+            font-size: 12px;
           }
         }
 
+        /* Responsive - Tablet Portrait */
         @media (max-width: 768px) {
           .products-section {
-            padding: 35px 16px;
+            padding: 35px 0;
             margin: 25px 0;
           }
 
-          .header-tabs-wrapper {
+          .products-container {
+            width: 95%;
+          }
+
+          .header-nav-wrapper {
             flex-direction: column;
             align-items: flex-start;
-            margin-bottom: 28px;
             gap: 16px;
-            justify-content: flex-start;
+            margin-bottom: 32px;
+          }
+
+          .products-header {
+            margin-bottom: 0;
           }
 
           .products-title {
             font-size: 20px;
           }
 
-          .category-tabs-wrapper {
+          .category-nav-wrapper {
             width: 100%;
-            margin-bottom: 0;
-            margin-left: 0;
+            gap: 8px;
+          }
+
+          .scroll-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+          }
+
+          .scroll-button.active {
+            color: #0369a1;
+          }
+
+          .category-tab {
+            padding: 12px 14px;
+            font-size: 11px;
           }
 
           .products-grid {
             grid-template-columns: repeat(3, 1fr);
             gap: 20px 14px;
           }
-
-          .category-tab {
-            padding: 10px 12px;
-            font-size: 10px;
-          }
         }
 
+        /* Responsive - Mobile */
         @media (max-width: 480px) {
           .products-section {
-            padding: 24px 12px;
+            padding: 24px 0;
             margin: 16px 0;
           }
 
-          .header-tabs-wrapper {
+          .products-container {
+            width: 95%;
+          }
+
+          .header-nav-wrapper {
             flex-direction: column;
             align-items: flex-start;
-            margin-bottom: 20px;
             gap: 12px;
+            margin-bottom: 28px;
+          }
+
+          .products-header {
+            margin-bottom: 0;
           }
 
           .products-title {
             font-size: 18px;
           }
 
-          .category-tabs-wrapper {
+          .category-nav-wrapper {
             width: 100%;
+            gap: 6px;
+          }
+
+          .scroll-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+          }
+
+          .scroll-button svg {
+            width: 18px;
+            height: 18px;
+          }
+
+          .category-tab {
+            padding: 10px 12px;
+            font-size: 10px;
           }
 
           .products-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 14px 10px;
-          }
-
-          .category-tab {
-            padding: 8px 10px;
-            font-size: 9px;
           }
 
           .view-more-btn {
@@ -351,18 +489,24 @@ export default function ProductsSection() {
           }
         }
 
+        /* Responsive - Small Mobile */
         @media (max-width: 360px) {
           .products-title {
             font-size: 16px;
           }
 
           .category-tab {
-            padding: 8px 8px;
-            font-size: 8px;
+            padding: 8px 10px;
+            font-size: 9px;
           }
 
           .products-grid {
             gap: 12px 8px;
+          }
+
+          .scroll-button svg {
+            width: 16px;
+            height: 16px;
           }
         }
       `}</style>

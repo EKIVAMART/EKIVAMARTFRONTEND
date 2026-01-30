@@ -1,28 +1,35 @@
-import Image, { type StaticImageData } from "next/image";
-import fashion from "../assets/fashion.png";
-import electronics from "../assets/Electronics.png";
-import bags from "../assets/beg.png";
-import footwear from "../assets/footwear.png";
-import groceries from "../assets/Groceries.png";
-import beauty from "../assets/Beauty.png";
-import wellness from "../assets/wellness.png";
-import jewellery from "../assets/jewellery.png";
+import Link from 'next/link';
+import Image, { type StaticImageData } from 'next/image';
+import fashion from '../assets/fashion.png';
+import electronics from '../assets/Electronics.png';
+import bags from '../assets/beg.png';
+import footwear from '../assets/footwear.png';
+import groceries from '../assets/Groceries.png';
+import beauty from '../assets/Beauty.png';
+import wellness from '../assets/wellness.png';
+import jewellery from '../assets/jewellery.png';
 
 type Category = {
   name: string;
   icon: StaticImageData;
   bg: string;
+  slug: string;
 };
 
 const categories: Category[] = [
-  { name: "Fashion", icon: fashion, bg: "bg-white" },
-  { name: "Electronics", icon: electronics, bg: "bg-orange-50" },
-  { name: "Bags", icon: bags, bg: "bg-pink-50" },
-  { name: "Footwear", icon: footwear, bg: "bg-blue-50" },
-  { name: "Groceries", icon: groceries, bg: "bg-purple-50" },
-  { name: "Beauty", icon: beauty, bg: "bg-teal-50" },
-  { name: "Wellness", icon: wellness, bg: "bg-violet-50" },
-  { name: "Jewellery", icon: jewellery, bg: "bg-green-50" },
+  { name: 'Fashion', icon: fashion, bg: 'bg-white', slug: 'fashion' },
+  {
+    name: 'Electronics',
+    icon: electronics,
+    bg: 'bg-orange-50',
+    slug: 'electronics',
+  },
+  { name: 'Bags', icon: bags, bg: 'bg-pink-50', slug: 'bags' },
+  { name: 'Footwear', icon: footwear, bg: 'bg-blue-50', slug: 'footwear' },
+  { name: 'Groceries', icon: groceries, bg: 'bg-purple-50', slug: 'groceries' },
+  { name: 'Beauty', icon: beauty, bg: 'bg-teal-50', slug: 'beauty' },
+  { name: 'Wellness', icon: wellness, bg: 'bg-violet-50', slug: 'wellness' },
+  { name: 'Jewellery', icon: jewellery, bg: 'bg-green-50', slug: 'jewellery' },
 ];
 
 const FeaturedCategories = () => {
@@ -34,8 +41,9 @@ const FeaturedCategories = () => {
 
       <div className="flex flex-wrap gap-6 justify-between">
         {categories.map((category) => (
-          <div
+          <Link
             key={category.name}
+            href={`/category/${category.slug}`}
             className="group flex flex-col items-center text-center cursor-pointer transition-transform duration-300 hover:-translate-y-2"
           >
             <div
@@ -67,7 +75,7 @@ const FeaturedCategories = () => {
             >
               {category.name}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
