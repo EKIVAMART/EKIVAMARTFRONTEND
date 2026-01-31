@@ -114,7 +114,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full border-b bg-white relative z-100">
+    <header className="hidden md:block w-full border-b bg-white relative z-100">
       <div className="mx-auto flex w-[95%] items-center justify-between py-3">
         {/* LEFT: Browse Categories */}
         <div className="relative flex items-center gap-6" ref={browseRef}>
