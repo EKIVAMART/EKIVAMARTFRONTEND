@@ -89,7 +89,11 @@ const navLinks = [
 export default function Header() {
   const [isBrowseOpen, setIsBrowseOpen] = useState(false);
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isFixed, setIsFixed] = useState(false);
   const browseRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const headerOffsetRef = useRef(0);
 
   // Close browse dropdown on outside click
   useEffect(() => {
@@ -100,6 +104,30 @@ export default function Header() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Set initial header offset on mount
+  useEffect(() => {
+    if (headerRef.current) {
+      headerOffsetRef.current = headerRef.current.offsetTop;
+    }
+  }, []);
+
+  // Detect scroll to make header fixed when it reaches top
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 100);
+
+      // When scroll reaches header position, fix it to top
+      if (scrollY >= headerOffsetRef.current) {
+        setIsFixed(true);
+      } else {
+        setIsFixed(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const categories = [
@@ -114,44 +142,77 @@ export default function Header() {
   ];
 
   return (
-    <header className="hidden md:block w-full border-b bg-white relative z-100">
+    <motion.header
+      ref={headerRef}
+      initial={{ opacity: 1 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.3, ease: 'easeInOut' },
+      }}
+      className={`hidden md:block w-full bg-white border-b transition-all duration-300 ease-in-out z-4 will-change-transform ${
+        isFixed ? 'fixed top-0 left-0 right-0' : 'relative'
+      }`}
+      style={{
+        boxShadow: isFixed
+          ? '0 10px 30px rgba(0, 0, 0, 0.15)'
+          : isScrolled
+            ? '0 4px 12px rgba(0, 0, 0, 0.08)'
+            : 'none',
+      }}
+    >
       <div className="mx-auto flex w-[95%] items-center justify-between py-3">
         {/* LEFT: Browse Categories */}
         <div className="relative flex items-center gap-6" ref={browseRef}>
-          <button
+          <motion.button
             onClick={() => setIsBrowseOpen(!isBrowseOpen)}
-            className="flex items-center gap-4 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-4 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition shadow-md hover:shadow-lg"
           >
             <Grid size={15} />
             Browse All Categories
-            <ChevronDown
-              size={14}
-              className={`transition-transform ${isBrowseOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
+            <motion.div
+              animate={{ rotate: isBrowseOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ChevronDown size={14} />
+            </motion.div>
+          </motion.button>
 
           <AnimatePresence>
             {isBrowseOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute left-0 top-11 z-50 w-64 rounded-md border bg-white shadow-lg"
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="absolute left-0 top-11 z-50 w-64 rounded-md border bg-white shadow-lg overflow-hidden"
               >
-                {categories.map((cat) => {
+                {categories.map((cat, index) => {
                   const Icon = cat.icon;
                   return (
-                    <Link
+                    <motion.div
                       key={cat.name}
-                      href={`/category/${cat.name.toLowerCase()}`}
-                      className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
                     >
-                      <div className="flex items-center gap-3">
-                        <Icon size={17} className="text-green-600" />
-                        <span className="font-medium">{cat.name}</span>
-                      </div>
-                      <ChevronRight size={15} className="text-gray-400" />
-                    </Link>
+                      <Link
+                        href={`/category/${cat.name.toLowerCase()}`}
+                        className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition"
+                      >
+                        <div className="flex items-center gap-3">
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <Icon size={17} className="text-green-600" />
+                          </motion.div>
+                          <span className="font-medium">{cat.name}</span>
+                        </div>
+                        <motion.div whileHover={{ x: 4 }}>
+                          <ChevronRight size={15} className="text-gray-400" />
+                        </motion.div>
+                      </Link>
+                    </motion.div>
                   );
                 })}
               </motion.div>
@@ -168,36 +229,48 @@ export default function Header() {
               onMouseEnter={() => setHoveredMenu(link.name)}
               onMouseLeave={() => setHoveredMenu(null)}
             >
-              <Link
-                href={link.href}
-                className={`flex items-center gap-1 transition-colors hover:text-green-600 ${hoveredMenu === link.name ? 'text-green-600' : ''}`}
-              >
-                {link.name}
-                {link.hasDropdown && (
-                  <ChevronDown
-                    size={13}
-                    className={`transition-transform duration-300 ${hoveredMenu === link.name ? 'rotate-180' : ''}`}
-                  />
-                )}
-              </Link>
+              <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                <Link
+                  href={link.href}
+                  className={`flex items-center gap-1 transition-colors hover:text-green-600 ${hoveredMenu === link.name ? 'text-green-600' : ''}`}
+                >
+                  {link.name}
+                  {link.hasDropdown && (
+                    <motion.div
+                      animate={{ rotate: hoveredMenu === link.name ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ChevronDown size={13} />
+                    </motion.div>
+                  )}
+                </Link>
+              </motion.div>
 
               {/* Standard Dropdown for individual links */}
               <AnimatePresence>
                 {hoveredMenu === link.name && link.hasDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 15 }}
-                    className="absolute left-0 mt-5 z-50 w-52 rounded-xl bg-white py-2 shadow-xl"
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    className="absolute left-0 mt-5 z-50 w-52 rounded-xl bg-white py-2 shadow-xl overflow-hidden"
                   >
-                    {link.subItems?.map((sub) => (
-                      <Link
+                    {link.subItems?.map((sub, index) => (
+                      <motion.div
                         key={sub.name}
-                        href={sub.href}
-                        className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.15, delay: index * 0.03 }}
+                        whileHover={{ x: 4, backgroundColor: '#f0fdf4' }}
                       >
-                        {sub.name}
-                      </Link>
+                        <Link
+                          href={sub.href}
+                          className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition"
+                        >
+                          {sub.name}
+                        </Link>
+                      </motion.div>
                     ))}
                   </motion.div>
                 )}
@@ -268,6 +341,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
