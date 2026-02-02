@@ -1,6 +1,7 @@
 import Subnavbar from '@/container/Subnavbar';
-import React from 'react';
 import HeaderNav from '@/container/HeaderNav';
+import React from 'react';
+
 const Navbar = () => {
   return (
     <div>

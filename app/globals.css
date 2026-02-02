@@ -32,7 +32,7 @@ body {
 }
 
 /* Category list styles moved from page component (global, server-safe) */
-.category-scroll{
+.category-scroll {
   max-height: 420px; /* taller so more items visible before scroll */
   overflow-y: auto;
   padding-right: 6px;
@@ -40,32 +40,86 @@ body {
 }
 
 /* No entrance animation: keep items immediately visible and reduce size */
-.category-item{
-  display:block;
+.category-item {
+  display: block;
   padding: 8px 10px; /* reduced padding */
   font-size: 13px; /* slightly smaller */
   border-radius: 8px;
   opacity: 1;
   transform: none;
-  transition: transform .15s ease, box-shadow .15s ease, background-color .12s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.12s ease;
 }
-.category-item.active{
+.category-item.active {
   background: #10b981; /* emerald */
   color: #fff !important;
 }
 
-.category-item:hover{
+.category-item:hover {
   transform: translateX(4px) scale(1.01);
-  box-shadow: 0 10px 30px rgba(2,6,23,0.06);
-  background: rgba(16,185,129,0.06);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+  background: rgba(16, 185, 129, 0.06);
 }
 
 /* custom scrollbar - refined */
-.category-scroll::-webkit-scrollbar{ width:10px; }
-.category-scroll::-webkit-scrollbar-track{ background: transparent; }
-.category-scroll::-webkit-scrollbar-thumb{
-  background: linear-gradient(180deg, rgba(16,185,129,0.18), rgba(16,185,129,0.36));
+.category-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.category-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.category-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(16, 185, 129, 0.18),
+    rgba(16, 185, 129, 0.36)
+  );
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+/* Mobile Sidebar Styles */
+@media (max-width: 768px) {
+  header {
+    position: relative;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Smooth transitions and animations */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Mobile Search Bar Focus */
+input:focus {
+  @apply outline-none;
+}
+
+/* Better Button States */
+button {
+  @apply active:scale-95;
+}
+
+/* Scrollbar for mobile sidebar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
 }
