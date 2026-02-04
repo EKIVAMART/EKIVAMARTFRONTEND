@@ -2,9 +2,10 @@
 import Link from 'next/link';
 import ProductCard from '../../../components/ProductCard';
 import CategoriesGrid from '../../../components/CategoriesGrid';
+import ProductFilters from '../../../components/ProductFilters';
 import { useProducts } from '../../../lib/hooks';
 import { useParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Product, Rating } from '../../../lib/types';
 
 // groups for broad categories (map URL slug -> product categories)
@@ -41,6 +42,41 @@ export default function CategoryPage() {
   const params = useParams();
   const slug = String(params?.slug || '').toLowerCase();
 
+  const allProducts = useProducts();
+
+  // Get category products first
+  const categoryProducts: Product[] = useMemo(() => {
+    const group = CATEGORY_GROUPS[slug] || [];
+    return allProducts.filter((p) => {
+      if (!p || !p.category) return false;
+      const cat = String(p.category).toLowerCase();
+      if (cat === slug) return true;
+      if (group.length > 0)
+        return group.map((g) => g.toLowerCase()).includes(cat);
+      return cat.includes(slug) || slug.includes(cat);
+    });
+  }, [allProducts, slug]);
+
+  // Calculate global min and max prices
+  const globalMin = useMemo(
+    () =>
+      categoryProducts.length
+        ? Math.min(...categoryProducts.map((p) => p.price || 0))
+        : 0,
+    [categoryProducts]
+  );
+  const globalMax = useMemo(
+    () =>
+      categoryProducts.length
+        ? Math.max(...categoryProducts.map((p) => p.price || 0))
+        : 100000,
+    [categoryProducts]
+  );
+
+  const [minPrice, setMinPrice] = useState<number>(globalMin || 0);
+  const [maxPrice, setMaxPrice] = useState<number>(globalMax || 100000);
+  const [selectedRating, setSelectedRating] = useState<number>(0);
+
   // Map slug to display name
   const slugToName: Record<string, string> = {
     electronics: 'Electronics',
@@ -56,20 +92,20 @@ export default function CategoryPage() {
   const active =
     slugToName[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
 
-  const allProducts = useProducts();
-
+  // Filter products by price and rating
   const products: Product[] = useMemo(() => {
-    const group = CATEGORY_GROUPS[slug] || [];
-    return allProducts.filter((p) => {
-      if (!p || !p.category) return false;
-      const cat = String(p.category).toLowerCase();
-      if (cat === slug) return true;
-      if (group.length > 0)
-        return group.map((g) => g.toLowerCase()).includes(cat);
-      // fallback: include if slug is substring of category or vice-versa
-      return cat.includes(slug) || slug.includes(cat);
+    return categoryProducts.filter((p) => {
+      const price = p.price || 0;
+      if (price < minPrice || price > maxPrice) return false;
+
+      if (selectedRating > 0) {
+        const rating = averageRating(p.rating) || 0;
+        if (rating < selectedRating) return false;
+      }
+
+      return true;
     });
-  }, [allProducts, slug]);
+  }, [categoryProducts, minPrice, maxPrice, selectedRating]);
 
   return (
     <main className="py-6 sm:py-8">
@@ -91,8 +127,26 @@ export default function CategoryPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Left sidebar - hidden on mobile */}
           <aside className="hidden md:block md:col-span-1">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 sticky top-6">
-              <CategoriesGrid />
+            <div className="flex flex-col gap-4">
+              {/* Categories */}
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <CategoriesGrid />
+              </div>
+
+              {/* Price and Rating Filters */}
+              <div>
+                <ProductFilters
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  globalMin={globalMin}
+                  globalMax={globalMax}
+                  onPriceChange={(min, max) => {
+                    setMinPrice(min);
+                    setMaxPrice(max);
+                  }}
+                  onRatingChange={(rating) => setSelectedRating(rating)}
+                />
+              </div>
             </div>
           </aside>
 
