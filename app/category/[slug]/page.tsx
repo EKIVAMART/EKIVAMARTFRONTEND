@@ -124,12 +124,12 @@ export default function CategoryPage() {
         </div>
 
         {/* Categories Grid - Desktop Only */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Left sidebar - hidden on mobile */}
           <aside className="hidden md:block md:col-span-1">
             <div className="flex flex-col gap-4">
               {/* Categories */}
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 h-96 overflow-y-auto">
                 <CategoriesGrid />
               </div>
 
@@ -151,7 +151,7 @@ export default function CategoryPage() {
           </aside>
 
           {/* Products grid */}
-          <section className="md:col-span-3">
+          <section className="md:col-span-4">
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-gray-600">
                 We found{' '}
@@ -170,7 +170,7 @@ export default function CategoryPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.length > 0 ? (
                 products.map((p: Product) => (
                   <div key={p.id} className="w-full">
