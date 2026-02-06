@@ -147,7 +147,7 @@ const Listfoot = () => {
       {/* BOTTOM SECTION */}
       <div  >
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">© 2025, Faflories</p>
+          <p className="text-sm text-gray-500">© 2026, Faflories</p>
 
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-gray-700">Follow Us</span>
