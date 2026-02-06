@@ -2,6 +2,7 @@ import gs_logo from './gs_logo.jpg';
 import happy_store from './happy_store.webp';
 import upload_area from './upload_area.svg';
 import hero_model_img from './hero_model_img.png';
+import pop_pord_img from './poprodimg.jpg';
 import hero_m from './hero.png';
 import hero_2 from './hero_2.png';
 import newsletter from './newsletter.png';
@@ -55,6 +56,7 @@ export const assets = {
   home_2,
   home_3,
   home_4,
+  pop_pord_img,
 };
 
 export const categories = [
