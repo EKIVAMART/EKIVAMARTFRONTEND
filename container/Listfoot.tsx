@@ -95,9 +95,9 @@ const socialLinks = [
 
 const Listfoot = () => {
   return (
-    <footer className="bg-white border-t">
+    <footer className="bg-white">
       {/* MAIN CONTENT */}
-      <div className="w-[90%] mx-auto px-4 py-14">
+      <div className="w-[90%] mx-auto px-4 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">

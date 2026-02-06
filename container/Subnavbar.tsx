@@ -279,7 +279,7 @@ const Subnavbar = (): JSX.Element => {
           </Link>
 
           {/* Search Bar - Takes up more space */}
-          <div className="flex flex-1 max-w-3xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-green-300 focus-within:border-green-500 transition group">
+          <div className="flex w-full items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-green-300 focus-within:border-green-500 transition group">
             <input
               type="text"
               placeholder="Search for items..."
@@ -291,53 +291,62 @@ const Subnavbar = (): JSX.Element => {
           </div>
 
           {/* Location Selector - RIGHT SIDE */}
-          <LocationSelector />
+          
+            <LocationSelector />
+         
 
           {/* Right Icons Section */}
           <div className="flex items-center gap-5">
             {/* Wishlist */}
-            <button className="relative flex flex-col items-center justify-center group">
+            <Link
+              href="/wishlist"
+              className="flex items-center gap-2 cursor-pointer group"
+            >
               <div className="relative">
                 <FiHeart
-                  size={22}
-                  className="text-gray-700 group-hover:text-green-600 transition"
+                  className="w-7 h-7 text-slate-700 group-hover:text-green-600 transition-colors"
+                  strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   0
                 </span>
               </div>
-              <span className="text-xs text-gray-600 group-hover:text-green-600 transition whitespace-nowrap hidden lg:block">
+              {/* This is your specific line of code, now wrapped in a Link */}
+              <span className="text-sm font-medium text-slate-700 group-hover:text-green-600 transition-colors">
                 Wishlist
               </span>
-            </button>
+            </Link>
 
-            {/* Cart */}
-            <button className="relative flex flex-col items-center justify-center group">
+            <Link
+              href="/cart"
+              className="flex items-center gap-2 cursor-pointer group"
+            >
               <div className="relative">
                 <FiShoppingCart
-                  size={22}
-                  className="text-gray-700 group-hover:text-green-600 transition"
+                  className="w-7 h-7 text-slate-700 group-hover:text-green-600 transition-colors"
+                  strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   0
                 </span>
               </div>
-              <span className="text-xs text-gray-600 group-hover:text-green-600 transition whitespace-nowrap hidden lg:block">
+              {/* This is your specific line of code, now wrapped in a Link */}
+              <span className="text-sm font-medium text-slate-700 group-hover:text-green-600 transition-colors">
                 Cart
               </span>
-            </button>
+            </Link>
 
             {/* Account */}
             {!user ? (
               <button
                 onClick={() => openSignIn?.()}
-                className="flex flex-col items-center justify-center group"
+                className="flex flex-wrap gap-3 items-center justify-center group"
               >
                 <FiUser
                   size={22}
                   className="text-gray-700 group-hover:text-green-600 transition"
                 />
-                <span className="text-xs text-gray-600 group-hover:text-green-600 transition whitespace-nowrap hidden lg:block">
+                <span className="text-sm text-gray-600 group-hover:text-green-600 transition whitespace-nowrap hidden lg:block">
                   Account
                 </span>
               </button>

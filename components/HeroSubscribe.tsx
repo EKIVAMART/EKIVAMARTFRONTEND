@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import { assets } from "@/assets/assets";
-import { Mail } from "lucide-react";
-import Image from "next/image";
+import { assets } from '@/assets/assets';
+import { Mail } from 'lucide-react';
+import Image from 'next/image';
 
 export default function HeroSubscribe() {
   return (
-    <section className="w-full py-12">
+    <section className="w-full pt-10">
       <div className="mx-auto flex w-[95%] flex-col items-center justify-between gap-10 rounded-3xl bg-[#E9FFF3] px-6 py-14 md:flex-row md:px-14">
-        
         {/* LEFT CONTENT */}
         <div className="max-w-xl">
           <h1 className="mb-4 text-3xl font-bold leading-snug text-[#3A3A3A] md:text-4xl">
@@ -22,7 +21,6 @@ export default function HeroSubscribe() {
 
           {/* SUBSCRIBE INPUT */}
           <div className="flex max-w-md items-center overflow-hidden rounded-full bg-white shadow-sm">
-            
             {/* Mail Icon */}
             <div className="flex items-center px-4 text-gray-400">
               <Mail size={18} />
