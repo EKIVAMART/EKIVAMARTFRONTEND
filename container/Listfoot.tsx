@@ -95,7 +95,7 @@ const socialLinks = [
 
 const Listfoot = () => {
   return (
-    <footer className="bg-white border-t">
+    <footer className="bg-white">
       {/* MAIN CONTENT */}
       <div className="w-[90%] mx-auto px-4 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
@@ -145,7 +145,7 @@ const Listfoot = () => {
       </div>
 
       {/* BOTTOM SECTION */}
-      <div className="border-t">
+      <div  >
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">© 2025, Faflories</p>
 
