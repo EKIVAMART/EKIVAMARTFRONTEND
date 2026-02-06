@@ -100,7 +100,7 @@ const Listfoot = () => {
       <div className="w-[90%] mx-auto px-4 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             <Image src="/logo.png" alt="Faflories" width={150} height={40} />
 
             <p className="text-gray-500 text-sm max-w-sm">
