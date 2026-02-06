@@ -15,6 +15,8 @@ import product_img4 from './product_img4.png';
 import product_img5 from './product_img5.png';
 import product_img6 from './product_img6.png';
 import product_img7 from './product_img7.png';
+import ctp_1 from './ctp1.jpg';
+import ctp_2 from './ctp2.jpg';
 import product_img8 from './product_img8.png';
 import product_img9 from './product_img9.png';
 import product_img10 from './product_img10.png';
@@ -57,6 +59,8 @@ export const assets = {
   home_3,
   home_4,
   pop_pord_img,
+  ctp_1,
+  ctp_2,
 };
 
 export const categories = [

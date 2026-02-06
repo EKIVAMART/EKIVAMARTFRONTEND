@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ProductCard from '../../../components/ProductCard';
 import CategoriesGrid from '../../../components/CategoriesGrid';
 import ProductFilters from '../../../components/ProductFilters';
+import CategoryPromoBanner from '../../../components/CategoryPromoBanner';
 import { useProducts } from '../../../lib/hooks';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -146,6 +147,11 @@ export default function CategoryPage() {
                   }}
                   onRatingChange={(rating) => setSelectedRating(rating)}
                 />
+              </div>
+
+              {/* Promotional Banner */}
+              <div>
+                <CategoryPromoBanner />
               </div>
             </div>
           </aside>
