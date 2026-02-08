@@ -174,7 +174,7 @@ export default function ProductsSection() {
           width: 100%;
           background: #ffffff;
           padding: 40px 0;
-          margin: 10px 0;
+          margin: 0;
         }
 
         .products-container {
@@ -375,8 +375,8 @@ export default function ProductsSection() {
         /* Responsive - Tablet Portrait */
         @media (max-width: 768px) {
           .products-section {
-            padding: 35px 0;
-            margin: 25px 0;
+            padding: 32px 0;
+            margin: 0;
           }
 
           .products-container {
@@ -429,7 +429,7 @@ export default function ProductsSection() {
         @media (max-width: 480px) {
           .products-section {
             padding: 24px 0;
-            margin: 16px 0;
+            margin: 0;
           }
 
           .products-container {
