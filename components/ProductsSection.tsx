@@ -160,6 +160,7 @@ export default function ProductsSection() {
                 originalPrice={product.mrp}
                 rating={calculateAverageRating(product.rating)}
                 author={product.store.name}
+                location={product.location}
                 href={`/product/${product.id}`}
               />
             ))}

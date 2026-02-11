@@ -98,6 +98,7 @@ const FeaturedProducts = () => {
                       title={product.name}
                       rating={calculateAverageRating(product.rating)}
                       author={product.store.name}
+                      location={product.location}
                       price={product.price}
                       originalPrice={product.mrp}
                       href={`/product/${product.id}`}

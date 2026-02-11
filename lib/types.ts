@@ -48,6 +48,7 @@ export interface Product {
   price: number
   images: StaticImageData[]
   category: string
+  location?: string
   storeId: string
   inStock: boolean
   store: Store

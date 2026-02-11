@@ -188,6 +188,7 @@ export default function CategoryPage() {
                       originalPrice={p.mrp}
                       rating={averageRating(p.rating)}
                       author={p.store?.name ?? p.storeId}
+                      location={p.location}
                       href={`/product/${p.id}`}
                     />
                   </div>

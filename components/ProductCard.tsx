@@ -1,6 +1,6 @@
 'use client';
 import Image, { StaticImageData } from 'next/image';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 type ProductCardProps = {
@@ -13,6 +13,7 @@ type ProductCardProps = {
   originalPrice?: number;
   currency?: string;
   href?: string;
+  location?: string;
 };
 
 export default function ProductCard({
@@ -25,6 +26,7 @@ export default function ProductCard({
   originalPrice,
   currency = '₦',
   href = '#',
+  location = 'Lagos',
 }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const fullStars = Math.floor(rating);
@@ -57,39 +59,47 @@ export default function ProductCard({
         </h3>
 
         <div className="pc-rating-row">
-          <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
-            {Array.from({ length: fullStars }).map((_, i) => (
-              <svg
-                key={'f' + i}
-                viewBox="0 0 24 24"
-                className="star star-filled"
-              >
-                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-              </svg>
-            ))}
-            {halfStar && (
-              <svg viewBox="0 0 24 24" className="star star-half">
-                <defs>
-                  <linearGradient id="halfGrad">
-                    <stop offset="50%" stopColor="#fb923c" />
-                    <stop offset="50%" stopColor="#e6e6e6" />
-                  </linearGradient>
-                </defs>
-                <path
-                  fill="url(#halfGrad)"
-                  d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z"
-                />
-              </svg>
-            )}
-            {Array.from({ length: emptyStars }).map((_, i) => (
-              <svg
-                key={'e' + i}
-                viewBox="0 0 24 24"
-                className="star star-empty"
-              >
-                <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-              </svg>
-            ))}
+          <div className="pc-stars-container">
+            <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
+              {Array.from({ length: fullStars }).map((_, i) => (
+                <svg
+                  key={'f' + i}
+                  viewBox="0 0 24 24"
+                  className="star star-filled"
+                >
+                  <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
+                </svg>
+              ))}
+              {halfStar && (
+                <svg viewBox="0 0 24 24" className="star star-half">
+                  <defs>
+                    <linearGradient id="halfGrad">
+                      <stop offset="50%" stopColor="#fb923c" />
+                      <stop offset="50%" stopColor="#e6e6e6" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#halfGrad)"
+                    d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z"
+                  />
+                </svg>
+              )}
+              {Array.from({ length: emptyStars }).map((_, i) => (
+                <svg
+                  key={'e' + i}
+                  viewBox="0 0 24 24"
+                  className="star star-empty"
+                >
+                  <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
+                </svg>
+              ))}
+            </div>
+            <span className="pc-rating-num">({rating})</span>
+          </div>
+          
+          <div className="pc-location">
+            <MapPin size={12} className="pc-location-icon" />
+            <span>{location}</span>
           </div>
         </div>
 
@@ -294,8 +304,42 @@ export default function ProductCard({
         .pc-rating-row {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           gap: 8px;
           margin: 6px 0;
+        }
+
+        .pc-stars-container {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .pc-rating-num {
+          font-size: 11px;
+          color: #6b7280;
+          font-weight: 500;
+        }
+
+        .pc-location {
+          display: flex;
+          align-items: center;
+          gap: 3px;
+          font-size: 11px;
+          color: #6b7280;
+          background: #f3f4f6;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 500;
+          max-width: 100px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .pc-location-icon {
+          color: #16a34a;
+          flex-shrink: 0;
         }
 
         .pc-stars {
