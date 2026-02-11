@@ -76,7 +76,7 @@ export default function Slider({
       >
         {/* SLIDES CONTAINER */}
         <div
-          className="flex h-64 md:h-95 transition-transform duration-700 ease-in-out"
+          className="flex h-64 md:h-97 transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
           {images.map((src, i) => (
