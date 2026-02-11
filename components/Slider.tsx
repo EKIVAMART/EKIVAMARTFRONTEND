@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
-import React, { useEffect, useRef, useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import styles from "./Slider.module.css";
+'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import styles from './Slider.module.css';
 
 type SliderProps = {
   images?: string[];
@@ -10,7 +10,7 @@ type SliderProps = {
   autoPlayInterval?: number;
 };
 
-const defaultImages = ["/slideBanner1.jpg", "/slideBanner2.jpg"];
+const defaultImages = ['/slideBanner1.jpg', '/slideBanner2.jpg'];
 
 export default function Slider({
   images = defaultImages,
@@ -38,7 +38,6 @@ export default function Slider({
   const prev = () => setIndex((i) => (i - 1 + len) % len);
   const next = () => setIndex((i) => (i + 1) % len);
 
- 
   function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
     if (e.touches && e.touches.length > 0) {
       touchStartX.current = e.touches[0].clientX;
@@ -53,7 +52,7 @@ export default function Slider({
     }
 
     const endX = e.changedTouches[0]?.clientX;
-    if (typeof endX !== "number") {
+    if (typeof endX !== 'number') {
       touchStartX.current = null;
       return;
     }
@@ -68,7 +67,7 @@ export default function Slider({
   }
 
   return (
-    <div className="w-[95%] mx-auto">
+    <div className="w-[95%] mx-auto pb-8 md:pb-6 lg:pb-8">
       <div
         className={`relative overflow-hidden rounded-lg bg-gray-100 ${styles.noSelect}`}
         onTouchStart={onTouchStart}
@@ -121,7 +120,7 @@ export default function Slider({
               key={i}
               onClick={() => setIndex(i)}
               className={`w-3 h-3 rounded-full ${
-                i === index ? "bg-white" : "bg-white/50"
+                i === index ? 'bg-white' : 'bg-white/50'
               }`}
             />
           ))}

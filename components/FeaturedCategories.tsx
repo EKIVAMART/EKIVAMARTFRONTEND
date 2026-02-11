@@ -34,7 +34,7 @@ const categories: Category[] = [
 
 const FeaturedCategories = () => {
   return (
-    <section className="w-[95%] mx-auto py-8">
+    <section className="w-[95%] mx-auto py-8 md:py-6 lg:py-8">
       <h2 className="text-lg font-semibold mb-6 text-black">
         Featured Categories
       </h2>

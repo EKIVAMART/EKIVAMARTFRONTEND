@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export default function HeroSubscribe() {
   return (
-    <section className="w-full pt-10">
+    <section className="w-full py-8 md:py-6 lg:py-8">
       <div className="mx-auto flex w-[95%] flex-col items-center justify-between gap-10 rounded-3xl bg-[#E9FFF3] px-6 py-14 md:flex-row md:px-14">
         {/* LEFT CONTENT */}
         <div className="max-w-xl">

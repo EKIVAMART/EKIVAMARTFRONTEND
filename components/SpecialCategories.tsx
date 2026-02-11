@@ -116,7 +116,7 @@ export default function SpecialCategories() {
         .special-categories-section {
           width: 100%;
           background: #ffffff;
-          padding: -10px 0;
+          padding: 0;
           margin: 0;
         }
 
@@ -192,7 +192,10 @@ export default function SpecialCategories() {
 
         @media (max-width: 768px) {
           .special-categories-section {
-            padding: 8px 0;
+            padding-top: 0;
+            padding-bottom: 32px;
+            padding-left: 0;
+            padding-right: 0;
           }
 
           .special-categories-container {
@@ -209,7 +212,10 @@ export default function SpecialCategories() {
 
         @media (max-width: 480px) {
           .special-categories-section {
-            padding: 6px 0;
+            padding-top: 16px;
+            padding-bottom: 24px;
+            padding-left: 0;
+            padding-right: 0;
           }
 
           .special-categories-container {

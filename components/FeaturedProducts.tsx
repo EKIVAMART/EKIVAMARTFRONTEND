@@ -46,7 +46,7 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="py-12 px-4 md:px-0">
+    <section className="py-8 md:py-6 lg:py-8 px-4 md:px-0">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h2 className="text-lg font-semibold mb-6 text-black">
@@ -98,6 +98,7 @@ const FeaturedProducts = () => {
                       title={product.name}
                       rating={calculateAverageRating(product.rating)}
                       author={product.store.name}
+                      location={product.location}
                       price={product.price}
                       originalPrice={product.mrp}
                       href={`/product/${product.id}`}
