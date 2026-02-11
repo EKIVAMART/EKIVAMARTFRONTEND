@@ -11,6 +11,9 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { assets } from '../assets/assets';
+
 
 export default function CartPage() {
   // Added 'quantity' field to the data
@@ -18,7 +21,7 @@ export default function CartPage() {
     {
       id: '1',
       name: ' Ideapad Slim 3 Intel Core I5-12450H 15.6" (...',
-      image: '../assets/product_img12.png',
+      image: assets.product_img12,
       rating: 5,
       reviews: 5,
       price: 45000,
@@ -27,7 +30,7 @@ export default function CartPage() {
     {
       id: '2',
       name: 'boAt Wave Fury Smartwatch with 4.64 cm (1.83 inch)...',
-      image: '/watch.jpg',
+      image: assets.product_img5,
       rating: 5,
       reviews: 5,
       price: 1800,
@@ -105,9 +108,11 @@ export default function CartPage() {
                     {/* Product Info */}
                     <div className="flex items-center gap-4">
                       <div className="relative w-20 h-20 border rounded-lg overflow-hidden bg-white p-2">
-                        <img
+                        <Image
                           src={item.image}
                           alt={item.name}
+                          width={100}
+                          height={100}
                           className="object-contain w-full h-full"
                         />
                       </div>
