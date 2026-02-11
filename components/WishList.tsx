@@ -1,17 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, Star, ChevronRight } from 'lucide-react';
+import { assets } from '../assets/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WishlistPage() {
-  const wishlistData = [
+  const [wishlistData, setWishlistData] = useState([
     {
       id: '1',
       name: 'Lenovo Ideapad Slim 3 Intel Core I5-12450H 15.6" (...',
-      image: '../assets/product_img12.png', // Replace with your actual paths
+      image: assets.product_img12,
       rating: 5,
       reviews: 5,
       price: 45000,
@@ -19,12 +20,16 @@ export default function WishlistPage() {
     {
       id: '2',
       name: 'boAt Wave Fury Smartwatch with 4.64 cm (1.83 inch)...',
-      image: '/watch.jpg',
+      image: assets.product_img5, // Using a smartwatch image from assets
       rating: 5,
       reviews: 5,
       price: 1800,
     },
-  ];
+  ]);
+
+  const removeItem = (id: string) => {
+    setWishlistData((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <div className="min-h-screen bg-white pb-10 ">
@@ -39,7 +44,7 @@ export default function WishlistPage() {
         </div>
       </div>
 
-      <main className="mx-auto w-[95%] mt-10 px-50">
+      <main className="mx-auto w-full md:w-[95%] mt-10 px-4 md:px-10">
         {/* 2. HEADER SECTION */}
         <section className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-1">My List</h1>
@@ -69,16 +74,18 @@ export default function WishlistPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] items-center p-4 md:p-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+                  className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr] items-center p-4 md:p-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors gap-4 md:gap-0"
                 >
                   {/* Product Info */}
-                  <div className="flex items-center gap-4 md:gap-6">
+                  <div className="col-span-2 md:col-span-1 flex items-center gap-4 md:gap-6">
                     <div className="relative w-24 h-24 md:w-32 md:h-24 border rounded-lg overflow-hidden flex-shrink-0 bg-white p-2">
                       {/* Using a placeholder div for image - replace with <Image /> */}
                       <div className="w-full h-full bg-gray-100 relative">
-                        <img
+                        <Image
                           src={item.image}
                           alt={item.name}
+                          width={100}
+                          height={100}
                           className="object-contain w-full h-full"
                         />
                       </div>
@@ -107,7 +114,7 @@ export default function WishlistPage() {
                   </div>
 
                   {/* Price */}
-                  <div className="mt-4 md:mt-0 text-left md:text-center">
+                  <div className="col-span-1 md:col-span-1 mt-0 md:mt-0 text-left md:text-center">
                     <span className="md:hidden text-xs text-gray-400 block mb-1">
                       Price
                     </span>
@@ -118,8 +125,11 @@ export default function WishlistPage() {
                   </div>
 
                   {/* Remove */}
-                  <div className="mt-4 md:mt-0 text-right">
-                    <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+                  <div className="col-span-1 md:col-span-1 mt-0 md:mt-0 text-right">
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                    >
                       <Trash2 size={25} />
                     </button>
                   </div>
