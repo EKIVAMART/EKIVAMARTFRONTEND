@@ -33,7 +33,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
           {onNext || isLastStep ? (
             <button 
                 onClick={onNext} 
-                className={`flex items-center gap-2 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#00A8B5] hover:bg-[#0096A3]'}`}
+                className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#00A8B5] hover:bg-[#0096A3]'}`}
             >
               {isLastStep ? "Submit Application" : "Next"} 
               {isLastStep ? <Check size={18} /> : <ChevronRight size={18} />}
