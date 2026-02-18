@@ -193,7 +193,6 @@ export const productDummyData = [
   {
     id: 'prod_1',
     location: 'Abia',
-    location: 'Abia',
     name: 'Modern table lamp',
     description:
       "Modern table lamp with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty. Enhance your audio experience with this earbuds. Indulge yourself in a world of pure sound with 50 hours of uninterrupted playtime. Equipped with the cutting-edge Zen Mode Tech ENC and BoomX Tech, prepare to be enthralled by a symphony of crystal-clear melodies.",
@@ -210,7 +209,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_2',
-    location: 'Adamawa',
     location: 'Adamawa',
     name: 'Smart speaker gray',
     description:
@@ -229,7 +227,6 @@ export const productDummyData = [
   {
     id: 'prod_3',
     location: 'Akwa Ibom',
-    location: 'Akwa Ibom',
     name: 'Smart watch white',
     description:
       "Smart watch with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty.",
@@ -246,7 +243,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_4',
-    location: 'Anambra',
     location: 'Anambra',
     name: 'Wireless headphones',
     description:
@@ -265,7 +261,6 @@ export const productDummyData = [
   {
     id: 'prod_5',
     location: 'Bauchi',
-    location: 'Bauchi',
     name: 'Smart watch black',
     description:
       "Smart watch with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty.",
@@ -282,7 +277,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_6',
-    location: 'Bayelsa',
     location: 'Bayelsa',
     name: 'Security Camera',
     description:
@@ -301,7 +295,6 @@ export const productDummyData = [
   {
     id: 'prod_7',
     location: 'Benue',
-    location: 'Benue',
     name: 'Smart Pen for iPad',
     description:
       "Smart Pen for iPad with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty.",
@@ -318,7 +311,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_8',
-    location: 'Borno',
     location: 'Borno',
     name: 'Home Theater',
     description:
@@ -337,7 +329,6 @@ export const productDummyData = [
   {
     id: 'prod_9',
     location: 'Cross River',
-    location: 'Cross River',
     name: 'Apple Wireless Earbuds',
     description:
       "Apple Wireless Earbuds with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty.",
@@ -354,7 +345,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_10',
-    location: 'Delta',
     location: 'Delta',
     name: 'Apple Smart Watch',
     description:
@@ -373,7 +363,6 @@ export const productDummyData = [
   {
     id: 'prod_11',
     location: 'Ebonyi',
-    location: 'Ebonyi',
     name: 'RGB Gaming Mouse',
     description:
       "RGB Gaming Mouse with a sleek design. It's perfect for any room. It's made of high-quality materials and comes with a lifetime warranty.",
@@ -390,7 +379,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_12',
-    location: 'Edo',
     location: 'Edo',
     name: 'Smart Home Cleaner',
     description:
@@ -410,7 +398,6 @@ export const productDummyData = [
   {
     id: 'prod_13',
     location: 'Ekiti',
-    location: 'Ekiti',
     name: 'Elegant wall mirror',
     description:
       'Elegant wall mirror with decorative frame. High-quality materials with lifetime warranty. Perfect for any room.',
@@ -427,7 +414,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_14',
-    location: 'Enugu',
     location: 'Enugu',
     name: 'Decorative wall art set',
     description:
@@ -446,7 +432,6 @@ export const productDummyData = [
   {
     id: 'prod_15',
     location: 'FCT - Abuja',
-    location: 'FCT - Abuja',
     name: 'Floor standing lamp',
     description:
       'Floor standing lamp with adjustable brightness. Modern design with high-quality materials. Lifetime warranty included.',
@@ -463,7 +448,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_16',
-    location: 'Gombe',
     location: 'Gombe',
     name: 'Ceramic vase collection',
     description:
@@ -482,7 +466,6 @@ export const productDummyData = [
   {
     id: 'prod_17',
     location: 'Imo',
-    location: 'Imo',
     name: 'Hanging pendant lights',
     description:
       'Hanging pendant lights with metal finish. Modern design, energy efficient. Comes with installation guide and warranty.',
@@ -499,7 +482,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_18',
-    location: 'Jigawa',
     location: 'Jigawa',
     name: 'Wooden wall shelves',
     description:
@@ -518,7 +500,6 @@ export const productDummyData = [
   {
     id: 'prod_19',
     location: 'Kaduna',
-    location: 'Kaduna',
     name: 'Modern canvas paintings',
     description:
       'Modern canvas paintings with vibrant colors. Professionally printed on premium canvas. Ready to hang.',
@@ -536,7 +517,6 @@ export const productDummyData = [
   {
     id: 'prod_20',
     location: 'Kano',
-    location: 'Kano',
     name: 'Decorative throw pillows',
     description:
       'Decorative throw pillows with premium fabric. Multiple color options. Machine washable with high-quality filling.',
@@ -553,7 +533,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_21',
-    location: 'Katsina',
     location: 'Katsina',
     name: 'Crystal chandelier',
     description:
@@ -573,7 +552,6 @@ export const productDummyData = [
   {
     id: 'prod_22',
     location: 'Kebbi',
-    location: 'Kebbi',
     name: 'Portable bluetooth speaker',
     description:
       'Portable bluetooth speaker with crystal clear sound. Waterproof design, 20 hours battery life. Premium quality guaranteed.',
@@ -590,7 +568,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_23',
-    location: 'Kogi',
     location: 'Kogi',
     name: 'Multi-room wireless speaker',
     description:
@@ -609,7 +586,6 @@ export const productDummyData = [
   {
     id: 'prod_24',
     location: 'Kwara',
-    location: 'Kwara',
     name: 'Premium soundbar system',
     description:
       'Premium soundbar system with surround sound. Home theater experience. High-quality materials and lifetime warranty.',
@@ -626,7 +602,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_25',
-    location: 'Lagos',
     location: 'Lagos',
     name: 'Compact desktop speaker',
     description:
@@ -645,7 +620,6 @@ export const productDummyData = [
   {
     id: 'prod_26',
     location: 'Nasarawa',
-    location: 'Nasarawa',
     name: 'Outdoor party speaker',
     description:
       'Outdoor party speaker with high volume output. Rugged design, water and dust resistant. Perfect for gatherings.',
@@ -662,7 +636,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_27',
-    location: 'Niger',
     location: 'Niger',
     name: 'Retro vintage speaker',
     description:
@@ -681,7 +654,6 @@ export const productDummyData = [
   {
     id: 'prod_28',
     location: 'Ogun',
-    location: 'Ogun',
     name: 'Studio professional speaker',
     description:
       'Studio professional speaker for music production. Crystal clear audio, accurate sound reproduction. Professional grade.',
@@ -699,7 +671,6 @@ export const productDummyData = [
   {
     id: 'prod_29',
     location: 'Ondo',
-    location: 'Ondo',
     name: 'Mini bluetooth speaker',
     description:
       'Mini bluetooth speaker with compact design. High-quality sound in small package. 12 hours battery life.',
@@ -716,7 +687,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_30',
-    location: 'Osun',
     location: 'Osun',
     name: 'Smart voice controlled speaker',
     description:
@@ -736,7 +706,6 @@ export const productDummyData = [
   {
     id: 'prod_31',
     location: 'Oyo',
-    location: 'Oyo',
     name: 'Noise cancelling headphones',
     description:
       'Noise cancelling headphones with active noise control. Comfortable fit, 30 hours battery. Premium build quality.',
@@ -753,7 +722,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_32',
-    location: 'Plateau',
     location: 'Plateau',
     name: 'Studio monitoring headphones',
     description:
@@ -772,7 +740,6 @@ export const productDummyData = [
   {
     id: 'prod_33',
     location: 'Rivers',
-    location: 'Rivers',
     name: 'Bluetooth gaming headset',
     description:
       'Bluetooth gaming headset with surround sound. Built-in microphone, low latency. Perfect for gaming and streaming.',
@@ -789,7 +756,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_34',
-    location: 'Sokoto',
     location: 'Sokoto',
     name: 'Lightweight portable headphones',
     description:
@@ -808,7 +774,6 @@ export const productDummyData = [
   {
     id: 'prod_35',
     location: 'Taraba',
-    location: 'Taraba',
     name: 'Premium audiophile headphones',
     description:
       'Premium audiophile headphones with superior sound. Hand-crafted design, premium materials. For music enthusiasts.',
@@ -825,7 +790,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_36',
-    location: 'Yobe',
     location: 'Yobe',
     name: 'Kids safe headphones',
     description:
@@ -844,7 +808,6 @@ export const productDummyData = [
   {
     id: 'prod_37',
     location: 'Zamfara',
-    location: 'Zamfara',
     name: 'Fitness sports headphones',
     description:
       'Fitness sports headphones with secure fit. Sweat resistant, water resistant design. 8 hours battery life.',
@@ -862,7 +825,6 @@ export const productDummyData = [
   {
     id: 'prod_38',
     location: 'Abia',
-    location: 'Abia',
     name: 'Wired professional headphones',
     description:
       'Wired professional headphones for audio work. High impedance, accurate audio. Includes cable and adapter.',
@@ -879,7 +841,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_39',
-    location: 'Adamawa',
     location: 'Adamawa',
     name: 'Casual everyday headphones',
     description:
@@ -899,7 +860,6 @@ export const productDummyData = [
   {
     id: 'prod_40',
     location: 'Akwa Ibom',
-    location: 'Akwa Ibom',
     name: 'Fitness tracker smart watch',
     description:
       'Fitness tracker smart watch with health monitoring. Heart rate sensor, sleep tracking. Water resistant design.',
@@ -916,7 +876,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_41',
-    location: 'Anambra',
     location: 'Anambra',
     name: 'Classic analog watch',
     description:
@@ -935,7 +894,6 @@ export const productDummyData = [
   {
     id: 'prod_42',
     location: 'Bauchi',
-    location: 'Bauchi',
     name: 'Premium luxury digital watch',
     description:
       'Premium luxury digital watch with elegant display. Multiple functions, durable construction. Lifetime support.',
@@ -952,7 +910,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_43',
-    location: 'Bayelsa',
     location: 'Bayelsa',
     name: 'Sports chronograph watch',
     description:
@@ -971,7 +928,6 @@ export const productDummyData = [
   {
     id: 'prod_44',
     location: 'Benue',
-    location: 'Benue',
     name: 'Minimalist smart watch',
     description:
       'Minimalist smart watch with clean design. Health tracking, notifications, long battery. Premium quality.',
@@ -989,7 +945,6 @@ export const productDummyData = [
   {
     id: 'prod_45',
     location: 'Borno',
-    location: 'Borno',
     name: 'Rugged outdoor smart watch',
     description:
       'Rugged outdoor smart watch with GPS. Durability tested, weather resistant. Perfect for adventurers.',
@@ -1006,7 +961,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_46',
-    location: 'Cross River',
     location: 'Cross River',
     name: 'Elegant dress watch',
     description:
@@ -1026,7 +980,6 @@ export const productDummyData = [
   {
     id: 'prod_47',
     location: 'Delta',
-    location: 'Delta',
     name: 'True wireless earbuds',
     description:
       'True wireless earbuds with charging case. Active noise cancelling, 24 hours total battery. Premium sound quality.',
@@ -1043,7 +996,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_48',
-    location: 'Ebonyi',
     location: 'Ebonyi',
     name: 'Budget friendly earbuds',
     description:
@@ -1062,7 +1014,6 @@ export const productDummyData = [
   {
     id: 'prod_49',
     location: 'Edo',
-    location: 'Edo',
     name: 'Gaming wireless earbuds',
     description:
       'Gaming wireless earbuds with low latency. Perfect for mobile gaming and streaming. High quality audio.',
@@ -1079,7 +1030,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_50',
-    location: 'Ekiti',
     location: 'Ekiti',
     name: 'Sports fitness earbuds',
     description:
@@ -1098,7 +1048,6 @@ export const productDummyData = [
   {
     id: 'prod_51',
     location: 'Enugu',
-    location: 'Enugu',
     name: 'Premium airpod style earbuds',
     description:
       'Premium airpod style earbuds with seamless connectivity. Touch controls, premium materials. Excellent quality.',
@@ -1115,7 +1064,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_52',
-    location: 'FCT - Abuja',
     location: 'FCT - Abuja',
     name: 'Professional recording earbuds',
     description:
@@ -1134,7 +1082,6 @@ export const productDummyData = [
   {
     id: 'prod_53',
     location: 'Gombe',
-    location: 'Gombe',
     name: 'Call center headset earbuds',
     description:
       'Call center headset earbuds with clear microphone. Noise cancellation, comfortable. Professional grade.',
@@ -1151,7 +1098,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_54',
-    location: 'Imo',
     location: 'Imo',
     name: 'Lightweight travel earbuds',
     description:
@@ -1171,7 +1117,6 @@ export const productDummyData = [
   {
     id: 'prod_55',
     location: 'Jigawa',
-    location: 'Jigawa',
     name: 'Wireless ergonomic mouse',
     description:
       'Wireless ergonomic mouse with comfort design. Reduces strain, precise tracking. 3 year warranty.',
@@ -1188,7 +1133,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_56',
-    location: 'Kaduna',
     location: 'Kaduna',
     name: 'Pro gamer mouse',
     description:
@@ -1207,7 +1151,6 @@ export const productDummyData = [
   {
     id: 'prod_57',
     location: 'Kano',
-    location: 'Kano',
     name: 'Bluetooth mouse',
     description:
       'Bluetooth mouse with wireless connectivity. Long battery life, compatible with multiple devices. Easy to use.',
@@ -1224,7 +1167,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_58',
-    location: 'Katsina',
     location: 'Katsina',
     name: 'Precision design mouse',
     description:
@@ -1243,7 +1185,6 @@ export const productDummyData = [
   {
     id: 'prod_59',
     location: 'Kebbi',
-    location: 'Kebbi',
     name: 'Budget wireless mouse',
     description:
       'Budget wireless mouse with basic features. Reliable performance, good battery life. Value for money.',
@@ -1260,7 +1201,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_60',
-    location: 'Kogi',
     location: 'Kogi',
     name: 'Vertical ergonomic mouse',
     description:
@@ -1279,7 +1219,6 @@ export const productDummyData = [
   {
     id: 'prod_61',
     location: 'Kwara',
-    location: 'Kwara',
     name: 'Mechanical switch mouse',
     description:
       'Mechanical switch mouse with satisfying click. RGB lighting, programmable buttons. Gaming focused.',
@@ -1297,7 +1236,6 @@ export const productDummyData = [
   {
     id: 'prod_62',
     location: 'Lagos',
-    location: 'Lagos',
     name: 'Silent office mouse',
     description:
       'Silent office mouse with quiet clicks. Perfect for quiet work environments. Comfortable design.',
@@ -1314,7 +1252,6 @@ export const productDummyData = [
   },
   {
     id: 'prod_63',
-    location: 'Nasarawa',
     location: 'Nasarawa',
     name: 'Portable travel mouse',
     description:
