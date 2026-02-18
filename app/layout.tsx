@@ -1,9 +1,7 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import StoreProvider from './StoreProvider';
+import LayoutWrapper from '@/components/LayoutWrapper';
 
 export default function RootLayout({
   children,
@@ -15,9 +13,7 @@ export default function RootLayout({
       <StoreProvider>
         <html lang="en">
           <body suppressHydrationWarning={true}>
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
+            <LayoutWrapper>{children}</LayoutWrapper>
           </body>
         </html>
       </StoreProvider>
