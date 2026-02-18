@@ -12,10 +12,10 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
       {/* Blue Header */}
-      <div className="bg-[#00A8B5] p-8 text-center text-white">
+      <div className="bg-[#340646] p-8 text-center text-white">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">Partner Registration</h2>
         <p className="text-sm opacity-90 font-medium">
-          Join Ensuram's healthcare marketplace. Need help? Contact us at compliance@ensuram.com
+          Faflories a muilti-vendor marketplace platform that connects local vendors with customers, providing a seamless online shopping experience. Join us to expand your reach and grow your business!
         </p>
       </div>
 
