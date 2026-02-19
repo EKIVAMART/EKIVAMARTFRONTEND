@@ -34,7 +34,7 @@ export default function VendorRegistrationPage() {
           <div className="text-[#00A8B5] flex justify-center mb-1">
              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
           </div>
-          <h1 className="text-2xl font-black tracking-tighter text-gray-800">ENSURAM</h1>
+          <h1 className="text-2xl font-black tracking-tighter text-[#00A8B5]">Faflories</h1>
         </div>
       </div>
 
