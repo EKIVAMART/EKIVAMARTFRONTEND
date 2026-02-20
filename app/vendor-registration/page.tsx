@@ -29,14 +29,14 @@ export default function VendorRegistrationPage() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pb-20 font-sans pt-20">
       {/* Brand Logo */}
-      <div className="flex justify-center py-8">
+      {/* <div className="flex justify-center py-8">
         <div className="text-center">
-          <div className="text-[#00A8B5] flex justify-center mb-1">
+          <div className="text-green-600 flex justify-center mb-1">
              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
           </div>
-          <h1 className="text-2xl font-black tracking-tighter text-[#00A8B5]">Faflories</h1>
+          <h1 className="text-2xl font-black tracking-tighter text-green-600">Faflories</h1>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-4xl mx-auto px-4">
         <Stepper currentStep={step} />

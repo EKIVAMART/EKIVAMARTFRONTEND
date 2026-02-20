@@ -11,7 +11,7 @@ export default function Step4Documents({ onNext, onPrev }: Props) {
   return (
     <FormWrapper onNext={onNext} onPrev={onPrev}>
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-[#00A8B5] rounded-lg text-white">
+        <div className="p-2 bg-green-600 rounded-lg text-white">
           <FileText size={20} />
         </div>
         <div>
