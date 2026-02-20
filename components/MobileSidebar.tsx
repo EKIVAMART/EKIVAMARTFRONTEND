@@ -184,7 +184,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             {/* Header - Logo */}
             <div className="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between">
               <div>
-                <div className="text-green-600 text-lg font-bold">
+                <div className="text-[#981d87] text-lg font-bold">
                   Faflories
                 </div>
                 <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
@@ -204,10 +204,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             >
               <button
                 onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm hover:border-green-500 transition"
+                className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm hover:border-[#fcedf9]0 transition"
               >
                 <div className="flex items-center gap-2">
-                  <MapPin size={18} className="text-green-600" />
+                  <MapPin size={18} className="text-[#981d87]" />
                   <span className="font-semibold text-gray-700">
                     {selectedLocation}
                   </span>
@@ -258,7 +258,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             }}
                             className={`w-full text-left px-4 py-3 text-sm transition ${
                               selectedLocation === location
-                                ? 'bg-green-600 text-white font-semibold'
+                                ? 'bg-[#981d87] text-white font-semibold'
                                 : 'text-gray-700 hover:bg-gray-50'
                             }`}
                           >
@@ -282,7 +282,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <Link
                 href="/"
                 onClick={onClose}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-[#fcedf9] hover:text-[#981d87] transition"
               >
                 <Home size={20} />
                 <span className="font-semibold text-sm">Home</span>
@@ -298,7 +298,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                       className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="text-gray-500 group-hover:text-green-600 transition">
+                        <div className="text-gray-500 group-hover:text-[#981d87] transition">
                           {category.icon}
                         </div>
                         <span className="font-medium text-sm">
@@ -330,7 +330,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                               key={sub}
                               href={`/category/${category.name.toLowerCase()}`}
                               onClick={onClose}
-                              className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-green-600 hover:bg-white transition"
+                              className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#981d87] hover:bg-white transition"
                             >
                               {sub}
                             </Link>

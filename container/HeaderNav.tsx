@@ -168,7 +168,7 @@ export default function Header() {
             onClick={() => setIsBrowseOpen(!isBrowseOpen)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-4 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition shadow-md hover:shadow-lg"
+            className="flex items-center gap-4 rounded-md bg-[#981d87] px-3 py-2 text-sm font-semibold text-white hover:bg-[#7a176c] transition shadow-md hover:shadow-lg"
           >
             <Grid size={15} />
             Browse All Categories
@@ -200,11 +200,11 @@ export default function Header() {
                     >
                       <Link
                         href={`/category/${cat.name.toLowerCase()}`}
-                        className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition"
+                        className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-[#fcedf9] hover:text-[#7a176c] transition"
                       >
                         <div className="flex items-center gap-3">
                           <motion.div whileHover={{ scale: 1.1 }}>
-                            <Icon size={17} className="text-green-600" />
+                            <Icon size={17} className="text-[#981d87]" />
                           </motion.div>
                           <span className="font-medium">{cat.name}</span>
                         </div>
@@ -232,7 +232,7 @@ export default function Header() {
               <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                 <Link
                   href={link.href}
-                  className={`flex items-center gap-1 transition-colors hover:text-green-600 ${hoveredMenu === link.name ? 'text-green-600' : ''}`}
+                  className={`flex items-center gap-1 transition-colors hover:text-[#981d87] ${hoveredMenu === link.name ? 'text-[#981d87]' : ''}`}
                 >
                   {link.name}
                   {link.hasDropdown && (
@@ -266,7 +266,7 @@ export default function Header() {
                       >
                         <Link
                           href={sub.href}
-                          className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition"
+                          className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:text-[#981d87] transition"
                         >
                           {sub.name}
                         </Link>
@@ -285,7 +285,7 @@ export default function Header() {
             onMouseLeave={() => setHoveredMenu(null)}
           >
             <div
-              className={`flex items-center gap-1 transition-colors hover:text-green-600 ${hoveredMenu === 'Shop' ? 'text-green-600' : ''}`}
+              className={`flex items-center gap-1 transition-colors hover:text-[#981d87] ${hoveredMenu === 'Shop' ? 'text-[#981d87]' : ''}`}
             >
               Shop{' '}
               <ChevronDown
@@ -306,7 +306,7 @@ export default function Header() {
                   <div className="grid grid-cols-5 gap-8">
                     {megaMenuData.map((section, idx) => (
                       <div key={idx}>
-                        <h3 className="mb-4 text-base font-bold text-green-600">
+                        <h3 className="mb-4 text-base font-bold text-[#981d87]">
                           {section.title}
                         </h3>
                         <ul className="space-y-3">
@@ -314,7 +314,7 @@ export default function Header() {
                             <li key={i}>
                               <Link
                                 href={subItem.href}
-                                className="text-sm font-medium text-gray-600 hover:text-green-600 transition"
+                                className="text-sm font-medium text-gray-600 hover:text-[#981d87] transition"
                               >
                                 {subItem.name}
                               </Link>
@@ -333,13 +333,13 @@ export default function Header() {
         {/* RIGHT: Contact */}
         <div className="flex items-center gap-3 text-sm">
           <Link href="/vendor-registration">
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+            <button className="bg-[#981d87] text-white px-4 py-2 rounded-md hover:bg-[#7a176c] transition-colors">
               Become a vendor
             </button>
           </Link>
           <Headphones size={24} className="text-gray-700" />
           <div className="hidden sm:block text-right leading-tight">
-            <p className="font-bold text-green-600 text-lg">09069910407</p>
+            <p className="font-bold text-[#981d87] text-lg">09069910407</p>
             <p className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">
               24/7 Support Center
             </p>

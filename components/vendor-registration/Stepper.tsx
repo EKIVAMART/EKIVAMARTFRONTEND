@@ -30,8 +30,8 @@ export default function Stepper({ currentStep }: StepperProps) {
                 <div
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10
-                    ${isCompleted ? 'bg-green-600 border-green-600 text-white' : ''}
-                    ${isActive ? 'bg-green-600 border-green-600 text-white shadow-lg shadow-green-100' : ''}
+                    ${isCompleted ? 'bg-[#981d87] border-[#981d87] text-white' : ''}
+                    ${isActive ? 'bg-[#981d87] border-[#981d87] text-white shadow-lg shadow-[#f5d2f0]' : ''}
                     ${!isCompleted && !isActive ? 'bg-white border-gray-200 text-gray-400' : ''}
                   `}
                 >
@@ -46,7 +46,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                 <span
                   className={`
                     absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors duration-300
-                    ${isActive || isCompleted ? 'text-green-600' : 'text-gray-400'}
+                    ${isActive || isCompleted ? 'text-[#981d87]' : 'text-gray-400'}
                   `}
                 >
                   {step.label}
@@ -59,7 +59,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                   <div className="h-[2px] w-full bg-gray-100 relative">
                     <div
                       className={`
-                        absolute top-0 left-0 h-full bg-green-600 transition-all duration-500 ease-in-out
+                        absolute top-0 left-0 h-full bg-[#981d87] transition-all duration-500 ease-in-out
                         ${isCompleted ? 'w-full' : 'w-0'}
                       `}
                     />
