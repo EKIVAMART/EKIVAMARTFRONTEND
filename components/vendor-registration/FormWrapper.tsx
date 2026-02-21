@@ -12,8 +12,8 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
       {/* Blue Header */}
-      <div className="bg-[#340646] p-8 text-center text-white">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">Partner Registration</h2>
+      <div className="bg-[#981d87] p-8 text-center text-white">
+        <h2 className="text-2xl md:text-3xl font-bold mb-2">Vendor Registration</h2>
         <p className="text-sm opacity-90 font-medium">
           Faflories a muilti-vendor marketplace platform that connects local vendors with customers, providing a seamless online shopping experience. Join us to expand your reach and grow your business!
         </p>
@@ -33,7 +33,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
           {onNext || isLastStep ? (
             <button 
                 onClick={onNext} 
-                className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#00A8B5] hover:bg-[#0096A3]'}`}
+                className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#981d87] hover:bg-[#7a176c]'}`}
             >
               {isLastStep ? "Submit Application" : "Next"} 
               {isLastStep ? <Check size={18} /> : <ChevronRight size={18} />}

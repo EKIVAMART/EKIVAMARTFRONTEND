@@ -11,7 +11,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isVendorRegistration = pathname === '/vendor-registration';
+  const isVendorRegistration = pathname === '';
 
   return (
     <>

@@ -29,7 +29,7 @@ const categories: Category[] = [
   { name: 'Groceries', icon: groceries, bg: 'bg-purple-50', slug: 'groceries' },
   { name: 'Beauty', icon: beauty, bg: 'bg-teal-50', slug: 'beauty' },
   { name: 'Wellness', icon: wellness, bg: 'bg-violet-50', slug: 'wellness' },
-  { name: 'Jewellery', icon: jewellery, bg: 'bg-green-50', slug: 'jewellery' },
+  { name: 'Jewellery', icon: jewellery, bg: 'bg-[#fcedf9]', slug: 'jewellery' },
 ];
 
 const CategoriesGrid = () => {
