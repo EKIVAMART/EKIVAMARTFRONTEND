@@ -23,7 +23,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
         {children}
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center mt-12 pt-6 border-t">
+        <div className="flex justify-between items-center mt-12 pt-7 border-t">
           {onPrev ? (
             <button onClick={onPrev} className="flex items-center gap-2 px-6 py-2.5 border-2 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition">
               <ChevronLeft size={18} /> Previous
