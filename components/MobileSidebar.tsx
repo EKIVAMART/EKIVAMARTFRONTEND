@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser, useClerk, UserButton } from '@clerk/nextjs';
 import {
   X,
@@ -118,13 +119,35 @@ interface MobileSidebarProps {
 }
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const locationParam = searchParams.get('location') || 'All';
+
   const { user } = useUser();
   const { signOut } = useClerk();
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState('Lagos');
+  const [selectedLocation, setSelectedLocation] = useState(locationParam);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [locationSearch, setLocationSearch] = useState('');
   const locationDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelectedLocation(locationParam);
+  }, [locationParam]);
+
+  const handleLocationSelect = (location: string) => {
+    setSelectedLocation(location);
+    setShowLocationDropdown(false);
+    setLocationSearch('');
+
+    const params = new URLSearchParams(window.location.search);
+    if (location === 'All') {
+      params.delete('location');
+    } else {
+      params.set('location', location);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   // Filter locations based on search
   const filteredLocations = allLocations.filter((loc) =>
@@ -251,11 +274,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                         filteredLocations.map((location) => (
                           <button
                             key={location}
-                            onClick={() => {
-                              setSelectedLocation(location);
-                              setShowLocationDropdown(false);
-                              setLocationSearch('');
-                            }}
+                            onClick={() => handleLocationSelect(location)}
                             className={`w-full text-left px-4 py-3 text-sm transition ${
                               selectedLocation === location
                                 ? 'bg-[#981d87] text-white font-semibold'

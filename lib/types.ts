@@ -77,6 +77,10 @@ export interface CartState {
   cartItems: Record<string, number>
 }
 
+export interface WishlistState {
+  items: string[] // Store product IDs
+}
+
 export interface ProductState {
   list: Product[]
 }
@@ -94,4 +98,5 @@ export interface RootState {
   product: ProductState
   address: AddressState
   rating: RatingState
+  wishlist: WishlistState
 }

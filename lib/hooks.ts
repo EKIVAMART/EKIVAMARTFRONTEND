@@ -13,3 +13,8 @@ export const useProductById = (id: string) => {
   const products = useAppSelector(state => state.product.list)
   return products.find(p => p.id === id)
 }
+
+// Cart & Wishlist selectors
+export const useCartCount = () => useAppSelector(state => state.cart.total)
+export const useWishlist = () => useAppSelector(state => state.wishlist.items)
+
