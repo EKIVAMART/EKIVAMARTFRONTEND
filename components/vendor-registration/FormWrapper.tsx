@@ -19,7 +19,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
         </p>
       </div>
 
-      <div className="p-6 md:p-10">
+      <div className="p-7 md:p-10">
         {children}
 
         {/* Navigation Buttons */}
