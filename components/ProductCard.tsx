@@ -1,9 +1,12 @@
 'use client';
 import Image, { StaticImageData } from 'next/image';
-import { Heart, ShoppingCart, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, ShoppingCart, MapPin, Plus } from 'lucide-react';
+import { useAppDispatch, useWishlist } from '@/lib/hooks';
+import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
+import { addToCart } from '@/lib/features/cart/cartSlice';
 
 type ProductCardProps = {
+  id: string;
   image?: string | StaticImageData;
   category?: string;
   title: string;
@@ -17,6 +20,7 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({
+  id,
   image = '/placeholder.png',
   category = 'Fashion',
   title,
@@ -28,7 +32,9 @@ export default function ProductCard({
   href = '#',
   location = 'Lagos',
 }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const dispatch = useAppDispatch();
+  const wishlistItems = useWishlist();
+  const isWishlisted = wishlistItems.includes(id);
   const fullStars = Math.floor(rating);
   const halfStar = rating - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
@@ -121,8 +127,32 @@ export default function ProductCard({
               </span>
             )}
           </div>
+          
+          <button 
+            className="pc-add-cart-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              dispatch(addToCart({ productId: id }));
+            }}
+          >
+            <Plus size={16} />
+            <span>Add</span>
+          </button>
         </div>
       </div>
+
+      <button 
+        className={`pc-wishlist-btn ${isWishlisted ? 'active' : ''}`}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dispatch(toggleWishlist(id));
+        }}
+        aria-label="Add to wishlist"
+      >
+        <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
+      </button>
 
       <style jsx>{`
         .pc-card {
@@ -239,6 +269,33 @@ export default function ProductCard({
           transform: scale(0.95);
         }
 
+        .pc-add-cart-btn {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: #fcedf9;
+          color: #981d87;
+          border: none;
+          padding: 6px 14px;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: 1px solid #fcedf9;
+        }
+
+        .pc-add-cart-btn:hover {
+          background: #981d87;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.2);
+        }
+
+        .pc-add-cart-btn:active {
+          transform: translateY(0);
+        }
+
         /* Quick View */
         .pc-quick-view {
           position: absolute;
@@ -276,7 +333,7 @@ export default function ProductCard({
 
         .pc-category {
           font-size: 11px;
-          color: #16a34a;
+          color: #981d87;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.6px;
@@ -297,7 +354,7 @@ export default function ProductCard({
         }
 
         .pc-card:hover .pc-title {
-          color: #16a34a;
+          color: #981d87;
         }
 
         /* Rating */
@@ -380,13 +437,13 @@ export default function ProductCard({
         }
 
         .pc-author {
-          color: #16a34a;
+          color: #981d87;
           font-weight: 700;
           transition: all 0.3s ease;
         }
 
         .pc-card:hover .pc-author {
-          color: #15803d;
+          color: #7a176c;
         }
 
         /* Price */
@@ -408,7 +465,7 @@ export default function ProductCard({
         .pc-current {
           font-size: 18px;
           font-weight: 800;
-          color: #16a34a;
+          color: #981d87;
           letter-spacing: -0.3px;
         }
 

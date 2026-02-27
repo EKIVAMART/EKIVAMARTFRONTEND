@@ -5,6 +5,8 @@ import { useUser, useClerk, UserButton } from '@clerk/nextjs';
 import { FiHeart, FiSearch, FiShoppingCart, FiMenu } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCartCount, useWishlist } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
 
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
@@ -50,11 +52,33 @@ const nigerianStates: string[] = [
 ];
 
 const LocationSelector = (): JSX.Element => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const locationParam = searchParams.get('location') || 'All';
+
   const [open, setOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>('All');
+  const [selected, setSelected] = useState<string>(locationParam);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelected(locationParam);
+  }, [locationParam]);
+
+  const handleSelect = (state: string) => {
+    setSelected(state);
+    setOpen(false);
+    setSearchQuery('');
+    
+    const params = new URLSearchParams(window.location.search);
+    if (state === 'All') {
+      params.delete('location');
+    } else {
+      params.set('location', state);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   const filteredStates = nigerianStates.filter((state) =>
     state.toLowerCase().includes(searchQuery.toLowerCase())
@@ -127,11 +151,7 @@ const LocationSelector = (): JSX.Element => {
               filteredStates.map((state) => (
                 <div
                   key={state}
-                  onClick={() => {
-                    setSelected(state);
-                    setOpen(false);
-                    setSearchQuery('');
-                  }}
+                  onClick={() => handleSelect(state)}
                   className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors duration-100 border-b border-gray-50 last:border-b-0"
                 >
                   <span className="font-medium">{state}</span>
@@ -176,6 +196,11 @@ const LocationSelector = (): JSX.Element => {
 const Subnavbar = (): JSX.Element => {
   const { user } = useUser();
   const { openSignIn } = useClerk();
+  const cartCount = useCartCount();
+  const wishlistItems = useWishlist();
+  
+  const wishlistCount = wishlistItems.length;
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -242,7 +267,7 @@ const Subnavbar = (): JSX.Element => {
               <button className="p-1.5 hover:bg-gray-100 rounded-lg transition relative">
                 <FiShoppingCart size={20} className="text-gray-700" />
                 <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
-                  0
+                  {cartCount}
                 </span>
               </button>
             </div>
@@ -307,8 +332,8 @@ const Subnavbar = (): JSX.Element => {
                   className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  0
+                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {wishlistCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
@@ -326,8 +351,8 @@ const Subnavbar = (): JSX.Element => {
                   className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  0
+                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}

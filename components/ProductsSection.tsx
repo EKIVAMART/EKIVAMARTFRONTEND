@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useMemo, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProductCard from './ProductCard';
 import { useProducts } from '@/lib/hooks';
 import { Package, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -31,6 +32,8 @@ const EmptyState = ({ category }: { category: string }) => (
 
 export default function ProductsSection() {
   const products = useProducts();
+  const searchParams = useSearchParams();
+  const selectedLocation = searchParams.get('location') || 'All';
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -83,13 +86,15 @@ export default function ProductsSection() {
 
   // Filter products by active category
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter(
-      (product) =>
-        product.category.toLowerCase() === activeCategory.toLowerCase()
-    );
+    const filtered = products.filter((product) => {
+      const matchesCategory = product.category.toLowerCase() === activeCategory.toLowerCase();
+      const matchesLocation = selectedLocation === 'All' || 
+                             product.location?.toLowerCase() === selectedLocation.toLowerCase();
+      return matchesCategory && matchesLocation;
+    });
     // Return at most 10 random products from the category
     return getRandomItems(filtered, 10);
-  }, [products, activeCategory]);
+  }, [products, activeCategory, selectedLocation]);
 
   return (
     <section className="products-section">
@@ -153,6 +158,7 @@ export default function ProductsSection() {
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
+                id={product.id}
                 image={product.images[0]}
                 category={product.category}
                 title={product.name}

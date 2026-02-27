@@ -20,7 +20,7 @@ export default function Step5Declaration({ onPrev }: Props) {
       </div>
 
       {/* Declaration Alert Box */}
-      <div className="bg-[#D1EDF0] border border-[#B2E4E8] p-5 rounded-xl mb-8 flex gap-3">
+      <div className="bg-[#fcedf9] border border-[#B2E4E8] p-5 rounded-xl mb-8 flex gap-3">
         <Info size={20} className="text-[#981d87] shrink-0 mt-1" />
         <div>
           <h4 className="text-sm font-bold text-[#007D87] mb-1">Declaration of Accuracy</h4>
