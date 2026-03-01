@@ -181,6 +181,7 @@ export default function CategoryPage() {
                 products.map((p: Product) => (
                   <div key={p.id} className="w-full">
                     <ProductCard
+                      id={p.id}
                       image={p.images?.[0] ?? '/placeholder.png'}
                       category={p.category}
                       title={p.name}
