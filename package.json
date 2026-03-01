@@ -12,7 +12,10 @@
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
     "@clerk/nextjs": "^6.36.5",
+    "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
+    "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",
     "cookie": "^0.5.0",
     "date-fns": "^4.1.0",
@@ -31,10 +34,12 @@
     "react-medium-image-zoom": "^5.4.0",
     "react-redux": "^9.2.0",
     "recharts": "^3.6.0",
+    "tailwind-merge": "^3.5.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/axios": "^0.9.36",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",

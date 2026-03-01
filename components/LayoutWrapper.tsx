@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { Toast } from '@/components/ui/Toast';
 
 export default function LayoutWrapper({
   children,
@@ -15,6 +16,7 @@ export default function LayoutWrapper({
 
   return (
     <>
+      <Toast />
       {!isVendorRegistration && <Navbar />}
       <main>{children}</main>
       {!isVendorRegistration && <Footer />}

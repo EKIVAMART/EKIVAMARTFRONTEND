@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { assets } from '@/assets/assets';
@@ -10,6 +10,8 @@ import { useProducts } from '@/lib/hooks';
 const FeaturedProducts = () => {
   const products = useProducts();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Helper function to shuffle array and get random items
   const getRandomItems = <T,>(array: T[], count: number) => {
@@ -21,6 +23,27 @@ const FeaturedProducts = () => {
   const featuredProducts = useMemo(() => {
     return getRandomItems(products, 10);
   }, [products]);
+
+  // Check scroll position and update button states
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  // Set up scroll listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScroll);
+      // Check initial state
+      setTimeout(checkScroll, 100);
+      return () => container.removeEventListener('scroll', checkScroll);
+    }
+  }, []);
 
   // Calculate average rating
   const calculateAverageRating = (ratings: Array<{ rating: number }>) => {
@@ -42,6 +65,9 @@ const FeaturedProducts = () => {
         left: targetScroll,
         behavior: 'smooth',
       });
+
+      // Update button states after scroll completes
+      setTimeout(checkScroll, 400);
     }
   };
 
@@ -58,13 +84,18 @@ const FeaturedProducts = () => {
           {/* Products Carousel - Constrained Container with Padels */}
           <div className="flex-1 overflow-hidden">
             <div className="relative w-full group">
-              {/* Left Padel Button */}
+              {/* Left Paddle Button */}
               <button
                 onClick={() => scroll('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center bg-white rounded-full p-3 shadow-lg hover:shadow-2xl hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 -translate-x-20 cursor-pointer"
+                disabled={!canScrollLeft}
+                className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
+                  canScrollLeft
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-100 active:scale-95 border-gray-300 cursor-pointer'
+                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 aria-label="Scroll left"
               >
-                <ChevronLeft size={32} className="text-gray-800 font-bold" />
+                <ChevronLeft size={24} className="font-bold" />
               </button>
 
               {/* Scroll Container - Hidden Scrollbar & Overflow Hidden */}
@@ -107,13 +138,18 @@ const FeaturedProducts = () => {
                 ))}
               </div>
 
-              {/* Right Padel Button */}
+              {/* Right Paddle Button */}
               <button
                 onClick={() => scroll('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center bg-white rounded-full p-3 shadow-lg hover:shadow-2xl hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 translate-x-20 cursor-pointer"
+                disabled={!canScrollRight}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
+                  canScrollRight
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-100 active:scale-95 border-gray-300 cursor-pointer'
+                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 aria-label="Scroll right"
               >
-                <ChevronRight size={32} className="text-gray-800 font-bold" />
+                <ChevronRight size={24} className="font-bold" />
               </button>
             </div>
 
