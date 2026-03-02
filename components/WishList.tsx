@@ -1,34 +1,29 @@
 'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, Star, ChevronRight } from 'lucide-react';
+import { useWishlist, useProducts, useAppDispatch } from '@/lib/hooks';
+import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
 import { assets } from '../assets/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WishlistPage() {
-  const [wishlistData, setWishlistData] = useState([
-    {
-      id: '1',
-      name: 'Lenovo Ideapad Slim 3 Intel Core I5-12450H 15.6" (...',
-      image: assets.product_img12,
-      rating: 5,
-      reviews: 5,
-      price: 45000,
-    },
-    {
-      id: '2',
-      name: 'boAt Wave Fury Smartwatch with 4.64 cm (1.83 inch)...',
-      image: assets.product_img5, // Using a smartwatch image from assets
-      rating: 5,
-      reviews: 5,
-      price: 1800,
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const wishlistItems = useWishlist();
+  const allProducts = useProducts();
+
+  const calculateAverageRating = (ratings: any[]) => {
+    if (!ratings || ratings.length === 0) return 0;
+    const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
+    return sum / ratings.length;
+  };
+
+  // Filter all products to only show those in the wishlist
+  const wishlistData = allProducts.filter(p => wishlistItems.includes(p.id));
 
   const removeItem = (id: string) => {
-    setWishlistData((prev) => prev.filter((item) => item.id !== id));
+    dispatch(toggleWishlist(id));
   };
 
   return (
@@ -36,7 +31,7 @@ export default function WishlistPage() {
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-gray-50/50">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
-          <Link href="/" className="text-green-600 font-medium hover:underline">
+          <Link href="/" className="text-[#981d87] font-medium hover:underline">
             Home
           </Link>
           <ChevronRight size={14} className="text-gray-400" />
@@ -50,7 +45,7 @@ export default function WishlistPage() {
           <h1 className="text-3xl font-bold text-slate-800 mb-1">My List</h1>
           <p className="text-gray-500 font-medium">
             There are{' '}
-            <span className="text-green-600 font-bold">
+            <span className="text-[#981d87] font-bold">
               {wishlistData.length}
             </span>{' '}
             products in your Wishlist
@@ -82,7 +77,7 @@ export default function WishlistPage() {
                       {/* Using a placeholder div for image - replace with <Image /> */}
                       <div className="w-full h-full bg-gray-100 relative">
                         <Image
-                          src={item.image}
+                          src={item.images[0]}
                           alt={item.name}
                           width={100}
                           height={100}
@@ -91,7 +86,7 @@ export default function WishlistPage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-green-600 cursor-pointer">
+                      <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-[#981d87] cursor-pointer">
                         {item.name}
                       </h3>
                       <div className="flex items-center gap-1 mt-1">
@@ -100,14 +95,14 @@ export default function WishlistPage() {
                             key={i}
                             size={16}
                             className={
-                              i < item.rating
+                              i < calculateAverageRating(item.rating)
                                 ? 'fill-orange-400 text-orange-400'
                                 : 'text-gray-300'
                             }
                           />
                         ))}
                         <span className="text-xs text-gray-400 font-medium ml-1">
-                          ({item.reviews})
+                          ({item.rating.length})
                         </span>
                       </div>
                     </div>
@@ -145,7 +140,7 @@ export default function WishlistPage() {
             <p className="text-gray-500 mb-4">Your wishlist is empty.</p>
             <Link
               href="/"
-              className="bg-green-600 text-white px-6 py-2 rounded-md font-bold hover:bg-green-700 transition"
+              className="bg-[#981d87] text-white px-6 py-2 rounded-md font-bold hover:bg-[#7a176c] transition"
             >
               Fill it now
             </Link>

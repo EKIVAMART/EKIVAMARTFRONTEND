@@ -4,7 +4,7 @@ export const InputGroup = ({ label, required, isTextArea, isSelect, type = "text
   <div className="space-y-1.5">
     <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
       {label} {required && <span className="text-red-500">*</span>}
-      <HelpCircle size={14} className="text-[#00A8B5] cursor-help" />
+      <HelpCircle size={14} className="text-[#981d87] cursor-help" />
     </label>
     {isTextArea ? (
       <textarea className="w-full p-3 rounded-xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none transition h-24 text-sm" />
@@ -21,10 +21,10 @@ export const InputGroup = ({ label, required, isTextArea, isSelect, type = "text
 export const UploadBox = ({ label }: { label: string }) => (
     <div className="space-y-1.5">
       <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
-        {label} <span className="text-red-500">*</span> <HelpCircle size={14} className="text-[#00A8B5]" />
+        {label} <span className="text-red-500">*</span> <HelpCircle size={14} className="text-[#981d87]" />
       </label>
       <div className="border-2 border-dashed border-[#B2E4E8] rounded-2xl p-8 bg-[#F8FDFF] flex flex-col items-center justify-center cursor-pointer hover:bg-[#F0F9FA] transition">
-          <div className="bg-[#00A8B5] text-white p-3 rounded-xl mb-3 shadow-md">
+          <div className="bg-[#981d87] text-white p-3 rounded-xl mb-3 shadow-md">
             <Upload size={24}/>
           </div>
           <p className="text-sm font-bold text-gray-700">Click to upload or drag and drop</p>

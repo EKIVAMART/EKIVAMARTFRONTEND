@@ -5,6 +5,8 @@ import { useAppSelector } from '@/lib/hooks';
 import { FiHeart, FiSearch, FiShoppingCart, FiMenu } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCartCount, useWishlist } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
@@ -53,11 +55,33 @@ const nigerianStates: string[] = [
 ];
 
 const LocationSelector = (): JSX.Element => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const locationParam = searchParams.get('location') || 'All';
+
   const [open, setOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>('All');
+  const [selected, setSelected] = useState<string>(locationParam);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelected(locationParam);
+  }, [locationParam]);
+
+  const handleSelect = (state: string) => {
+    setSelected(state);
+    setOpen(false);
+    setSearchQuery('');
+    
+    const params = new URLSearchParams(window.location.search);
+    if (state === 'All') {
+      params.delete('location');
+    } else {
+      params.set('location', state);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   const filteredStates = nigerianStates.filter((state) =>
     state.toLowerCase().includes(searchQuery.toLowerCase())
@@ -130,11 +154,7 @@ const LocationSelector = (): JSX.Element => {
               filteredStates.map((state) => (
                 <div
                   key={state}
-                  onClick={() => {
-                    setSelected(state);
-                    setOpen(false);
-                    setSearchQuery('');
-                  }}
+                  onClick={() => handleSelect(state)}
                   className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors duration-100 border-b border-gray-50 last:border-b-0"
                 >
                   <span className="font-medium">{state}</span>
@@ -177,8 +197,13 @@ const LocationSelector = (): JSX.Element => {
 /* ================== MAIN SUBNAVBAR COMPONENT ================== */
 
 const Subnavbar = (): JSX.Element => {
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  const user = useAppSelector((state) => state.auth.user);
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
+  const cartCount = useCartCount();
+  const wishlistItems = useWishlist();
+  
+  const wishlistCount = wishlistItems.length;
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -241,7 +266,7 @@ const Subnavbar = (): JSX.Element => {
 
             {/* Logo */}
             <div className="flex-1 text-center">
-              <div className="text-green-600 text-lg font-bold">Faflories</div>
+              <div className="text-[#981d87] text-lg font-bold">Faflories</div>
               <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
             </div>
 
@@ -249,8 +274,8 @@ const Subnavbar = (): JSX.Element => {
             <div className="flex items-center gap-2">
               <button className="p-1.5 hover:bg-gray-100 rounded-lg transition relative">
                 <FiShoppingCart size={20} className="text-gray-700" />
-                <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
-                  0
+                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+                  {cartCount}
                 </span>
               </button>
             </div>
@@ -280,21 +305,21 @@ const Subnavbar = (): JSX.Element => {
             href="/"
             className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
           >
-            <div className="text-green-600 text-2xl font-bold">Faflories</div>
+            <div className="text-[#981d87] text-2xl font-bold">Faflories</div>
             <span className="text-xs text-gray-500 font-semibold">
               BIG MEGA SHOP
             </span>
           </Link>
 
           {/* Search Bar - Takes up more space */}
-          <div className="flex w-full items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-green-300 focus-within:border-green-500 transition group">
+          <div className="flex w-full items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-green-300 focus-within:border-[#fcedf9]0 transition group">
             <input
               type="text"
               placeholder="Search for items..."
               className="flex-1 outline-none text-sm text-black bg-transparent placeholder-gray-500"
             />
             <button className="p-1 hover:bg-gray-100 rounded-lg transition">
-              <FiSearch size={20} className="text-green-600" />
+              <FiSearch size={20} className="text-[#981d87]" />
             </button>
           </div>
 
@@ -311,15 +336,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiHeart
-                  className="w-7 h-7 text-slate-700 group-hover:text-green-600 transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  0
+                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {wishlistCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-green-600 transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#981d87] transition-colors">
                 Wishlist
               </span>
             </Link>
@@ -330,15 +355,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiShoppingCart
-                  className="w-7 h-7 text-slate-700 group-hover:text-green-600 transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#5db182] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  0
+                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-green-600 transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#981d87] transition-colors">
                 Cart
               </span>
             </Link>
@@ -351,9 +376,9 @@ const Subnavbar = (): JSX.Element => {
               >
                 <FiUser
                   size={22}
-                  className="text-gray-700 group-hover:text-green-600 transition"
+                  className="text-gray-700 group-hover:text-[#981d87] transition"
                 />
-                <span className="text-sm text-gray-600 group-hover:text-green-600 transition whitespace-nowrap hidden lg:block">
+                <span className="text-sm text-gray-600 group-hover:text-[#981d87] transition whitespace-nowrap hidden lg:block">
                   Account
                 </span>
               </button>

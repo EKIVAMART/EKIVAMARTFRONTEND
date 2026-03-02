@@ -1,10 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { Toast } from '@/components/ui/Toast';
+
+function NavbarSkeleton() {
+  return <div className="h-16 sm:h-20 bg-gray-100 animate-pulse" />;
+}
+
+function MainSkeleton() {
+  return <div className="min-h-screen bg-gray-100 animate-pulse" />;
+}
 
 export default function LayoutWrapper({
   children,
@@ -12,13 +20,18 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isVendorRegistration = pathname === '/vendor-registration';
+  const isVendorRegistration = pathname === '';
 
   return (
     <>
-      <Toast />
-      {!isVendorRegistration && <Navbar />}
-      <main>{children}</main>
+      {!isVendorRegistration && (
+        <Suspense fallback={<NavbarSkeleton />}>
+          <Navbar />
+        </Suspense>
+      )}
+      <Suspense fallback={<MainSkeleton />}>
+        <main>{children}</main>
+      </Suspense>
       {!isVendorRegistration && <Footer />}
     </>
   );

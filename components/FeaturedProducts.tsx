@@ -2,6 +2,7 @@
 
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { assets } from '@/assets/assets';
 import ProductCard from './ProductCard';
@@ -9,6 +10,8 @@ import { useProducts } from '@/lib/hooks';
 
 const FeaturedProducts = () => {
   const products = useProducts();
+  const searchParams = useSearchParams();
+  const selectedLocation = searchParams.get('location') || 'All';
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -19,10 +22,14 @@ const FeaturedProducts = () => {
     return shuffled.slice(0, count);
   };
 
-  // Get 10 random products from useProducts hook
+  // Get 10 random products from useProducts hook, filtered by location if selected
   const featuredProducts = useMemo(() => {
-    return getRandomItems(products, 10);
-  }, [products]);
+    const filtered = products.filter((product) => {
+      return selectedLocation === 'All' || 
+             product.location?.toLowerCase() === selectedLocation.toLowerCase();
+    });
+    return getRandomItems(filtered, 10);
+  }, [products, selectedLocation]);
 
   // Check scroll position and update button states
   const checkScroll = () => {
@@ -124,6 +131,7 @@ const FeaturedProducts = () => {
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ProductCard
+                      id={product.id}
                       image={product.images[0]}
                       category={product.category}
                       title={product.name}

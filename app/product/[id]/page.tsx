@@ -3,7 +3,10 @@
 import { useState, use } from 'react';
 import Image, { StaticImageData } from 'next/image';
 import { productDummyData } from '@/assets/assets';
-import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
+import { useAppDispatch, useWishlist } from '@/lib/hooks';
+import { addToCart } from '@/lib/features/cart/cartSlice';
+import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
 import Link from 'next/link';
 import './product-details.css';
 
@@ -36,13 +39,16 @@ export default function ProductDetailsPage({
 }: ProductDetailsPageProps) {
   const { id } = use(params);
   const product = productDummyData.find((p) => p.id === id);
+  const dispatch = useAppDispatch();
+  const wishlistItems = useWishlist();
+  const isWishlisted = wishlistItems.includes(id);
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string>('M');
   const [activeTab, setActiveTab] = useState<
     'description' | 'additional' | 'reviews'
   >('description');
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   if (!product) {
     return (
@@ -262,23 +268,28 @@ export default function ProductDetailsPage({
                 </button>
               </div>
 
-              <button className="pd-btn-primary pd-btn-add-to-cart">
-                <svg className="pd-cart-icon" viewBox="0 0 24 24">
-                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-. 9-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7.17 14.75l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25z" />
-                </svg>
+               <button 
+                className="pd-btn-primary pd-btn-add-to-cart"
+                onClick={() => {
+                  for(let i = 0; i < quantity; i++) {
+                    dispatch(addToCart({ productId: id }));
+                  }
+                }}
+              >
+                <ShoppingCart className="pd-cart-icon" size={20} />
                 Add To Cart
               </button>
-
-              <button
-                className={`pd-btn-wishlist ${isWishlisted ? 'active' : ''}`}
-                onClick={() => setIsWishlisted(!isWishlisted)}
-                aria-label="Add to wishlist"
-              >
-                <Heart
-                  size={20}
-                  fill={isWishlisted ? 'currentColor' : 'none'}
-                />
-              </button>
+ 
+               <button
+                 className={`pd-btn-wishlist ${isWishlisted ? 'active' : ''}`}
+                 onClick={() => dispatch(toggleWishlist(id))}
+                 aria-label="Add to wishlist"
+               >
+                 <Heart
+                   size={20}
+                   fill={isWishlisted ? 'currentColor' : 'none'}
+                 />
+               </button>
             </div>
           </div>
         </div>

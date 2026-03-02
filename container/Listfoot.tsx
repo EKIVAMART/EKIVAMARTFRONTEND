@@ -115,7 +115,7 @@ const Listfoot = () => {
                     key={index}
                     className="flex items-start gap-3 text-sm text-gray-600"
                   >
-                    <Icon className="text-green-600 mt-1" />
+                    <Icon className="text-[#981d87] mt-1" />
                     <span>{item.text}</span>
                   </li>
                 );
@@ -133,7 +133,7 @@ const Listfoot = () => {
                 {section.links.map((link, idx) => (
                   <li
                     key={idx}
-                    className="text-sm text-gray-600 hover:text-green-600 cursor-pointer transition"
+                    className="text-sm text-gray-600 hover:text-[#981d87] cursor-pointer transition"
                   >
                     {link}
                   </li>
@@ -161,7 +161,7 @@ const Listfoot = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-green-600 text-white hover:bg-green-700 transition"
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-[#981d87] text-white hover:bg-[#7a176c] transition"
                   >
                     <Icon size={14} />
                   </a>

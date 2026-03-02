@@ -1,5 +1,6 @@
 "use client";
 import React, { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ProductCard from "./ProductCard";
 
 type SimpleProduct = {
@@ -21,6 +22,8 @@ type Props = {
 };
 
 export default function CategoryProductsClient({ initialProducts, categories, active }: Props) {
+   const searchParams = useSearchParams();
+  const selectedLocation = searchParams.get('location') || 'All';
   const currency = "₦";
 
   const globalMin = useMemo(() => (initialProducts.length ? Math.min(...initialProducts.map((p) => p.price)) : 0), [initialProducts]);
@@ -36,8 +39,13 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
   }, [globalMin, globalMax]);
 
   const filtered = useMemo(() => {
-    return initialProducts.filter((p) => p.price >= minValue && p.price <= maxValue);
-  }, [initialProducts, minValue, maxValue]);
+    return initialProducts.filter((p) => {
+      const matchesPrice = p.price >= minValue && p.price <= maxValue;
+      const matchesLocation = selectedLocation === 'All' || 
+                             p.location?.toLowerCase() === selectedLocation.toLowerCase();
+      return matchesPrice && matchesLocation;
+    });
+  }, [initialProducts, minValue, maxValue, selectedLocation]);
 
   function handleMinChange(v: number) {
     const next = Math.min(v, maxValue);
@@ -127,6 +135,7 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
               filtered.map((p) => (
                 <div key={p.id} className="w-full">
                   <ProductCard
+                    id={p.id}
                     image={p.image ?? '/placeholder.png'}
                     category={p.category}
                     title={p.name}

@@ -11,7 +11,7 @@ export default function Step2CompanyInfo({ onNext, onPrev }: Props) {
   return (
     <FormWrapper onNext={onNext} onPrev={onPrev}>
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-[#00A8B5] rounded-lg text-white">
+        <div className="p-2 bg-[#981d87] rounded-lg text-white">
           <Building2 size={20} />
         </div>
         <div>

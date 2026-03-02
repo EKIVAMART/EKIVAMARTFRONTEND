@@ -45,7 +45,7 @@ export default function Features() {
             key={index}
             className="flex items-center gap-4 rounded-xl bg-gray-50 p-4 transition hover:shadow-sm"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5d2f0]">
               <Image
                 src={feature.icon}
                 alt={feature.title}
