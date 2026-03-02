@@ -1,13 +1,16 @@
 'use client';
 
 import { JSX, useState, useRef, useEffect } from 'react';
-import { useUser, useClerk, UserButton } from '@clerk/nextjs';
+import { useAppSelector } from '@/lib/hooks';
 import { FiHeart, FiSearch, FiShoppingCart, FiMenu } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartCount, useWishlist } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
+import { LoginModal } from '@/components/auth/LoginModal';
+import { SignupModal } from '@/components/auth/SignupModal';
+import { ProfileModal } from '@/components/auth/ProfileModal';
 
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
 
@@ -205,6 +208,9 @@ const Subnavbar = (): JSX.Element => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -237,6 +243,8 @@ const Subnavbar = (): JSX.Element => {
       <MobileSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onSigninClick={() => setIsLoginModalOpen(true)}
+        onProfileClick={() => setIsProfileModalOpen(true)}
       />
 
       {/* ===== MOBILE HEADER ===== */}
@@ -316,9 +324,8 @@ const Subnavbar = (): JSX.Element => {
           </div>
 
           {/* Location Selector - RIGHT SIDE */}
-          
-            <LocationSelector />
-         
+
+          <LocationSelector />
 
           {/* Right Icons Section */}
           <div className="flex items-center gap-5">
@@ -362,9 +369,9 @@ const Subnavbar = (): JSX.Element => {
             </Link>
 
             {/* Account */}
-            {!user ? (
+            {!isAuthenticated ? (
               <button
-                onClick={() => openSignIn?.()}
+                onClick={() => setIsLoginModalOpen(true)}
                 className="flex flex-wrap gap-3 items-center justify-center group"
               >
                 <FiUser
@@ -376,13 +383,41 @@ const Subnavbar = (): JSX.Element => {
                 </span>
               </button>
             ) : (
-              <div className="flex flex-col items-center gap-1">
-                <UserButton />
+              <button
+                onClick={() => setIsProfileModalOpen(true)}
+                className="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition"
+              >
+                <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold">
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </div>
                 <span className="text-xs text-gray-600 hidden lg:block">
-                  Account
+                  {user?.firstName}
                 </span>
-              </div>
+              </button>
             )}
+
+            {/* Modals */}
+            <LoginModal
+              isOpen={isLoginModalOpen}
+              onClose={() => setIsLoginModalOpen(false)}
+              onSwitchToSignup={() => {
+                setIsLoginModalOpen(false);
+                setIsSignupModalOpen(true);
+              }}
+            />
+            <SignupModal
+              isOpen={isSignupModalOpen}
+              onClose={() => setIsSignupModalOpen(false)}
+              onSwitchToLogin={() => {
+                setIsSignupModalOpen(false);
+                setIsLoginModalOpen(true);
+              }}
+            />
+            <ProfileModal
+              isOpen={isProfileModalOpen}
+              onClose={() => setIsProfileModalOpen(false)}
+            />
           </div>
         </div>
       </header>

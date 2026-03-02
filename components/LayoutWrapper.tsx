@@ -4,6 +4,7 @@ import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { Toast } from '@/components/ui/Toast';
 
 function NavbarSkeleton() {
   return <div className="h-16 sm:h-20 bg-gray-100 animate-pulse" />;

@@ -21,6 +21,7 @@ import {
   Gem,
   Home,
   Search,
+  User,
 } from 'lucide-react';
 
 interface Category {
@@ -116,6 +117,8 @@ const allLocations = [
 interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onSigninClick?: () => void;
+  onProfileClick?: () => void;
 }
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
@@ -160,8 +163,8 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     );
   };
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    dispatch(logout());
     onClose();
   };
 
@@ -366,17 +369,26 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             <div className="sticky bottom-0 bg-white p-4 space-y-3">
               {user ? (
                 <>
-                  <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50">
-                    <UserButton />
-                    <div className="flex-1 min-w-0">
+                  <button
+                    onClick={() => {
+                      onProfileClick?.();
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-green-50 hover:border-green-300 border border-gray-100 transition group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
+                      {user.firstName?.[0]}
+                      {user.lastName?.[0]}
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
                       <p className="text-sm font-semibold text-gray-700 truncate">
                         {user.firstName} {user.lastName}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
-                        {user.primaryEmailAddress?.emailAddress}
+                        {user.email}
                       </p>
                     </div>
-                  </div>
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2.5 rounded-lg transition"
@@ -386,9 +398,16 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   </button>
                 </>
               ) : (
-                <p className="text-center text-sm text-gray-500">
-                  Sign in to continue
-                </p>
+                <button
+                  onClick={() => {
+                    onSigninClick?.();
+                    onClose();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition"
+                >
+                  <User size={18} />
+                  Sign In
+                </button>
               )}
             </div>
           </motion.div>

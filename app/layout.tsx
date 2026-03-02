@@ -14,6 +14,8 @@ export default function RootLayout({
         <html lang="en">
           <body suppressHydrationWarning={true}>
             <LayoutWrapper>{children}</LayoutWrapper>
+            {/* Portal target for modals and overlays */}
+            <div id="modal-root" />
           </body>
         </html>
       </StoreProvider>
