@@ -33,6 +33,7 @@ export default function LayoutWrapper({
         <main>{children}</main>
       </Suspense>
       {!isVendorRegistration && <Footer />}
+      <Toast />
     </>
   );
 }

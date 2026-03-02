@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 export const Toast = () => {
   return (
     <Toaster
-      position="bottom-right"
+      position="top-right"
       containerStyle={{
         zIndex: 999999999,
         position: 'fixed',
