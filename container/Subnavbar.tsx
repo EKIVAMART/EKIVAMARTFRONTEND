@@ -1,12 +1,11 @@
 'use client';
 
 import { JSX, useState, useRef, useEffect } from 'react';
-import { useAppSelector } from '@/lib/hooks';
 import { FiHeart, FiSearch, FiShoppingCart, FiMenu } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCartCount, useWishlist } from '@/lib/hooks';
+import { useCartCount, useWishlist, useAppSelector } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
@@ -73,7 +72,7 @@ const LocationSelector = (): JSX.Element => {
     setSelected(state);
     setOpen(false);
     setSearchQuery('');
-    
+
     const params = new URLSearchParams(window.location.search);
     if (state === 'All') {
       params.delete('location');
@@ -197,11 +196,11 @@ const LocationSelector = (): JSX.Element => {
 /* ================== MAIN SUBNAVBAR COMPONENT ================== */
 
 const Subnavbar = (): JSX.Element => {
-  const { user } = useUser();
-  const { openSignIn } = useClerk();
+  const user = useAppSelector((state) => state.auth.user);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const cartCount = useCartCount();
   const wishlistItems = useWishlist();
-  
+
   const wishlistCount = wishlistItems.length;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);

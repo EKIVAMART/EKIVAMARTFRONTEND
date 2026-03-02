@@ -1,9 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-import cartReducer from './features/cart/cartSlice'
-import wishlistReducer from './features/wishlist/wishlistSlice'
-import productReducer from './features/product/productSlice'
-import addressReducer from './features/address/addressSlice'
-import ratingReducer from './features/rating/ratingSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './features/auth/authSlice';
+import cartReducer from './features/cart/cartSlice';
+import wishlistReducer from './features/wishlist/wishlistSlice';
+import productReducer from './features/product/productSlice';
+import addressReducer from './features/address/addressSlice';
+import ratingReducer from './features/rating/ratingSlice';
 
 export const makeStore = () => {
   return configureStore({

@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useUser, useClerk, UserButton } from '@clerk/nextjs';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { logout } from '@/lib/features/auth/authSlice';
 import {
   X,
   MapPin,
@@ -126,8 +127,8 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const searchParams = useSearchParams();
   const locationParam = searchParams.get('location') || 'All';
 
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState(locationParam);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -371,7 +372,6 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <>
                   <button
                     onClick={() => {
-                      onProfileClick?.();
                       onClose();
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-green-50 hover:border-green-300 border border-gray-100 transition group"
@@ -400,7 +400,6 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               ) : (
                 <button
                   onClick={() => {
-                    onSigninClick?.();
                     onClose();
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition"
