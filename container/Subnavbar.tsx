@@ -1,7 +1,8 @@
 'use client';
 
 import { JSX, useState, useRef, useEffect } from 'react';
-import { FiHeart, FiSearch, FiShoppingCart, FiMenu } from 'react-icons/fi';
+import { FiHeart, FiSearch, FiShoppingCart, FiMenu, FiMapPin } from 'react-icons/fi';
+import { FaAngleDown } from "react-icons/fa6";
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,7 +15,7 @@ import { ProfileModal } from '@/components/auth/ProfileModal';
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
 
 const nigerianStates: string[] = [
-  'All',
+  'Location',
   'Abia',
   'Adamawa',
   'Akwa Ibom',
@@ -56,7 +57,7 @@ const nigerianStates: string[] = [
 const LocationSelector = (): JSX.Element => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const locationParam = searchParams.get('location') || 'All';
+  const locationParam = searchParams.get('location') || 'Location';
 
   const [open, setOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>(locationParam);
@@ -103,24 +104,14 @@ const LocationSelector = (): JSX.Element => {
       <div
         ref={buttonRef}
         onClick={handleOpen}
-        className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm cursor-pointer bg-white hover:bg-gray-50 transition-all rounded-md border border-gray-300 w-20 group"
+        className="flex items-center justify-between gap-4 px-4 py-2.5 cursor-pointer bg-white hover:bg-gray-50 transition-all rounded-md border border-gray-300 group"
       >
-        <span className="font-medium text-gray-800 text-xs">{selected}</span>
-        <svg
-          className={`w-4 h-4 text-gray-600 transition-transform ${
-            open ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 14l-7 7m0 0l-7-7m7 7V3"
-          />
-        </svg>
+        <div className="flex items-center gap-1.5 w-full">
+          <FiMapPin className="text-[#981d87] shrink-0" size={15} />
+          <span className="font-medium text-gray-800 text-[15px] truncate">{selected}</span>
+        </div>
+          <FaAngleDown className="text-gray-600" size={15} />
+ 
       </div>
 
       {/* Dropdown with Search */}
@@ -156,7 +147,10 @@ const LocationSelector = (): JSX.Element => {
                   onClick={() => handleSelect(state)}
                   className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors duration-100 border-b border-gray-50 last:border-b-0"
                 >
-                  <span className="font-medium">{state}</span>
+                  <div className="flex items-center gap-2">
+                    {state === 'All' && <FiMapPin size={14} className="text-[#981d87]" />}
+                    <span className="font-medium">{state}</span>
+                  </div>
                 </div>
               ))
             ) : (
@@ -178,14 +172,14 @@ const LocationSelector = (): JSX.Element => {
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: #10b981;
+          background-color: #981d87;
           border-radius: 6px;
           border: 2px solid transparent;
           background-clip: content-box;
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background-color: #059669;
+          background-color: #7a176c;
           background-clip: content-box;
         }
       `}</style>
@@ -311,7 +305,7 @@ const Subnavbar = (): JSX.Element => {
           </Link>
 
           {/* Search Bar - Takes up more space */}
-          <div className="flex w-full items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-green-300 focus-within:border-[#fcedf9]0 transition group">
+          <div className="flex w-full max-w-xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-[#fcedf9] focus-within:border-[#fcedf9]0 transition group">
             <input
               type="text"
               placeholder="Search for items..."
@@ -386,7 +380,7 @@ const Subnavbar = (): JSX.Element => {
                 onClick={() => setIsProfileModalOpen(true)}
                 className="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition"
               >
-                <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold">
+                <div className="w-8 h-8 rounded-full bg-[#981d87] text-white flex items-center justify-center text-sm font-semibold">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </div>

@@ -20,11 +20,11 @@ export default function Step5Declaration({ onPrev }: Props) {
       </div>
 
       {/* Declaration Alert Box */}
-      <div className="bg-[#fcedf9] border border-[#B2E4E8] p-5 rounded-xl mb-8 flex gap-3">
+      <div className="bg-[#fcedf9] border border-[#fcedf9] p-5 rounded-xl mb-8 flex gap-3">
         <Info size={20} className="text-[#981d87] shrink-0 mt-1" />
         <div>
-          <h4 className="text-sm font-bold text-[#007D87] mb-1">Declaration of Accuracy</h4>
-          <p className="text-[11px] text-[#007D87] leading-relaxed font-medium">
+          <h4 className="text-sm font-bold text-[#981d87] mb-1">Declaration of Accuracy</h4>
+          <p className="text-[11px] text-[#981d87] leading-relaxed font-medium">
             The individual submitting this Service Request Form affirms that all information provided herein is true, accurate, and complete to the best of their knowledge. They understand that any false, misleading, or incomplete information may result in the delay, suspension, or termination of the onboarding process or service eligibility.
           </p>
         </div>

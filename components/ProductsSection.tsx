@@ -340,7 +340,7 @@ export default function ProductsSection() {
           justify-content: center;
           gap: 10px;
           padding: 12px 32px;
-          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
           color: white;
           font-size: 14px;
           font-weight: 700;
@@ -348,13 +348,13 @@ export default function ProductsSection() {
           border-radius: 50px;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+          box-shadow: 0 6px 20px rgba(152, 29, 135, 0.3);
           letter-spacing: 0.3px;
         }
 
         .view-more-btn:hover {
-          background: linear-gradient(135deg, #15803d 0%, #166534 100%);
-          box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4);
+          background: linear-gradient(135deg, #7a176c 0%, #166534 100%);
+          box-shadow: 0 10px 30px rgba(152, 29, 135, 0.4);
           transform: translateY(-3px);
         }
 

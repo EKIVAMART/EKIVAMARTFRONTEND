@@ -23,7 +23,7 @@ export const UploadBox = ({ label }: { label: string }) => (
       <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
         {label} <span className="text-red-500">*</span> <HelpCircle size={14} className="text-[#981d87]" />
       </label>
-      <div className="border-2 border-dashed border-[#B2E4E8] rounded-2xl p-8 bg-[#F8FDFF] flex flex-col items-center justify-center cursor-pointer hover:bg-[#F0F9FA] transition">
+      <div className="border-2 border-dashed border-[#fcedf9] rounded-2xl p-8 bg-[#F8FDFF] flex flex-col items-center justify-center cursor-pointer hover:bg-[#F0F9FA] transition">
           <div className="bg-[#981d87] text-white p-3 rounded-xl mb-3 shadow-md">
             <Upload size={24}/>
           </div>
