@@ -111,7 +111,7 @@ export default function CategoryPage() {
   return (
     <main className="py-6 sm:py-8">
       <div className="mx-auto w-[90%]">
-        <div className="rounded-2xl bg-emerald-50 p-5 sm:p-6 mb-5 shadow-sm">
+        <div className="rounded-2xl bg-emerald-50 p-5 sm:p-5 mb-5 shadow-sm">
           <h1 className="text-2xl sm:text-3xl font-bold text-emerald-800 capitalize">
             {active}
           </h1>
