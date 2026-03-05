@@ -374,9 +374,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     onClick={() => {
                       onClose();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-green-50 hover:border-green-300 border border-gray-100 transition group"
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#fcedf9] hover:border-[#fcedf9] border border-gray-100 transition group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
+                    <div className="w-10 h-10 rounded-full bg-[#981d87] text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
                       {user.firstName?.[0]}
                       {user.lastName?.[0]}
                     </div>
@@ -402,7 +402,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   onClick={() => {
                     onClose();
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition"
+                  className="w-full flex items-center justify-center gap-2 bg-[#981d87] hover:bg-[#7a176c] text-white font-semibold py-2.5 rounded-lg transition"
                 >
                   <User size={18} />
                   Sign In

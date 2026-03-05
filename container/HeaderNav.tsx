@@ -262,7 +262,7 @@ export default function Header() {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.15, delay: index * 0.03 }}
-                        whileHover={{ x: 4, backgroundColor: '#f0fdf4' }}
+                        whileHover={{ x: 4, backgroundColor: '#fcedf9' }}
                       >
                         <Link
                           href={sub.href}

@@ -44,7 +44,7 @@ const CategoriesGrid = () => {
             <Link
               key={category.name}
               href={`/category/${category.slug}`}
-              className="flex items-center gap-1.5 p-1.5 rounded-sm transition-all duration-300 bg-white border border-gray-100 text-gray-800 hover:border-emerald-200 hover:shadow-xs"
+              className="flex items-center gap-1.5 p-1.5 rounded-sm transition-all duration-300 bg-white border border-gray-100 text-gray-800 hover:border-[#fcedf9] hover:shadow-xs"
             >
               <div
                 className={`

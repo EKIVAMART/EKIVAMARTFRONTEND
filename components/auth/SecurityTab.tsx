@@ -81,13 +81,13 @@ export const SecurityTab: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Success Message */}
         {success && (
-          <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-100 rounded-xl">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
+          <div className="flex items-center gap-3 p-4 bg-[#fcedf9] border border-[#fcedf9] rounded-xl">
+            <CheckCircle2 className="w-5 h-5 text-[#981d87]" />
             <div>
-              <p className="text-sm font-medium text-green-800">
+              <p className="text-sm font-medium text-[#7a176c]">
                 Password changed successfully!
               </p>
-              <p className="text-xs text-green-600 mt-0.5">
+              <p className="text-xs text-[#981d87] mt-0.5">
                 All other sessions have been logged out for security
               </p>
             </div>

@@ -168,17 +168,17 @@ export default function ProductCard({
           will-change: transform, box-shadow;
           position: relative;
           height: 100%;
-          border: 1px solid rgba(22, 163, 74, 0.1);
+          border: 1px solid rgba(152, 29, 135, 0.1);
         }
 
         .pc-card:hover {
           transform: translateY(-12px);
-          box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
-          border-color: rgba(22, 163, 74, 0.3);
+          box-shadow: 0 20px 40px rgba(152, 29, 135, 0.15);
+          border-color: rgba(152, 29, 135, 0.3);
         }
 
         .pc-image-wrap {
-          background: linear-gradient(135deg, #f8fafb 0%, #f0fdf4 100%);
+          background: linear-gradient(135deg, #f8fafb 0%, #fcedf9 100%);
           height: 240px;
           display: flex;
           align-items: center;
@@ -214,7 +214,7 @@ export default function ProductCard({
           position: absolute;
           top: 12px;
           right: 12px;
-          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
           color: white;
           border-radius: 12px;
           padding: 8px 12px;
@@ -225,7 +225,7 @@ export default function ProductCard({
           gap: 2px;
           font-weight: 700;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.3);
           min-width: 52px;
         }
 
@@ -248,19 +248,19 @@ export default function ProductCard({
           height: 40px;
           border-radius: 50%;
           background: white;
-          border: 2px solid #16a34a;
-          color: #16a34a;
+          border: 2px solid #981d87;
+          color: #981d87;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s ease;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.15);
         }
 
         .pc-wishlist-btn:hover {
-          background: #16a34a;
+          background: #981d87;
           color: white;
           transform: scale(1.1);
         }
@@ -302,7 +302,7 @@ export default function ProductCard({
           bottom: 0;
           left: 0;
           right: 0;
-          background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+          background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
           color: white;
           padding: 12px;
           display: flex;
@@ -395,7 +395,7 @@ export default function ProductCard({
         }
 
         .pc-location-icon {
-          color: #16a34a;
+          color: #981d87;
           flex-shrink: 0;
         }
 
