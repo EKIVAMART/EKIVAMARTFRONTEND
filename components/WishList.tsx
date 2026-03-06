@@ -2,9 +2,11 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Trash2, Star, ChevronRight } from 'lucide-react';
+import { Trash2, Star, ChevronRight, ShoppingCart } from 'lucide-react';
 import { useWishlist, useProducts, useAppDispatch } from '@/lib/hooks';
 import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
+import { addToCart } from '@/lib/features/cart/cartSlice';
+import toast from 'react-hot-toast';
 import { assets } from '../assets/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,6 +26,11 @@ export default function WishlistPage() {
 
   const removeItem = (id: string) => {
     dispatch(toggleWishlist(id));
+  };
+
+  const handleAddToCart = (id: string, name: string) => {
+    dispatch(addToCart({ productId: id }));
+    toast.success(`${name} added to cart`);
   };
 
   return (
@@ -55,9 +62,10 @@ export default function WishlistPage() {
         {/* 3. WISHLIST TABLE/LIST */}
         <div className="w-full">
           {/* Table Header (Hidden on Mobile) */}
-          <div className="hidden md:grid grid-cols-[2fr_1fr_1fr] bg-gray-100 rounded-2xl px-6 py-4 text-sm font-bold text-slate-700">
+          <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] bg-gray-100 rounded-2xl px-6 py-4 text-sm font-bold text-slate-700">
             <div>Product</div>
             <div className="text-center">Price</div>
+            <div className="text-center">Action</div>
             <div className="text-right">Remove</div>
           </div>
 
@@ -69,7 +77,7 @@ export default function WishlistPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr] items-center p-4 md:p-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors gap-4 md:gap-0"
+                  className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] items-center p-4 md:p-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors gap-4 md:gap-0"
                 >
                   {/* Product Info */}
                   <div className="col-span-2 md:col-span-1 flex items-center gap-4 md:gap-6">
@@ -119,8 +127,19 @@ export default function WishlistPage() {
                     </p>
                   </div>
 
+                  {/* Cart Action */}
+                  <div className="col-span-2 md:col-span-1 mt-2 md:mt-0 text-center flex justify-center">
+                    <button
+                      onClick={() => handleAddToCart(item.id, item.name)}
+                      className="bg-[#981d87] text-white px-4 py-2 rounded-md font-semibold hover:bg-[#7a176c] transition text-sm w-full md:w-auto flex items-center justify-center gap-2"
+                    >
+                      <ShoppingCart size={16} />
+                      Add to Cart
+                    </button>
+                  </div>
+
                   {/* Remove */}
-                  <div className="col-span-1 md:col-span-1 mt-0 md:mt-0 text-right">
+                  <div className="col-span-2 md:col-span-1 mt-0 md:mt-0 flex justify-end">
                     <button
                       onClick={() => removeItem(item.id)}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
