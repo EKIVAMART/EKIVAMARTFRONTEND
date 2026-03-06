@@ -109,7 +109,7 @@ export default function CategoryPage() {
   }, [categoryProducts, minPrice, maxPrice, selectedRating]);
 
   return (
-    <main className="py-6 sm:py-8">
+    <main className="py-7 sm:py-6">
       <div className="mx-auto w-[90%]">
         <div className="rounded-2xl bg-[#fcedf9] p-5 sm:p-5 mb-5 shadow-sm">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#7a176c] capitalize">

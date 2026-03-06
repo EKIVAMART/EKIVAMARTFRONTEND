@@ -181,11 +181,36 @@ export const authApi = {
     }
   },
 
+  // OTP Verification Endpoints
+  async verifyEmailOTP(data: { email: string; otp: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/verify-email-otp',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
   async resetPassword(data: { token: string; newPassword: string }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
         '/auth/reset-password',
         data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async resendEmailOTP(email: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/resend-email-otp',
+        { email }
       );
       return response.data;
     } catch (error) {
