@@ -58,6 +58,7 @@ const megaMenuData = [
 // Define which items have dropdowns and their contents
 const navLinks = [
   { name: 'Home', href: '/', hasDropdown: false },
+  { name: 'About Us', href: '/about-us', hasDropdown: false },
   {
     name: 'Fashion',
     href: '/category/fashion',
