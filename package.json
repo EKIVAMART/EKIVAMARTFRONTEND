@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "formate": "prettier --write .",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
