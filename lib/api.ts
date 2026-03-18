@@ -218,3 +218,78 @@ export const authApi = {
     }
   },
 };
+
+//Product API
+export const productApi = {
+  async getAllProducts() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/products');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsByCategory(category: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/category/${category}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsBySubCategory(subCategory: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/sub-category/${subCategory}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsByBrand(brand: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/brand/${brand}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsByPrice(price: number) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price/${price}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsByRating(rating: number) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/rating/${rating}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getProductsByPriceRange(minPrice: number, maxPrice: number) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price-range/${minPrice}/${maxPrice}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};

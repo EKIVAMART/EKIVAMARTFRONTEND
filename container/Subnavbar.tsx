@@ -263,14 +263,31 @@ const Subnavbar = (): JSX.Element => {
               <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
             </div>
 
-            {/* Cart Icon */}
+            {/* Account & Cart Icons */}
             <div className="flex items-center gap-2">
-              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition relative">
-                <FiShoppingCart size={20} className="text-gray-700" />
-                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+              {!isAuthenticated ? (
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition group"
+                >
+                  <FiUser size={20} className="text-gray-700 group-hover:text-[#981d87]" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsProfileModalOpen(true)}
+                  className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-[#981d87] text-white flex items-center justify-center text-xs font-semibold"
+                >
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </button>
+              )}
+
+              <Link href="/cart" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
+                <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#981d87]" />
+                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
                   {cartCount}
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
 

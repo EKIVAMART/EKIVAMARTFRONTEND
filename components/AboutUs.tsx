@@ -1,8 +1,15 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Users, Box, MapPin, CheckCircle2 } from 'lucide-react';
+import { 
+  ArrowRight, Users, Box, MapPin, CheckCircle2,
+  Building2, Briefcase, Factory, Landmark, Truck, Wrench,
+  Stethoscope, Scissors, Plane, GraduationCap, HardHat, Store,
+  ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen,
+  Coffee, Utensils, Package, Gift, Camera, Headphones
+} from 'lucide-react';
 import indBanner from '../assets/industries-banner.webp';
 
 // --- Shared Components ---
@@ -28,7 +35,7 @@ export default function AboutUs() {
   };
 
   return (
-    <div className="font-sans overflow-x-hidden">
+    <div className="font-sans overflow-x-hidden mb-20">
       
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-20">
@@ -46,7 +53,7 @@ export default function AboutUs() {
         <div className="absolute bottom-0 w-full opacity-60">
            <div className="relative w-full">
              {/* Invisible original image just to define the height/ratio exactly */}
-             <img src={indBanner.src} alt="Skyline Layout" className="w-full h-auto object-cover opacity-0 pointer-events-none" />
+             <Image src={indBanner} alt="Skyline Layout" className="w-full h-auto object-cover opacity-0 pointer-events-none" priority />
              {/* Custom colored mask */}
              <div 
                className="absolute inset-0 bg-[#981d87]"
@@ -89,8 +96,8 @@ export default function AboutUs() {
                   <h3 className="text-4xl font-black text-[#981d87]">56+</h3>
                   <p className="text-gray-500 font-bold">Industries</p>
                 </div>
-                <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-40">
-                   {[...Array(12)].map((_, i) => <div key={i} className="w-8 h-8 bg-gray-200 rounded-sm" />)}
+                <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
+                   {[Building2, Briefcase, Factory, Landmark, Truck, Wrench, Stethoscope, Scissors, Plane, GraduationCap, HardHat, Store].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#981d87]" /></div>)}
                 </div>
              </div>
              <div className="flex items-center gap-8">
@@ -98,8 +105,8 @@ export default function AboutUs() {
                   <h3 className="text-4xl font-black text-[#981d87]">11CR+</h3>
                   <p className="text-gray-500 font-bold">Products</p>
                 </div>
-                <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-40">
-                   {[...Array(12)].map((_, i) => <div key={i} className="w-8 h-8 bg-gray-200 rounded-sm" />)}
+                <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
+                   {[ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen, Coffee, Utensils, Package, Gift, Camera, Headphones].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#981d87]" /></div>)}
                 </div>
              </div>
              <div className="flex items-center gap-8">
@@ -120,7 +127,7 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
           <motion.div className="relative" {...fadeInUp}>
              <div className="w-full aspect-square bg-[#303385] rounded-[40%_60%_70%_30%_/_40%_50%_60%_40%] overflow-hidden relative z-10">
-                <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80" alt="Handshake" className="w-full h-full object-cover" />
+                <Image src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80" alt="Handshake" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
              </div>
              <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-600 rounded-full -z-0 opacity-80" />
              <div className="absolute bottom-10 right-10 w-20 h-20 bg-gray-300 rounded-full -z-0" />
@@ -144,31 +151,15 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* 4. HOW WE DO IT */}
-      <section className="py-24 bg-white text-center">
-        <div className="max-w-4xl mx-auto px-4 mb-16">
-          <SectionHeading sub="HOW" title="WE DO IT" />
-          <p className="text-gray-600 leading-loose">
-            We believe in empowering businesses with tech-powered solutions. Our innovative tools 
-            ensure quick and responsive connections between suppliers and buyers.
-          </p>
-        </div>
-        <div className="relative w-full max-w-xl mx-auto flex items-center justify-center">
-            {/* Visualizing the circle of icons from image 4 */}
-            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-[#303385] flex items-center justify-center relative">
-               <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center text-white font-black text-4xl">M</div>
-               {/* Decorative dots/icons would go here in an absolute loop */}
-            </div>
-        </div>
-      </section>
+      
 
       {/* 5. LEADERSHIP TEAM */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-16 items-center">
           <motion.div className="grid grid-cols-3 gap-4 flex-1" {...fadeInUp}>
              {[...Array(9)].map((_, i) => (
-               <div key={i} className={`aspect-square rounded-xl overflow-hidden ${['bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-red-100'][i % 4]}`}>
-                  <img src={`https://i.pravatar.cc/150?u=${i}`} alt="Leader" className="w-full h-full object-cover mix-blend-multiply" />
+               <div key={i} className={`relative aspect-square rounded-xl overflow-hidden ${['bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-red-100'][i % 4]}`}>
+                  <Image src={`https://i.pravatar.cc/150?u=${i}`} alt="Leader" fill className="object-cover mix-blend-multiply" sizes="(max-width: 768px) 33vw, 150px" loading="lazy" />
                </div>
              ))}
           </motion.div>
@@ -195,7 +186,7 @@ export default function AboutUs() {
             <TealButton text="Our Milestones" />
           </motion.div>
           <motion.div className="relative" {...fadeInUp}>
-             <img src="https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&q=80" alt="Old Office" className="w-full h-auto rounded-lg shadow-xl" />
+             <Image src="https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&q=80" alt="Old Office" width={800} height={600} className="w-full h-auto rounded-lg shadow-xl" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
              <div className="absolute -bottom-10 -right-5 w-64 bg-white p-4 shadow-2xl rounded-md border transform rotate-3">
                 <p className="text-[10px] text-gray-400 font-bold mb-2">OPENING CEREMONY</p>
                 <div className="w-full h-40 bg-orange-50 rounded" />
@@ -205,7 +196,7 @@ export default function AboutUs() {
       </section>
 
       {/* 7. SOCIAL RESPONSIBILITY */}
-      <section className="py-24 bg-[#303385] text-white">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row-reverse gap-16 items-center">
           <motion.div className="flex-1" {...fadeInUp}>
             <span className="font-bold uppercase tracking-widest text-sm text-blue-300">OUR SOCIAL</span>
@@ -218,17 +209,17 @@ export default function AboutUs() {
           </motion.div>
           <motion.div className="flex-1 relative h-[400px]" {...fadeInUp}>
              {/* Cluster of circles representing Image 7 */}
-             <div className="absolute top-0 left-0 w-48 h-48 rounded-full border-4 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80" className="w-full h-full object-cover" /></div>
-             <div className="absolute top-20 right-0 w-56 h-56 rounded-full border-4 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80" className="w-full h-full object-cover" /></div>
-             <div className="absolute bottom-0 left-20 w-40 h-40 rounded-full border-4 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1524069290683-0457abfe42c3?auto=format&fit=crop&q=80" className="w-full h-full object-cover" /></div>
+             <div className="absolute top-0 left-0 w-48 h-48 rounded-full border-4 border-white overflow-hidden relative"><Image src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80" alt="Impact Image 1" fill className="object-cover" sizes="(max-width: 768px) 50vw, 30vw" loading="lazy" /></div>
+             <div className="absolute top-20 right-0 w-56 h-56 rounded-full border-4 border-white overflow-hidden relative"><Image src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80" alt="Impact Image 2" fill className="object-cover" sizes="(max-width: 768px) 50vw, 30vw" loading="lazy" /></div>
+             <div className="absolute bottom-0 left-20 w-40 h-40 rounded-full border-4 border-white overflow-hidden relative"><Image src="https://images.unsplash.com/photo-1524069290683-0457abfe42c3?auto=format&fit=crop&q=80" alt="Impact Image 3" fill className="object-cover" sizes="(max-width: 768px) 50vw, 30vw" loading="lazy" /></div>
           </motion.div>
         </div>
       </section>
 
       {/* 8. JOIN THE TEAM (Final Section Image 9) */}
       <section className="relative py-32 bg-gray-900 text-white overflow-hidden text-center">
-        <div className="absolute inset-0 opacity-30">
-          <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80" alt="Hands" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 opacity-30 bg-gray-900 border-none">
+          <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80" alt="Hands" fill className="object-cover mix-blend-screen" sizes="100vw" loading="lazy" />
         </div>
         <motion.div className="relative z-10 max-w-2xl mx-auto px-4" {...fadeInUp}>
           <SectionHeading sub="JOIN THE" title="TEAM" />
