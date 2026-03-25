@@ -115,7 +115,7 @@ export default function CategoryPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-[#7a176c] capitalize">
             {active}
           </h1>
-          <div className="mt-2 text-sm text-gray-700 flex items-center gap-2">
+          <div className="mt-2 text-sm text-gray-800 flex items-center gap-2">
             <Link href="/" className="hover:underline">
               Home
             </Link>
