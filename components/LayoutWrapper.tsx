@@ -21,10 +21,12 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isVendorRegistration = pathname === '';
+  const isAdminRoute = pathname?.startsWith('/admin');
+  const hideNavigation = isVendorRegistration || isAdminRoute;
 
   return (
     <>
-      {!isVendorRegistration && (
+      {!hideNavigation && (
         <Suspense fallback={<NavbarSkeleton />}>
           <Navbar />
         </Suspense>
@@ -32,7 +34,7 @@ export default function LayoutWrapper({
       <Suspense fallback={<MainSkeleton />}>
         <main>{children}</main>
       </Suspense>
-      {!isVendorRegistration && <Footer />}
+      {!hideNavigation && <Footer />}
       <Toast />
     </>
   );

@@ -282,6 +282,13 @@ const Subnavbar = (): JSX.Element => {
                 </button>
               )}
 
+              <Link href="/wishlist" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
+                <FiHeart size={20} className="text-gray-700 group-hover:text-[#981d87]" />
+                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
+                  {wishlistCount}
+                </span>
+              </Link>
+
               <Link href="/cart" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
                 <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#981d87]" />
                 <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">

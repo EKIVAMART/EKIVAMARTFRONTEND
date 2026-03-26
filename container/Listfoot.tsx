@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 import { FaInstagram, FaLinkedinIn, FaTiktok } from 'react-icons/fa';
 
@@ -16,7 +17,7 @@ const footerLinks = [
       'Terms & Conditions',
       'Contact Us',
       'Support Center',
-      'Careers',
+      'Admin', 
     ],
   },
   {
@@ -135,7 +136,11 @@ const Listfoot = () => {
                     key={idx}
                     className="text-sm text-gray-600 hover:text-[#981d87] cursor-pointer transition"
                   >
-                    {link}
+                    {link === 'Admin' ? (
+                      <Link href="/admin/login" className="block w-full">{link}</Link>
+                    ) : (
+                      link
+                    )}
                   </li>
                 ))}
               </ul>
