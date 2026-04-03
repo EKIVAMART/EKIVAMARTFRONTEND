@@ -69,7 +69,7 @@ const contactInfo = [
   },
   {
     icon: FiMail,
-    text: 'Email:faflories@outlook.com',
+    text: 'Email: faflories@outlook.com',
   },
   {
     icon: FiClock,
@@ -131,18 +131,26 @@ const Listfoot = () => {
                 {section.title}
               </h4>
               <ul className="space-y-3">
-                {section.links.map((link, idx) => (
-                  <li
-                    key={idx}
-                    className="text-sm text-gray-600 hover:text-[#981d87] cursor-pointer transition"
-                  >
-                    {link === 'Admin' ? (
-                      <Link href="/admin/login" className="block w-full">{link}</Link>
-                    ) : (
-                      link
-                    )}
-                  </li>
-                ))}
+                {section.links.map((link, idx) => {
+                  const isTerms = link === 'Terms & Conditions';
+                  const isAdmin = link === 'Admin';
+                  const href = isTerms 
+                    ? '/terms-and-conditions' 
+                    : isAdmin 
+                    ? '/admin/login' 
+                    : ''; // All other links point to home for now
+
+                  return (
+                    <li
+                      key={idx}
+                      className="text-sm text-gray-600 hover:text-[#981d87] cursor-pointer transition"
+                    >
+                      <Link href={href} className="block w-full">
+                        {link}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -150,7 +158,7 @@ const Listfoot = () => {
       </div>
 
       {/* BOTTOM SECTION */}
-      <div  >
+      <div>
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">© 2026, Faflories</p>
 
