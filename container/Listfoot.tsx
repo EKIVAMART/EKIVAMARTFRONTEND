@@ -133,12 +133,15 @@ const Listfoot = () => {
               <ul className="space-y-3">
                 {section.links.map((link, idx) => {
                   const isTerms = link === 'Terms & Conditions';
+                  const isPrivacy = link === 'Privacy Policy';
                   const isAdmin = link === 'Admin';
                   const href = isTerms 
                     ? '/terms-and-conditions' 
+                    : isPrivacy
+                    ? '/privacy-policy'
                     : isAdmin 
                     ? '/admin/login' 
-                    : ''; // All other links point to home for now
+                    : ''; // All other links point to current page for now
 
                   return (
                     <li
