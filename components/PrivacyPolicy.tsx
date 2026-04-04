@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import FadeInSection from '@/components/FadeInSection';
 import TypingText from '@/components/TypingText';
