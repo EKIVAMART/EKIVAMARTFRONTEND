@@ -257,32 +257,71 @@ export default function TermsAndConditions() {
 
           {/* ── CTA FOOTER ── */}
           <FadeInSection type="fadeUp" delay={0.7} className="pt-16">
-            <div className="relative overflow-hidden rounded-3xl text-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#981d87]" />
-              <div className="absolute top-[-30%] left-[20%] w-[60%] h-[150%] rounded-full bg-[#c740b0] opacity-20 blur-[80px] pointer-events-none" />
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 32px)' }} />
-              <div className="absolute -bottom-16 -right-16 w-56 h-56 rounded-full border border-white/10 pointer-events-none" />
+            <div className="relative overflow-hidden rounded-[28px] w-full">
+              {/* Backgrounds */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1e0020] via-[#5a0a5a] to-[#981d87]" />
+              <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 40px)' }} />
+              <div className="absolute top-[-40%] left-[-10%] w-[55%] h-[200%] rounded-full bg-[#c740b0] opacity-18 blur-[90px] pointer-events-none" />
+              <div className="absolute bottom-[-40%] right-[-5%] w-[40%] h-[180%] rounded-full bg-[#3d0060] opacity-28 blur-[80px] pointer-events-none" />
+              <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full border border-white/[0.07] pointer-events-none" />
+              <div className="absolute -top-7 -right-7 w-44 h-44 rounded-full border border-white/[0.07] pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full border border-white/[0.04] pointer-events-none" />
 
-              <div className="relative px-8 py-14 md:py-20 flex flex-col items-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-6 backdrop-blur-sm">
-                  <Store size={24} className="text-white" />
+              {/* Content grid */}
+              <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_auto] items-center gap-10 lg:gap-16 px-10 lg:px-20 py-14 lg:py-16">
+
+                {/* LEFT */}
+                <div className="flex flex-col gap-5">
+                  <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 text-[11px] font-bold uppercase tracking-[2px] px-4 py-2 rounded-full w-fit">
+                    <span className="w-2 h-2 rounded-full bg-[#ff69e0]" />
+                    Nigeria's premier marketplace
+                  </div>
+
+                  <h4 className="text-white font-black text-[2.2rem] md:text-[2.5rem] leading-[1.1] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                    Shop Seamless.<br />
+                    <span className="text-[#ff9eed]">Sell Smarter.</span>
+                  </h4>
+
+                  <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl">
+                    Joining Faflories means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, Faflories isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
+                  </p>
+
+                  {/* Stats strip */}
+                  <div className="flex flex-col md:flex-row gap-7 px-6 py-4 bg-white/[0.06] border border-white/10 rounded-2xl w-full mx-auto">
+                    {[
+                      { num: 'Escrow', label: 'Protected payments' },
+                      { num: 'NDPR', label: 'Data compliant' },
+                      { num: '36 States', label: 'Nationwide reach' },
+                    ].map(({ num, label }, i, arr) => (
+                      <React.Fragment key={i}>
+                        <div className="text-center">
+                          <span className="block text-white font-extrabold text-lg tracking-tight">{num}</span>
+                          <span className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">{label}</span>
+                        </div>
+                        {i < arr.length - 1 && <div className="w-px self-stretch bg-white/10" />}
+                      </React.Fragment>
+                    ))}
+                  </div>
+
+                  <p className="text-white/30 text-xs leading-relaxed max-w-md border-l-2 border-white/10 pl-3">
+                    By continuing to browse or use Faflories, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
+                  </p>
                 </div>
-                <h4 className="text-white font-extrabold text-2xl md:text-3xl mb-3 tracking-tight">
-                  Shop Seamless. Sell Smarter.
-                </h4>
-                <p className="text-white/70 mb-3 max-w-lg mx-auto leading-relaxed text-sm md:text-base">
-                  Joining Faflories means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, Faflories isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
-                </p>
-                <p className="text-white/70 mb-8 max-w-lg mx-auto leading-relaxed text-base md:text-lg">
-                  Why wait? Onboard today, list your products, and watch your business flourish. 
-                  <span className="block mt-3 font-medium">
-                    Welcome to Faflories — the future of Nigerian commerce starts here.
-                  </span>
-                </p>
-                <p className="text-white/40 mb-10 max-w-md mx-auto text-xs md:text-md leading-relaxed">
-                  By continuing to browse or use Faflories, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
-                </p>
-                <PrimaryButton text="Return to Homepage" onClick={() => (window.location.href = '/')} />
+
+                {/* RIGHT */}
+                <div className="flex flex-col items-center gap-5">
+                  <div className="w-16 h-16 lg:flex hidden rounded-[18px] bg-white/10 border border-white/20 items-center justify-center">
+                    <Store size={28} className="text-white/85" />
+                  </div>
+                  <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                  <PrimaryButton text="Return to Homepage" onClick={() => (window.location.href = '/')} />
+                  <p className="text-white/50 text-[12px] md:text-[15px] text-center md:max-w-[140px] leading-relaxed">
+                    Why wait? Onboard today, list your products, and watch your business flourish
+                  </p>
+                  <p className="text-white/70 text-[12px] md:text-[15px] text-center md:max-w-[140px] leading-relaxed">
+                    The future of Nigerian commerce starts here.
+                  </p>
+                </div>
               </div>
             </div>
           </FadeInSection>
