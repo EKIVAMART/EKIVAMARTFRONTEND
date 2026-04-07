@@ -132,13 +132,19 @@ const Listfoot = () => {
               </h4>
               <ul className="space-y-3">
                 {section.links.map((link, idx) => {
+                  const isAbout = link === 'About Us';;
                   const isTerms = link === 'Terms & Conditions';
                   const isPrivacy = link === 'Privacy Policy';
+                  const isSupport = link === 'Support Center';
                   const isAdmin = link === 'Admin';
-                  const href = isTerms 
+                  const href = isAbout
+                    ? '/about-us'
+                    : isTerms 
                     ? '/terms-and-conditions' 
                     : isPrivacy
                     ? '/privacy-policy'
+                    : isSupport
+                    ? '/support'
                     : isAdmin 
                     ? '/admin/login' 
                     : ''; // All other links point to current page for now
