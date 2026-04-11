@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
           <p className="text-slate-500 text-sm mt-2 font-medium">Verify your credentials to continue</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-slate-700 block">Email Address</label>
             <div className="relative">
