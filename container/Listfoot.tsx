@@ -136,6 +136,7 @@ const Listfoot = () => {
                   const isTerms = link === 'Terms & Conditions';
                   const isPrivacy = link === 'Privacy Policy';
                   const isSupport = link === 'Support Center';
+                  const isContact = link === 'Contact Us';
                   const isAdmin = link === 'Admin';
                   const href = isAbout
                     ? '/about-us'
@@ -145,6 +146,8 @@ const Listfoot = () => {
                     ? '/privacy-policy'
                     : isSupport
                     ? '/support'
+                    : isContact
+                    ? '/contact-us'
                     : isAdmin 
                     ? '/admin/login' 
                     : ''; // All other links point to current page for now
