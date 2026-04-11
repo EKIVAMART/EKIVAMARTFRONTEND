@@ -298,7 +298,7 @@ export default function TermsAndConditions() {
                           <span className="block text-white font-extrabold text-lg tracking-tight">{num}</span>
                           <span className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">{label}</span>
                         </div>
-                        {i < arr.length - 1 && <div className="w-px self-stretch bg-white/10" />}
+                        {i < arr.length - 1 && <div className="w-full h-px md:w-px md:h-auto bg-white/30 md:bg-white/20" />}
                       </React.Fragment>
                     ))}
                   </div>

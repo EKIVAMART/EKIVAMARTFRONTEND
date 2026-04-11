@@ -14,6 +14,12 @@ import {
   RotateCw,
   Truck,
   HelpCircle,
+  UserCog,
+  Search,
+  ShieldCheck,
+  Smartphone,
+  LayoutDashboard,
+  Scale,
 } from 'lucide-react';
 import { popularArticles } from '../../app/support/data/supportData';
 import FadeInSection from '../FadeInSection';
@@ -29,11 +35,17 @@ interface PopularArticle {
 const getArticleIcon = (topicSlug: string): React.ReactNode => {
   const icons: Record<string, React.ReactNode> = {
     'account-creation-verification': <User size={15} />,
+    'buyer-account-management': <UserCog size={15} />,
     'becoming-a-vendor': <Store size={15} />,
+    'browsing-purchasing': <Search size={15} />,
     'orders-tracking': <Package size={15} />,
     'payments-refunds-withdrawals': <CreditCard size={15} />,
-    'returns-refunds-disputes': <RotateCw size={15} />,
     'delivery-shipping': <Truck size={15} />,
+    'returns-refunds-disputes': <RotateCw size={15} />,
+    'security-fraud-privacy': <ShieldCheck size={15} />,
+    'app-technical-issues': <Smartphone size={15} />,
+    'vendor-tools-dashboard': <LayoutDashboard size={15} />,
+    'policies-legal': <Scale size={15} />,
   };
   return icons[topicSlug] ?? <HelpCircle size={15} />;
 };
@@ -48,9 +60,13 @@ export default function PopularCarousel() {
   const [paused, setPaused] = useState(false);
   const [animState, setAnimState] = useState<'idle' | 'exit' | 'enter'>('idle');
   const [direction, setDirection] = useState<1 | -1>(1); // 1 = forward, -1 = back
-  const [displayed, setDisplayed] = useState(0); // the index actually rendered
+  const [displayed, setDisplayed] = useState(0);
   const pendingRef = useRef<number>(0);
   const total = (popularArticles as PopularArticle[]).length;
+
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
 
   const goTo = useCallback(
     (next: number) => {
@@ -101,12 +117,38 @@ export default function PopularCarousel() {
 
   const item = (popularArticles as PopularArticle[])[displayed];
 
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEndHandler = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && current < total - 1) {
+      goTo(current + 1);
+    }
+    if (isRightSwipe && current > 0) {
+      goTo(current - 1);
+    }
+  };
+
   return (
     <FadeInSection type="fadeUp" delay={0.35}>
       <div
         className="relative"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEndHandler}
       >
         {/* Left arrow — hidden at first slide */}
         {current > 0 && (

@@ -14,9 +14,14 @@ import {
   HelpCircle,
   X,
   BookOpen,
+  UserCog,
+  ShieldCheck,
+  Smartphone,
+  LayoutDashboard,
+  Scale,
 } from 'lucide-react';
 import React, { useState, useRef, useEffect, } from 'react';
-import { popularArticles } from '../../app/support/data/supportData';
+import { fafloriesSupportData } from '../../app/support/data/supportData';
 
 /* ─── TYPES ─── */
 interface PopularArticle {
@@ -25,15 +30,29 @@ interface PopularArticle {
   slug: string;
 }
 
+const allArticles: PopularArticle[] = fafloriesSupportData.flatMap(topic => 
+  topic.articles.map(article => ({
+    title: article.title,
+    slug: article.slug,
+    topicSlug: topic.slug
+  }))
+);
+
 /* ─── HELPERS ─── */
 const getArticleIcon = (topicSlug: string): React.ReactNode => {
   const icons: Record<string, React.ReactNode> = {
     'account-creation-verification': <User size={15} />,
+    'buyer-account-management': <UserCog size={15} />,
     'becoming-a-vendor': <Store size={15} />,
+    'browsing-purchasing': <Search size={15} />,
     'orders-tracking': <Package size={15} />,
     'payments-refunds-withdrawals': <CreditCard size={15} />,
-    'returns-refunds-disputes': <RotateCw size={15} />,
     'delivery-shipping': <Truck size={15} />,
+    'returns-refunds-disputes': <RotateCw size={15} />,
+    'security-fraud-privacy': <ShieldCheck size={15} />,
+    'app-technical-issues': <Smartphone size={15} />,
+    'vendor-tools-dashboard': <LayoutDashboard size={15} />,
+    'policies-legal': <Scale size={15} />,
   };
   return icons[topicSlug] ?? <HelpCircle size={15} />;
 };
@@ -43,7 +62,6 @@ const getArticleIcon = (topicSlug: string): React.ReactNode => {
  * - Left search icon (decorative)
  * - Live dropdown of up to 5 matching article rows
  * - No-match state with redirect link to /contact-us
- * - Right "Search" button
  * - Closes on outside click or Escape
  */
 export default function SearchBar() {
@@ -52,10 +70,8 @@ export default function SearchBar() {
   const [focused, setFocused] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const articles = popularArticles as PopularArticle[];
-
   const results = query.trim()
-    ? articles
+    ? allArticles
         .filter((a) => a.title.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 5)
     : [];
@@ -184,8 +200,7 @@ export default function SearchBar() {
               <li className="px-5 py-3 bg-[#fdf8ff] border-t border-[#f0e0ef]">
                 <p className="text-[11px] text-gray-400 flex items-center gap-1.5">
                   <BookOpen size={11} />
-                  Showing {results.length} of 100+ articles · Click to Open
-                  {/*Showing {results.length} of {articles.length} articles · Press Enter or click Search*/}
+                  Showing {results.length} of {allArticles.length} articles · Click to Open
                 </p>
               </li>
             </ul>
