@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
     // Simulate API call and login
     setTimeout(() => {
       setIsLoading(false);
-      router.push('/admin');
+      router.push('/admin/dashboard');
     }, 1500);
   };
 
