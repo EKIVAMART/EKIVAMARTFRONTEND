@@ -54,6 +54,7 @@ export const authApi = {
     lastName: string;
     email: string;
     password: string;
+    phoneNumber: string;
   }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
@@ -217,6 +218,26 @@ export const authApi = {
       handleApiError(error);
     }
   },
+
+  async googleLogin() {
+    try {
+      await axiosInstance.get<ApiResponse<any>>(
+        '/auth/google'
+      )
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async facebookLogin() {
+    try {
+      await axiosInstance.get<ApiResponse<any>>(
+        '/auth/facebook'
+      );
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
 };
 
 //Product API

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'react-phone-number-input/style.css';
 
 :root {
   --background: #ffffff;
@@ -348,6 +349,24 @@ input:focus,
 textarea:focus,
 select:focus {
   @apply outline-none ring-2 ring-purple-500/20 border-purple-600;
+}
+
+.phone-number-input .PhoneInputInput {
+  background: transparent;
+  color: rgb(17 24 39);
+  outline: none;
+}
+
+.phone-number-input .PhoneInputInput::placeholder {
+  color: rgb(156 163 175);
+}
+
+.phone-number-input .PhoneInputCountry {
+  margin-right: 0.75rem;
+}
+
+.phone-number-input .PhoneInputCountryIcon {
+  font-size: 1.125rem;
 }
 
 /* Toast Container - Always on top of everything including modals */
