@@ -8,7 +8,7 @@ import VendorTable from '@/components/admin/VendorTable';
 import { Plus, Search } from 'lucide-react';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'vendors'>('products');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
 

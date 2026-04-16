@@ -30,7 +30,7 @@ interface ActionModalProps {
   onClose: () => void;
   activeTab: 'products' | 'vendors';
   editingItem?: any;
-  onSave?: (data: ProductFormData) => void;
+  onSave?: (data: any) => void;
 }
 
 const categories = ['Fashion', 'Electronics', 'Bags', 'Footwear', 'Groceries', 'Beauty', 'Wellness', 'Jewellery', 'Home Decor', 'Sports', 'Toys & Games'];
