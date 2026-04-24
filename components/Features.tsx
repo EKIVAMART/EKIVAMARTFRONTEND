@@ -11,27 +11,27 @@ type Feature = {
 const features: Feature[] = [
   {
     title: 'Best prices & offers',
-    subtitle: 'Orders $50 or more',
+    subtitle: 'Orders #30000 or more',
     icon: '/deal.svg',
   },
   {
     title: 'Free delivery',
-    subtitle: 'Orders $50 or more',
+    subtitle: 'Orders #30000 or more',
     icon: 'Easy.svg',
   },
   {
     title: 'Great daily deal',
-    subtitle: 'Orders $50 or more',
+    subtitle: 'Orders #30000 or more',
     icon: 'file.svg',
   },
   {
     title: 'Wide assortment',
-    subtitle: 'Orders $50 or more',
+    subtitle: 'Orders #30000 or more',
     icon: 'free.svg',
   },
   {
     title: 'Easy returns',
-    subtitle: 'Orders $50 or more',
+    subtitle: 'Orders #30000 or more',
     icon: 'globe.svg',
   },
 ];
