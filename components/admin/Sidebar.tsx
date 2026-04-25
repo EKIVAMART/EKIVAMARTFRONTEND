@@ -1,15 +1,48 @@
-import { LayoutDashboard, Package, Users, Settings } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
+import Image from 'next/image';
 
-export default function Sidebar({ activeTab, setActiveTab }: any) {
+interface SidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: any) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
   return (
-    <aside className="w-64 bg-white border-r hidden md:flex flex-col sticky top-0 h-screen">
-      <div className="p-6 border-b">
-        <h1 className="text-xl font-black tracking-tighter text-[#00A8B5]">SHOPSTIC ADMIN</h1>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[45] md:hidden backdrop-blur-sm transition-opacity"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar Content */}
+      <aside className={`
+        fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r flex flex-col z-50
+        transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="p-6 border-b flex justify-between items-center">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="text-[#981d87] text-2xl font-bold">Faflories</div>
+            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
+              Admin
+            </span>
+          </div>
+          {onClose && (
+            <button onClick={onClose} className="md:hidden p-2 -mr-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-xl transition">
+              <X size={20} />
+            </button>
+          )}
+        </div>
       <nav className="flex-1 p-4 space-y-2">
         <SidebarLink icon={<LayoutDashboard size={20}/>} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
         <SidebarLink icon={<Package size={20}/>} label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
+        <SidebarLink icon={<ShoppingCart size={20}/>} label="Orders" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
         <SidebarLink icon={<Users size={20}/>} label="Vendor Settings" active={activeTab === 'vendors'} onClick={() => setActiveTab('vendors')} />
         <SidebarLink icon={<Settings size={20}/>} label="Settings" active={false} onClick={() => {}} />
       </nav>
@@ -22,6 +55,7 @@ export default function Sidebar({ activeTab, setActiveTab }: any) {
           </div>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
