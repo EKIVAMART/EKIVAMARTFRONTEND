@@ -24,37 +24,35 @@ const footerLinks = [
   {
     title: 'Account',
     links: [
-      'About Us',
-      'Delivery Information',
-      'Privacy Policy',
-      'Terms & Conditions',
-      'Contact Us',
-      'Support Center',
-      'Careers',
+      'Talent Solutions',
+      'Marketing Solutions & Analytics',
+      'Advertising',
+      'Small Business',
+      'Black Friday',
+      'Flash Sales',
     ],
   },
   {
-    title: 'Corporate',
+    title: 'Useful Links',
     links: [
-      'About Us',
-      'Delivery Information',
-      'Privacy Policy',
-      'Terms & Conditions',
-      'Contact Us',
-      'Support Center',
-      'Careers',
+      'Announcement',
+      'Trust Management Center',
+      'Voice of the Customer',
+      'Store Entry/Partnership Inquiries',
+      'Sitemap',
+      'Accessibility',
     ],
   },
   {
     title: 'Popular',
     links: [
-      'About Us',
-      'Delivery Information',
-      'Privacy Policy',
-      'Terms & Conditions',
-      'Contact Us',
-      'Support Center',
-      'Careers',
+      'Payment Methods',
+      'Cancellation & Returns',
+      'Shopping & Delivery',
+      'Blog',
+      'FAQ',
+      'Customer Care ',
+      'New Arrivals',
     ],
   },
 ];
@@ -70,7 +68,7 @@ const contactInfo = [
   },
   {
     icon: FiMail,
-    text: 'Email: faflories@outlook.com',
+    text: 'Email: faflora@outlook.com',
   },
   {
     icon: FiClock,
@@ -103,7 +101,7 @@ const Listfoot = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
-            <Image src={assets.gs_logo} alt="Faflories" width={150} height={40} />
+            <Image src="/logo.png" alt="Faflora" width={150} height={40} />
 
             <p className="text-gray-500 text-sm max-w-sm">
               Awesome grocery store website template
@@ -173,7 +171,7 @@ const Listfoot = () => {
       {/* BOTTOM SECTION */}
       <div>
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">© 2026, Faflories</p>
+          <p className="text-sm text-gray-500">© 2026, Faflora</p>
 
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-gray-700">Follow Us</span>
