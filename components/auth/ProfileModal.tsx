@@ -37,12 +37,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await authApi.logout();
+      await authApi.logoutCurrentSession();
+      dispatch(logout());
+      onClose();
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      dispatch(logout());
-      onClose();
       setLoading(false);
     }
   };
