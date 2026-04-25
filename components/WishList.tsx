@@ -46,7 +46,7 @@ export default function WishlistPage() {
         </div>
       </div>
 
-      <main className="mx-auto w-full md:w-[95%] mt-10 px-4 md:px-10">
+      <main className="mx-auto w-full md:w-[95%] mt-10 px-5 md:px-10">
         {/* 2. HEADER SECTION */}
         <section className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-1">My List</h1>
