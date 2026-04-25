@@ -6,7 +6,7 @@ import { setCredentials, logout } from '@/lib/features/auth/authSlice';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:5000/api/v1';
+  'https://fafloriesbackend-5.onrender.com/api/v1';
 
 // Create axios instance
 export const axiosInstance = axios.create({
