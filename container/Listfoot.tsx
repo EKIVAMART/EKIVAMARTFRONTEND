@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 import { FaInstagram, FaLinkedinIn, FaTiktok } from 'react-icons/fa';
+import { assets } from '@/assets/assets';
 
 /* ================== DATA ARRAYS ================== */
 
