@@ -28,7 +28,7 @@ interface ProductFormData {
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'products' | 'vendors';
+  activeTab: 'products' | 'vendors' | 'orders';
   editingItem?: any;
   onSave?: (data: any) => void;
 }

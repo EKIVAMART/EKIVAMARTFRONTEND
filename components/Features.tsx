@@ -1,7 +1,5 @@
 'use client';
-
 import Image from 'next/image';
-
 type Feature = {
   title: string;
   subtitle: string;
@@ -38,12 +36,12 @@ const features: Feature[] = [
 
 export default function Features() {
   return (
-    <section className="w-full bg-white py-8 md:py-6 lg:py-8">
+    <section className="w-full bg-white py-7 md:py-6 lg:py-8">
       <div className="mx-auto grid w-[95%] grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {features.map((feature, index) => (
           <div
             key={index}
-            className="flex items-center gap-4 rounded-xl bg-gray-50 p-4 transition hover:shadow-sm"
+            className="flex items-center gap-3 rounded-xl bg-gray-50 p-4 transition hover:shadow-sm"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5d2f0]">
               <Image
