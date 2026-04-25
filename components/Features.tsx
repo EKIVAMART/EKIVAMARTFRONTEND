@@ -1,7 +1,5 @@
 'use client';
-
 import Image from 'next/image';
-
 type Feature = {
   title: string;
   subtitle: string;
@@ -43,7 +41,7 @@ export default function Features() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className="flex items-center gap-4 rounded-xl bg-gray-50 p-4 transition hover:shadow-sm"
+            className="flex items-center gap-3 rounded-xl bg-gray-50 p-4 transition hover:shadow-sm"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5d2f0]">
               <Image
