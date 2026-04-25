@@ -1,11 +1,12 @@
-/* eslint-disable react-hooks/incompatible-library */
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Phone, User } from 'lucide-react';
+import PhoneInput from 'react-phone-number-input';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import toast from 'react-hot-toast';
 import { authApi } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
@@ -30,6 +31,10 @@ const signupSchema = z
         'Password must contain at least one special character'
       ),
     confirmPassword: z.string(),
+    phoneNumber: z
+      .string()
+      .min(1, 'Phone number is required')
+      .refine((value) => isValidPhoneNumber(value), 'Invalid phone number'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -37,6 +42,28 @@ const signupSchema = z
   });
 
 type SignupFormData = z.infer<typeof signupSchema>;
+type SocialProvider = 'google' | 'facebook';
+
+const socialProviderLabels: Record<SocialProvider, string> = {
+  google: 'Google',
+  facebook: 'Facebook',
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+
+  return fallback;
+};
 
 interface SignupModalProps {
   isOpen: boolean;
@@ -53,15 +80,26 @@ export const SignupModal: React.FC<SignupModalProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [socialSubmitting, setSocialSubmitting] =
+    useState<SocialProvider | null>(null);
 
   const {
     register,
     handleSubmit,
+    control,
     watch,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phoneNumber: '',
+    },
   });
 
   const password = watch('password');
@@ -73,15 +111,35 @@ export const SignupModal: React.FC<SignupModalProps> = ({
         lastName: data.lastName,
         email: data.email,
         password: data.password,
+        phoneNumber: data.phoneNumber,
       });
 
       toast.success('Account created! Please verify your email.');
       setRegisteredEmail(data.email);
       setVerificationModalOpen(true);
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Registration failed';
-      toast.error(errorMessage);
+      toast.error(getErrorMessage(error, 'Registration failed'));
+    }
+  };
+
+  const handleSocialSignup = async (provider: SocialProvider) => {
+    try {
+      setSocialSubmitting(provider);
+
+      if (provider === 'google') {
+        await authApi.googleLogin();
+      } else {
+        await authApi.facebookLogin();
+      }
+    } catch (error: unknown) {
+      toast.error(
+        getErrorMessage(
+          error,
+          `${socialProviderLabels[provider]} signup failed`
+        )
+      );
+    } finally {
+      setSocialSubmitting(null);
     }
   };
 
@@ -211,6 +269,49 @@ export const SignupModal: React.FC<SignupModalProps> = ({
             }
           />
 
+          {/* Phone Number */}
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ field, fieldState }) => (
+              <div className="space-y-1 sm:space-y-1.5">
+                <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+                  <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  Phone number
+                </label>
+                <PhoneInput
+                  {...field}
+                  defaultCountry="NG"
+                  international
+                  countryCallingCodeEditable={false}
+                  disabled={isSubmitting}
+                  placeholder="Enter your phone number"
+                  className={`phone-number-input rounded-lg sm:rounded-xl border bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base transition-all duration-200 focus-within:ring-2 ${
+                    fieldState.error
+                      ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20'
+                      : 'border-gray-200 focus-within:border-purple-600 focus-within:ring-purple-500/20'
+                  }`}
+                />
+                {fieldState.error && (
+                  <p className="text-xs text-red-600 flex items-center gap-1 sm:gap-1.5 animate-in slide-in-from-top-1 duration-200">
+                    <svg
+                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
           {/* Terms */}
           <p className="text-xs text-gray-600">
             By signing up, you agree to our{' '}
@@ -259,6 +360,9 @@ export const SignupModal: React.FC<SignupModalProps> = ({
               variant="outline"
               size="md"
               className="w-full"
+              onClick={() => handleSocialSignup('google')}
+              loading={socialSubmitting === 'google'}
+              disabled={isSubmitting || socialSubmitting !== null}
               icon={
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -287,6 +391,9 @@ export const SignupModal: React.FC<SignupModalProps> = ({
               variant="outline"
               size="md"
               className="w-full text-xs sm:text-sm"
+              onClick={() => handleSocialSignup('facebook')}
+              loading={socialSubmitting === 'facebook'}
+              disabled={isSubmitting || socialSubmitting !== null}
               icon={
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5"

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/features/auth/authSlice';
+import { authApi } from '@/lib/api';
 import {
   X,
   MapPin,
@@ -164,9 +165,14 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     );
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    onClose();
+  const handleLogout = async () => {
+    try {
+      await authApi.logoutCurrentSession();
+      dispatch(logout());
+      onClose();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   // Close location dropdown when clicking outside

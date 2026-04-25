@@ -14,6 +14,84 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+interface AuthSessionRecord {
+  id?: string;
+  _id?: string;
+  sessionId?: string;
+  isCurrent?: boolean;
+  isCurrentSession?: boolean;
+  current?: boolean;
+}
+
+const getAuthRedirectUrl = (path: string) => {
+  const baseUrl = axiosInstance.defaults.baseURL?.replace(/\/$/, '');
+
+  return baseUrl ? `${baseUrl}${path}` : path;
+};
+
+const redirectToAuthProvider = (path: string) => {
+  if (typeof window === 'undefined') {
+    throw new Error('Social login is only available in the browser');
+  }
+
+  window.location.assign(getAuthRedirectUrl(path));
+};
+
+const getSessionIdentifier = (session?: AuthSessionRecord) =>
+  session?.id || session?._id || session?.sessionId;
+
+const isCurrentSession = (session?: AuthSessionRecord) =>
+  Boolean(
+    session?.isCurrent || session?.isCurrentSession || session?.current
+  );
+
+const findCurrentSessionId = (sessions: AuthSessionRecord[] = []) => {
+  const currentSession = sessions.find(
+    (session) => getSessionIdentifier(session) && isCurrentSession(session)
+  );
+
+  if (currentSession) {
+    return getSessionIdentifier(currentSession);
+  }
+
+  return getSessionIdentifier(
+    sessions.find((session) => getSessionIdentifier(session))
+  );
+};
+
+const extractSessions = (payload: unknown): AuthSessionRecord[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    return [];
+  }
+
+  const record = payload as {
+    data?: unknown;
+    sessions?: unknown;
+  };
+
+  if (Array.isArray(record.data)) {
+    return record.data as AuthSessionRecord[];
+  }
+
+  if (
+    record.data &&
+    typeof record.data === 'object' &&
+    Array.isArray((record.data as { sessions?: unknown }).sessions)
+  ) {
+    return (record.data as { sessions: AuthSessionRecord[] }).sessions;
+  }
+
+  if (Array.isArray(record.sessions)) {
+    return record.sessions as AuthSessionRecord[];
+  }
+
+  return [];
+};
+
 // Handle API errors
 const handleApiError = (error: unknown): never => {
   // Check if this is an axios error by checking for response property
@@ -54,6 +132,7 @@ export const authApi = {
     lastName: string;
     email: string;
     password: string;
+    phoneNumber: string;
   }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
@@ -78,10 +157,12 @@ export const authApi = {
     }
   },
 
-  async logout() {
+  async logout(sessionId?: string) {
     try {
-      const response =
-        await axiosInstance.post<ApiResponse<any>>('/auth/logout');
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/logout',
+        { sessionId: sessionId ?? null }
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -125,6 +206,44 @@ export const authApi = {
     try {
       const response =
         await axiosInstance.get<ApiResponse<any>>('/auth/sessions');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getCurrentSessionId() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<AuthSessionRecord[]>>(
+        '/auth/sessions'
+      );
+      return findCurrentSessionId(extractSessions(response.data));
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async logoutCurrentSession() {
+    try {
+      const sessionsResponse =
+        await axiosInstance.get<ApiResponse<AuthSessionRecord[]>>(
+          '/auth/sessions'
+        );
+      const sessionId = findCurrentSessionId(
+        extractSessions(sessionsResponse.data)
+      );
+
+      if (!sessionId) {
+        throw {
+          message: 'Could not determine the current session id for logout.',
+          statusCode: 400,
+        } as ApiError;
+      }
+
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/logout',
+        { sessionId }
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -217,6 +336,14 @@ export const authApi = {
       handleApiError(error);
     }
   },
+
+  async googleLogin() {
+    redirectToAuthProvider('/auth/google');
+  },
+
+  async facebookLogin() {
+    redirectToAuthProvider('/auth/facebook');
+  }
 };
 
 //Product API
