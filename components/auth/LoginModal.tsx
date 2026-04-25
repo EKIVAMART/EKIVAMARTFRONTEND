@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { authApi } from '@/lib/api';
+import { authApi, type ApiError } from '@/lib/api';
 import { useAppDispatch } from '@/lib/hooks';
 import { setCredentials } from '@/lib/features/auth/authSlice';
 import { Modal } from '@/components/ui/Modal';
@@ -19,6 +19,32 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
+type SocialProvider = 'google' | 'facebook';
+
+const socialProviderLabels: Record<SocialProvider, string> = {
+  google: 'Google',
+  facebook: 'Facebook',
+};
+
+const isApiError = (error: unknown): error is ApiError => {
+  if (!error || typeof error !== 'object' || !('message' in error)) {
+    return false;
+  }
+
+  return typeof (error as { message?: unknown }).message === 'string';
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (isApiError(error)) {
+    return error.message;
+  }
+
+  return fallback;
+};
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -37,6 +63,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     blocked: boolean;
     retryAfter?: number;
   }>({ blocked: false });
+  const [socialSubmitting, setSocialSubmitting] =
+    useState<SocialProvider | null>(null);
 
   const {
     register,
@@ -62,12 +90,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       toast.success('Welcome back! 🎉');
       onClose();
       reset();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.statusCode === 429) {
+    } catch (error: unknown) {
+      if (isApiError(error) && error.statusCode === 429) {
+        const retryAfter = error.retryAfter || 900;
+
         setRateLimitInfo({
           blocked: true,
-          retryAfter: error.retryAfter,
+          retryAfter,
         });
         toast.error(error.message);
 
@@ -75,11 +104,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           () => {
             setRateLimitInfo({ blocked: false });
           },
-          (error.retryAfter || 900) * 1000
+          retryAfter * 1000
         );
       } else {
-        toast.error(error.message || 'Invalid email or password');
+        toast.error(getErrorMessage(error, 'Invalid email or password'));
       }
+    }
+  };
+
+  const handleSocialLogin = async (provider: SocialProvider) => {
+    try {
+      setSocialSubmitting(provider);
+
+      if (provider === 'google') {
+        await authApi.googleLogin();
+      } else {
+        await authApi.facebookLogin();
+      }
+    } catch (error: unknown) {
+      toast.error(
+        getErrorMessage(error, `${socialProviderLabels[provider]} login failed`)
+      );
+    } finally {
+      setSocialSubmitting(null);
     }
   };
 
@@ -205,6 +252,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             variant="outline"
             size="md"
             className="w-full text-xs sm:text-sm"
+            onClick={() => handleSocialLogin('google')}
+            loading={socialSubmitting === 'google'}
+            disabled={
+              isSubmitting || rateLimitInfo.blocked || socialSubmitting !== null
+            }
             icon={
               <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                 <path
@@ -233,6 +285,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             variant="outline"
             size="md"
             className="w-full text-xs sm:text-sm"
+            onClick={() => handleSocialLogin('facebook')}
+            loading={socialSubmitting === 'facebook'}
+            disabled={
+              isSubmitting || rateLimitInfo.blocked || socialSubmitting !== null
+            }
             icon={
               <svg
                 className="w-4 h-4 sm:w-5 sm:h-5"

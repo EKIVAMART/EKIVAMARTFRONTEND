@@ -14,6 +14,20 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+const getAuthRedirectUrl = (path: string) => {
+  const baseUrl = axiosInstance.defaults.baseURL?.replace(/\/$/, '');
+
+  return baseUrl ? `${baseUrl}${path}` : path;
+};
+
+const redirectToAuthProvider = (path: string) => {
+  if (typeof window === 'undefined') {
+    throw new Error('Social login is only available in the browser');
+  }
+
+  window.location.assign(getAuthRedirectUrl(path));
+};
+
 // Handle API errors
 const handleApiError = (error: unknown): never => {
   // Check if this is an axios error by checking for response property
@@ -220,23 +234,11 @@ export const authApi = {
   },
 
   async googleLogin() {
-    try {
-      await axiosInstance.get<ApiResponse<any>>(
-        '/auth/google'
-      )
-    } catch (error) {
-      handleApiError(error);
-    }
+    redirectToAuthProvider('/auth/google');
   },
 
   async facebookLogin() {
-    try {
-      await axiosInstance.get<ApiResponse<any>>(
-        '/auth/facebook'
-      );
-    } catch (error) {
-      handleApiError(error);
-    }
+    redirectToAuthProvider('/auth/facebook');
   }
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/incompatible-library */
 'use client';
 
 import React, { useState } from 'react';
@@ -43,6 +42,28 @@ const signupSchema = z
   });
 
 type SignupFormData = z.infer<typeof signupSchema>;
+type SocialProvider = 'google' | 'facebook';
+
+const socialProviderLabels: Record<SocialProvider, string> = {
+  google: 'Google',
+  facebook: 'Facebook',
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+
+  return fallback;
+};
 
 interface SignupModalProps {
   isOpen: boolean;
@@ -59,6 +80,8 @@ export const SignupModal: React.FC<SignupModalProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [socialSubmitting, setSocialSubmitting] =
+    useState<SocialProvider | null>(null);
 
   const {
     register,
@@ -95,9 +118,28 @@ export const SignupModal: React.FC<SignupModalProps> = ({
       setRegisteredEmail(data.email);
       setVerificationModalOpen(true);
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Registration failed';
-      toast.error(errorMessage);
+      toast.error(getErrorMessage(error, 'Registration failed'));
+    }
+  };
+
+  const handleSocialSignup = async (provider: SocialProvider) => {
+    try {
+      setSocialSubmitting(provider);
+
+      if (provider === 'google') {
+        await authApi.googleLogin();
+      } else {
+        await authApi.facebookLogin();
+      }
+    } catch (error: unknown) {
+      toast.error(
+        getErrorMessage(
+          error,
+          `${socialProviderLabels[provider]} signup failed`
+        )
+      );
+    } finally {
+      setSocialSubmitting(null);
     }
   };
 
@@ -318,6 +360,9 @@ export const SignupModal: React.FC<SignupModalProps> = ({
               variant="outline"
               size="md"
               className="w-full"
+              onClick={() => handleSocialSignup('google')}
+              loading={socialSubmitting === 'google'}
+              disabled={isSubmitting || socialSubmitting !== null}
               icon={
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -346,6 +391,9 @@ export const SignupModal: React.FC<SignupModalProps> = ({
               variant="outline"
               size="md"
               className="w-full text-xs sm:text-sm"
+              onClick={() => handleSocialSignup('facebook')}
+              loading={socialSubmitting === 'facebook'}
+              disabled={isSubmitting || socialSubmitting !== null}
               icon={
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5"

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 import { FaInstagram, FaLinkedinIn, FaTiktok } from 'react-icons/fa';
+import { assets } from '@/assets/assets';
 
 /* ================== DATA ARRAYS ================== */
 
@@ -102,7 +103,7 @@ const Listfoot = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
-            <Image src="/logo.png" alt="Faflories" width={150} height={40} />
+            <Image src={assets.gs_logo} alt="Faflories" width={150} height={40} />
 
             <p className="text-gray-500 text-sm max-w-sm">
               Awesome grocery store website template

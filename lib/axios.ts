@@ -21,7 +21,11 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: any) => {
     const state = store.getState();
-    const token = state.auth.accessToken;
+    const token =
+      state.auth.accessToken ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('accessToken')
+        : null);
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -84,7 +88,11 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       const state = store.getState();
-      const refreshToken = state.auth.refreshToken;
+      const refreshToken =
+        state.auth.refreshToken ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('refreshToken')
+          : null);
 
       if (!refreshToken) {
         store.dispatch(logout());
