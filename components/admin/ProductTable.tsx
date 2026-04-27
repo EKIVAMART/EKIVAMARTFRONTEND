@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Edit3, Trash2, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Product {
-  id: any;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -13,14 +13,32 @@ interface Product {
 interface ProductTableProps {
   data: Product[];
   onEdit: (item: Product) => void;
-  onDelete: (id: any) => void;
+  onDelete: (id: string) => void;
   searchQuery?: string;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
+  isLoading?: boolean;
 }
 
-export default function ProductTable({ data, onEdit, onDelete, searchQuery = '' }: ProductTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function ProductTable({
+  data,
+  onEdit,
+  onDelete,
+  searchQuery = '',
+  currentPage: serverPage,
+  totalPages: serverTotalPages,
+  totalItems,
+  itemsPerPage = 10,
+  onPageChange,
+  isLoading = false,
+}: ProductTableProps) {
+  const [localPage, setLocalPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const itemsPerPage = 10;
+  const isServerPaginated = Boolean(onPageChange);
+  const currentPage = serverPage || localPage;
 
   const filteredAndSortedData = useMemo(() => {
     let result = [...data];
@@ -42,16 +60,45 @@ export default function ProductTable({ data, onEdit, onDelete, searchQuery = '' 
     return result;
   }, [data, searchQuery, sortOrder]);
 
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
-  const paginatedData = filteredAndSortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages =
+    serverTotalPages || Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
+  const paginatedData = isServerPaginated
+    ? filteredAndSortedData
+    : filteredAndSortedData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
+  const displayTotal = totalItems ?? filteredAndSortedData.length;
+  const showingFrom =
+    displayTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const showingTo = Math.min(
+    (currentPage - 1) * itemsPerPage + paginatedData.length,
+    displayTotal
+  );
 
   const handleSortToggle = () => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
+    if (isServerPaginated) {
+      onPageChange?.(1);
+      return;
+    }
+
+    setLocalPage(1);
+  }, [isServerPaginated, onPageChange, searchQuery]);
+
+  const goToPage = (page: number) => {
+    const nextPage = Math.min(totalPages, Math.max(1, page));
+
+    if (isServerPaginated) {
+      onPageChange?.(nextPage);
+      return;
+    }
+
+    setLocalPage(nextPage);
+  };
 
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
@@ -147,15 +194,15 @@ export default function ProductTable({ data, onEdit, onDelete, searchQuery = '' 
       </div>
 
       {/* Pagination Footer */}
-      {(filteredAndSortedData.length > itemsPerPage || currentPage > 1) && (
+      {(totalPages > 1 || currentPage > 1) && (
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
           <span className="text-sm text-gray-500 font-medium hidden sm:block">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} entries
+            Showing {showingFrom} to {showingTo} of {displayTotal} entries
           </span>
           <div className="flex items-center gap-1 mx-auto sm:mx-0">
             <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1 || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronLeft size={18} />
@@ -164,7 +211,8 @@ export default function ProductTable({ data, onEdit, onDelete, searchQuery = '' 
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
               <button 
                 key={page}
-                onClick={() => setCurrentPage(page)}
+                onClick={() => goToPage(page)}
+                disabled={isLoading}
                 className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
                   currentPage === page 
                     ? 'bg-gray-100 text-slate-800 font-bold' 
@@ -176,8 +224,8 @@ export default function ProductTable({ data, onEdit, onDelete, searchQuery = '' 
             ))}
 
             <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronRight size={18} />

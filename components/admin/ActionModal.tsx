@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Tag } from 'lucide-react';
+import { categoryApi } from '@/lib/api';
 
 interface ProductFormData {
   id?: string;
@@ -25,16 +26,92 @@ interface ProductFormData {
   images: string[];
 }
 
+type EditableProduct = Partial<ProductFormData> & {
+  description?: string;
+  mrp?: number;
+  price?: number;
+  createdAt?: string;
+};
+
+type SavedProductData = ProductFormData & {
+  rating: never[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: 'products' | 'vendors' | 'orders';
-  editingItem?: any;
-  onSave?: (data: any) => void;
+  editingItem?: EditableProduct;
+  onSave?: (data: SavedProductData) => void;
 }
 
-const categories = ['Fashion', 'Electronics', 'Bags', 'Footwear', 'Groceries', 'Beauty', 'Wellness', 'Jewellery', 'Home Decor', 'Sports', 'Toys & Games'];
+type CategoryOption = {
+  id: string;
+  name: string;
+};
+
+type CategoryRecord = {
+  id?: string;
+  _id?: string;
+  slug?: string;
+  name?: string;
+  title?: string;
+  label?: string;
+};
+
+const fallbackCategories: CategoryOption[] = [
+  'Fashion',
+  'Electronics',
+  'Bags',
+  'Footwear',
+  'Groceries',
+  'Beauty',
+  'Wellness',
+  'Jewellery',
+  'Home Decor',
+  'Sports',
+  'Toys & Games',
+].map((name) => ({ id: name, name }));
 const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value && typeof value === 'object');
+
+const getCategoryList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+
+  const data = payload.data;
+
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.categories)) return data.categories;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.categories)) return payload.categories;
+
+  return [];
+};
+
+const normalizeCategory = (category: unknown): CategoryOption | null => {
+  if (typeof category === 'string') {
+    return { id: category, name: category };
+  }
+
+  if (!isRecord(category)) {
+    return null;
+  }
+
+  const record = category as CategoryRecord;
+  const name = record.name || record.title || record.label;
+  if (!name) {
+    return null;
+  }
+
+  return {
+    id: record.id || record._id || record.slug || name,
+    name,
+  };
+};
 
 export default function ActionModal({ 
   isOpen, 
@@ -45,9 +122,12 @@ export default function ActionModal({
 }: ActionModalProps) {
   
   const [currentStep, setCurrentStep] = useState(1);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>(fallbackCategories);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [categoryLoadError, setCategoryLoadError] = useState('');
   const [formData, setFormData] = useState<ProductFormData>({
     name: editingItem?.name || '',
-    category: editingItem?.category || categories[0],
+    category: editingItem?.category || fallbackCategories[0].name,
     shortDescription: editingItem?.shortDescription || '',
     fullDescription: editingItem?.fullDescription || editingItem?.description || '',
     originalPrice: editingItem?.mrp || editingItem?.originalPrice || 0,
@@ -69,6 +149,63 @@ export default function ActionModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const totalSteps = 4;
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isMounted = true;
+
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      setCategoryLoadError('');
+
+      try {
+        const response = await categoryApi.getCategories({
+          page: 1,
+          limit: 100,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        });
+        const categories = getCategoryList(response)
+          .map(normalizeCategory)
+          .filter((category): category is CategoryOption => Boolean(category));
+
+        if (!isMounted) return;
+
+        if (categories.length > 0) {
+          const options =
+            editingItem?.category &&
+            !categories.some((category) => category.name === editingItem.category)
+              ? [
+                  { id: editingItem.category, name: editingItem.category },
+                  ...categories,
+                ]
+              : categories;
+
+          setCategoryOptions(options);
+          setFormData((prev) => ({
+            ...prev,
+            category: options.some((category) => category.name === prev.category)
+              ? prev.category
+              : options[0].name,
+          }));
+        }
+      } catch {
+        if (!isMounted) return;
+        setCategoryLoadError('Could not load categories. Showing defaults.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingCategories(false);
+        }
+      }
+    };
+
+    fetchCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, editingItem?.category]);
+
   // Auto-calculate selling price
   useEffect(() => {
     const discountAmount = (formData.originalPrice * formData.discountPercent) / 100;
@@ -76,7 +213,10 @@ export default function ActionModal({
     setFormData(prev => ({ ...prev, sellingPrice: calculated }));
   }, [formData.originalPrice, formData.discountPercent]);
 
-  const updateField = (key: keyof ProductFormData, value: any) => {
+  const updateField = <Key extends keyof ProductFormData>(
+    key: Key,
+    value: ProductFormData[Key]
+  ) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
@@ -207,9 +347,11 @@ export default function ActionModal({
                         <p className="text-xs text-gray-500">Choose the category that best describes your product. This helps customers find it easily in the store.</p>
                       </div>
                     </div>
-                    <select value={formData.category} onChange={e => updateField('category', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required>
-                      {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    <select value={formData.category} onChange={e => updateField('category', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required disabled={isLoadingCategories && categoryOptions.length === 0}>
+                      {categoryOptions.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                     </select>
+                    {isLoadingCategories && <p className="text-xs text-gray-500 mt-2">Loading categories...</p>}
+                    {categoryLoadError && <p className="text-xs text-amber-600 mt-2">{categoryLoadError}</p>}
                   </div>
 
                   <textarea placeholder="Short Description (for previews) *" value={formData.shortDescription} onChange={e => updateField('shortDescription', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
