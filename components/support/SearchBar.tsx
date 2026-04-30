@@ -21,7 +21,7 @@ import {
   Scale,
 } from 'lucide-react';
 import React, { useState, useRef, useEffect, } from 'react';
-import { fafloriesSupportData } from '../../app/support/data/supportData';
+import { fafloraSupportData } from '../../app/support/data/supportData';
 
 /* ─── TYPES ─── */
 interface PopularArticle {
@@ -30,7 +30,7 @@ interface PopularArticle {
   slug: string;
 }
 
-const allArticles: PopularArticle[] = fafloriesSupportData.flatMap(topic => 
+const allArticles: PopularArticle[] = fafloraSupportData.flatMap(topic =>
   topic.articles.map(article => ({
     title: article.title,
     slug: article.slug,
@@ -72,8 +72,8 @@ export default function SearchBar() {
 
   const results = query.trim()
     ? allArticles
-        .filter((a) => a.title.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 5)
+      .filter((a) => a.title.toLowerCase().includes(query.toLowerCase()))
+      .slice(0, 5)
     : [];
 
   const hasQuery = query.trim().length > 0;
@@ -105,11 +105,10 @@ export default function SearchBar() {
     <div ref={wrapperRef} className="relative w-full max-w-2xl">
       {/* Input row */}
       <div
-        className={`flex items-center bg-white rounded-2xl shadow-[0_8px_40px_rgba(152,29,135,0.12)] border transition-all duration-300 overflow-hidden ${
-          focused
+        className={`flex items-center bg-white rounded-2xl shadow-[0_8px_40px_rgba(152,29,135,0.12)] border transition-all duration-300 overflow-hidden ${focused
             ? 'border-[#981d87] shadow-[0_8px_40px_rgba(152,29,135,0.22)]'
             : 'border-[#e8b8e4]'
-        }`}
+          }`}
       >
         {/* Search icon */}
         <div className="flex-shrink-0 md:pl-5 md:pr-3 pl-2 pr-1 text-[#c740b0]">

@@ -23,7 +23,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import FadeInSection from '@/components/FadeInSection';
-import { fafloriesSupportData } from '../../../data/supportData';
+import { fafloraSupportData } from '../../../data/supportData';
 
 /* ─── TOPIC ICON MAP ─── */
 const topicIcons: Record<string, React.ReactNode> = {
@@ -52,7 +52,7 @@ export default async function ArticlePage({
   let currentArticle = null;
   let currentTopic = null;
 
-  for (const topic of fafloriesSupportData) {
+  for (const topic of fafloraSupportData) {
     if (topic.slug === topicSlug) {
       const found = topic.articles.find((a) => a.slug === articleSlug);
       if (found) {
@@ -292,10 +292,10 @@ export default async function ArticlePage({
                       <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c740b0] flex items-center justify-center text-[#981d87] transition-colors">
                         <ArrowRight size={16} />
                       </div>
-                      
+
                       <div className="min-w-0 flex-1">
                         <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-0.5">Next</p>
-                        <p 
+                        <p
                           className="text-sm font-bold text-[#1a0018] group-hover:text-[#981d87] transition-colors 
                                     line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap"
                         >
@@ -337,19 +337,17 @@ export default async function ArticlePage({
                         <Link
                           key={article.id}
                           href={`/support/topics/${currentTopic.slug}/${article.slug}`}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13.5px] transition-all group ${
-                            isActive
+                          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13.5px] transition-all group ${isActive
                               ? 'bg-gradient-to-r from-[#fdf3fc] to-white text-[#981d87] font-extrabold border border-[#e8b8e4]'
                               : 'hover:bg-[#fdf8ff] text-gray-600 hover:text-[#981d87]'
-                          }`}
+                            }`}
                         >
                           {/* Index number */}
                           <span
-                            className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black transition-colors ${
-                              isActive
+                            className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black transition-colors ${isActive
                                 ? 'bg-gradient-to-br from-[#981d87] to-[#c740b0] text-white shadow-sm'
                                 : 'bg-[#f5e8f5] text-[#c740b0] group-hover:bg-[#fdf3fc]'
-                            }`}
+                              }`}
                           >
                             {i + 1}
                           </span>

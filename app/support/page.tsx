@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import FadeInSection from '@/components/FadeInSection';
 import TypingText from '@/components/TypingText';
-import { fafloriesSupportData } from './data/supportData';
+import { fafloraSupportData } from './data/supportData';
 import PopularCarousel from '@/components/support/PopularCarousel';
 import SearchBar from '@/components/support/SearchBar';
 
@@ -244,7 +244,7 @@ export default function SupportHome() {
             <FadeInSection type="fadeDown" delay={0.1}>
               <div className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#981d87] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
                 <HelpCircle size={11} />
-                Faflories · Support Center
+                Faflora · Support Center
               </div>
             </FadeInSection>
 
@@ -361,7 +361,7 @@ export default function SupportHome() {
             icon={<Store size={17} />}
           />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {(fafloriesSupportData as Topic[]).map((topic, i) => (
+            {(fafloraSupportData as Topic[]).map((topic, i) => (
               <TopicCard key={topic.id} topic={topic} index={i} />
             ))}
           </div>

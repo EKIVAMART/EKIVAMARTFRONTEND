@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simulate API call and login
     setTimeout(() => {
       setIsLoading(false);
@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#981d87] focus:ring-4 focus:ring-[#981d87]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
-                placeholder="admin@faflories.com"
+                placeholder="admin@faflora.com"
               />
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="mt-8 text-center text-sm font-medium text-slate-400">
-        <p>&copy; {new Date().getFullYear()} Faflories Group. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Faflora Group. All rights reserved.</p>
         <p className="mt-1 flex items-center justify-center gap-1">
           <Lock size={12} />
           Secured by enterprise-grade encryption

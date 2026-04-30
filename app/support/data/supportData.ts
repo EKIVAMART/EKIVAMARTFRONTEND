@@ -17,20 +17,20 @@ export interface SupportTopic {
 }
 
 // Full data (you can expand articles later)
-export const fafloriesSupportData: SupportTopic[] = [
+export const fafloraSupportData: SupportTopic[] = [
   // ==================== TOPIC 1: Account Creation & Verification ====================
   {
     id: "account-creation-verification",
     slug: "account-creation-verification",
     title: "Account Creation & Verification",
-    description: "Learn how to create and verify your Faflories account as a buyer or seller.",
+    description: "Learn how to create and verify your Faflora account as a buyer or seller.",
     articleCount: 12,
     articles: [
       {
         id: "1",
-        slug: "how-do-i-create-a-buyer-account-on-faflories",
-        title: "How do I create a buyer account on Faflories?",
-        content: `# How do I create a buyer account on Faflories?\n\nCreating a buyer account on Faflories is completely free and takes less than 2 minutes.\n\n### Step-by-step guide:\n1. Visit [faflories.com](https://faflories.com) or download the Faflories app from Google Play Store.\n2. Tap on **Sign Up**.\n3. Enter your Nigerian phone number (MTN, Airtel, Glo, or 9mobile).\n4. You will receive a One-Time Password (OTP) via SMS — enter it to verify your number.\n5. Provide your full name and a valid email address.\n6. Create a strong password.\n7. Tap **Create Account**.\n\nOnce completed, you will be automatically logged in and can start browsing thousands of high-quality, locally made Nigerian products.\n\n**Pro Tip**: Use your primary phone number. This makes order tracking, delivery updates, and account recovery much easier.`,
+        slug: "how-do-i-create-a-buyer-account-on-faflora",
+        title: "How do I create a buyer account on Faflora?",
+        content: `# How do I create a buyer account on Faflora?\n\nCreating a buyer account on Faflora is completely free and takes less than 2 minutes.\n\n### Step-by-step guide:\n1. Visit [faflora.com](https://faflora.com) or download the Faflora app from Google Play Store.\n2. Tap on **Sign Up**.\n3. Enter your Nigerian phone number (MTN, Airtel, Glo, or 9mobile).\n4. You will receive a One-Time Password (OTP) via SMS — enter it to verify your number.\n5. Provide your full name and a valid email address.\n6. Create a strong password.\n7. Tap **Create Account**.\n\nOnce completed, you will be automatically logged in and can start browsing thousands of high-quality, locally made Nigerian products.\n\n**Pro Tip**: Use your primary phone number. This makes order tracking, delivery updates, and account recovery much easier.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -44,7 +44,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "3",
         slug: "how-to-complete-kyc-as-a-buyer",
         title: "How to complete KYC as a buyer (Level 1 & Level 2)",
-        content: `# How to complete KYC as a buyer (Level 1 & Level 2)\n\nFaflories uses a simple two-level KYC system to keep the platform safe.\n\n**Level 1 (Basic Verification)** — Done automatically during signup:\n- Phone number verification via OTP\n- Email verification\n\n**Level 2 (Full KYC)** — Recommended for frequent shoppers:\n1. Go to your **Profile** → **Verification**.\n2. Upload a valid government-issued ID (NIN Slip, Voter’s Card, Driver’s License, or International Passport).\n3. Take a quick selfie for face matching.\n4. Submit for review.\n\n**Approval usually takes 5–30 minutes.** Once approved, you unlock higher daily purchase limits and faster dispute resolution.`,
+        content: `# How to complete KYC as a buyer (Level 1 & Level 2)\n\nFaflora uses a simple two-level KYC system to keep the platform safe.\n\n**Level 1 (Basic Verification)** — Done automatically during signup:\n- Phone number verification via OTP\n- Email verification\n\n**Level 2 (Full KYC)** — Recommended for frequent shoppers:\n1. Go to your **Profile** → **Verification**.\n2. Upload a valid government-issued ID (NIN Slip, Voter’s Card, Driver’s License, or International Passport).\n3. Take a quick selfie for face matching.\n4. Submit for review.\n\n**Approval usually takes 5–30 minutes.** Once approved, you unlock higher daily purchase limits and faster dispute resolution.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -65,7 +65,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "6",
         slug: "can-i-use-same-account-for-buying-and-selling",
         title: "Can I use the same account for buying and selling?",
-        content: `# Can I use the same account for buying and selling?\n\n**Yes!** One Faflories account can be used for both buying and selling.\n\nAfter you create a buyer account, you can apply to become a vendor from your profile. Once your vendor application is approved, you can easily switch between **Buyer Mode** and **Seller Mode** anytime from the app menu.\n\nThis makes it convenient for users who want to both shop and sell on the platform.`,
+        content: `# Can I use the same account for buying and selling?\n\n**Yes!** One Faflora account can be used for both buying and selling.\n\nAfter you create a buyer account, you can apply to become a vendor from your profile. Once your vendor application is approved, you can easily switch between **Buyer Mode** and **Seller Mode** anytime from the app menu.\n\nThis makes it convenient for users who want to both shop and sell on the platform.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -93,7 +93,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "10",
         slug: "how-to-switch-from-buyer-to-vendor-account",
         title: "How to switch from buyer to vendor account",
-        content: `# How to switch from buyer to vendor account\n\n1. Log into your Faflories account.\n2. Go to **Profile**.\n3. Tap **Switch to Seller** or **Become a Vendor**.\n4. Complete the vendor application form and upload required documents.\n5. Once approved, you can switch between buyer and seller modes easily from the side menu.\n\nYou can still buy products even after becoming a vendor.`,
+        content: `# How to switch from buyer to vendor account\n\n1. Log into your Faflora account.\n2. Go to **Profile**.\n3. Tap **Switch to Seller** or **Become a Vendor**.\n4. Complete the vendor application form and upload required documents.\n5. Once approved, you can switch between buyer and seller modes easily from the side menu.\n\nYou can still buy products even after becoming a vendor.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -124,7 +124,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "13",
         slug: "how-to-update-profile-address-and-delivery-details",
         title: "How to update my profile, address, and delivery details",
-        content: `# How to update my profile, address, and delivery details\n\nKeeping your information up to date ensures smooth delivery and better service.\n\n### Steps to update:\n1. Open the Faflories app and tap on your **Profile** (bottom right).\n2. Tap **Edit Profile**.\n3. Update your full name, phone number, or email address.\n4. Go to **My Addresses** section.\n5. Tap **Add New Address** or edit an existing one.\n6. Fill in your full address, landmark, city, and state.\n7. Mark one address as **Default Delivery Address**.\n\n**Tip**: Always include a clear landmark and phone number for the delivery person.`,
+        content: `# How to update my profile, address, and delivery details\n\nKeeping your information up to date ensures smooth delivery and better service.\n\n### Steps to update:\n1. Open the Faflora app and tap on your **Profile** (bottom right).\n2. Tap **Edit Profile**.\n3. Update your full name, phone number, or email address.\n4. Go to **My Addresses** section.\n5. Tap **Add New Address** or edit an existing one.\n6. Fill in your full address, landmark, city, and state.\n7. Mark one address as **Default Delivery Address**.\n\n**Tip**: Always include a clear landmark and phone number for the delivery person.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -180,7 +180,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "21",
         slug: "how-to-download-my-data",
         title: "How to download my data (NDPR/GDPR request)",
-        content: `# How to download my data (NDPR request)\n\nFaflories respects your data rights under NDPR.\n\n1. Go to **Profile** → **Account Settings** → **Privacy & Data**.\n2. Tap **Request My Data**.\n3. Select the data you want (orders, profile, etc.).\n4. Submit request.\n\nWe will prepare and send your data via email within 7 business days.`,
+        content: `# How to download my data (NDPR request)\n\nFaflora respects your data rights under NDPR.\n\n1. Go to **Profile** → **Account Settings** → **Privacy & Data**.\n2. Tap **Request My Data**.\n3. Select the data you want (orders, profile, etc.).\n4. Submit request.\n\nWe will prepare and send your data via email within 7 business days.`,
         lastUpdated: "April 06, 2026"
       }
     ]
@@ -190,14 +190,14 @@ export const fafloriesSupportData: SupportTopic[] = [
     id: "becoming-a-vendor",
     slug: "becoming-a-vendor",
     title: "Becoming a Vendor / Seller Onboarding",
-    description: "Everything you need to start selling successfully on Faflories.",
+    description: "Everything you need to start selling successfully on Faflora.",
     articleCount: 18,
     articles: [
       {
         id: "22",
         slug: "how-to-register-as-a-vendor",
-        title: "How to register as a vendor on Faflories",
-        content: `# How to register as a vendor on Faflories\n\n1. Log into your existing Faflories account (buyer account is fine).\n2. Go to **Profile** → **Switch to Seller**.\n3. Tap **Apply to Become a Vendor**.\n4. Fill the vendor application form with your business details.\n5. Upload required documents.\n6. Submit application.\n\nOur team reviews applications within 1–3 business days. You will be notified once approved.`,
+        title: "How to register as a vendor on Faflora",
+        content: `# How to register as a vendor on Faflora\n\n1. Log into your existing Faflora account (buyer account is fine).\n2. Go to **Profile** → **Switch to Seller**.\n3. Tap **Apply to Become a Vendor**.\n4. Fill the vendor application form with your business details.\n5. Upload required documents.\n6. Submit application.\n\nOur team reviews applications within 1–3 business days. You will be notified once approved.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -239,7 +239,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "28",
         slug: "vendor-commission-structure",
         title: "What is the vendor commission structure?",
-        content: `# What is the vendor commission structure?\n\nFaflories charges a competitive commission rate ranging from **8% to 15%** depending on category.\n\n- Fashion & Apparel: 10%\n- Beauty & Personal Care: 12%\n- Home & Kitchen: 8%\n- Handmade & Crafts: 15%\n\nNo monthly subscription or listing fees. You only pay commission when a sale is completed.`,
+        content: `# What is the vendor commission structure?\n\nFaflora charges a competitive commission rate ranging from **8% to 15%** depending on category.\n\n- Fashion & Apparel: 10%\n- Beauty & Personal Care: 12%\n- Home & Kitchen: 8%\n- Handmade & Crafts: 15%\n\nNo monthly subscription or listing fees. You only pay commission when a sale is completed.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -302,14 +302,14 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "37",
         slug: "can-i-sell-both-new-and-handmade-products",
         title: "Can I sell both new and handmade products?",
-        content: `# Can I sell both new and handmade products?\n\nYes, you can sell both new factory-made and handmade/original products on Faflories.\n\nWe encourage authentic Nigerian handmade items with the “Made in Nigeria” badge. Just make sure to accurately categorize and describe each product so buyers know what they are getting.`,
+        content: `# Can I sell both new and handmade products?\n\nYes, you can sell both new factory-made and handmade/original products on Faflora.\n\nWe encourage authentic Nigerian handmade items with the “Made in Nigeria” badge. Just make sure to accurately categorize and describe each product so buyers know what they are getting.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "38",
-        slug: "how-to-contact-faflories-for-vendor-support",
-        title: "How to contact Faflories for vendor support",
-        content: `# How to contact Faflories for vendor support\n\nVendors have priority support:\n1. Use the **Seller Dashboard** → **Support** tab.\n2. Chat directly with the vendor support team.\n3. Email vendor@faflories.com for complex issues.\n4. Call our dedicated vendor helpline (available on dashboard).\n\nResponse time for vendors is usually under 2 hours during business days.`,
+        slug: "how-to-contact-faflora-for-vendor-support",
+        title: "How to contact Faflora for vendor support",
+        content: `# How to contact Faflora for vendor support\n\nVendors have priority support:\n1. Use the **Seller Dashboard** → **Support** tab.\n2. Chat directly with the vendor support team.\n3. Email vendor@faflora.com for complex issues.\n4. Call our dedicated vendor helpline (available on dashboard).\n\nResponse time for vendors is usually under 2 hours during business days.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -327,7 +327,7 @@ export const fafloriesSupportData: SupportTopic[] = [
     id: "browsing-purchasing",
     slug: "browsing-purchasing",
     title: "Browsing & Purchasing",
-    description: "Tips and guides for finding and buying products on Faflories.",
+    description: "Tips and guides for finding and buying products on Faflora.",
     articleCount: 11,
     articles: [
       {
@@ -369,14 +369,14 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "45",
         slug: "how-does-recommendation-engine-work",
         title: "How does the recommendation engine work?",
-        content: `# How does the recommendation engine work?\n\nFaflories shows personalized recommendations based on:\n- Your browsing and purchase history\n- Similar buyer behavior\n- Product popularity and ratings\n- Your location and preferences\n\nThe more you shop and rate products, the better our recommendations become.`,
+        content: `# How does the recommendation engine work?\n\nFaflora shows personalized recommendations based on:\n- Your browsing and purchase history\n- Similar buyer behavior\n- Product popularity and ratings\n- Your location and preferences\n\nThe more you shop and rate products, the better our recommendations become.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "46",
         slug: "can-i-buy-from-multiple-vendors-in-one-order",
         title: "Can I buy from multiple vendors in one order?",
-        content: `# Can I buy from multiple vendors in one order?\n\nYes! Faflories supports **multi-vendor checkout**.\n\nYou can add products from different sellers to your cart and complete them in a single order. Each vendor ships their items separately, and you may receive multiple delivery packages.`,
+        content: `# Can I buy from multiple vendors in one order?\n\nYes! Faflora supports **multi-vendor checkout**.\n\nYou can add products from different sellers to your cart and complete them in a single order. Each vendor ships their items separately, and you may receive multiple delivery packages.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -390,7 +390,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "48",
         slug: "what-payment-options-are-available",
         title: "What payment options are available?",
-        content: `# What payment options are available?\n\nFaflories supports:\n- Card payments (Visa, Mastercard, Verve)\n- Bank transfers\n- Wallet balance\n- Cash on Delivery (available in select cities)\n- Paystack and Flutterwave secure gateways\n\nAll payments are encrypted and secure.`,
+        content: `# What payment options are available?\n\nFaflora supports:\n- Card payments (Visa, Mastercard, Verve)\n- Bank transfers\n- Wallet balance\n- Cash on Delivery (available in select cities)\n- Paystack and Flutterwave secure gateways\n\nAll payments are encrypted and secure.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -409,7 +409,7 @@ export const fafloriesSupportData: SupportTopic[] = [
       }
     ]
   },
-    // ==================== TOPIC 5: Orders & Tracking ====================
+  // ==================== TOPIC 5: Orders & Tracking ====================
   {
     id: "orders-tracking",
     slug: "orders-tracking",
@@ -421,7 +421,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "51",
         slug: "how-to-view-all-my-orders",
         title: "How to view all my orders",
-        content: `# How to view all my orders\n\n1. Open the Faflories app and go to your **Profile**.\n2. Tap **My Orders**.\n3. You will see a list of all your orders with their current status.\n4. Use the tabs to filter: All, Pending, Shipped, Delivered, Cancelled.\n\nTap any order to see detailed information including items, total amount, and tracking details.`,
+        content: `# How to view all my orders\n\n1. Open the Faflora app and go to your **Profile**.\n2. Tap **My Orders**.\n3. You will see a list of all your orders with their current status.\n4. Use the tabs to filter: All, Pending, Shipped, Delivered, Cancelled.\n\nTap any order to see detailed information including items, total amount, and tracking details.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -512,7 +512,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "64",
         slug: "bulk-ordering-for-businesses",
         title: "Bulk ordering for businesses – how it works",
-        content: `# Bulk ordering for businesses – how it works\n\nBusinesses can request bulk orders by:\n1. Contacting the seller directly via message.\n2. Mentioning quantity needed and delivery timeline.\n3. Some vendors offer special pricing for wholesale.\n\nFor very large orders, you can also email support@faflories.com for assistance in coordinating with multiple vendors.`,
+        content: `# Bulk ordering for businesses – how it works\n\nBusinesses can request bulk orders by:\n1. Contacting the seller directly via message.\n2. Mentioning quantity needed and delivery timeline.\n3. Some vendors offer special pricing for wholesale.\n\nFor very large orders, you can also email support@faflora.com for assistance in coordinating with multiple vendors.`,
         lastUpdated: "April 06, 2026"
       }
     ]
@@ -528,9 +528,9 @@ export const fafloriesSupportData: SupportTopic[] = [
     articles: [
       {
         id: "65",
-        slug: "what-payment-methods-does-faflories-accept",
-        title: "What payment methods does Faflories accept?",
-        content: `# What payment methods does Faflories accept?\n\nFaflories supports secure payments through:\n- Debit/Credit Cards (Visa, Mastercard, Verve)\n- Bank Account transfers via Paystack/Flutterwave\n- Mobile Money / USSD\n- Wallet balance\n- Cash on Delivery (in selected cities)\n\nAll transactions are protected with industry-standard encryption.`,
+        slug: "what-payment-methods-does-faflora-accept",
+        title: "What payment methods does Faflora accept?",
+        content: `# What payment methods does Faflora accept?\n\nFaflora supports secure payments through:\n- Debit/Credit Cards (Visa, Mastercard, Verve)\n- Bank Account transfers via Paystack/Flutterwave\n- Mobile Money / USSD\n- Wallet balance\n- Cash on Delivery (in selected cities)\n\nAll transactions are protected with industry-standard encryption.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -544,7 +544,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "67",
         slug: "how-safe-is-my-payment-information",
         title: "How safe is my payment information?",
-        content: `# How safe is my payment information?\n\nFaflories does **not** store your full card details. All payments are processed securely by Paystack and Flutterwave using 256-bit SSL encryption and PCI-DSS compliance.\n\nYou can also enable additional security like PIN or biometric authentication on your bank app.`,
+        content: `# How safe is my payment information?\n\nFaflora does **not** store your full card details. All payments are processed securely by Paystack and Flutterwave using 256-bit SSL encryption and PCI-DSS compliance.\n\nYou can also enable additional security like PIN or biometric authentication on your bank app.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -607,7 +607,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "76",
         slug: "how-to-use-wallet-balance",
         title: "How to use wallet balance",
-        content: `# How to use wallet balance\n\nYour Faflories Wallet holds refunds and promotional credits.\n\nAt checkout, your wallet balance is automatically applied first. You can also manually add money to your wallet from the Profile section.`,
+        content: `# How to use wallet balance\n\nYour Faflora Wallet holds refunds and promotional credits.\n\nAt checkout, your wallet balance is automatically applied first. You can also manually add money to your wallet from the Profile section.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -635,12 +635,12 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "80",
         slug: "can-i-get-an-instant-refund",
         title: "Can I get an instant refund?",
-        content: `# Can I get an instant refund?\n\nInstant refunds are available when:\n- You paid using Faflories Wallet\n- The seller agrees to an immediate refund\n- The order was cancelled before shipping\n\nFor card payments, refunds follow standard bank processing times.`,
+        content: `# Can I get an instant refund?\n\nInstant refunds are available when:\n- You paid using Faflora Wallet\n- The seller agrees to an immediate refund\n- The order was cancelled before shipping\n\nFor card payments, refunds follow standard bank processing times.`,
         lastUpdated: "April 06, 2026"
       }
     ]
   },
-    // ==================== TOPIC 7: Delivery & Shipping ====================
+  // ==================== TOPIC 7: Delivery & Shipping ====================
   {
     id: "delivery-shipping",
     slug: "delivery-shipping",
@@ -650,9 +650,9 @@ export const fafloriesSupportData: SupportTopic[] = [
     articles: [
       {
         id: "81",
-        slug: "how-does-faflories-delivery-work",
-        title: "How does Faflories delivery work?",
-        content: `# How does Faflories delivery work?\n\nFaflories partners with reliable local courier services across Nigeria. When you place an order:\n\n1. The seller prepares and packages your item.\n2. The package is handed over to our courier partner.\n3. You receive real-time tracking updates via the app.\n4. The courier delivers to your provided address.\n\nMultiple vendors = multiple packages is normal.`,
+        slug: "how-does-faflora-delivery-work",
+        title: "How does Faflora delivery work?",
+        content: `# How does Faflora delivery work?\n\nFaflora partners with reliable local courier services across Nigeria. When you place an order:\n\n1. The seller prepares and packages your item.\n2. The package is handed over to our courier partner.\n3. You receive real-time tracking updates via the app.\n4. The courier delivers to your provided address.\n\nMultiple vendors = multiple packages is normal.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -687,7 +687,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "86",
         slug: "how-to-track-my-parcel-with-the-courier",
         title: "How to track my parcel with the courier",
-        content: `# How to track my parcel with the courier\n\n1. Go to **My Orders** → select your order.\n2. In the Tracking section, you will see the courier name and tracking number.\n3. Tap the tracking number to open it in the courier’s website or app.\n\nYou can also track directly in the Faflories app for most orders.`,
+        content: `# How to track my parcel with the courier\n\n1. Go to **My Orders** → select your order.\n2. In the Tracking section, you will see the courier name and tracking number.\n3. Tap the tracking number to open it in the courier’s website or app.\n\nYou can also track directly in the Faflora app for most orders.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -701,14 +701,14 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "88",
         slug: "partner-courier-services-we-use",
         title: "Partner courier services we use",
-        content: `# Partner courier services we use\n\nFaflories works with trusted partners including:\n- GIG Logistics\n- DHL Express\n- UPS Nigeria\n- Local courier partners in different states\n\nThe specific courier for your order is shown in the tracking details.`,
+        content: `# Partner courier services we use\n\nFaflora works with trusted partners including:\n- GIG Logistics\n- DHL Express\n- UPS Nigeria\n- Local courier partners in different states\n\nThe specific courier for your order is shown in the tracking details.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "89",
         slug: "is-international-shipping-available",
         title: "International shipping – is it available?",
-        content: `# International shipping – is it available?\n\nCurrently, Faflories delivers **only within Nigeria**.\n\nWe are focused on supporting local Nigerian vendors and fast domestic delivery. International shipping is not yet available but is being considered for the future.`,
+        content: `# International shipping – is it available?\n\nCurrently, Faflora delivers **only within Nigeria**.\n\nWe are focused on supporting local Nigerian vendors and fast domestic delivery. International shipping is not yet available but is being considered for the future.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -752,9 +752,9 @@ export const fafloriesSupportData: SupportTopic[] = [
     articles: [
       {
         id: "94",
-        slug: "what-is-faflories-return-policy",
-        title: "What is Faflories return policy?",
-        content: `# What is Faflories return policy?\n\nFaflories offers a **7-day return window** for most items from the date of delivery.\n\nReturns are accepted if the item is unused, in original condition, and with all tags intact. Some categories like underwear, custom-made, or perishable items are non-returnable. Always check the product page for specific return rules.`,
+        slug: "what-is-faflora-return-policy",
+        title: "What is Faflora return policy?",
+        content: `# What is Faflora return policy?\n\nFaflora offers a **7-day return window** for most items from the date of delivery.\n\nReturns are accepted if the item is unused, in original condition, and with all tags intact. Some categories like underwear, custom-made, or perishable items are non-returnable. Always check the product page for specific return rules.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -796,28 +796,28 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "100",
         slug: "how-to-open-a-dispute-with-a-seller",
         title: "How to open a dispute with a seller",
-        content: `# How to open a dispute with a seller\n\n1. Go to the order in **My Orders**.\n2. Tap **Open Dispute**.\n3. Select the issue (wrong item, damaged, not as described, etc.).\n4. Provide detailed explanation and upload evidence (photos/videos).\n5. Submit the dispute.\n\nFaflories mediation team will review and help resolve it fairly.`,
+        content: `# How to open a dispute with a seller\n\n1. Go to the order in **My Orders**.\n2. Tap **Open Dispute**.\n3. Select the issue (wrong item, damaged, not as described, etc.).\n4. Provide detailed explanation and upload evidence (photos/videos).\n5. Submit the dispute.\n\nFaflora mediation team will review and help resolve it fairly.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "101",
         slug: "dispute-resolution-timeline",
         title: "Dispute resolution timeline",
-        content: `# Dispute resolution timeline\n\n- Initial review: Within 48 hours\n- Seller response period: 3–5 business days\n- Final decision by Faflories: Usually within 7–10 days from opening the dispute\n\nYou will receive regular updates via notification and email.`,
+        content: `# Dispute resolution timeline\n\n- Initial review: Within 48 hours\n- Seller response period: 3–5 business days\n- Final decision by Faflora: Usually within 7–10 days from opening the dispute\n\nYou will receive regular updates via notification and email.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "102",
         slug: "what-happens-after-a-dispute-is-raised",
         title: "What happens after a dispute is raised?",
-        content: `# What happens after a dispute is raised?\n\n1. The seller is notified and given time to respond.\n2. Faflories reviews all evidence from both sides.\n3. A fair resolution is proposed (refund, replacement, or partial refund).\n4. Both parties are notified of the decision.\n\nMost disputes are resolved in favor of the buyer when clear evidence is provided.`,
+        content: `# What happens after a dispute is raised?\n\n1. The seller is notified and given time to respond.\n2. Faflora reviews all evidence from both sides.\n3. A fair resolution is proposed (refund, replacement, or partial refund).\n4. Both parties are notified of the decision.\n\nMost disputes are resolved in favor of the buyer when clear evidence is provided.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "103",
         slug: "seller-is-not-responding-what-next",
         title: "Seller is not responding – what next?",
-        content: `# Seller is not responding – what next?\n\nIf the seller doesn’t respond within the given time:\n1. The dispute automatically escalates to Faflories support team.\n2. We will review the case based on your evidence.\n3. A decision will be made, usually in the buyer’s favor if evidence is strong.\n\nYou don’t need to do anything extra — just wait for our update.`,
+        content: `# Seller is not responding – what next?\n\nIf the seller doesn’t respond within the given time:\n1. The dispute automatically escalates to Faflora support team.\n2. We will review the case based on your evidence.\n3. A decision will be made, usually in the buyer’s favor if evidence is strong.\n\nYou don’t need to do anything extra — just wait for our update.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -857,19 +857,19 @@ export const fafloriesSupportData: SupportTopic[] = [
       }
     ]
   },
-    // ==================== TOPIC 9: Security, Fraud & Privacy ====================
+  // ==================== TOPIC 9: Security, Fraud & Privacy ====================
   {
     id: "security-fraud-privacy",
     slug: "security-fraud-privacy",
     title: "Security, Fraud & Privacy",
-    description: "How we protect your account, data, and help you stay safe on Faflories.",
+    description: "How we protect your account, data, and help you stay safe on Faflora.",
     articleCount: 10,
     articles: [
       {
         id: "109",
-        slug: "how-does-faflories-protect-my-data",
-        title: "How does Faflories protect my data?",
-        content: `# How does Faflories protect my data?\n\nWe take your privacy seriously and are fully NDPR compliant.\n\n- All data is encrypted in transit and at rest\n- We only collect information necessary to provide our service\n- Access to personal data is strictly limited to authorized personnel\n- You can request your data or deletion at any time\n\nYour trust is the foundation of our marketplace.`,
+        slug: "how-does-faflora-protect-my-data",
+        title: "How does Faflora protect my data?",
+        content: `# How does Faflora protect my data?\n\nWe take your privacy seriously and are fully NDPR compliant.\n\n- All data is encrypted in transit and at rest\n- We only collect information necessary to provide our service\n- Access to personal data is strictly limited to authorized personnel\n- You can request your data or deletion at any time\n\nYour trust is the foundation of our marketplace.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -883,7 +883,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "111",
         slug: "i-think-ive-been-scammed-what-should-i-do",
         title: "I think I’ve been scammed – what should I do?",
-        content: `# I think I’ve been scammed – what should I do?\n\n1. Immediately open a dispute on the order with clear evidence.\n2. Do not make payment outside the Faflories platform.\n3. Report the seller through the app.\n4. Contact support@faflories.com with order details.\n\nWe take fraud very seriously and will investigate and take action against fraudulent vendors.`,
+        content: `# I think I’ve been scammed – what should I do?\n\n1. Immediately open a dispute on the order with clear evidence.\n2. Do not make payment outside the Faflora platform.\n3. Report the seller through the app.\n4. Contact support@faflora.com with order details.\n\nWe take fraud very seriously and will investigate and take action against fraudulent vendors.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -911,7 +911,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "115",
         slug: "is-my-payment-information-safe",
         title: "Is my payment information safe?",
-        content: `# Is my payment information safe?\n\nYes. Faflories does not store your full card details. Payments are securely processed by licensed partners (Paystack and Flutterwave) using bank-level encryption. We only see confirmation of successful payment.`,
+        content: `# Is my payment information safe?\n\nYes. Faflora does not store your full card details. Payments are securely processed by licensed partners (Paystack and Flutterwave) using bank-level encryption. We only see confirmation of successful payment.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -932,7 +932,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "118",
         slug: "what-to-do-if-your-account-is-hacked",
         title: "What to do if your account is hacked",
-        content: `# What to do if your account is hacked\n\n1. Change your password immediately from another device.\n2. Enable 2FA.\n3. Sign out all other sessions from Security Settings.\n4. Contact support@faflories.com with details of suspicious activity.\n5. We will help secure your account and review recent transactions.`,
+        content: `# What to do if your account is hacked\n\n1. Change your password immediately from another device.\n2. Enable 2FA.\n3. Sign out all other sessions from Security Settings.\n4. Contact support@faflora.com with details of suspicious activity.\n5. We will help secure your account and review recent transactions.`,
         lastUpdated: "April 06, 2026"
       }
     ]
@@ -943,7 +943,7 @@ export const fafloriesSupportData: SupportTopic[] = [
     id: "app-technical-issues",
     slug: "app-technical-issues",
     title: "App & Technical Issues",
-    description: "Troubleshooting common problems with the Faflories app and website.",
+    description: "Troubleshooting common problems with the Faflora app and website.",
     articleCount: 8,
     articles: [
       {
@@ -955,9 +955,9 @@ export const fafloriesSupportData: SupportTopic[] = [
       },
       {
         id: "120",
-        slug: "how-to-update-the-faflories-app",
-        title: "How to update the Faflories app",
-        content: `# How to update the Faflories app\n\n1. Open Google Play Store.\n2. Search for “Faflories”.\n3. Tap **Update** if available.\n\nRegular updates bring new features and fix bugs. We recommend keeping the app updated.`,
+        slug: "how-to-update-the-faflora-app",
+        title: "How to update the Faflora app",
+        content: `# How to update the Faflora app\n\n1. Open Google Play Store.\n2. Search for “Faflora”.\n3. Tap **Update** if available.\n\nRegular updates bring new features and fix bugs. We recommend keeping the app updated.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -971,7 +971,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "122",
         slug: "notifications-not-working",
         title: "Notifications not working",
-        content: `# Notifications not working\n\n1. Go to your phone Settings → Apps → Faflories → Notifications.\n2. Make sure notifications are enabled.\n3. Check Do Not Disturb mode is off.\n4. In the Faflories app, go to Settings → Notifications and enable all options.\n\nRestart the app after making changes.`,
+        content: `# Notifications not working\n\n1. Go to your phone Settings → Apps → Faflora → Notifications.\n2. Make sure notifications are enabled.\n3. Check Do Not Disturb mode is off.\n4. In the Faflora app, go to Settings → Notifications and enable all options.\n\nRestart the app after making changes.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -985,14 +985,14 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "124",
         slug: "how-to-clear-cache-and-data",
         title: "How to clear cache and data",
-        content: `# How to clear cache and data\n\nOn Android:\n1. Go to phone Settings → Apps → Faflories.\n2. Tap **Storage** → **Clear Cache** (try this first).\n3. If needed, tap **Clear Data** (you may need to log in again).\n\nThis often fixes many technical glitches.`,
+        content: `# How to clear cache and data\n\nOn Android:\n1. Go to phone Settings → Apps → Faflora.\n2. Tap **Storage** → **Clear Cache** (try this first).\n3. If needed, tap **Clear Data** (you may need to log in again).\n\nThis often fixes many technical glitches.`,
         lastUpdated: "April 06, 2026"
       },
       {
         id: "125",
         slug: "app-not-available-in-my-countrys-app-store",
         title: "App not available in my country’s app store",
-        content: `# App not available in my country’s app store\n\nThe Faflories app is currently available only on Google Play Store in Nigeria.\n\nYou can also use the full website version at faflories.com on any browser. We are working on expanding availability to more regions.`,
+        content: `# App not available in my country’s app store\n\nThe Faflora app is currently available only on Google Play Store in Nigeria.\n\nYou can also use the full website version at faflora.com on any browser. We are working on expanding availability to more regions.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1004,7 +1004,7 @@ export const fafloriesSupportData: SupportTopic[] = [
       }
     ]
   },
-    // ==================== TOPIC 11: Vendor Tools & Dashboard ====================
+  // ==================== TOPIC 11: Vendor Tools & Dashboard ====================
   {
     id: "vendor-tools-dashboard",
     slug: "vendor-tools-dashboard",
@@ -1058,7 +1058,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "133",
         slug: "how-to-promote-my-products",
         title: "How to promote my products",
-        content: `# How to promote my products\n\n- Create attractive listings with good photos and descriptions\n- Offer limited-time discounts\n- Ask satisfied customers to leave reviews\n- Share your store link on social media (WhatsApp, Instagram, etc.)\n- Participate in Faflories promotional campaigns when available\n\nConsistent promotion leads to more visibility and sales.`,
+        content: `# How to promote my products\n\n- Create attractive listings with good photos and descriptions\n- Offer limited-time discounts\n- Ask satisfied customers to leave reviews\n- Share your store link on social media (WhatsApp, Instagram, etc.)\n- Participate in Faflora promotional campaigns when available\n\nConsistent promotion leads to more visibility and sales.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1079,7 +1079,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "136",
         slug: "how-to-feature-my-products",
         title: "How to feature my products",
-        content: `# How to feature my products\n\nFaflories occasionally features high-quality products on the homepage and category pages.\n\nTo increase chances:\n- Maintain excellent ratings\n- Use high-resolution images\n- Keep stock updated\n- Price competitively\n\nYou can also promote products using discount codes and social sharing.`,
+        content: `# How to feature my products\n\nFaflora occasionally features high-quality products on the homepage and category pages.\n\nTo increase chances:\n- Maintain excellent ratings\n- Use high-resolution images\n- Keep stock updated\n- Price competitively\n\nYou can also promote products using discount codes and social sharing.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1119,9 +1119,9 @@ export const fafloriesSupportData: SupportTopic[] = [
       },
       {
         id: "142",
-        slug: "how-to-get-featured-on-faflories-homepage",
-        title: "How to get featured on Faflories homepage",
-        content: `# How to get featured on Faflories homepage\n\nFeatured spots are given to vendors who:\n- Have excellent ratings and fast delivery\n- Offer unique, high-quality Made-in-Nigeria products\n- Maintain good stock levels\n- Actively promote their store\n\nKeep performing well — our team may reach out when good opportunities arise.`,
+        slug: "how-to-get-featured-on-faflora-homepage",
+        title: "How to get featured on Faflora homepage",
+        content: `# How to get featured on Faflora homepage\n\nFeatured spots are given to vendors who:\n- Have excellent ratings and fast delivery\n- Offer unique, high-quality Made-in-Nigeria products\n- Maintain good stock levels\n- Actively promote their store\n\nKeep performing well — our team may reach out when good opportunities arise.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1144,9 +1144,9 @@ export const fafloriesSupportData: SupportTopic[] = [
     articles: [
       {
         id: "144",
-        slug: "faflories-terms-of-service-summary",
-        title: "Faflories Terms of Service summary",
-        content: `# Faflories Terms of Service summary\n\nBy using Faflories, you agree to our Terms of Service. Key points:\n- You must be at least 18 years old or have guardian consent.\n- All listings must be accurate and honest.\n- Prohibited activities include fraud, counterfeit goods, and abusive behavior.\n- We may suspend accounts that violate policies.\n\nFull Terms are available on the website.`,
+        slug: "faflora-terms-of-service-summary",
+        title: "Faflora Terms of Service summary",
+        content: `# Faflora Terms of Service summary\n\nBy using Faflora, you agree to our Terms of Service. Key points:\n- You must be at least 18 years old or have guardian consent.\n- All listings must be accurate and honest.\n- Prohibited activities include fraud, counterfeit goods, and abusive behavior.\n- We may suspend accounts that violate policies.\n\nFull Terms are available on the website.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1174,7 +1174,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "148",
         slug: "prohibited-products-list",
         title: "Prohibited products list",
-        content: `# Prohibited products list\n\nThe following are not allowed on Faflories:\n- Counterfeit or fake goods\n- Weapons, drugs, or illegal substances\n- Hazardous or toxic materials\n- Stolen goods\n- Adult content or services\n- Items that violate Nigerian laws\n\nListing prohibited items can result in immediate account suspension.`,
+        content: `# Prohibited products list\n\nThe following are not allowed on Faflora:\n- Counterfeit or fake goods\n- Weapons, drugs, or illegal substances\n- Hazardous or toxic materials\n- Stolen goods\n- Adult content or services\n- Items that violate Nigerian laws\n\nListing prohibited items can result in immediate account suspension.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -1188,7 +1188,7 @@ export const fafloriesSupportData: SupportTopic[] = [
         id: "150",
         slug: "contact-us-for-legal-or-policy-questions",
         title: "Contact us for legal or policy questions",
-        content: `# Contact us for legal or policy questions\n\nFor legal, policy, or compliance matters:\n- Email: legal@faflories.com\n- Use the Support ticket system in the Seller Dashboard\n- For urgent issues, use the in-app chat (priority for verified vendors)\n\nWe aim to respond to legal inquiries within 48 business hours.`,
+        content: `# Contact us for legal or policy questions\n\nFor legal, policy, or compliance matters:\n- Email: legal@faflora.com\n- Use the Support ticket system in the Seller Dashboard\n- For urgent issues, use the in-app chat (priority for verified vendors)\n\nWe aim to respond to legal inquiries within 48 business hours.`,
         lastUpdated: "April 06, 2026"
       }
     ]
@@ -1197,12 +1197,12 @@ export const fafloriesSupportData: SupportTopic[] = [
 
 export const popularArticles = [
   {
-    title: "How do I create a buyer account on Faflories?",
-    slug: "how-do-i-create-a-buyer-account-on-faflories",
+    title: "How do I create a buyer account on Faflora?",
+    slug: "how-do-i-create-a-buyer-account-on-faflora",
     topicSlug: "account-creation-verification"
   },
   {
-    title: "How to register as a vendor on Faflories",
+    title: "How to register as a vendor on Faflora",
     slug: "how-to-register-as-a-vendor",
     topicSlug: "becoming-a-vendor"
   },
@@ -1217,8 +1217,8 @@ export const popularArticles = [
     topicSlug: "payments-refunds-withdrawals"
   },
   {
-    title: "What is Faflories return policy?",
-    slug: "what-is-faflories-return-policy",
+    title: "What is Faflora return policy?",
+    slug: "what-is-faflora-return-policy",
     topicSlug: "returns-refunds-disputes"
   },
   {

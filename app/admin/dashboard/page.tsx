@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
 import ActionModal from '@/components/admin/ActionModal';
+import ImageUploadModal from '@/components/admin/ImageUploadModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
@@ -17,6 +18,7 @@ type AdminProduct = {
   category?: string;
   stock: number;
   image: string;
+  status?: 'draft' | 'published';
 };
 
 type AdminVendor = {
@@ -153,6 +155,8 @@ export default function AdminPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [productToPublishId, setProductToPublishId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
@@ -209,14 +213,19 @@ export default function AdminPage() {
 
         if (!isMounted) return;
 
-        setProducts(fetchedProducts);
+        const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
+        const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+
+        setProducts([...savedDrafts, ...fetchedProducts]);
         setProductPage(pagination.page);
         setProductLimit(pagination.limit);
         setProductTotal(pagination.total);
         setProductTotalPages(pagination.totalPages);
       } catch {
         if (!isMounted) return;
-        setProducts(fallbackProducts);
+        const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
+        const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+        setProducts([...savedDrafts, ...fallbackProducts]);
         setProductTotal(fallbackProducts.length);
         setProductTotalPages(1);
         setProductLoadError('Could not load products. Showing fallback data.');
@@ -234,18 +243,85 @@ export default function AdminPage() {
     };
   }, [productPage]);
 
+  const handleSaveProduct = (formData: any) => {
+    if (activeTab !== 'products') return;
+
+    const id = formData.id || `draft-${Date.now()}`;
+    const newDraft = {
+      ...formData,
+      id,
+      name: formData.name,
+      price: formData.price,
+      category: formData.categoryId,
+      stock: formData.stock,
+      image: formData.images?.[0] || '',
+      status: formData.status
+    } as AdminProduct;
+
+    if (formData.status === 'draft') {
+      const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
+      const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+
+      const existingIdx = savedDrafts.findIndex(d => d.id === id);
+      if (existingIdx >= 0) {
+        savedDrafts[existingIdx] = newDraft;
+      } else {
+        savedDrafts.unshift(newDraft);
+      }
+
+      localStorage.setItem('faflora_product_drafts', JSON.stringify(savedDrafts));
+
+      setProducts(prev => {
+        const existing = prev.findIndex(p => p.id === id);
+        if (existing >= 0) {
+          const newProducts = [...prev];
+          newProducts[existing] = newDraft;
+          return newProducts;
+        }
+        return [newDraft, ...prev];
+      });
+    }
+    // Note: If saving as published directly without draft, one would normally call the API.
+  };
+
+  const handlePublishClick = (id: string) => {
+    setProductToPublishId(id);
+    setIsImageModalOpen(true);
+  };
+
+  const handleImageComplete = (images: string[]) => {
+    if (!productToPublishId) return;
+
+    setProducts(prev => prev.map(p => {
+      if (p.id === productToPublishId) {
+        return { ...p, status: 'published', image: images[0] || '' };
+      }
+      return p;
+    }));
+
+    const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
+    if (savedDraftsRaw) {
+      const savedDrafts: AdminProduct[] = JSON.parse(savedDraftsRaw);
+      const updatedDrafts = savedDrafts.filter(d => d.id !== productToPublishId);
+      localStorage.setItem('faflora_product_drafts', JSON.stringify(updatedDrafts));
+    }
+
+    setIsImageModalOpen(false);
+    setProductToPublishId(null);
+  };
+
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
-      
+
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="text-[#981d87] text-2xl font-bold">Faflories</div>
+          <div className="text-[#981d87] text-2xl font-bold">Faflora</div>
           <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div 
+            <div
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm cursor-pointer border border-teal-200 shadow-sm"
             >
@@ -257,7 +333,7 @@ export default function AdminPage() {
                 <div className="absolute right-0 mt-3 w-56 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
                   <div className="px-4 py-3 border-b bg-gray-50/50">
                     <p className="text-sm font-bold text-slate-800">Admin User</p>
-                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflories.com</p>
+                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflora.com</p>
                   </div>
                   <button className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-gray-50 transition">
                     Account Settings
@@ -275,11 +351,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={(t) => { setActiveTab(t); setIsSidebarOpen(false); }} 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={(t) => { setActiveTab(t); setIsSidebarOpen(false); }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
@@ -289,7 +365,7 @@ export default function AdminPage() {
             <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
           </div>
           {activeTab !== 'orders' && (
-            <button 
+            <button
               onClick={() => openModal()}
               className="bg-[#981d87] hover:bg-[#7a176c] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
             >
@@ -300,9 +376,9 @@ export default function AdminPage() {
 
         <div className="bg-white p-4 rounded-2xl border mb-6 flex items-center gap-3 shadow-sm">
           <Search size={18} className="text-gray-400" />
-          <input 
-            type="text" 
-            placeholder={`Search across ${activeTab}...`} 
+          <input
+            type="text"
+            placeholder={`Search across ${activeTab}...`}
             className="flex-1 outline-none text-sm font-medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -312,11 +388,10 @@ export default function AdminPage() {
         {activeTab === 'products' && (
           <div className="space-y-3">
             {(isLoadingProducts || productLoadError) && (
-              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${
-                productLoadError
+              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
                   ? 'border-amber-200 bg-amber-50 text-amber-700'
                   : 'border-gray-200 bg-white text-gray-500'
-              }`}>
+                }`}>
                 {productLoadError || 'Loading products...'}
               </div>
             )}
@@ -324,6 +399,7 @@ export default function AdminPage() {
               data={products}
               onEdit={openModal}
               onDelete={(id: string) => setProducts(products.filter(p => p.id !== id))}
+              onPublish={handlePublishClick}
               searchQuery={searchQuery}
               currentPage={productPage}
               totalPages={productTotalPages}
@@ -335,17 +411,25 @@ export default function AdminPage() {
           </div>
         )}
         {activeTab === 'vendors' && (
-            <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
         )}
         {activeTab === 'orders' && (
           <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
         )}
 
-        <ActionModal 
-          isOpen={isModalOpen && activeTab !== 'orders'} 
-          onClose={() => setIsModalOpen(false)} 
-          activeTab={activeTab} 
-          editingItem={activeTab === 'products' && editingItem ? editingItem as AdminProduct : undefined} 
+        <ActionModal
+          isOpen={isModalOpen && activeTab !== 'orders'}
+          onClose={() => setIsModalOpen(false)}
+          activeTab={activeTab}
+          editingItem={activeTab === 'products' && editingItem ? editingItem as AdminProduct : undefined}
+          onSave={handleSaveProduct}
+        />
+
+        <ImageUploadModal
+          isOpen={isImageModalOpen}
+          onClose={() => { setIsImageModalOpen(false); setProductToPublishId(null); }}
+          onComplete={handleImageComplete}
+          onSkip={() => handleImageComplete([])}
         />
 
         <OrderDetailsModal

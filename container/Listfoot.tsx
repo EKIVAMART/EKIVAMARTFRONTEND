@@ -18,7 +18,7 @@ const footerLinks = [
       'Terms & Conditions',
       'Contact Us',
       'Support Center',
-      'Admin', 
+      'Admin',
     ],
   },
   {
@@ -79,7 +79,7 @@ const contactInfo = [
 const socialLinks = [
   {
     icon: FaInstagram,
-    href: 'https://www.instagram.com/faflories?igsh=N3dld2VpMzNycDQy',
+    href: 'https://www.instagram.com/faflora?igsh=N3dld2VpMzNycDQy',
   },
   {
     icon: FaLinkedinIn,
@@ -87,7 +87,7 @@ const socialLinks = [
   },
   {
     icon: FaTiktok,
-    href: 'https://www.tiktok.com/@faflories?_r=1&_t=ZS-92NK2t2CIlB',
+    href: 'https://www.tiktok.com/@faflora?_r=1&_t=ZS-92NK2t2CIlB',
   },
 ];
 
@@ -97,7 +97,7 @@ const Listfoot = () => {
   return (
     <footer className="bg-white">
       {/* MAIN CONTENT */}
-      <div className="w-[90%] mx-auto px-4 pb-10">
+      <div className="w-[90%] mx-auto px-4 pb-10 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
@@ -139,17 +139,17 @@ const Listfoot = () => {
                   const isAdmin = link === 'Admin';
                   const href = isAbout
                     ? '/about-us'
-                    : isTerms 
-                    ? '/terms-and-conditions' 
-                    : isPrivacy
-                    ? '/privacy-policy'
-                    : isSupport
-                    ? '/support'
-                    : isContact
-                    ? '/contact-us'
-                    : isAdmin 
-                    ? '/admin/login' 
-                    : ''; // All other links point to current page for now
+                    : isTerms
+                      ? '/terms-and-conditions'
+                      : isPrivacy
+                        ? '/privacy-policy'
+                        : isSupport
+                          ? '/support'
+                          : isContact
+                            ? '/contact-us'
+                            : isAdmin
+                              ? '/admin/login'
+                              : ''; // All other links point to current page for now
 
                   return (
                     <li

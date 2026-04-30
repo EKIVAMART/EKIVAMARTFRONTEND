@@ -27,26 +27,26 @@ export type Category =
 
 /* ─── CONSTANTS ─── */
 export const CONTACT_REASONS = [
-  { value: 'order-issue',    label: 'Order Issue',             icon: ShoppingBag  },
-  { value: 'payment',        label: 'Payment & Billing',       icon: CreditCard   },
-  { value: 'vendor-support', label: 'Vendor Support',          icon: Store        },
-  { value: 'returns',        label: 'Returns & Refunds',       icon: ArrowRight   },
-  { value: 'delivery',       label: 'Delivery & Shipping',     icon: Truck        },
-  { value: 'account',        label: 'Account Help',            icon: LifeBuoy     },
-  { value: 'partnerships',   label: 'Business & Partnerships', icon: Briefcase    },
-  { value: 'other',          label: 'Something Else',          icon: MessageSquare},
+  { value: 'order-issue', label: 'Order Issue', icon: ShoppingBag },
+  { value: 'payment', label: 'Payment & Billing', icon: CreditCard },
+  { value: 'vendor-support', label: 'Vendor Support', icon: Store },
+  { value: 'returns', label: 'Returns & Refunds', icon: ArrowRight },
+  { value: 'delivery', label: 'Delivery & Shipping', icon: Truck },
+  { value: 'account', label: 'Account Help', icon: LifeBuoy },
+  { value: 'partnerships', label: 'Business & Partnerships', icon: Briefcase },
+  { value: 'other', label: 'Something Else', icon: MessageSquare },
 ] as const;
 
 export const SOCIALS = [
-  { label: 'Instagram', icon: FaInstagram,  href: 'https://www.instagram.com/faflories?igsh=N3dld2VpMzNycDQy', handle: '@faflories' },
-  { label: 'TikTok',    icon: FaTiktok,     href: 'https://www.tiktok.com/@faflories?_r=1&_t=ZS-92NK2t2CIlB',  handle: '@faflories' },
-  { label: 'LinkedIn',  icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/108237871/admin/dashboard/', handle: 'Faflories' },
+  { label: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/faflora?igsh=N3dld2VpMzNycDQy', handle: '@faflora' },
+  { label: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@faflora?_r=1&_t=ZS-92NK2t2CIlB', handle: '@faflora' },
+  { label: 'LinkedIn', icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/108237871/admin/dashboard/', handle: 'Faflora' },
 ];
 
 export const RESPONSE_TIMES = [
-  { channel: 'Email',    time: 'Within 24 hours',    icon: Mail,          dot: 'bg-emerald-400'              },
-  { channel: 'WhatsApp', time: 'Within a few hours', icon: FaWhatsapp, dot: 'bg-emerald-400 animate-pulse'},
-  { channel: 'Phone',    time: 'Mon–Sat, 8am–8pm',   icon: Phone,         dot: 'bg-amber-400'                },
+  { channel: 'Email', time: 'Within 24 hours', icon: Mail, dot: 'bg-emerald-400' },
+  { channel: 'WhatsApp', time: 'Within a few hours', icon: FaWhatsapp, dot: 'bg-emerald-400 animate-pulse' },
+  { channel: 'Phone', time: 'Mon–Sat, 8am–8pm', icon: Phone, dot: 'bg-amber-400' },
 ];
 
 export const faqs = [
@@ -59,7 +59,7 @@ export const faqs = [
     a: "First, check your order tracking from your account dashboard. If it's been more than 3 business days past the expected date, contact us with your Order ID and we'll investigate right away.",
   },
   {
-    q: 'How do I become a vendor on Faflories?',
+    q: 'How do I become a vendor on Faflora?',
     a: 'Head over to our vendor onboarding page from the main navigation, fill out the vendor application form, and our vendor success team will review your application within 48 hours.',
   },
   {

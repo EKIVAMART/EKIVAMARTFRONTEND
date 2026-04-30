@@ -1,217 +1,198 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Tag } from 'lucide-react';
+import { X, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Tag, Plus, Trash2 } from 'lucide-react';
 import { categoryApi } from '@/lib/api';
 
-interface ProductFormData {
-  id?: string;
-  name: string;
-  category: string;
-  shortDescription: string;
-  fullDescription: string;
-  originalPrice: number;
-  discountPercent: number;
-  sellingPrice: number;
-  stock: number;
-  inStock: boolean;
-  brand?: string;           
-  weight: number;           
-  sizes: string[];          
-  material?: string;
-  fitType?: string;
-  careInstructions?: string;
-  origin?: string;
-  images: string[];
+export interface ProductDimensions {
+  length: number;
+  width: number;
+  height: number;
 }
 
-type EditableProduct = Partial<ProductFormData> & {
-  description?: string;
-  mrp?: number;
-  price?: number;
-  createdAt?: string;
-};
+export interface ProductFormData {
+  id?: string;
+  name: string;
+  preview: string;
+  description: string;
+  sku: string;
+  price: number;
+  compareAtPrice: number;
+  discount?: number;
+  costPerItem: number;
+  currency: string;
+  condition: string;
+  stock: number;
+  inStock: boolean;
+  categoryId: string;
+  subCategoryId: string;
+  brand: string;
+  colours: string[];
+  sizes: string[];
+  weight: number;
+  dimensions: ProductDimensions;
+  tags: string[];
+  metadata: Record<string, any>;
+  origin: string;
+  returnWindow: string;
+  whoPaysReturnShipping: string;
+  returnConditions: string;
+  warrantyPeriod: string;
+  warrantyDetails: string;
+  status: 'draft' | 'published';
+  images?: string[]; // Allowed optional, for the API
+}
 
-type SavedProductData = ProductFormData & {
-  rating: never[];
-  createdAt: string;
-  updatedAt: string;
-};
+export type EditableProduct = Partial<ProductFormData>;
 
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: 'products' | 'vendors' | 'orders';
   editingItem?: EditableProduct;
-  onSave?: (data: SavedProductData) => void;
+  onSave?: (data: ProductFormData) => void;
 }
 
-type CategoryOption = {
-  id: string;
-  name: string;
+const CATEGORY_SUBCATEGORY_MAP: Record<string, string[]> = {
+  'Fashion': ['Men', 'Women', 'Kids', 'Accessories'],
+  'Electronics': ['Phones', 'Laptops', 'Audio', 'Accessories'],
+  'Bags': ['Backpacks', 'Handbags', 'Luggage'],
+  'Footwear': ['Sneakers', 'Formal', 'Sandals', 'Boots'],
+  'Groceries': ['Fresh Produce', 'Pantry', 'Beverages', 'Snacks'],
+  'Beauty': ['Makeup', 'Skincare', 'Haircare', 'Fragrance'],
+  'Wellness': ['Supplements', 'Vitamins', 'Fitness Accessories'],
+  'Home Decor': ['Furniture', 'Wall Art & Mirrors', 'Lighting', 'Rugs & Carpets', 'Cushions & Throws', 'Vases & Decorative Objects', 'Candles & Scents', 'Curtains & Blinds', 'Planters'],
+  'Toys and Games': ['Infant & Preschool Toys', 'Dolls & Stuffed Toys', 'Action Figures', 'Board Games & Puzzles', 'Educational Toys (STEM)', 'Outdoor & Ride-on Toys', 'Building & Construction Sets', 'Card Games'],
+  'Sports': ['Football & Soccer', 'Basketball', 'Running & Athletics', 'Fitness Equipment', 'Cycling', 'Swimming & Water Sports', 'Outdoor & Camping Gear', 'Sports Apparel & Footwear', 'Team Sports Equipment'],
+  'Home & Jewellery': ['Kitchen', 'Bedding', 'Necklaces', 'Rings', 'Bracelets']
 };
 
-type CategoryRecord = {
-  id?: string;
-  _id?: string;
-  slug?: string;
-  name?: string;
-  title?: string;
-  label?: string;
+const CATEGORIES = Object.keys(CATEGORY_SUBCATEGORY_MAP);
+
+const generateSKU = (name: string, category: string, brand?: string, colours?: string[]) => {
+  const prefix = (category || 'GEN').substring(0, 4).toUpperCase();
+  const namePart = (name || 'PRD').replace(/[^a-zA-Z0-9]/g, '').substring(0, 5).toUpperCase();
+  const brandPart = brand ? brand.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() : 'XX';
+  const colorPart = colours && colours.length > 0 ? colours[0].replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() : 'XXX';
+  const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}-${brandPart}-${namePart}-${colorPart}-${randomStr}`;
 };
 
-const fallbackCategories: CategoryOption[] = [
-  'Fashion',
-  'Electronics',
-  'Bags',
-  'Footwear',
-  'Groceries',
-  'Beauty',
-  'Wellness',
-  'Jewellery',
-  'Home Decor',
-  'Sports',
-  'Toys & Games',
-].map((name) => ({ id: name, name }));
-const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  Boolean(value && typeof value === 'object');
-
-const getCategoryList = (payload: unknown): unknown[] => {
-  if (!isRecord(payload)) return [];
-
-  const data = payload.data;
-
-  if (Array.isArray(data)) return data;
-  if (isRecord(data) && Array.isArray(data.categories)) return data.categories;
-  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
-  if (Array.isArray(payload.categories)) return payload.categories;
-
-  return [];
-};
-
-const normalizeCategory = (category: unknown): CategoryOption | null => {
-  if (typeof category === 'string') {
-    return { id: category, name: category };
-  }
-
-  if (!isRecord(category)) {
-    return null;
-  }
-
-  const record = category as CategoryRecord;
-  const name = record.name || record.title || record.label;
-  if (!name) {
-    return null;
-  }
-
-  return {
-    id: record.id || record._id || record.slug || name,
-    name,
-  };
-};
-
-export default function ActionModal({ 
-  isOpen, 
-  onClose, 
-  activeTab, 
+export default function ActionModal({
+  isOpen,
+  onClose,
+  activeTab,
   editingItem,
-  onSave 
+  onSave
 }: ActionModalProps) {
-  
   const [currentStep, setCurrentStep] = useState(1);
-  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>(fallbackCategories);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-  const [categoryLoadError, setCategoryLoadError] = useState('');
+  const totalSteps = 3;
+
   const [formData, setFormData] = useState<ProductFormData>({
-    name: editingItem?.name || '',
-    category: editingItem?.category || fallbackCategories[0].name,
-    shortDescription: editingItem?.shortDescription || '',
-    fullDescription: editingItem?.fullDescription || editingItem?.description || '',
-    originalPrice: editingItem?.mrp || editingItem?.originalPrice || 0,
-    discountPercent: editingItem?.discountPercent || 0,
-    sellingPrice: editingItem?.price || 0,
-    stock: editingItem?.stock || 0,
-    inStock: editingItem?.inStock ?? true,
-    brand: editingItem?.brand || '',
-    weight: editingItem?.weight || 0,
-    sizes: editingItem?.sizes || [],
-    material: editingItem?.material || '',
-    fitType: editingItem?.fitType || '',
-    careInstructions: editingItem?.careInstructions || '',
-    origin: editingItem?.origin || '',
-    images: editingItem?.images || [],
+    id: '',
+    name: '',
+    preview: '',
+    description: '',
+    sku: '',
+    price: 0,
+    compareAtPrice: 0,
+    costPerItem: 0,
+    currency: 'NGN',
+    condition: 'new',
+    stock: 0,
+    inStock: true,
+    categoryId: CATEGORIES[0],
+    subCategoryId: CATEGORY_SUBCATEGORY_MAP[CATEGORIES[0]][0] || '',
+    brand: '',
+    colours: [],
+    sizes: [],
+    weight: 0,
+    dimensions: { length: 0, width: 0, height: 0 },
+    tags: [],
+    metadata: {},
+    origin: 'Nigeria',
+    returnWindow: 'Use Store Default',
+    whoPaysReturnShipping: 'Use Store Default',
+    returnConditions: '',
+    warrantyPeriod: 'Use Store Default',
+    warrantyDetails: '',
+    status: 'draft',
+    images: [],
   });
 
-  const [imagePreviews, setImagePreviews] = useState<string[]>(editingItem?.images || []);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const totalSteps = 4;
+  const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [customFields, setCustomFields] = useState<Array<{ key: string, value: string }>>([]);
+  const [seoExpanded, setSeoExpanded] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const [sizeInput, setSizeInput] = useState('');
+  const [colourInput, setColourInput] = useState('');
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      setFormData({
+        id: editingItem?.id || '',
+        name: editingItem?.name || '',
+        preview: editingItem?.preview || '',
+        description: editingItem?.description || '',
+        sku: editingItem?.sku || '',
+        price: editingItem?.price || 0,
+        compareAtPrice: editingItem?.compareAtPrice || 0,
+        costPerItem: editingItem?.costPerItem || 0,
+        currency: editingItem?.currency || 'NGN',
+        condition: editingItem?.condition || 'new',
+        stock: editingItem?.stock || 0,
+        inStock: editingItem?.inStock ?? true,
+        categoryId: editingItem?.categoryId || CATEGORIES[0],
+        subCategoryId: editingItem?.subCategoryId || CATEGORY_SUBCATEGORY_MAP[CATEGORIES[0]][0] || '',
+        brand: editingItem?.brand || '',
+        colours: (editingItem as any)?.colours || ((editingItem as any)?.colour ? [(editingItem as any).colour] : []),
+        sizes: editingItem?.sizes || [],
+        weight: editingItem?.weight || 0,
+        dimensions: editingItem?.dimensions || { length: 0, width: 0, height: 0 },
+        tags: editingItem?.tags || [],
+        metadata: editingItem?.metadata || {},
+        origin: editingItem?.origin || 'Nigeria',
+        returnWindow: editingItem?.returnWindow || 'Use Store Default',
+        whoPaysReturnShipping: editingItem?.whoPaysReturnShipping || 'Use Store Default',
+        returnConditions: editingItem?.returnConditions || '',
+        warrantyPeriod: editingItem?.warrantyPeriod || 'Use Store Default',
+        warrantyDetails: editingItem?.warrantyDetails || '',
+        status: editingItem?.status || 'draft',
+        images: editingItem?.images || [],
+      });
 
-    let isMounted = true;
+      let initialDiscount = 0;
+      if ((editingItem as any)?.discount) {
+        initialDiscount = (editingItem as any).discount;
+      } else if (editingItem?.compareAtPrice && editingItem?.price) {
+        initialDiscount = Math.round(((editingItem.compareAtPrice - editingItem.price) / editingItem.compareAtPrice) * 100);
+      }
+      setDiscountPercent(initialDiscount);
 
-    const fetchCategories = async () => {
-      setIsLoadingCategories(true);
-      setCategoryLoadError('');
-
-      try {
-        const response = await categoryApi.getCategories({
-          page: 1,
-          limit: 100,
-          sortBy: 'name',
-          sortOrder: 'asc',
-        });
-        const categories = getCategoryList(response)
-          .map(normalizeCategory)
-          .filter((category): category is CategoryOption => Boolean(category));
-
-        if (!isMounted) return;
-
-        if (categories.length > 0) {
-          const options =
-            editingItem?.category &&
-            !categories.some((category) => category.name === editingItem.category)
-              ? [
-                  { id: editingItem.category, name: editingItem.category },
-                  ...categories,
-                ]
-              : categories;
-
-          setCategoryOptions(options);
-          setFormData((prev) => ({
-            ...prev,
-            category: options.some((category) => category.name === prev.category)
-              ? prev.category
-              : options[0].name,
-          }));
-        }
-      } catch {
-        if (!isMounted) return;
-        setCategoryLoadError('Could not load categories. Showing defaults.');
-      } finally {
-        if (isMounted) {
-          setIsLoadingCategories(false);
+      const fields = [];
+      if (editingItem?.metadata?.customAttributes) {
+        for (const [k, v] of Object.entries(editingItem.metadata.customAttributes)) {
+          fields.push({ key: k, value: String(v) });
         }
       }
-    };
+      setCustomFields(fields);
+      setCurrentStep(1);
+      setTagInput('');
+      setSizeInput('');
+      setColourInput('');
+      setSeoExpanded(false);
+    }
+  }, [isOpen, editingItem]);
 
-    fetchCategories();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isOpen, editingItem?.category]);
-
-  // Auto-calculate selling price
+  // Auto calculate selling price when compareAtPrice or discount changes
   useEffect(() => {
-    const discountAmount = (formData.originalPrice * formData.discountPercent) / 100;
-    const calculated = Math.max(0, Math.round(formData.originalPrice - discountAmount));
-    setFormData(prev => ({ ...prev, sellingPrice: calculated }));
-  }, [formData.originalPrice, formData.discountPercent]);
+    if (formData.compareAtPrice && discountPercent >= 0) {
+      const discountAmount = (formData.compareAtPrice * discountPercent) / 100;
+      const calculated = Math.max(0, Math.round(formData.compareAtPrice - discountAmount));
+      updateField('price', calculated);
+    }
+  }, [formData.compareAtPrice, discountPercent]);
 
   const updateField = <Key extends keyof ProductFormData>(
     key: Key,
@@ -220,58 +201,117 @@ export default function ActionModal({
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  const toggleSize = (size: string) => {
-    const current = formData.sizes;
-    const updated = current.includes(size)
-      ? current.filter(s => s !== size)
-      : [...current, size];
-    updateField('sizes', updated);
+  const updateMetadata = (key: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      metadata: { ...prev.metadata, [key]: value }
+    }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 6));
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCat = e.target.value;
+    const defaultSub = CATEGORY_SUBCATEGORY_MAP[newCat]?.[0] || '';
+    setFormData(prev => ({ ...prev, categoryId: newCat, subCategoryId: defaultSub }));
   };
 
-  const removeImage = (index: number) => {
-    const newPreviews = [...imagePreviews];
-    URL.revokeObjectURL(newPreviews[index]);
-    newPreviews.splice(index, 1);
-    setImagePreviews(newPreviews);
+  const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (!formData.tags.includes(tagInput.trim())) {
+        updateField('tags', [...formData.tags, tagInput.trim()]);
+      }
+      setTagInput('');
+    }
   };
 
-  const nextStep = () => currentStep < totalSteps && setCurrentStep(prev => prev + 1);
-  const prevStep = () => currentStep > 1 && setCurrentStep(prev => prev - 1);
+  const removeTag = (tagToRemove: string) => {
+    updateField('tags', formData.tags.filter(t => t !== tagToRemove));
+  };
+
+  const addSize = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && sizeInput.trim()) {
+      e.preventDefault();
+      if (!formData.sizes.includes(sizeInput.trim())) {
+        updateField('sizes', [...formData.sizes, sizeInput.trim()]);
+      }
+      setSizeInput('');
+    }
+  };
+
+  const removeSize = (sizeToRemove: string) => {
+    updateField('sizes', formData.sizes.filter(s => s !== sizeToRemove));
+  };
+
+  const addColour = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && colourInput.trim()) {
+      e.preventDefault();
+      if (!formData.colours.includes(colourInput.trim())) {
+        updateField('colours', [...formData.colours, colourInput.trim()]);
+      }
+      setColourInput('');
+    }
+  };
+
+  const removeColour = (colourToRemove: string) => {
+    updateField('colours', formData.colours.filter(c => c !== colourToRemove));
+  };
+
+  const handleAutoGenerateSKU = () => {
+    updateField('sku', generateSKU(formData.name, formData.categoryId, formData.brand, formData.colours));
+  };
+
+  const generateSEO = () => {
+    if (!formData.name) return;
+    updateMetadata('seoTitle', `${formData.name} - Buy on Faflora`);
+    updateMetadata('seoDescription', `Shop ${formData.name} on Faflora. ${formData.preview.substring(0, 100)}... Get the best deals today.`);
+  };
+
+  const handleSaveAsDraft = () => {
+    saveData('draft');
+  };
+
+  const saveData = (statusOverride?: 'draft' | 'published') => {
+    // Collect custom attributes
+    const customObj: Record<string, string> = {};
+    customFields.forEach(f => {
+      if (f.key.trim() && f.value.trim()) {
+        customObj[f.key.trim()] = f.value.trim();
+      }
+    });
+
+    const finalData = {
+      ...formData,
+      discount: discountPercent,
+      status: statusOverride || formData.status,
+      metadata: {
+        ...formData.metadata,
+        customAttributes: customObj
+      }
+    };
+
+    if (!finalData.price) finalData.price = 0;
+
+    onSave?.(finalData);
+    handleClose();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.sizes.length === 0) {
-      alert("Please select at least one size");
+    if (currentStep < totalSteps) {
+      nextStep();
       return;
     }
-    if (formData.weight <= 0) {
-      alert("Please enter a valid weight");
-      return;
-    }
-
-    const dataToSave = {
-      ...formData,
-      images: imagePreviews,
-      rating: [],                  
-      createdAt: editingItem?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    onSave?.(dataToSave);
-    handleClose();
+    // Only allow submitting if required fields exist, though it's fine for drafts
+    saveData();
   };
 
   const handleClose = () => {
     setCurrentStep(1);
-    setImagePreviews([]);
     onClose();
   };
+
+  const nextStep = () => currentStep < totalSteps && setCurrentStep(prev => prev + 1);
+  const prevStep = () => currentStep > 1 && setCurrentStep(prev => prev - 1);
 
   if (activeTab !== 'products') return null;
 
@@ -286,24 +326,24 @@ export default function ActionModal({
             className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
           >
             {/* Header */}
-            <div className="bg-[#981d87] px-8 py-6 text-white flex items-center justify-between">
+            <div className="bg-[#981d87] px-5 md:px-8 py-5 md:py-6 text-white flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold">
                   {editingItem ? 'Edit Product' : 'Add New Product'}
                 </h2>
                 <p className="text-sm opacity-90 mt-1">Step {currentStep} of {totalSteps}</p>
               </div>
-              <button onClick={handleClose} className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
+              <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
                 <X size={26} />
               </button>
             </div>
 
             {/* Progress Stepper */}
-            <div className="px-8 pt-8 pb-6 bg-white border-b">
+            <div className="px-5 md:px-8 pt-6 md:pt-8 pb-5 md:pb-6 bg-white border-b">
               <div className="flex items-center justify-center gap-3">
-                {[1, 2, 3, 4].map((stepNum, index) => (
+                {[1, 2, 3].map((stepNum, index) => (
                   <React.Fragment key={stepNum}>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center z-10 bg-white">
                       <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all
                         ${currentStep > stepNum ? 'bg-[#981d87] border-[#981d87] text-white' : ''}
                         ${currentStep === stepNum ? 'bg-[#981d87] border-[#981d87] text-white shadow-lg' : ''}
@@ -313,18 +353,18 @@ export default function ActionModal({
                       </div>
                       <span className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${currentStep >= stepNum ? 'text-[#981d87]' : 'text-gray-400'}`}>
                         {stepNum === 1 && 'Basic'}
-                        {stepNum === 2 && 'Images'}
-                        {stepNum === 3 && 'Pricing'}
-                        {stepNum === 4 && 'Details'}
+                        {stepNum === 2 && 'Pricing'}
+                        {stepNum === 3 && 'Details'}
                       </span>
                     </div>
-                    {index < 3 && <div className={`flex-1 h-[2px] mt-5 ${currentStep > stepNum ? 'bg-[#981d87]' : 'bg-gray-100'}`} />}
+                    {index < 2 && <div className={`flex-1 h-[2px] mt-5 relative -z-0 ${currentStep > stepNum ? 'bg-[#981d87]' : 'bg-gray-100'}`} />}
                   </React.Fragment>
                 ))}
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 py-8 space-y-8">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 md:px-8 py-6 md:py-8 space-y-6 md:space-y-8" onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as any).tagName !== 'TEXTAREA') e.preventDefault() }}>
+
               {/* STEP 1: Basic */}
               {currentStep === 1 && (
                 <div className="space-y-6">
@@ -336,187 +376,432 @@ export default function ActionModal({
                     </div>
                   </div>
 
-                  <input type="text" placeholder="Product Name *" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
-
-                  {/* Category with descriptive header */}
                   <div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-[#981d87] rounded-lg text-white"><Tag size={20} /></div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800">Product Category</h4>
-                        <p className="text-xs text-gray-500">Choose the category that best describes your product. This helps customers find it easily in the store.</p>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#981d87] ml-1">*</span></label>
+                    <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#981d87] ml-1">*</span></label>
+                      <select value={formData.categoryId} onChange={handleCategoryChange} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required>
+                        {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#981d87] ml-1">*</span></label>
+                      <select value={formData.subCategoryId} onChange={e => updateField('subCategoryId', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required>
+                        {(CATEGORY_SUBCATEGORY_MAP[formData.categoryId] || []).map(sub => <option key={sub} value={sub}>{sub}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#981d87] ml-1">*</span></label>
+                    <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#981d87] ml-1">*</span></label>
+                    <textarea value={formData.description} onChange={e => updateField('description', e.target.value)} rows={5} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
+                      <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
+                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                        {formData.tags.map(t => (
+                          <span key={t} className="bg-[#e9d2e5] text-[#981d87] text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1">
+                            {t} <X size={12} className="cursor-pointer" onClick={() => removeTag(t)} />
+                          </span>
+                        ))}
+                        <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm" placeholder="Add tag..." />
                       </div>
                     </div>
-                    <select value={formData.category} onChange={e => updateField('category', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required disabled={isLoadingCategories && categoryOptions.length === 0}>
-                      {categoryOptions.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                    </select>
-                    {isLoadingCategories && <p className="text-xs text-gray-500 mt-2">Loading categories...</p>}
-                    {categoryLoadError && <p className="text-xs text-amber-600 mt-2">{categoryLoadError}</p>}
                   </div>
 
-                  <textarea placeholder="Short Description (for previews) *" value={formData.shortDescription} onChange={e => updateField('shortDescription', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
-
-                  <textarea placeholder="Full Description *" value={formData.fullDescription} onChange={e => updateField('fullDescription', e.target.value)} rows={5} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
-
-                  <input type="text" placeholder="Brand (Optional)" value={formData.brand || ''} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                  <div className="pt-4 border-t border-gray-100">
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU <span className="text-[#981d87] ml-1">*</span></label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                      <button type="button" onClick={handleAutoGenerateSKU} className="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-sm whitespace-nowrap">
+                        Auto-Generate
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* STEP 2: Images */}
+              {/* STEP 2: Pricing & Inventory */}
               {currentStep === 2 && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#981d87] rounded-lg text-white"><Upload size={22} /></div>
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
-                      <p className="text-xs text-gray-500">Upload up to 6 high-quality images</p>
-                    </div>
-                  </div>
-
-                  <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-[#fcedf9] rounded-3xl p-12 bg-[#F8FDFF] flex flex-col items-center cursor-pointer hover:bg-[#F0F9FA]">
-                    <div className="bg-[#981d87] text-white p-4 rounded-2xl mb-4"><Upload size={36} /></div>
-                    <p className="font-bold text-gray-700">Click to upload or drag & drop</p>
-                    <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP • Max 6 images</p>
-                  </div>
-                  <input type="file" ref={fileInputRef} multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
-
-                  {imagePreviews.length > 0 && (
-                    <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-                      {imagePreviews.map((preview, i) => (
-                        <div key={i} className="relative group">
-                          <img src={preview} alt="" className="w-full aspect-square object-cover rounded-2xl border" />
-                          <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow opacity-0 group-hover:opacity-100">
-                            <X size={14} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* STEP 3: Pricing & Inventory */}
-              {currentStep === 3 && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-[#981d87] rounded-lg text-white"><DollarSign size={22} /></div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
-                      <p className="text-xs text-gray-500">Set price, stock, and key product specifications</p>
+                      <p className="text-xs text-gray-500">Set price, stock, variants and shipping metrics</p>
                     </div>
                   </div>
 
-                  {/* Price & Discount */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Original Price (₦) *</label>
-                      <input type="number" value={formData.originalPrice} onChange={e => updateField('originalPrice', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#981d87] ml-1">*</span></label>
+                      <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%) </label>
-                      <input type="number" min="0" max="99" value={formData.discountPercent} onChange={e => updateField('discountPercent', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
+                      <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (Auto-calculated)</label>
-                    <div className="p-4 rounded-2xl bg-[#F0F7F8] text-2xl font-semibold text-[#981d87]">
-                      ₦{formData.sellingPrice.toLocaleString()}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#981d87] ml-1">*</span></label>
+                      <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-bold text-[#981d87]" required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
+                      <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
                     </div>
                   </div>
 
-                  {/* Stock */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity *</label>
-                      <input type="number" value={formData.stock} onChange={e => updateField('stock', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#981d87] ml-1">*</span></label>
+                      <input type="number" value={formData.stock || ''} onChange={e => updateField('stock', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                     </div>
-                    <div className="flex items-center pt-8">
+                    <div className="flex items-center pt-2 md:pt-8">
                       <label className="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#981d87]" />
-                        <span className="font-medium text-gray-700">In Stock</span>
+                        <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#981d87] rounded" />
+                        <span className="font-bold text-gray-700 text-sm">In Stock</span>
                       </label>
                     </div>
                   </div>
 
-                  {/* Weight & Sizes */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight (kg) *</label>
-                      <input type="number" step="0.01" value={formData.weight} onChange={e => updateField('weight', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required min="0.01" />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Condition</label>
+                      <select value={formData.condition} onChange={e => updateField('condition', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
+                        <option value="new">New</option>
+                        <option value="used">Used</option>
+                        <option value="refurbished">Refurbished</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Colours (Press Enter to add)</label>
+                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                        {formData.colours.map(c => (
+                          <span key={c} className="bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-2">
+                            {c} <X size={12} className="cursor-pointer" onClick={() => removeColour(c)} />
+                          </span>
+                        ))}
+                        <input type="text" value={colourInput} onChange={e => setColourInput(e.target.value)} onKeyDown={addColour} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm" placeholder="e.g. Black, White, Red..." />
+                      </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-600 mb-3 block">Available Sizes <span className="text-gray-600">*</span></label>
-                    <div className="flex flex-wrap gap-3">
-                      {availableSizes.map(size => (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => toggleSize(size)}
-                          className={`px-6 py-3 rounded-2xl font-medium transition ${formData.sizes.includes(size) ? 'bg-[#981d87] text-white shadow' : 'bg-[#F0F7F8] hover:bg-white border border-gray-200'}`}
-                        >
-                          {size}
-                        </button>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Available Sizes (Press Enter to add)</label>
+                    <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                      {formData.sizes.map(s => (
+                        <span key={s} className="bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-2">
+                          {s} <X size={12} className="cursor-pointer" onClick={() => removeSize(s)} />
+                        </span>
                       ))}
+                      <input type="text" value={sizeInput} onChange={e => setSizeInput(e.target.value)} onKeyDown={addSize} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm" placeholder="e.g. EU 42, 256GB, XL..." />
                     </div>
-                    {formData.sizes.length === 0 && <p className="text-red-500 text-xs mt-1">Please select at least one size</p>}
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight (kg)</label>
+                      <input type="number" step="0.01" value={formData.weight || ''} onChange={e => updateField('weight', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Length (cm)</label>
+                      <input type="number" step="0.1" value={formData.dimensions.length || ''} onChange={e => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Width (cm)</label>
+                      <input type="number" step="0.1" value={formData.dimensions.width || ''} onChange={e => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Height (cm)</label>
+                      <input type="number" step="0.1" value={formData.dimensions.height || ''} onChange={e => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* STEP 4: Additional Details */}
-              {currentStep === 4 && (
-                <div className="space-y-6">
+              {/* STEP 3: Additional Details / Specifications */}
+              {currentStep === 3 && (
+                <div className="space-y-8">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-[#981d87] rounded-lg text-white"><Info size={22} /></div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
-                      <p className="text-xs text-gray-500">More specifications for the product page</p>
+                      <p className="text-xs text-gray-500">Policies, specs, and SEO details</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  {/* General */}
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label>
-                      <input type="text" value={formData.material} onChange={e => updateField('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" placeholder="Cotton Blend" />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
+                      <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                    </div>
+                  </div>
+
+                  {/* Return Policy */}
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
+                        <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
+                          <option value="Use Store Default">Use Store Default</option>
+                          <option value="7 days">7 days</option>
+                          <option value="14 days">14 days</option>
+                          <option value="30 days">30 days</option>
+                          <option value="No Returns / Final Sale">No Returns / Final Sale</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
+                        <select disabled={formData.returnWindow === 'No Returns / Final Sale'} value={formData.returnWindow === 'No Returns / Final Sale' ? 'Not Applicable' : formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className={`w-full p-3.5 rounded-2xl border outline-none text-sm ${formData.returnWindow === 'No Returns / Final Sale' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`}>
+                          <option value="Not Applicable" className="hidden">Not Applicable</option>
+                          <option value="Use Store Default">Use Store Default</option>
+                          <option value="Customer pays">Customer pays</option>
+                          <option value="Seller pays">Seller pays</option>
+                        </select>
+                      </div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Fit Type</label>
-                      <input type="text" value={formData.fitType} onChange={e => updateField('fitType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" placeholder="Regular Fit" />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
+                      <textarea disabled={formData.returnWindow === 'No Returns / Final Sale'} value={formData.returnWindow === 'No Returns / Final Sale' ? 'Not Applicable' : formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.returnWindow === 'No Returns / Final Sale' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Must be in original packaging, unworn, etc." />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Care Instructions</label>
-                    <textarea value={formData.careInstructions} onChange={e => updateField('careInstructions', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" placeholder="Machine wash cold, tumble dry low..." />
+                  {/* Warranty */}
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
+                    <div className="mb-4">
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
+                      <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
+                        <option value="Use Store Default">Use Store Default</option>
+                        <option value="None">None</option>
+                        <option value="3 months">3 months</option>
+                        <option value="6 months">6 months</option>
+                        <option value="1 year">1 year</option>
+                        <option value="2 years">2 years</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
+                      <textarea disabled={formData.warrantyPeriod === 'None'} value={formData.warrantyPeriod === 'None' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'None' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin</label>
-                    <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" placeholder="Manufactured in Nigeria" />
+                  {/* Dynamic Category Specs */}
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#981d87]">
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Category Specifications: {formData.categoryId}</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      {formData.categoryId === 'Fashion' && (
+                        <>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label>
+                            <input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Fit Type</label>
+                            <input type="text" value={formData.metadata.fitType || ''} onChange={e => updateMetadata('fitType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" />
+                          </div>
+                          <div className="col-span-2">
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Care Instructions</label>
+                            <input type="text" value={formData.metadata.careInstructions || ''} onChange={e => updateMetadata('careInstructions', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" />
+                          </div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Footwear' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Shoe Size Type</label><input type="text" value={formData.metadata.shoeSize || ''} onChange={e => updateMetadata('shoeSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Closure Type</label><input type="text" value={formData.metadata.closureType || ''} onChange={e => updateMetadata('closureType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Bags' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Strap Type</label><input type="text" value={formData.metadata.strapType || ''} onChange={e => updateMetadata('strapType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Compartment Details</label><input type="text" value={formData.metadata.compartmentDetails || ''} onChange={e => updateMetadata('compartmentDetails', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Electronics' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Screen Size</label><input type="text" value={formData.metadata.screenSize || ''} onChange={e => updateMetadata('screenSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Storage</label><input type="text" value={formData.metadata.storage || ''} onChange={e => updateMetadata('storage', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">RAM</label><input type="text" value={formData.metadata.ram || ''} onChange={e => updateMetadata('ram', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Battery Capacity</label><input type="text" value={formData.metadata.batteryCapacity || ''} onChange={e => updateMetadata('batteryCapacity', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Operating System</label><input type="text" value={formData.metadata.operatingSystem || ''} onChange={e => updateMetadata('operatingSystem', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Groceries' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Pack Size</label><input type="text" value={formData.metadata.packSize || ''} onChange={e => updateMetadata('packSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Expiry Date</label><input type="date" value={formData.metadata.expiryDate || ''} onChange={e => updateMetadata('expiryDate', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Storage Instructions</label><input type="text" value={formData.metadata.storageInstructions || ''} onChange={e => updateMetadata('storageInstructions', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Ingredients</label><input type="text" value={formData.metadata.keyIngredients || ''} onChange={e => updateMetadata('keyIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Beauty' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Skin Type</label><input type="text" value={formData.metadata.skinType || ''} onChange={e => updateMetadata('skinType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Form</label><input type="text" value={formData.metadata.productForm || ''} onChange={e => updateMetadata('productForm', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Ingredients</label><input type="text" value={formData.metadata.keyIngredients || ''} onChange={e => updateMetadata('keyIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Wellness' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Supplement Type</label><input type="text" value={formData.metadata.supplementType || ''} onChange={e => updateMetadata('supplementType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Serving Size</label><input type="text" value={formData.metadata.servingSize || ''} onChange={e => updateMetadata('servingSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Active Ingredients</label><input type="text" value={formData.metadata.keyActiveIngredients || ''} onChange={e => updateMetadata('keyActiveIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Home & Jewellery' && (
+                        <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                      )}
+                      {formData.categoryId === 'Home Decor' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. Wood, Ceramic" /></div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Style</label>
+                            <select value={formData.metadata.style || ''} onChange={e => updateMetadata('style', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm">
+                              <option value="">Select Style</option>
+                              <option value="Modern">Modern</option><option value="Minimalist">Minimalist</option><option value="Rustic">Rustic</option><option value="Bohemian">Bohemian</option><option value="Classic">Classic</option><option value="Industrial">Industrial</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Room Type</label>
+                            <select value={formData.metadata.roomType || ''} onChange={e => updateMetadata('roomType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm">
+                              <option value="">Select Room</option>
+                              <option value="Living Room">Living Room</option><option value="Bedroom">Bedroom</option><option value="Kitchen">Kitchen</option><option value="Bathroom">Bathroom</option><option value="Office">Office</option><option value="Outdoor">Outdoor</option>
+                            </select>
+                          </div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Care Instructions</label><input type="text" value={formData.metadata.careInstructions || ''} onChange={e => updateMetadata('careInstructions', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Toys and Games' && (
+                        <>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Age Range</label><input type="text" value={formData.metadata.ageRange || ''} onChange={e => updateMetadata('ageRange', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. 3-5 years" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Educational Benefits</label><input type="text" value={formData.metadata.educationalBenefits || ''} onChange={e => updateMetadata('educationalBenefits', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Safety Certification</label><input type="text" value={formData.metadata.safetyCertification || ''} onChange={e => updateMetadata('safetyCertification', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Battery Required</label><input type="text" value={formData.metadata.batteryRequired || ''} onChange={e => updateMetadata('batteryRequired', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. Yes (2x AA)" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Number of Players</label><input type="text" value={formData.metadata.numberOfPlayers || ''} onChange={e => updateMetadata('numberOfPlayers', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. 2-4 players" /></div>
+                        </>
+                      )}
+                      {formData.categoryId === 'Sports' && (
+                        <>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sport Type</label>
+                            <select value={formData.metadata.sportType || ''} onChange={e => updateMetadata('sportType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm">
+                              <option value="">Select Sport</option>
+                              <option value="Football">Football</option><option value="Basketball">Basketball</option><option value="Running">Running</option><option value="Fitness">Fitness</option><option value="Cycling">Cycling</option><option value="Swimming">Swimming</option><option value="Outdoor/Adventures">Outdoor/Adventures</option>
+                            </select>
+                          </div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Size / Dimensions</label><input type="text" value={formData.metadata.sizeDimensions || ''} onChange={e => updateMetadata('sizeDimensions', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight / Capacity</label><input type="text" value={formData.metadata.weightCapacity || ''} onChange={e => updateMetadata('weightCapacity', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
+                          <div className="col-span-2">
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Intended Use</label>
+                            <select value={formData.metadata.intendedUse || ''} onChange={e => updateMetadata('intendedUse', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm">
+                              <option value="">Select Use</option>
+                              <option value="Professional">Professional</option><option value="Amateur">Amateur</option><option value="Training">Training</option><option value="Recreational">Recreational</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Custom Attributes */}
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Custom Attributes</h4>
+                    <div className="space-y-3">
+                      {customFields.map((field, index) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-3">
+                          <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
+                            const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
+                          }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none" />
+                          <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
+                            const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
+                          }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none" />
+                          <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-bold text-[#981d87] flex items-center gap-1 hover:underline">
+                        <Plus size={16} /> Add Custom Field
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* SEO */}
+                  <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
+                    <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
+                      <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
+                      <span className="text-gray-400 text-xs">{seoExpanded ? 'Collapse' : 'Expand'}</span>
+                    </button>
+                    {seoExpanded && (
+                      <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
+                        <div className="flex justify-end">
+                          <button type="button" onClick={generateSEO} className="text-xs font-bold bg-[#f1f8fc] text-[#1c7bb3] px-3 py-1.5 rounded-lg hover:bg-[#e1eff8] transition">
+                            Auto-Generate from Product Data
+                          </button>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
+                          <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm" />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
+                          <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm resize-y" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                 </div>
               )}
             </form>
 
             {/* Footer */}
-            <div className="px-8 py-6 border-t bg-gray-50 flex justify-between items-center">
-              <button type="button" onClick={prevStep} disabled={currentStep === 1} className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-medium transition">
+            <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex flex-col-reverse md:flex-row justify-between items-center gap-4 z-10 relative">
+              <button type="button" onClick={prevStep} disabled={currentStep === 1} className="flex items-center justify-center gap-2 px-6 py-3 w-full md:w-auto text-gray-600 hover:text-gray-900 disabled:opacity-40 font-medium transition">
                 <ChevronLeft size={20} /> Previous
               </button>
 
-              {currentStep < totalSteps ? (
-                <button type="button" onClick={nextStep} className="flex items-center gap-2 px-8 py-3 bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition">
-                  Next <ChevronRight size={20} />
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full md:w-auto">
+                <button type="button" onClick={handleSaveAsDraft} className="flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 rounded-2xl font-bold transition shadow-sm">
+                  Save as Draft
                 </button>
-              ) : (
-                <button type="button" onClick={handleSubmit} className="flex items-center gap-2 px-10 py-3 bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition shadow-lg">
-                  <Check size={20} />
-                  {editingItem ? 'Update Product' : 'Add Product'}
-                </button>
-              )}
+                {currentStep < totalSteps ? (
+                  <button type="button" onClick={nextStep} className="flex items-center justify-center gap-2 px-8 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition">
+                    Next <ChevronRight size={20} />
+                  </button>
+                ) : (
+                  <button type="button" onClick={handleSubmit} className="flex items-center justify-center gap-2 px-10 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition shadow-lg">
+                    <Check size={20} />
+                    {editingItem ? 'Update Product' : 'Save Details'}
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>

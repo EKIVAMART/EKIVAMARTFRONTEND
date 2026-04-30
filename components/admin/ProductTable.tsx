@@ -8,12 +8,14 @@ interface Product {
   stock: number;
   image: string;
   category?: string;
+  status?: 'draft' | 'published';
 }
 
 interface ProductTableProps {
   data: Product[];
   onEdit: (item: Product) => void;
   onDelete: (id: string) => void;
+  onPublish?: (id: string) => void;
   searchQuery?: string;
   currentPage?: number;
   totalPages?: number;
@@ -27,6 +29,7 @@ export default function ProductTable({
   data,
   onEdit,
   onDelete,
+  onPublish,
   searchQuery = '',
   currentPage: serverPage,
   totalPages: serverTotalPages,
@@ -136,10 +139,17 @@ export default function ProductTable({
             {paginatedData.length > 0 ? paginatedData.map((p) => (
               <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50/50 transition">
                 <td className="p-4 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border p-1 shrink-0">
-                    <img src={p.image} className="w-full h-full object-contain" alt={p.name} />
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border p-1 shrink-0 relative">
+                    {p.image ? (
+                      <img src={p.image} className="w-full h-full object-contain" alt={p.name} />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-400 rounded">IMG</div>
+                    )}
                   </div>
-                  <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
+                    {p.status === 'draft' && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mt-0.5">DRAFT</span>}
+                  </div>
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-slate-700">₦ {p.price.toLocaleString()}</td>
                 <td className="p-4 text-center">
@@ -147,6 +157,9 @@ export default function ProductTable({
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
+                    {p.status === 'draft' && onPublish && (
+                      <button onClick={() => onPublish(p.id)} className="px-3 py-1.5 bg-[#981d87] hover:bg-[#7a176c] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
+                    )}
                     <button onClick={() => onEdit(p)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
                     <button onClick={() => onDelete(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
                   </div>
@@ -167,10 +180,17 @@ export default function ProductTable({
           <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden border p-2 shrink-0">
-                <img src={p.image} className="w-full h-full object-contain mix-blend-multiply" alt={p.name} />
+                {p.image ? (
+                  <img src={p.image} className="w-full h-full object-contain mix-blend-multiply" alt={p.name} />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-400 rounded-lg">IMG</div>
+                )}
               </div>
               <div className="flex-1 min-w-0 pt-1">
-                <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
+                  {p.status === 'draft' && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0">DRAFT</span>}
+                </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   <span className="text-sm font-black text-[#981d87]">₦ {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
@@ -178,6 +198,11 @@ export default function ProductTable({
               </div>
             </div>
             <div className="flex justify-end gap-3 border-t border-gray-50 pt-3 mt-1">
+              {p.status === 'draft' && onPublish && (
+                <button onClick={() => onPublish(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-[#981d87] text-white hover:bg-[#7a176c] rounded-xl transition text-xs font-bold shadow">
+                  Publish
+                </button>
+              )}
               <button onClick={() => onEdit(p)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-xs font-bold">
                 <Edit3 size={16}/> Edit
               </button>

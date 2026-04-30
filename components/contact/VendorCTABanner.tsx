@@ -21,7 +21,7 @@ export default function VendorCTABanner() {
           <div className="flex-1 text-center sm:text-left">
             <p className="text-[10px] font-black uppercase tracking-[4px] text-[#f0c8ec] mb-1">Grow Your Business</p>
             <h4 className="text-white font-extrabold text-xl md:text-2xl leading-tight">
-              Ready to sell on Faflories?
+              Ready to sell on Faflora?
             </h4>
             <p className="mt-2 text-white/60 text-sm leading-relaxed max-w-md">
               Join thousands of Nigerian vendors reaching millions of buyers. Our vendor team will onboard you within 48 hours.
