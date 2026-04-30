@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
 import ActionModal from '@/components/admin/ActionModal';
 import ProductTable from '@/components/admin/ProductTable';
@@ -8,23 +8,166 @@ import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
 import OrderDetailsModal from '@/components/admin/OrderDetailsModal';
 import { Plus, Search, Menu } from 'lucide-react';
+import { productApi } from '@/lib/api';
+
+type AdminProduct = {
+  id: string;
+  name: string;
+  price: number;
+  category?: string;
+  stock: number;
+  image: string;
+};
+
+type AdminVendor = {
+  id: number;
+  name: string;
+  type: string;
+  email: string;
+  status: string;
+};
+
+type AdminOrder = {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  items: string;
+  total: number;
+  address: string;
+  date: string;
+  status: 'Ongoing' | 'Delivered' | 'Cancelled' | 'Returned';
+};
+
+type ProductRecord = {
+  id?: string | number;
+  _id?: string;
+  name?: string;
+  title?: string;
+  price?: number;
+  sellingPrice?: number;
+  originalPrice?: number;
+  category?: string | { name?: string; title?: string };
+  stock?: number;
+  quantity?: number;
+  image?: string;
+  images?: string[];
+};
+
+type ProductPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+const PRODUCT_PAGE_LIMIT = 20;
+
+const fallbackProducts: AdminProduct[] = [
+  {
+    id: '1',
+    name: 'Lenovo Ideapad Slim 3',
+    price: 45000,
+    category: 'Electronics',
+    stock: 12,
+    image: '/laptop.jpg',
+  },
+];
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value && typeof value === 'object');
+
+const getProductList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+
+  const data = payload.data;
+
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.products)) return data.products;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.products)) return payload.products;
+
+  return [];
+};
+
+const getNumber = (value: unknown, fallback: number) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) && numericValue > 0
+    ? numericValue
+    : fallback;
+};
+
+const getProductPagination = (
+  payload: unknown,
+  fallbackCount: number
+): ProductPagination => {
+  if (!isRecord(payload) || !isRecord(payload.data)) {
+    return {
+      page: 1,
+      limit: PRODUCT_PAGE_LIMIT,
+      total: fallbackCount,
+      totalPages: Math.max(1, Math.ceil(fallbackCount / PRODUCT_PAGE_LIMIT)),
+    };
+  }
+
+  const data = payload.data;
+  const page = getNumber(data.page, 1);
+  const limit = getNumber(data.limit, PRODUCT_PAGE_LIMIT);
+  const total = getNumber(data.total, fallbackCount);
+  const totalPages = getNumber(
+    data.totalPages ?? data.totalPage ?? data.pages,
+    Math.max(1, Math.ceil(total / limit))
+  );
+
+  return { page, limit, total, totalPages };
+};
+
+const getCategoryName = (category: ProductRecord['category']) => {
+  if (typeof category === 'string') return category;
+  return category?.name || category?.title || '';
+};
+
+const normalizeProduct = (product: unknown): AdminProduct | null => {
+  if (!isRecord(product)) return null;
+
+  const record = product as ProductRecord;
+  const id = record.id || record._id;
+  const name = record.name || record.title;
+
+  if (!id || !name) return null;
+
+  return {
+    id: String(id),
+    name,
+    price: Number(record.price ?? record.sellingPrice ?? record.originalPrice ?? 0),
+    category: getCategoryName(record.category),
+    stock: Number(record.stock ?? record.quantity ?? 0),
+    image: record.image || record.images?.[0] || '/laptop.jpg',
+  };
+};
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productLoadError, setProductLoadError] = useState('');
+  const [productPage, setProductPage] = useState(1);
+  const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
+  const [productTotal, setProductTotal] = useState(fallbackProducts.length);
+  const [productTotalPages, setProductTotalPages] = useState(1);
 
   // Mock Data 
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Lenovo Ideapad Slim 3', price: 45000, category: 'Electronics', stock: 12, image: '/laptop.jpg' },
-  ]);
-  const [vendors, setVendors] = useState([
+  const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
+  const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
-  const [orders, setOrders] = useState<any[]>([
+  const [orders] = useState<AdminOrder[]>([
     { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing' },
     { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered' },
     { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing' },
@@ -42,10 +185,54 @@ export default function AdminPage() {
     { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered' },
   ]);
 
-  const openModal = (item: any = null) => {
+  const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
     setIsModalOpen(true);
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchProducts = async () => {
+      setIsLoadingProducts(true);
+      setProductLoadError('');
+
+      try {
+        const response = await productApi.getAllProducts({
+          page: productPage,
+          limit: PRODUCT_PAGE_LIMIT,
+        });
+        const fetchedProducts = getProductList(response)
+          .map(normalizeProduct)
+          .filter((product): product is AdminProduct => Boolean(product));
+        const pagination = getProductPagination(response, fetchedProducts.length);
+
+        if (!isMounted) return;
+
+        setProducts(fetchedProducts);
+        setProductPage(pagination.page);
+        setProductLimit(pagination.limit);
+        setProductTotal(pagination.total);
+        setProductTotalPages(pagination.totalPages);
+      } catch {
+        if (!isMounted) return;
+        setProducts(fallbackProducts);
+        setProductTotal(fallbackProducts.length);
+        setProductTotalPages(1);
+        setProductLoadError('Could not load products. Showing fallback data.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingProducts(false);
+        }
+      }
+    };
+
+    fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productPage]);
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
@@ -123,10 +310,32 @@ export default function AdminPage() {
         </div>
 
         {activeTab === 'products' && (
-          <ProductTable data={products} onEdit={openModal} onDelete={(id: any) => setProducts(products.filter(p => p.id !== id))} searchQuery={searchQuery} />
+          <div className="space-y-3">
+            {(isLoadingProducts || productLoadError) && (
+              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${
+                productLoadError
+                  ? 'border-amber-200 bg-amber-50 text-amber-700'
+                  : 'border-gray-200 bg-white text-gray-500'
+              }`}>
+                {productLoadError || 'Loading products...'}
+              </div>
+            )}
+            <ProductTable
+              data={products}
+              onEdit={openModal}
+              onDelete={(id: string) => setProducts(products.filter(p => p.id !== id))}
+              searchQuery={searchQuery}
+              currentPage={productPage}
+              totalPages={productTotalPages}
+              totalItems={productTotal}
+              itemsPerPage={productLimit}
+              onPageChange={setProductPage}
+              isLoading={isLoadingProducts}
+            />
+          </div>
         )}
         {activeTab === 'vendors' && (
-          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: any) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+            <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
         )}
         {activeTab === 'orders' && (
           <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
@@ -136,7 +345,7 @@ export default function AdminPage() {
           isOpen={isModalOpen && activeTab !== 'orders'} 
           onClose={() => setIsModalOpen(false)} 
           activeTab={activeTab} 
-          editingItem={editingItem} 
+          editingItem={activeTab === 'products' && editingItem ? editingItem as AdminProduct : undefined} 
         />
 
         <OrderDetailsModal

@@ -348,9 +348,16 @@ export const authApi = {
 
 //Product API
 export const productApi = {
-  async getAllProducts() {
+  async getAllProducts(params: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>('/products');
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/products?page=${params.page || 1}&limit=${params.limit || 20}&sortBy=${params.sortBy || 'createdAt'}&sortOrder=${params.sortOrder || 'desc'}`
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -419,4 +426,60 @@ export const productApi = {
       handleApiError(error);
     }
   },
+
+  async createProducts (body: any) {
+    try {
+       const response = await axiosInstance.post<ApiResponse<any>>(`/products`, body);
+      return response.data;
+      /**
+       * Use this body as guide for the form
+       * 
+       * '{
+          "name": "iPhone 15 Pro",
+          "preview": "Summary of product to user",
+          "description": "Latest Apple smartphone with titanium design",
+          "sku": "IPHONE-15-PRO-25626" (optional),
+          "price": 850000,
+          "compareAtPrice": 200 (optional),
+          "costPerItem": 1000 (optional),
+          "currency": "NGN",
+          "condition": ["new", "used", "refurbished"] (optional)
+          "stock": 50,
+          "categoryId": "8220892a-50af-4aaf-a020-de5cd33749e6",
+          "metadata": {
+            "storage": "256GB",
+            "color": "Natural Titanium",
+            "brand": "Apple"
+          } (optional),
+          "weight": 0.187 (optional),
+          "dimensions": {
+            "unit": "cm",
+            "length": 14.67,
+            "width": 7.09,
+            "height": 0.83
+          } (optional),
+          "tags": ["iphone", "15", "pro", "phone]
+        }'
+       */
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
 };
+
+export const categoryApi = {
+  async getCategories(params: {
+    page?: number; 
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories?page=${params.page || 1}&limit=${params.limit || 20}&sortBy=${params.sortBy || 'name'}&sortOrder=${params.sortOrder || 'asc'}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
+
+}
