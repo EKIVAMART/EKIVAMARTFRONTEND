@@ -58,7 +58,7 @@ export default function VendorPage({ params }: VendorPageProps) {
       {/* Profile Section */}
       <div className="vp-cover-photo">
         <div className="vp-cover-content">
-          <div className="vp-title-group -mt-12">
+          <div className="vp-title-group -mt-16">
             <h1 className="vp-brilliant-title">{vendor.name}</h1>
             <div className="vp-brilliant-badge">VERIFIED SELLER</div>
           </div>
@@ -76,7 +76,7 @@ export default function VendorPage({ params }: VendorPageProps) {
           </div>
           
           <div className="vp-profile-actions">
-            <button className="vp-follow-btn">
+            <button className="vp-follow-btn -mt-8">
               <UserPlus size={16} /> Follow
             </button>
           </div>
