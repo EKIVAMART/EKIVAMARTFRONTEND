@@ -7,33 +7,57 @@ import { X, Upload, Check, ImageIcon } from 'lucide-react';
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (images: string[]) => void;
+  onComplete: (images: File[]) => void;
   onSkip: () => void;
 }
 
 export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }: ImageUploadModalProps) {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const clearSelectedImages = () => {
+    imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    setImagePreviews([]);
+    setImageFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleClose = () => {
+    clearSelectedImages();
+    onClose();
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 10)); // Max 10 images
+    const allowedFiles = files
+      .filter((file) => file.size <= 5 * 1024 * 1024)
+      .slice(0, Math.max(0, 10 - imageFiles.length));
+    const newPreviews = allowedFiles.map(file => URL.createObjectURL(file));
+
+    setImageFiles(prev => [...prev, ...allowedFiles].slice(0, 10));
+    setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 10));
   };
 
   const removeImage = (index: number) => {
     const newPreviews = [...imagePreviews];
+    const newFiles = [...imageFiles];
     URL.revokeObjectURL(newPreviews[index]);
     newPreviews.splice(index, 1);
+    newFiles.splice(index, 1);
     setImagePreviews(newPreviews);
+    setImageFiles(newFiles);
   };
 
   const handleComplete = () => {
-    if (imagePreviews.length === 0) {
+    if (imageFiles.length === 0) {
       onSkip();
     } else {
-      onComplete(imagePreviews);
+      onComplete(imageFiles);
     }
+    clearSelectedImages();
   };
 
   return (
@@ -52,7 +76,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                 <h2 className="text-2xl font-bold">Upload Product Images</h2>
                 <p className="text-sm opacity-90 mt-1">Add visuals to publish your product</p>
               </div>
-              <button onClick={onClose} type="button" className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
+              <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
                 <X size={26} />
               </button>
             </div>

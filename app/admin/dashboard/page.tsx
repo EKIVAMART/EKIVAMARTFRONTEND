@@ -2,23 +2,41 @@
 
 import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
-import ActionModal from '@/components/admin/ActionModal';
+import ActionModal, {
+  ProductCategoryOption,
+  ProductFormData,
+} from '@/components/admin/ActionModal';
 import ImageUploadModal from '@/components/admin/ImageUploadModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
 import OrderDetailsModal from '@/components/admin/OrderDetailsModal';
 import { Plus, Search, Menu } from 'lucide-react';
-import { productApi } from '@/lib/api';
+import {
+  ApiError,
+  CreateProductDto,
+  ProductCondition,
+  ProductStatus,
+  ReturnShipping,
+  ReturnWindow,
+  WarrantyPeriod,
+  authApi,
+  categoryApi,
+  productApi,
+} from '@/lib/api';
+import { useAppSelector } from '@/lib/hooks';
 
-type AdminProduct = {
+type AdminProduct = Partial<ProductFormData> & {
   id: string;
   name: string;
   price: number;
   category?: string;
   stock: number;
   image: string;
-  status?: 'draft' | 'published';
+  status?: ProductStatus;
+  images?: string[];
+  color?: string;
+  size?: string;
 };
 
 type AdminVendor = {
@@ -45,16 +63,37 @@ type AdminOrder = {
 type ProductRecord = {
   id?: string | number;
   _id?: string;
+  vendorId?: string;
+  categoryId?: string;
   name?: string;
   title?: string;
-  price?: number;
+  preview?: string;
+  description?: string;
+  brand?: string;
+  sku?: string;
+  price?: number | { amount?: number };
+  compareAtPrice?: number | { amount?: number };
+  costPerItem?: number | { amount?: number };
   sellingPrice?: number;
   originalPrice?: number;
-  category?: string | { name?: string; title?: string };
-  stock?: number;
+  category?: string | { id?: string; name?: string; title?: string };
+  stock?: number | { quantity?: number; isInStock?: boolean };
   quantity?: number;
   image?: string;
-  images?: string[];
+  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number }>;
+  status?: ProductStatus;
+  condition?: ProductCondition;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  color?: string;
+  size?: string;
+  weight?: number;
+  dimensions?: { length?: number; width?: number; height?: number; unit?: string };
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  discount?: number;
+  discountPercentage?: number;
 };
 
 type ProductPagination = {
@@ -62,6 +101,14 @@ type ProductPagination = {
   limit: number;
   total: number;
   totalPages: number;
+};
+
+type CategoryRecord = {
+  id?: string | number;
+  _id?: string;
+  name?: string;
+  title?: string;
+  slug?: string;
 };
 
 const PRODUCT_PAGE_LIMIT = 20;
@@ -92,6 +139,56 @@ const getProductList = (payload: unknown): unknown[] => {
   if (Array.isArray(payload.products)) return payload.products;
 
   return [];
+};
+
+const getCategoryList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+
+  const data = payload.data;
+
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.categories)) return data.categories;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.categories)) return payload.categories;
+
+  return [];
+};
+
+const normalizeCategory = (category: unknown): ProductCategoryOption | null => {
+  if (!isRecord(category)) return null;
+
+  const record = category as CategoryRecord;
+  const id = record.id || record._id;
+  const name = record.name || record.title || record.slug;
+
+  if (!id || !name) return null;
+
+  return {
+    id: String(id),
+    name: String(name),
+  };
+};
+
+const getStoredUserId = () => {
+  if (typeof window === 'undefined') return '';
+
+  const candidateKeys = ['user', 'authUser', 'faflora_user', 'userId', 'vendorId'];
+
+  for (const key of candidateKeys) {
+    const value = localStorage.getItem(key);
+    if (!value) continue;
+
+    try {
+      const parsed = JSON.parse(value) as { id?: unknown; user?: { id?: unknown } };
+      const id = parsed.id || parsed.user?.id;
+      if (id) return String(id);
+    } catch {
+      if (key.toLowerCase().includes('id')) return value;
+    }
+  }
+
+  return '';
 };
 
 const getNumber = (value: unknown, fallback: number) => {
@@ -131,6 +228,30 @@ const getCategoryName = (category: ProductRecord['category']) => {
   return category?.name || category?.title || '';
 };
 
+const getMoneyAmount = (value: ProductRecord['price']) => {
+  if (isRecord(value)) return Number(value.amount ?? 0);
+  return Number(value ?? 0);
+};
+
+const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
+  if (isRecord(stock)) return Number(stock.quantity ?? 0);
+  return Number(stock ?? quantity ?? 0);
+};
+
+const getProductImages = (images: ProductRecord['images']) => {
+  if (!Array.isArray(images)) return [];
+
+  return [...images]
+    .sort((a, b) => {
+      if (typeof a === 'string' || typeof b === 'string') return 0;
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return Number(a.order ?? 0) - Number(b.order ?? 0);
+    })
+    .map((image) => (typeof image === 'string' ? image : image.url))
+    .filter((url): url is string => Boolean(url));
+};
+
 const normalizeProduct = (product: unknown): AdminProduct | null => {
   if (!isRecord(product)) return null;
 
@@ -140,17 +261,172 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
 
   if (!id || !name) return null;
 
+  const imageUrls = getProductImages(record.images);
+  const compareAtPrice = getMoneyAmount(record.compareAtPrice);
+  const price = getMoneyAmount(record.price) || Number(record.sellingPrice ?? record.originalPrice ?? 0);
+  const metadata = record.metadata || {};
+  const colours = record.color
+    ? [record.color]
+    : Array.isArray((metadata as { colours?: unknown }).colours)
+      ? ((metadata as { colours: string[] }).colours)
+      : [];
+  const sizes = record.size
+    ? [record.size]
+    : Array.isArray((metadata as { sizes?: unknown }).sizes)
+      ? ((metadata as { sizes: string[] }).sizes)
+      : [];
+
   return {
     id: String(id),
+    vendorId: record.vendorId || '',
+    categoryId: record.categoryId || getCategoryName(record.category),
     name,
-    price: Number(record.price ?? record.sellingPrice ?? record.originalPrice ?? 0),
+    preview: record.preview || '',
+    description: record.description || '',
+    brand: record.brand || '',
+    sku: record.sku || '',
+    price,
+    compareAtPrice,
+    costPerItem: getMoneyAmount(record.costPerItem),
     category: getCategoryName(record.category),
-    stock: Number(record.stock ?? record.quantity ?? 0),
-    image: record.image || record.images?.[0] || '/laptop.jpg',
+    stock: getStockQuantity(record.stock, record.quantity),
+    inStock: isRecord(record.stock)
+      ? Boolean(record.stock.isInStock)
+      : getStockQuantity(record.stock, record.quantity) > 0,
+    image: record.image || imageUrls[0] || '',
+    images: imageUrls,
+    status: record.status || 'draft',
+    condition: record.condition || 'new',
+    returnWindow: record.returnWindow ? String(record.returnWindow) : 'Use Store Default',
+    whoPaysReturnShipping: record.returnShipping || 'Use Store Default',
+    warrantyPeriod: record.warrantyPeriod || 'Use Store Default',
+    color: record.color,
+    size: record.size,
+    colours,
+    sizes,
+    weight: Number(record.weight ?? 0),
+    dimensions: {
+      length: Number(record.dimensions?.length ?? 0),
+      width: Number(record.dimensions?.width ?? 0),
+      height: Number(record.dimensions?.height ?? 0),
+    },
+    tags: record.tags || [],
+    metadata,
+    discount: record.discount ?? record.discountPercentage ?? 0,
+    currency: 'NGN',
+    subCategoryId: '',
+    origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
+    returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
+    warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
   };
 };
 
+const getOptionalNumber = (value: unknown) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue > 0
+    ? numberValue
+    : undefined;
+};
+
+const parseReturnWindow = (value: string): ReturnWindow | undefined => {
+  const match = value.match(/\d+/);
+  const parsed = match ? Number(match[0]) : undefined;
+  return parsed === 3 || parsed === 7 || parsed === 14 || parsed === 30
+    ? parsed
+    : undefined;
+};
+
+const getApiErrorMessage = (error: unknown) => {
+  const apiError = error as ApiError;
+  const validationErrors = Array.isArray(apiError.errors)
+    ? apiError.errors.map((item) => `${item.field}: ${item.message}`)
+    : [];
+
+  return [apiError.message, ...validationErrors]
+    .filter(Boolean)
+    .join(' ');
+};
+
+const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
+  const customMetadata: Record<string, unknown> = {
+    ...formData.metadata,
+    origin: formData.origin,
+    returnConditions: formData.returnConditions,
+    warrantyDetails: formData.warrantyDetails,
+  };
+
+  if (formData.colours.length > 1) {
+    customMetadata.colours = formData.colours;
+  }
+
+  if (formData.sizes.length > 1) {
+    customMetadata.sizes = formData.sizes;
+  }
+
+  const payload: CreateProductDto = {
+    vendorId: formData.vendorId,
+    categoryId: formData.categoryId,
+    name: formData.name,
+    preview: formData.preview,
+    description: formData.description,
+    compareAtPrice: formData.compareAtPrice,
+    stock: formData.stock,
+    metadata: customMetadata,
+  };
+
+  if (formData.brand) payload.brand = formData.brand;
+  if (formData.sku) payload.sku = formData.sku;
+  if (formData.currency) payload.currency = formData.currency;
+  if (formData.condition === 'new' || formData.condition === 'used' || formData.condition === 'refurbished') {
+    payload.condition = formData.condition;
+  }
+  if (formData.tags.length) payload.tags = formData.tags;
+  if (formData.colours[0]) payload.color = formData.colours[0];
+  if (formData.sizes[0]) payload.size = formData.sizes[0];
+
+  const returnWindow = parseReturnWindow(formData.returnWindow);
+  if (returnWindow !== undefined) payload.returnWindow = returnWindow;
+  if (
+    formData.whoPaysReturnShipping === 'store' ||
+    formData.whoPaysReturnShipping === 'vendor' ||
+    formData.whoPaysReturnShipping === 'customer'
+  ) {
+    payload.returnShipping = formData.whoPaysReturnShipping;
+  }
+  if (
+    formData.warrantyPeriod === 'none' ||
+    formData.warrantyPeriod === '3 months' ||
+    formData.warrantyPeriod === '6 months' ||
+    formData.warrantyPeriod === '1 year' ||
+    formData.warrantyPeriod === '2 years'
+  ) {
+    payload.warrantyPeriod = formData.warrantyPeriod;
+  }
+
+  const costPerItem = getOptionalNumber(formData.costPerItem);
+  if (costPerItem !== undefined) payload.costPerItem = costPerItem;
+
+  const discount = getOptionalNumber(formData.discount);
+  if (discount !== undefined) payload.discount = discount;
+
+  const weight = getOptionalNumber(formData.weight);
+  if (weight !== undefined) payload.weight = weight;
+
+  const { length, width, height } = formData.dimensions;
+  if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
+    payload.dimensions = {
+      length: Number(length) || 0,
+      width: Number(width) || 0,
+      height: Number(height) || 0,
+      unit: 'cm',
+    };
+  }
+
+  return payload;
+};
+
 export default function AdminPage() {
+  const authUser = useAppSelector((state) => state.auth.user);
   const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -165,6 +441,10 @@ export default function AdminPage() {
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
   const [productTotal, setProductTotal] = useState(fallbackProducts.length);
   const [productTotalPages, setProductTotalPages] = useState(1);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState('');
+  const [categories, setCategories] = useState<ProductCategoryOption[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
@@ -197,7 +477,120 @@ export default function AdminPage() {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchProducts = async () => {
+    const resolveCurrentUserId = async () => {
+      const reduxUserId = authUser?.id;
+      if (reduxUserId) {
+        setCurrentUserId(reduxUserId);
+        return;
+      }
+
+      const storedUserId = getStoredUserId();
+      if (storedUserId) {
+        setCurrentUserId(storedUserId);
+        return;
+      }
+
+      if (typeof window === 'undefined' || !localStorage.getItem('accessToken')) {
+        return;
+      }
+
+      try {
+        const response = await authApi.getProfile();
+        const profileUserId = response?.data?.user?.id || response?.data?.id;
+        if (isMounted && profileUserId) {
+          setCurrentUserId(String(profileUserId));
+        }
+      } catch {
+        if (isMounted) {
+          setCurrentUserId('');
+        }
+      }
+    };
+
+    resolveCurrentUserId();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authUser?.id]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+
+      try {
+        const response = await categoryApi.getCategories({
+          page: 1,
+          limit: 100,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        });
+        const fetchedCategories = getCategoryList(response)
+          .map(normalizeCategory)
+          .filter((category): category is ProductCategoryOption => Boolean(category));
+
+        if (isMounted) {
+          setCategories(fetchedCategories);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setProductLoadError(
+            getApiErrorMessage(error) || 'Could not load product categories.'
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCategories(false);
+        }
+      }
+    };
+
+    fetchCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const fetchProducts = async () => {
+    setIsLoadingProducts(true);
+    setProductLoadError('');
+
+    try {
+      const response = await productApi.getAllProducts({
+        page: productPage,
+        limit: PRODUCT_PAGE_LIMIT,
+        searchQuery: searchQuery || undefined,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      });
+      const fetchedProducts = getProductList(response)
+        .map(normalizeProduct)
+        .filter((product): product is AdminProduct => Boolean(product));
+      const pagination = getProductPagination(response, fetchedProducts.length);
+
+      setProducts(fetchedProducts);
+      setProductLimit(pagination.limit);
+      setProductTotal(pagination.total);
+      setProductTotalPages(pagination.totalPages);
+    } catch (error) {
+      setProducts(fallbackProducts);
+      setProductTotal(fallbackProducts.length);
+      setProductTotalPages(1);
+      setProductLoadError(
+        getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+      );
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProducts = async () => {
       setIsLoadingProducts(true);
       setProductLoadError('');
 
@@ -205,6 +598,9 @@ export default function AdminPage() {
         const response = await productApi.getAllProducts({
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
+          searchQuery: searchQuery || undefined,
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
         });
         const fetchedProducts = getProductList(response)
           .map(normalizeProduct)
@@ -213,22 +609,18 @@ export default function AdminPage() {
 
         if (!isMounted) return;
 
-        const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
-        const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
-
-        setProducts([...savedDrafts, ...fetchedProducts]);
-        setProductPage(pagination.page);
+        setProducts(fetchedProducts);
         setProductLimit(pagination.limit);
         setProductTotal(pagination.total);
         setProductTotalPages(pagination.totalPages);
-      } catch {
+      } catch (error) {
         if (!isMounted) return;
-        const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
-        const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
-        setProducts([...savedDrafts, ...fallbackProducts]);
+        setProducts(fallbackProducts);
         setProductTotal(fallbackProducts.length);
         setProductTotalPages(1);
-        setProductLoadError('Could not load products. Showing fallback data.');
+        setProductLoadError(
+          getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+        );
       } finally {
         if (isMounted) {
           setIsLoadingProducts(false);
@@ -236,52 +628,56 @@ export default function AdminPage() {
       }
     };
 
-    fetchProducts();
+    loadProducts();
 
     return () => {
       isMounted = false;
     };
-  }, [productPage]);
+  }, [productPage, searchQuery]);
 
-  const handleSaveProduct = (formData: any) => {
+  const handleSaveProduct = async (formData: ProductFormData) => {
     if (activeTab !== 'products') return;
 
-    const id = formData.id || `draft-${Date.now()}`;
-    const newDraft = {
-      ...formData,
-      id,
-      name: formData.name,
-      price: formData.price,
-      category: formData.categoryId,
-      stock: formData.stock,
-      image: formData.images?.[0] || '',
-      status: formData.status
-    } as AdminProduct;
+    setIsSavingProduct(true);
+    setProductLoadError('');
 
-    if (formData.status === 'draft') {
-      const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
-      const savedDrafts: AdminProduct[] = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+    try {
+      const productFormData = {
+        ...formData,
+        vendorId: formData.vendorId || currentUserId,
+      };
 
-      const existingIdx = savedDrafts.findIndex(d => d.id === id);
-      if (existingIdx >= 0) {
-        savedDrafts[existingIdx] = newDraft;
-      } else {
-        savedDrafts.unshift(newDraft);
+      if (!productFormData.vendorId) {
+        const message = 'Could not determine the current user ID for vendorId. Please sign in again.';
+        setProductLoadError(message);
+        throw new Error(message);
       }
 
-      localStorage.setItem('faflora_product_drafts', JSON.stringify(savedDrafts));
+      const response = formData.id
+        ? await productApi.updateProduct(formData.id, buildProductPayload(productFormData))
+        : await productApi.createProduct(buildProductPayload(productFormData));
+      const savedProduct = normalizeProduct(response?.data);
 
-      setProducts(prev => {
-        const existing = prev.findIndex(p => p.id === id);
-        if (existing >= 0) {
-          const newProducts = [...prev];
-          newProducts[existing] = newDraft;
-          return newProducts;
-        }
-        return [newDraft, ...prev];
-      });
+      if (savedProduct) {
+        setProducts((prev) => {
+          const existingIndex = prev.findIndex((product) => product.id === savedProduct.id);
+          if (existingIndex < 0) return [savedProduct, ...prev];
+
+          const next = [...prev];
+          next[existingIndex] = savedProduct;
+          return next;
+        });
+      } else {
+        await fetchProducts();
+      }
+    } catch (error) {
+      const message =
+        getApiErrorMessage(error) || 'Could not save product. Please check the product details and try again.';
+      setProductLoadError(message);
+      throw error;
+    } finally {
+      setIsSavingProduct(false);
     }
-    // Note: If saving as published directly without draft, one would normally call the API.
   };
 
   const handlePublishClick = (id: string) => {
@@ -289,25 +685,50 @@ export default function AdminPage() {
     setIsImageModalOpen(true);
   };
 
-  const handleImageComplete = (images: string[]) => {
+  const handleImageComplete = async (images: File[]) => {
     if (!productToPublishId) return;
 
-    setProducts(prev => prev.map(p => {
-      if (p.id === productToPublishId) {
-        return { ...p, status: 'published', image: images[0] || '' };
-      }
-      return p;
-    }));
+    try {
+      setIsLoadingProducts(true);
+      setProductLoadError('');
 
-    const savedDraftsRaw = localStorage.getItem('faflora_product_drafts');
-    if (savedDraftsRaw) {
-      const savedDrafts: AdminProduct[] = JSON.parse(savedDraftsRaw);
-      const updatedDrafts = savedDrafts.filter(d => d.id !== productToPublishId);
-      localStorage.setItem('faflora_product_drafts', JSON.stringify(updatedDrafts));
+      if (images.length > 0) {
+        await productApi.uploadProductImages(productToPublishId, images);
+      }
+
+      const response = await productApi.publishProduct(productToPublishId);
+      const publishedProduct = normalizeProduct(response?.data);
+
+      if (publishedProduct) {
+        setProducts(prev => prev.map(p => p.id === productToPublishId ? publishedProduct : p));
+      } else {
+        await fetchProducts();
+      }
+    } catch (error) {
+      setProductLoadError(
+        getApiErrorMessage(error) ||
+        'Could not publish product. Products need images and stock before publishing.'
+      );
+      return;
+    } finally {
+      setIsLoadingProducts(false);
     }
 
     setIsImageModalOpen(false);
     setProductToPublishId(null);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    setProductLoadError('');
+
+    try {
+      await productApi.deleteProduct(id);
+      setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      setProductLoadError(
+        getApiErrorMessage(error) || 'Could not delete product. Please try again.'
+      );
+    }
   };
 
   return (
@@ -381,26 +802,28 @@ export default function AdminPage() {
             placeholder={`Search across ${activeTab}...`}
             className="flex-1 outline-none text-sm font-medium"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setProductPage(1);
+            }}
           />
         </div>
 
         {activeTab === 'products' && (
           <div className="space-y-3">
-            {(isLoadingProducts || productLoadError) && (
+            {(isLoadingProducts || isSavingProduct || productLoadError) && (
               <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
                   ? 'border-amber-200 bg-amber-50 text-amber-700'
                   : 'border-gray-200 bg-white text-gray-500'
                 }`}>
-                {productLoadError || 'Loading products...'}
+                {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
               </div>
             )}
             <ProductTable
               data={products}
               onEdit={openModal}
-              onDelete={(id: string) => setProducts(products.filter(p => p.id !== id))}
+              onDelete={handleDeleteProduct}
               onPublish={handlePublishClick}
-              searchQuery={searchQuery}
               currentPage={productPage}
               totalPages={productTotalPages}
               totalItems={productTotal}
@@ -422,6 +845,9 @@ export default function AdminPage() {
           onClose={() => setIsModalOpen(false)}
           activeTab={activeTab}
           editingItem={activeTab === 'products' && editingItem ? editingItem as AdminProduct : undefined}
+          categories={categories}
+          isLoadingCategories={isLoadingCategories}
+          currentUserId={currentUserId}
           onSave={handleSaveProduct}
         />
 

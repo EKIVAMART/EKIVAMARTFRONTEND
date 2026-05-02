@@ -5,7 +5,7 @@ export interface ApiError {
   message: string;
   statusCode?: number;
   retryAfter?: number;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[]> | Array<{ field: string; message: string }>;
 }
 
 export interface ApiResponse<T> {
@@ -346,17 +346,119 @@ export const authApi = {
   }
 };
 
-//Product API
+// Product API
+export type ProductStatus =
+  | 'draft'
+  | 'active'
+  | 'inactive'
+  | 'out_of_stock'
+  | 'discontinued';
+export type ReturnShipping = 'store' | 'vendor' | 'customer';
+export type WarrantyPeriod =
+  | 'none'
+  | '3 months'
+  | '6 months'
+  | '1 year'
+  | '2 years';
+export type ProductCondition = 'new' | 'refurbished' | 'used';
+export type ReturnWindow = 3 | 7 | 14 | 30;
+
+export interface ProductSearchParams {
+  categoryId?: string;
+  vendorId?: string;
+  status?: ProductStatus;
+  condition?: ProductCondition;
+  brand?: string;
+  color?: string;
+  size?: string;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  minPrice?: number;
+  maxPrice?: number;
+  minDiscount?: number;
+  maxDiscount?: number;
+  inStock?: boolean;
+  tags?: string | string[];
+  searchQuery?: string;
+  page?: number;
+  limit?: number;
+  sortBy?:
+    | 'id'
+    | 'name'
+    | 'description'
+    | 'sku'
+    | 'price'
+    | 'priceAmount'
+    | 'stock'
+    | 'stockQuantity'
+    | 'status'
+    | 'condition'
+    | 'brand'
+    | 'discount'
+    | 'returnWindow'
+    | 'returnShipping'
+    | 'warrantyPeriod'
+    | 'createdAt'
+    | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateProductDto {
+  vendorId?: string;
+  categoryId: string;
+  name: string;
+  preview: string;
+  description: string;
+  brand?: string;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  sku?: string;
+  discount?: number;
+  currency?: string;
+  compareAtPrice: number;
+  costPerItem?: number;
+  stock: number;
+  color?: string;
+  size?: string;
+  condition?: ProductCondition;
+  weight?: number;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export type UpdateProductDto = Partial<CreateProductDto>;
+
+const toQueryParams = (params: ProductSearchParams = {}) => {
+  const queryParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value));
+  });
+
+  return queryParams;
+};
+
 export const productApi = {
-  async getAllProducts(params: {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-  } = {}) {
+  async getAllProducts(params: ProductSearchParams = {}) {
     try {
+      const queryParams = toQueryParams({
+        page: 1,
+        limit: 20,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+        ...params,
+      });
       const response = await axiosInstance.get<ApiResponse<any>>(
-        `/products?page=${params.page || 1}&limit=${params.limit || 20}&sortBy=${params.sortBy || 'createdAt'}&sortOrder=${params.sortOrder || 'desc'}`
+        `/products?${queryParams.toString()}`
       );
       return response.data;
     } catch (error) {
@@ -373,98 +475,66 @@ export const productApi = {
     }
   },
 
-  async getProductsByCategory(category: string) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/category/${category}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsBySubCategory(subCategory: string) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/sub-category/${subCategory}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsByBrand(brand: string) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/brand/${brand}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsByPrice(price: number) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price/${price}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsByRating(rating: number) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/rating/${rating}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsByPriceRange(minPrice: number, maxPrice: number) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price-range/${minPrice}/${maxPrice}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async createProducts (body: any) {
+  async createProduct(body: CreateProductDto) {
     try {
        const response = await axiosInstance.post<ApiResponse<any>>(`/products`, body);
       return response.data;
-      /**
-       * Use this body as guide for the form
-       * 
-       * '{
-          "name": "iPhone 15 Pro",
-          "preview": "Summary of product to user",
-          "description": "Latest Apple smartphone with titanium design",
-          "sku": "IPHONE-15-PRO-25626" (optional),
-          "price": 850000,
-          "compareAtPrice": 200 (optional),
-          "costPerItem": 1000 (optional),
-          "currency": "NGN",
-          "condition": ["new", "used", "refurbished"] (optional)
-          "stock": 50,
-          "categoryId": "8220892a-50af-4aaf-a020-de5cd33749e6",
-          "metadata": {
-            "storage": "256GB",
-            "color": "Natural Titanium",
-            "brand": "Apple"
-          } (optional),
-          "weight": 0.187 (optional),
-          "dimensions": {
-            "unit": "cm",
-            "length": 14.67,
-            "width": 7.09,
-            "height": 0.83
-          } (optional),
-          "tags": ["iphone", "15", "pro", "phone]
-        }'
-       */
     } catch (error) {
       handleApiError(error);
     }
-  }
+  },
+
+  async createProducts(body: CreateProductDto) {
+    return this.createProduct(body);
+  },
+
+  async updateProduct(id: string, body: UpdateProductDto) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/products/${id}`,
+        body
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async uploadProductImages(id: string, files: File[]) {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('images', file);
+      });
+
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/products/${id}/images`,
+        formData
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async publishProduct(id: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/products/${id}/publish`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteProduct(id: string) {
+    try {
+      await axiosInstance.delete(`/products/${id}`);
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 export const categoryApi = {

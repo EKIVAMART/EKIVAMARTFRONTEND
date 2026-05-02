@@ -8,7 +8,7 @@ interface Product {
   stock: number;
   image: string;
   category?: string;
-  status?: 'draft' | 'published';
+  status?: 'draft' | 'active' | 'inactive' | 'out_of_stock' | 'discontinued';
 }
 
 interface ProductTableProps {
@@ -148,10 +148,10 @@ export default function ProductTable({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
-                    {p.status === 'draft' && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mt-0.5">DRAFT</span>}
+                    {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mt-0.5 uppercase">{p.status.replaceAll('_', ' ')}</span>}
                   </div>
                 </td>
-                <td className="p-4 text-center text-sm font-bold text-slate-700">₦ {p.price.toLocaleString()}</td>
+                <td className="p-4 text-center text-sm font-bold text-slate-700">NGN {p.price.toLocaleString()}</td>
                 <td className="p-4 text-center">
                   <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{p.stock} In Stock</span>
                 </td>
@@ -189,10 +189,10 @@ export default function ProductTable({
               <div className="flex-1 min-w-0 pt-1">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
-                  {p.status === 'draft' && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0">DRAFT</span>}
+                  {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0 uppercase">{p.status.replaceAll('_', ' ')}</span>}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                  <span className="text-sm font-black text-[#981d87]">₦ {p.price.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#981d87]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
                 </div>
               </div>
@@ -261,3 +261,4 @@ export default function ProductTable({
     </div>
   );
 }
+

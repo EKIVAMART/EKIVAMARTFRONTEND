@@ -1,9 +1,10 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Tag, Plus, Trash2 } from 'lucide-react';
-import { categoryApi } from '@/lib/api';
+import { X, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Plus, Trash2 } from 'lucide-react';
 
 export interface ProductDimensions {
   length: number;
@@ -13,6 +14,7 @@ export interface ProductDimensions {
 
 export interface ProductFormData {
   id?: string;
+  vendorId: string;
   name: string;
   preview: string;
   description: string;
@@ -40,50 +42,36 @@ export interface ProductFormData {
   returnConditions: string;
   warrantyPeriod: string;
   warrantyDetails: string;
-  status: 'draft' | 'published';
+  status: 'draft' | 'active' | 'inactive' | 'out_of_stock' | 'discontinued';
   images?: string[]; // Allowed optional, for the API
 }
 
 export type EditableProduct = Partial<ProductFormData>;
+
+export interface ProductCategoryOption {
+  id: string;
+  name: string;
+}
 
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: 'products' | 'vendors' | 'orders';
   editingItem?: EditableProduct;
-  onSave?: (data: ProductFormData) => void;
+  categories?: ProductCategoryOption[];
+  isLoadingCategories?: boolean;
+  currentUserId?: string;
+  onSave?: (data: ProductFormData) => void | Promise<void>;
 }
-
-const CATEGORY_SUBCATEGORY_MAP: Record<string, string[]> = {
-  'Fashion': ['Men', 'Women', 'Kids', 'Accessories'],
-  'Electronics': ['Phones', 'Laptops', 'Audio', 'Accessories'],
-  'Bags': ['Backpacks', 'Handbags', 'Luggage'],
-  'Footwear': ['Sneakers', 'Formal', 'Sandals', 'Boots'],
-  'Groceries': ['Fresh Produce', 'Pantry', 'Beverages', 'Snacks'],
-  'Beauty': ['Makeup', 'Skincare', 'Haircare', 'Fragrance'],
-  'Wellness': ['Supplements', 'Vitamins', 'Fitness Accessories'],
-  'Home Decor': ['Furniture', 'Wall Art & Mirrors', 'Lighting', 'Rugs & Carpets', 'Cushions & Throws', 'Vases & Decorative Objects', 'Candles & Scents', 'Curtains & Blinds', 'Planters'],
-  'Toys and Games': ['Infant & Preschool Toys', 'Dolls & Stuffed Toys', 'Action Figures', 'Board Games & Puzzles', 'Educational Toys (STEM)', 'Outdoor & Ride-on Toys', 'Building & Construction Sets', 'Card Games'],
-  'Sports': ['Football & Soccer', 'Basketball', 'Running & Athletics', 'Fitness Equipment', 'Cycling', 'Swimming & Water Sports', 'Outdoor & Camping Gear', 'Sports Apparel & Footwear', 'Team Sports Equipment'],
-  'Home & Jewellery': ['Kitchen', 'Bedding', 'Necklaces', 'Rings', 'Bracelets']
-};
-
-const CATEGORIES = Object.keys(CATEGORY_SUBCATEGORY_MAP);
-
-const generateSKU = (name: string, category: string, brand?: string, colours?: string[]) => {
-  const prefix = (category || 'GEN').substring(0, 4).toUpperCase();
-  const namePart = (name || 'PRD').replace(/[^a-zA-Z0-9]/g, '').substring(0, 5).toUpperCase();
-  const brandPart = brand ? brand.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() : 'XX';
-  const colorPart = colours && colours.length > 0 ? colours[0].replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() : 'XXX';
-  const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `${prefix}-${brandPart}-${namePart}-${colorPart}-${randomStr}`;
-};
 
 export default function ActionModal({
   isOpen,
   onClose,
   activeTab,
   editingItem,
+  categories = [],
+  isLoadingCategories = false,
+  currentUserId = '',
   onSave
 }: ActionModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -91,6 +79,7 @@ export default function ActionModal({
 
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
+    vendorId: '',
     name: '',
     preview: '',
     description: '',
@@ -102,8 +91,8 @@ export default function ActionModal({
     condition: 'new',
     stock: 0,
     inStock: true,
-    categoryId: CATEGORIES[0],
-    subCategoryId: CATEGORY_SUBCATEGORY_MAP[CATEGORIES[0]][0] || '',
+    categoryId: '',
+    subCategoryId: '',
     brand: '',
     colours: [],
     sizes: [],
@@ -128,10 +117,18 @@ export default function ActionModal({
   const [sizeInput, setSizeInput] = useState('');
   const [colourInput, setColourInput] = useState('');
 
+  const updateField = <Key extends keyof ProductFormData>(
+    key: Key,
+    value: ProductFormData[Key]
+  ) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
   useEffect(() => {
     if (isOpen) {
       setFormData({
         id: editingItem?.id || '',
+        vendorId: editingItem?.vendorId || currentUserId,
         name: editingItem?.name || '',
         preview: editingItem?.preview || '',
         description: editingItem?.description || '',
@@ -143,8 +140,8 @@ export default function ActionModal({
         condition: editingItem?.condition || 'new',
         stock: editingItem?.stock || 0,
         inStock: editingItem?.inStock ?? true,
-        categoryId: editingItem?.categoryId || CATEGORIES[0],
-        subCategoryId: editingItem?.subCategoryId || CATEGORY_SUBCATEGORY_MAP[CATEGORIES[0]][0] || '',
+        categoryId: editingItem?.categoryId || '',
+        subCategoryId: editingItem?.subCategoryId || '',
         brand: editingItem?.brand || '',
         colours: (editingItem as any)?.colours || ((editingItem as any)?.colour ? [(editingItem as any).colour] : []),
         sizes: editingItem?.sizes || [],
@@ -183,7 +180,7 @@ export default function ActionModal({
       setColourInput('');
       setSeoExpanded(false);
     }
-  }, [isOpen, editingItem]);
+  }, [isOpen, editingItem, currentUserId]);
 
   // Auto calculate selling price when compareAtPrice or discount changes
   useEffect(() => {
@@ -194,24 +191,11 @@ export default function ActionModal({
     }
   }, [formData.compareAtPrice, discountPercent]);
 
-  const updateField = <Key extends keyof ProductFormData>(
-    key: Key,
-    value: ProductFormData[Key]
-  ) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-  };
-
   const updateMetadata = (key: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       metadata: { ...prev.metadata, [key]: value }
     }));
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCat = e.target.value;
-    const defaultSub = CATEGORY_SUBCATEGORY_MAP[newCat]?.[0] || '';
-    setFormData(prev => ({ ...prev, categoryId: newCat, subCategoryId: defaultSub }));
   };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -256,10 +240,6 @@ export default function ActionModal({
     updateField('colours', formData.colours.filter(c => c !== colourToRemove));
   };
 
-  const handleAutoGenerateSKU = () => {
-    updateField('sku', generateSKU(formData.name, formData.categoryId, formData.brand, formData.colours));
-  };
-
   const generateSEO = () => {
     if (!formData.name) return;
     updateMetadata('seoTitle', `${formData.name} - Buy on Faflora`);
@@ -270,7 +250,7 @@ export default function ActionModal({
     saveData('draft');
   };
 
-  const saveData = (statusOverride?: 'draft' | 'published') => {
+  const saveData = async (statusOverride?: ProductFormData['status']) => {
     // Collect custom attributes
     const customObj: Record<string, string> = {};
     customFields.forEach(f => {
@@ -291,7 +271,7 @@ export default function ActionModal({
 
     if (!finalData.price) finalData.price = 0;
 
-    onSave?.(finalData);
+    await onSave?.(finalData);
     handleClose();
   };
 
@@ -302,7 +282,7 @@ export default function ActionModal({
       return;
     }
     // Only allow submitting if required fields exist, though it's fine for drafts
-    saveData();
+    void saveData();
   };
 
   const handleClose = () => {
@@ -381,18 +361,31 @@ export default function ActionModal({
                     <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                   </div>
 
+                  <input type="hidden" value={formData.vendorId} readOnly />
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#981d87] ml-1">*</span></label>
-                      <select value={formData.categoryId} onChange={handleCategoryChange} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required>
-                        {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      <select
+                        value={formData.categoryId}
+                        onChange={e => updateField('categoryId', e.target.value)}
+                        className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                        required
+                        disabled={isLoadingCategories}
+                      >
+                        <option value="">
+                          {isLoadingCategories ? 'Loading categories...' : 'Select category'}
+                        </option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#981d87] ml-1">*</span></label>
-                      <select value={formData.subCategoryId} onChange={e => updateField('subCategoryId', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required>
-                        {(CATEGORY_SUBCATEGORY_MAP[formData.categoryId] || []).map(sub => <option key={sub} value={sub}>{sub}</option>)}
-                      </select>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category</label>
+                      <input type="text" value={formData.subCategoryId} onChange={e => updateField('subCategoryId', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
                     </div>
                   </div>
 
@@ -424,15 +417,6 @@ export default function ActionModal({
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-100">
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU <span className="text-[#981d87] ml-1">*</span></label>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
-                      <button type="button" onClick={handleAutoGenerateSKU} className="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-sm whitespace-nowrap">
-                        Auto-Generate
-                      </button>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -565,25 +549,25 @@ export default function ActionModal({
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
                         <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
                           <option value="Use Store Default">Use Store Default</option>
+                          <option value="3">3 days</option>
                           <option value="7 days">7 days</option>
                           <option value="14 days">14 days</option>
                           <option value="30 days">30 days</option>
-                          <option value="No Returns / Final Sale">No Returns / Final Sale</option>
                         </select>
                       </div>
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
-                        <select disabled={formData.returnWindow === 'No Returns / Final Sale'} value={formData.returnWindow === 'No Returns / Final Sale' ? 'Not Applicable' : formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className={`w-full p-3.5 rounded-2xl border outline-none text-sm ${formData.returnWindow === 'No Returns / Final Sale' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`}>
-                          <option value="Not Applicable" className="hidden">Not Applicable</option>
+                        <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3]">
                           <option value="Use Store Default">Use Store Default</option>
-                          <option value="Customer pays">Customer pays</option>
-                          <option value="Seller pays">Seller pays</option>
+                          <option value="store">Store pays</option>
+                          <option value="vendor">Vendor pays</option>
+                          <option value="customer">Customer pays</option>
                         </select>
                       </div>
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
-                      <textarea disabled={formData.returnWindow === 'No Returns / Final Sale'} value={formData.returnWindow === 'No Returns / Final Sale' ? 'Not Applicable' : formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.returnWindow === 'No Returns / Final Sale' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Must be in original packaging, unworn, etc." />
+                      <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
                     </div>
                   </div>
 
@@ -594,7 +578,7 @@ export default function ActionModal({
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
                       <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
                         <option value="Use Store Default">Use Store Default</option>
-                        <option value="None">None</option>
+                        <option value="none">None</option>
                         <option value="3 months">3 months</option>
                         <option value="6 months">6 months</option>
                         <option value="1 year">1 year</option>
@@ -603,7 +587,7 @@ export default function ActionModal({
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
-                      <textarea disabled={formData.warrantyPeriod === 'None'} value={formData.warrantyPeriod === 'None' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'None' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
+                      <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
                     </div>
                   </div>
 

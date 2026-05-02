@@ -6,7 +6,7 @@ import { setCredentials, logout } from '@/lib/features/auth/authSlice';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  'https://faflorabackend-5.onrender.com/api/v1';
+  'https://fafloriesbackend-5.onrender.com/api/v1';
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -29,6 +29,14 @@ axiosInstance.interceptors.request.use(
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (
+      typeof FormData !== 'undefined' &&
+      config.data instanceof FormData &&
+      config.headers
+    ) {
+      delete config.headers['Content-Type'];
     }
 
     return config;
