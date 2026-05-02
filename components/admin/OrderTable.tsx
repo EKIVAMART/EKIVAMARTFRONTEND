@@ -12,6 +12,7 @@ interface Order {
   address: string;
   date: string;
   status: 'Ongoing' | 'Delivered' | 'Cancelled' | 'Returned';
+  paymentStatus: 'Paid' | 'Pending' | 'Failed' | 'Refunded';
 }
 
 const statusStyles = {
@@ -22,6 +23,7 @@ const statusStyles = {
 };
 
 const allStatuses = ['All', 'Ongoing', 'Delivered', 'Cancelled', 'Returned'];
+const allPaymentStatuses = ['All', 'Paid', 'Pending', 'Failed', 'Refunded'];
 
 interface OrderTableProps {
   data: Order[];
@@ -33,6 +35,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [paymentFilter, setPaymentFilter] = useState<string>('All');
   
   const itemsPerPage = 10;
 
@@ -56,6 +59,11 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
       result = result.filter(order => order.status === statusFilter);
     }
 
+    // Payment Status filter
+    if (paymentFilter !== 'All') {
+      result = result.filter(order => order.paymentStatus === paymentFilter);
+    }
+
     // Sort by ID (as a proxy for recency in this mock)
     result.sort((a, b) => {
       const valA = parseInt(a.id.replace(/\D/g, '')) || 0;
@@ -64,7 +72,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
     });
 
     return result;
-  }, [data, searchQuery, statusFilter, sortOrder]);
+  }, [data, searchQuery, statusFilter, paymentFilter, sortOrder]);
 
   const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
   const paginatedData = filteredAndSortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -76,7 +84,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
   // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, paymentFilter]);
 
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
@@ -90,7 +98,16 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             {allStatuses.map(status => (
-              <option key={status} value={status}>{status === 'All' ? 'All Statuses' : status}</option>
+              <option key={status} value={status}>{status === 'All' ? 'All Order Status' : status}</option>
+            ))}
+          </select>
+          <select 
+            className="bg-gray-50 border-none text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer"
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+          >
+            {allPaymentStatuses.map(status => (
+              <option key={status} value={status}>{status === 'All' ? 'All Payment' : status}</option>
             ))}
           </select>
         </div>
@@ -115,6 +132,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Address</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Date</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize text-center">Status</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 capitalize text-center">Payment</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize text-right">Actions</th>
             </tr>
           </thead>
@@ -138,6 +156,16 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
                 <td className="p-4 text-center">
                   <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${statusStyles[order.status]}`}>
                     {order.status}
+                  </span>
+                </td>
+                <td className="p-4 text-center">
+                  <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    order.paymentStatus === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 
+                    order.paymentStatus === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                    order.paymentStatus === 'Failed' ? 'bg-rose-100 text-rose-700' :
+                    'bg-slate-100 text-slate-700'
+                  }`}>
+                    {order.paymentStatus}
                   </span>
                 </td>
                 <td className="p-4 text-right">
@@ -181,9 +209,14 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
           <div key={order.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
             <div className="flex justify-between items-center border-b border-gray-50 pb-3">
               <span className="font-bold text-slate-800 text-base">{order.id}</span>
-              <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${statusStyles[order.status]}`}>
-                {order.status}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${order.paymentStatus === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                  {order.paymentStatus}
+                </span>
+                <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${statusStyles[order.status]}`}>
+                  {order.status}
+                </span>
+              </div>
             </div>
             
             <div className="space-y-3">

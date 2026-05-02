@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/features/auth/authSlice';
@@ -217,10 +218,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             {/* Header - Logo */}
             <div className="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between">
               <div>
-                <div className="text-[#981d87] text-lg font-bold">
-                  Faflora
-                </div>
-                <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
+                <Link href="/" className="flex flex-col items-start gap-1">
+                  <Image src="/logo.jpg" alt="Faflora" width={120} height={32} className="object-contain" />
+                </Link>
               </div>
               <button
                 onClick={onClose}
