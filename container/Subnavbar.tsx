@@ -5,12 +5,14 @@ import { FiHeart, FiSearch, FiShoppingCart, FiMenu, FiMapPin } from 'react-icons
 import { FaAngleDown } from "react-icons/fa6";
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartCount, useWishlist, useAppSelector } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
 import { ProfileModal } from '@/components/auth/ProfileModal';
+import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
 
@@ -203,6 +205,7 @@ const Subnavbar = (): JSX.Element => {
   const [showMobileHeader, setShowMobileHeader] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
@@ -257,9 +260,10 @@ const Subnavbar = (): JSX.Element => {
             </button>
 
             {/* Logo */}
-            <div className="flex-1 text-center">
-              <div className="text-[#981d87] text-lg font-bold">Faflora</div>
-              <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
+            <div className="flex-1 flex justify-center">
+              <Link href="/">
+                <Image src="/logo.jpg" alt="Faflora" width={120} height={32} className="object-contain" />
+              </Link>
             </div>
 
             {/* Account & Cart Icons */}
@@ -320,10 +324,7 @@ const Subnavbar = (): JSX.Element => {
             href="/"
             className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
           >
-            <div className="text-[#981d87] text-2xl font-bold">Faflora</div>
-            <span className="text-xs text-gray-500 font-semibold">
-              BIG MEGA SHOP
-            </span>
+            <Image src="/logo.jpg" alt="Faflora" width={160} height={45} className="object-contain" />
           </Link>
 
           {/* Search Bar - Takes up more space */}
@@ -419,6 +420,18 @@ const Subnavbar = (): JSX.Element => {
               onSwitchToSignup={() => {
                 setIsLoginModalOpen(false);
                 setIsSignupModalOpen(true);
+              }}
+              onSwitchToForgotPassword={() => {
+                setIsLoginModalOpen(false);
+                setIsForgotPasswordModalOpen(true);
+              }}
+            />
+            <ForgotPasswordModal
+              isOpen={isForgotPasswordModalOpen}
+              onClose={() => setIsForgotPasswordModalOpen(false)}
+              onSwitchToLogin={() => {
+                setIsForgotPasswordModalOpen(false);
+                setIsLoginModalOpen(true);
               }}
             />
             <SignupModal

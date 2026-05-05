@@ -50,12 +50,14 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignup: () => void;
+  onSwitchToForgotPassword: () => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onSwitchToSignup,
+  onSwitchToForgotPassword,
 }) => {
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
@@ -215,6 +217,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         <div className="flex justify-end -mt-1">
           <button
             type="button"
+            onClick={onSwitchToForgotPassword}
             className="text-xs sm:text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors"
           >
             Forgot password?

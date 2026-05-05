@@ -101,7 +101,9 @@ const Listfoot = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
-            <Image src="/logo.png" alt="Faflora" width={150} height={40} />
+            <Link href="/">
+              <Image src="/logo.jpg" alt="Faflora" width={160} height={45} className="object-contain" />
+            </Link>
 
             <p className="text-gray-500 text-sm max-w-sm">
               Awesome grocery store website template

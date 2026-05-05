@@ -1,6 +1,7 @@
 import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface SidebarProps {
   activeTab: string;
@@ -28,12 +29,14 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
       `}>
         <div className="p-6 border-b flex justify-between items-center">
           <div className="flex items-center gap-1.5 shrink-0">
-            <div className="text-[#981d87] text-2xl font-bold">Faflora</div>
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
-              Admin
-            </span>
+            <Link href="/" className="flex items-center gap-2">
+              <Image src="/logo.jpg" alt="Faflora" width={110} height={30} className="object-contain" />
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
+                Admin
+              </span>
+            </Link>
           </div>
-          {onClose && (
+          {isOpen && onClose && (
             <button onClick={onClose} className="md:hidden p-2 -mr-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-xl transition">
               <X size={20} />
             </button>
