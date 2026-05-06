@@ -5,12 +5,14 @@ import { FiHeart, FiSearch, FiShoppingCart, FiMenu, FiMapPin } from 'react-icons
 import { FaAngleDown } from "react-icons/fa6";
 import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartCount, useWishlist, useAppSelector } from '@/lib/hooks';
 import MobileSidebar from '@/components/MobileSidebar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
 import { ProfileModal } from '@/components/auth/ProfileModal';
+import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
 
@@ -110,8 +112,8 @@ const LocationSelector = (): JSX.Element => {
           <FiMapPin className="text-[#981d87] shrink-0" size={15} />
           <span className="font-medium text-gray-800 text-[15px] truncate">{selected}</span>
         </div>
-          <FaAngleDown className="text-gray-600" size={15} />
- 
+        <FaAngleDown className="text-gray-600" size={15} />
+
       </div>
 
       {/* Dropdown with Search */}
@@ -203,6 +205,7 @@ const Subnavbar = (): JSX.Element => {
   const [showMobileHeader, setShowMobileHeader] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
@@ -242,9 +245,8 @@ const Subnavbar = (): JSX.Element => {
 
       {/* ===== MOBILE HEADER ===== */}
       <header
-        className={`md:hidden w-full bg-white text-black z-10 border-2 border-amber-950 transition-all duration-300 ease-in-out overflow-hidden ${
-          showMobileHeader ? 'sticky top-0' : 'fixed -top-full'
-        }`}
+        className={`md:hidden w-full bg-white text-black z-10 border-2 border-amber-950 transition-all duration-300 ease-in-out overflow-hidden ${showMobileHeader ? 'sticky top-0' : 'fixed -top-full'
+          }`}
       >
         <div className="px-3 py-3">
           <div className="flex items-center justify-between gap-2 mb-3">
@@ -258,9 +260,10 @@ const Subnavbar = (): JSX.Element => {
             </button>
 
             {/* Logo */}
-            <div className="flex-1 text-center">
-              <div className="text-[#981d87] text-lg font-bold">Faflories</div>
-              <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
+            <div className="flex-1 flex justify-center">
+              <Link href="/">
+                <Image src="/logo.jpg" alt="Faflora" width={120} height={32} className="object-contain" />
+              </Link>
             </div>
 
             {/* Account & Cart Icons */}
@@ -312,9 +315,8 @@ const Subnavbar = (): JSX.Element => {
 
       {/* ===== DESKTOP HEADER - TOP SECTION ===== */}
       <header
-        className={`hidden md:flex w-full bg-white text-black relative z-20 transition-all duration-300 ease-in-out ${
-          isScrolled ? 'shadow-md' : 'shadow-none'
-        }`}
+        className={`hidden md:flex w-full bg-white text-black relative z-20 transition-all duration-300 ease-in-out ${isScrolled ? 'shadow-md' : 'shadow-none'
+          }`}
       >
         <div className="mx-auto w-[95%] flex items-center justify-between gap-4 py-4">
           {/* Logo */}
@@ -322,10 +324,7 @@ const Subnavbar = (): JSX.Element => {
             href="/"
             className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
           >
-            <div className="text-[#981d87] text-2xl font-bold">Faflories</div>
-            <span className="text-xs text-gray-500 font-semibold">
-              BIG MEGA SHOP
-            </span>
+            <Image src="/logo.jpg" alt="Faflora" width={160} height={45} className="object-contain" />
           </Link>
 
           {/* Search Bar - Takes up more space */}
@@ -421,6 +420,18 @@ const Subnavbar = (): JSX.Element => {
               onSwitchToSignup={() => {
                 setIsLoginModalOpen(false);
                 setIsSignupModalOpen(true);
+              }}
+              onSwitchToForgotPassword={() => {
+                setIsLoginModalOpen(false);
+                setIsForgotPasswordModalOpen(true);
+              }}
+            />
+            <ForgotPasswordModal
+              isOpen={isForgotPasswordModalOpen}
+              onClose={() => setIsForgotPasswordModalOpen(false)}
+              onSwitchToLogin={() => {
+                setIsForgotPasswordModalOpen(false);
+                setIsLoginModalOpen(true);
               }}
             />
             <SignupModal

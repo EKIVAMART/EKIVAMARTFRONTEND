@@ -22,7 +22,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import FadeInSection from '@/components/FadeInSection';
-import { fafloriesSupportData } from '../../data/supportData';
+import { fafloraSupportData } from '../../data/supportData';
 
 /* ─── TOPIC ICON MAP ─── */
 const topicIcons: Record<string, React.ReactNode> = {
@@ -108,7 +108,7 @@ export default async function TopicPage({
   params: Promise<{ topicSlug: string }>;
 }) {
   const { topicSlug } = await params;
-  const topic = fafloriesSupportData.find((t) => t.slug === topicSlug);
+  const topic = fafloraSupportData.find((t) => t.slug === topicSlug);
   if (!topic) notFound();
 
   const icon = topicIcons[topic.slug] ?? <BookOpen size={22} />;

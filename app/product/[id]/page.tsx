@@ -291,6 +291,42 @@ export default function ProductDetailsPage({
                  />
                </button>
             </div>
+            
+            {/* Vendor Section */}
+            {product.store && (
+              <Link href={`/vendor/${product.storeId}`} className="pd-vendor-card group">
+                <div className="pd-vendor-header">
+                  <div className="pd-vendor-avatar">
+                    {product.store.logo ? (
+                      <Image src={product.store.logo} alt={product.store.name} width={48} height={48} className="pd-vendor-logo-img" />
+                    ) : (
+                      <span className="pd-vendor-initials">{product.store.name.substring(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <div className="pd-vendor-info">
+                    <h4 className="pd-vendor-name">{product.store.name}</h4>
+                    <p className="pd-vendor-stats">450K+ Sold <span className="pd-info-icon">?</span> | 156 Items</p>
+                  </div>
+                  <ChevronRight size={20} className="pd-vendor-chevron group-hover:translate-x-1 transition-transform text-gray-400" />
+                </div>
+                <div className="pd-vendor-footer">
+                  <div className="pd-vendor-rating">
+                    <div className="pd-stars-mini flex items-center">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} className={`pd-star-xs ${i < 4 ? 'filled text-yellow-400' : 'empty text-gray-300'}`} viewBox="0 0 24 24" width="12" height="12">
+                          <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="text-xs font-bold ml-1 text-gray-700">4.7</span>
+                  </div>
+                  <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pd-calendar-icon w-3.5 h-3.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>Selling on Faflories for 3 years</span>
+                  </div>
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ export interface ApiError {
   message: string;
   statusCode?: number;
   retryAfter?: number;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[]> | Array<{ field: string; message: string }>;
 }
 
 export interface ApiResponse<T> {
@@ -346,11 +346,120 @@ export const authApi = {
   }
 };
 
-//Product API
+// Product API
+export type ProductStatus =
+  | 'draft'
+  | 'active'
+  | 'inactive'
+  | 'out_of_stock'
+  | 'discontinued';
+export type ReturnShipping = 'store' | 'vendor' | 'customer';
+export type WarrantyPeriod =
+  | 'none'
+  | '3 months'
+  | '6 months'
+  | '1 year'
+  | '2 years';
+export type ProductCondition = 'new' | 'refurbished' | 'used';
+export type ReturnWindow = 3 | 7 | 14 | 30;
+
+export interface ProductSearchParams {
+  categoryId?: string;
+  vendorId?: string;
+  status?: ProductStatus;
+  condition?: ProductCondition;
+  brand?: string;
+  color?: string;
+  size?: string;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  minPrice?: number;
+  maxPrice?: number;
+  minDiscount?: number;
+  maxDiscount?: number;
+  inStock?: boolean;
+  tags?: string | string[];
+  searchQuery?: string;
+  page?: number;
+  limit?: number;
+  sortBy?:
+    | 'id'
+    | 'name'
+    | 'description'
+    | 'sku'
+    | 'price'
+    | 'priceAmount'
+    | 'stock'
+    | 'stockQuantity'
+    | 'status'
+    | 'condition'
+    | 'brand'
+    | 'discount'
+    | 'returnWindow'
+    | 'returnShipping'
+    | 'warrantyPeriod'
+    | 'createdAt'
+    | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateProductDto {
+  vendorId?: string;
+  categoryId: string;
+  name: string;
+  preview: string;
+  description: string;
+  brand?: string;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  sku?: string;
+  discount?: number;
+  currency?: string;
+  compareAtPrice: number;
+  costPerItem?: number;
+  stock: number;
+  color?: string;
+  size?: string;
+  condition?: ProductCondition;
+  weight?: number;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export type UpdateProductDto = Partial<CreateProductDto>;
+
+const toQueryParams = (params: ProductSearchParams = {}) => {
+  const queryParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value));
+  });
+
+  return queryParams;
+};
+
 export const productApi = {
-  async getAllProducts() {
+  async getAllProducts(params: ProductSearchParams = {}) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>('/products');
+      const queryParams = toQueryParams({
+        page: 1,
+        limit: 20,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+        ...params,
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/products?${queryParams.toString()}`
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -366,57 +475,81 @@ export const productApi = {
     }
   },
 
-  async getProductsByCategory(category: string) {
+  async createProduct(body: CreateProductDto) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/category/${category}`);
+       const response = await axiosInstance.post<ApiResponse<any>>(`/products`, body);
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
 
-  async getProductsBySubCategory(subCategory: string) {
+  async createProducts(body: CreateProductDto) {
+    return this.createProduct(body);
+  },
+
+  async updateProduct(id: string, body: UpdateProductDto) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/sub-category/${subCategory}`);
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/products/${id}`,
+        body
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
 
-  async getProductsByBrand(brand: string) {
+  async uploadProductImages(id: string, files: File[]) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/brand/${brand}`);
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('images', file);
+      });
+
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/products/${id}/images`,
+        formData
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
 
-  async getProductsByPrice(price: number) {
+  async publishProduct(id: string) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price/${price}`);
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/products/${id}/publish`
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
 
-  async getProductsByRating(rating: number) {
+  async deleteProduct(id: string) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/rating/${rating}`);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async getProductsByPriceRange(minPrice: number, maxPrice: number) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/products/price-range/${minPrice}/${maxPrice}`);
-      return response.data;
+      await axiosInstance.delete(`/products/${id}`);
     } catch (error) {
       handleApiError(error);
     }
   },
 };
+
+export const categoryApi = {
+  async getCategories(params: {
+    page?: number; 
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories?page=${params.page || 1}&limit=${params.limit || 20}&sortBy=${params.sortBy || 'name'}&sortOrder=${params.sortOrder || 'asc'}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
+
+}

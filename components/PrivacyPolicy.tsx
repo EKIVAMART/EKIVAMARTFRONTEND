@@ -340,7 +340,7 @@ const sections: SectionData[] = [
           If you have any questions or suggestions about our Privacy Policy, or if you need to exercise your rights regarding your personal data, please reach out to us:
         </p>
         <a
-          href="mailto:support@faflories.com"
+          href="mailto:support@faflora.com"
           className="inline-flex items-center gap-3 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-lg shadow-[#981d8730] group-hover:scale-110 transition-transform">
@@ -348,7 +348,7 @@ const sections: SectionData[] = [
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[3px] text-[#c740b0]">Email</p>
-            <p className="text-[#981d87] font-bold text-base group-hover:underline">support@faflories.com</p>
+            <p className="text-[#981d87] font-bold text-base group-hover:underline">support@faflora.com</p>
           </div>
         </a>
       </>
@@ -390,7 +390,7 @@ export default function PrivacyPolicy() {
           <FadeInSection type="fadeDown" delay={0.1}>
             <div className="inline-flex items-center gap-2 border border-[#e8b8e4] text-[#981d87] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-8 bg-[#fdf3fc]">
               <ShieldCheck size={11} />
-              <span>Faflories · Legal</span>
+              <span>Faflora · Legal</span>
             </div>
           </FadeInSection>
 
@@ -423,14 +423,14 @@ export default function PrivacyPolicy() {
                 Last updated: <span className="text-[#981d87] font-bold">April 03, 2026</span>
               </p>
               <div className="h-px w-8 bg-[#e8b8e4]" />
-              <Pill text="Faflories Marketplace" />
+              <Pill text="Faflora Marketplace" />
             </div>
           </FadeInSection>
 
           <FadeInSection type="fadeUp" delay={0.65}>
             <p className="mt-8 text-gray-500 text-base md:text-lg lg:text-xl max-w-2xl leading-relaxed">
               Your privacy is the foundation of our trust. This page explains exactly how{' '}
-              <span className="font-bold text-[#981d87]">Faflories</span> — Nigeria's premier
+              <span className="font-bold text-[#981d87]">Faflora</span> — Nigeria's premier
               multi-vendor marketplace — collects, uses, and safeguards your personal information.
             </p>
           </FadeInSection>
@@ -448,7 +448,7 @@ export default function PrivacyPolicy() {
         <div className="bg-gradient-to-r from-[#2d0029] via-[#6b0f6b] to-[#981d87] py-5 px-6 md:px-12">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
             <p className="text-white/80 text-sm md:text-base lg:text-[17px] leading-relaxed max-w-3xl">
-              <span className="font-bold text-white">Faflories</span> is Nigeria's premier multi-vendor marketplace connecting buyers with affordable, high-quality, locally made products. We empower vendors, offer seamless shopping, secure payments, and fast delivery — supporting local businesses and celebrating Nigerian creativity.{' '}
+              <span className="font-bold text-white">Faflora</span> is Nigeria's premier multi-vendor marketplace connecting buyers with affordable, high-quality, locally made products. We empower vendors, offer seamless shopping, secure payments, and fast delivery — supporting local businesses and celebrating Nigerian creativity.{' '}
               <span className="italic text-[#f0c8ec]">Shop smart. Shop Nigerian.</span>
             </p>
             <a
@@ -475,7 +475,7 @@ export default function PrivacyPolicy() {
                 Terms used in this Privacy Policy carry the same meanings as in our{' '}
                 <a href="/terms-and-conditions" className="text-[#981d87] font-semibold hover:underline inline-flex items-center gap-1">
                   Terms and Conditions <ExternalLink size={12} />
-                </a>, accessible at Faflories, unless otherwise defined herein.
+                </a>, accessible at Faflora, unless otherwise defined herein.
               </p>
             </div>
           </div>
@@ -537,7 +537,7 @@ export default function PrivacyPolicy() {
                   <span className="text-[#981d87]">Always.</span>
                 </h3>
                 <p className="text-gray-500 text-sm md:text-base lg:text-[17px] leading-relaxed max-w-md">
-                  At Faflories, transparency is not a legal checkbox — it's a commitment. We build trust with every vendor and buyer, one interaction at a time.
+                  At Faflora, transparency is not a legal checkbox — it's a commitment. We build trust with every vendor and buyer, one interaction at a time.
                 </p>
               </div>
 
@@ -555,7 +555,7 @@ export default function PrivacyPolicy() {
                   Return to Homepage
                 </a>
                 <p className="text-center text-[11px] text-gray-400 mt-1">
-                  By using Faflories, you accept this Privacy Policy.
+                  By using Faflora, you accept this Privacy Policy.
                 </p>
               </div>
             </div>

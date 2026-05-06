@@ -124,13 +124,13 @@ export default function TermsAndConditions() {
               <Shield size={14} className="text-white" />
             </div>
             <p className="text-lg text-gray-700 leading-relaxed">
-              <span className="font-bold text-[#981d87]">Faflories</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, Faflories eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, Faflories provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
+              <span className="font-bold text-[#981d87]">Faflora</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, Faflora eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, Faflora provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
             </p>
             <p className="mt-5 text-gray-600 leading-relaxed">
               We handle the heavy lifting so you can focus on what matters most: sourcing quality products, delighting customers, and scaling your brand. Our platform supports seamless shopping experiences with features like easy search, secure transactions, fast nationwide delivery partnerships, and innovative options such as partial or installment payments — allowing customers to buy now and pay later without stress. This flexibility boosts conversion rates and helps vendors move more inventory, especially for higher-value items like clothing, accessories, electronics, home goods, and more.
             </p>
             <p className="mt-5 text-gray-600 leading-relaxed">
-              At its core, Faflories is built on trust, empowerment, and simplicity. We bridge buyers seeking affordable, high-quality, locally made Nigerian products with vendors ready to grow. Shopping on Faflories is seamless, secure, and stylish — customers discover authentic items from trusted local sellers, while vendors gain visibility, analytics, and tools to compete effectively against bigger players.
+              At its core, Faflora is built on trust, empowerment, and simplicity. We bridge buyers seeking affordable, high-quality, locally made Nigerian products with vendors ready to grow. Shopping on Faflora is seamless, secure, and stylish — customers discover authentic items from trusted local sellers, while vendors gain visibility, analytics, and tools to compete effectively against bigger players.
             </p>
           </div>
         </FadeInSection>
@@ -141,7 +141,7 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.3}>
             <SectionTitle subtitle="1" title="Payments" icon={<CreditCard size={20} />} />
             <p className="text-gray-600">
-              Faflories integrates robust, secure payment gateways tailored for the Nigerian market, supporting popular methods like bank transfers, cards, mobile money, USSD, and flexible partial payment plans. Customers can split payments over time, making premium or bulk purchases accessible without waiting for payday.
+              Faflora integrates robust, secure payment gateways tailored for the Nigerian market, supporting popular methods like bank transfers, cards, mobile money, USSD, and flexible partial payment plans. Customers can split payments over time, making premium or bulk purchases accessible without waiting for payday.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Funds are held securely in escrow until delivery confirmation, protecting both buyers and vendors." />
@@ -160,7 +160,7 @@ export default function TermsAndConditions() {
             <div className="mt-6 grid gap-3">
               <BulletItem text="Track performance metrics like views, add-to-carts, orders, revenue trends, top-performing items, and customer feedback." />
               <BulletItem text="Use insights to optimize listings, adjust pricing strategically, run promotions, and identify growth opportunities." />
-              <BulletItem text="No more scattered spreadsheets — Faflories keeps your vendor data organized, secure, and actionable, helping you make data-driven decisions to boost profitability." />
+              <BulletItem text="No more scattered spreadsheets — Faflora keeps your vendor data organized, secure, and actionable, helping you make data-driven decisions to boost profitability." />
             </div>
           </SectionWrapper>
 
@@ -168,7 +168,7 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.4}>
             <SectionTitle subtitle="3" title="Customer Data" icon={<Users size={20} />} />
             <p className="text-gray-600">
-              Faflories securely collects and manages buyer information needed for smooth transactions: shipping addresses, order history, preferences, and contact details.
+              Faflora securely collects and manages buyer information needed for smooth transactions: shipping addresses, order history, preferences, and contact details.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Powers personalized recommendations, targeted promotions, abandoned cart reminders, and loyalty rewards." />
@@ -181,12 +181,12 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.45}>
             <SectionTitle subtitle="4" title="Payment Liability" icon={<Shield size={20} />} />
             <p className="text-gray-600">
-              One of the biggest advantages of joining Faflories is reduced financial risk for vendors. We manage the entire payment ecosystem, including fraud detection, chargeback handling, and dispute resolution.
+              One of the biggest advantages of joining Faflora is reduced financial risk for vendors. We manage the entire payment ecosystem, including fraud detection, chargeback handling, and dispute resolution.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="When a customer pays, funds enter escrow — released to you only after order fulfillment and buyer confirmation (or auto-release after a set period if no issues arise)." />
               <BulletItem text="Protects you from non-payment scams or unauthorized transactions." />
-              <BulletItem text="In cases of valid disputes (e.g., item not received), Faflories facilitates fair resolution, often covering platform-side liabilities." />
+              <BulletItem text="In cases of valid disputes (e.g., item not received), Faflora facilitates fair resolution, often covering platform-side liabilities." />
               <BulletItem text="Vendors aren't directly exposed to raw card details or immediate refund demands — we handle processing refunds from escrow where appropriate." />
               <BulletItem text="Competitive, transparent commission rates with scheduled payouts. This structure builds confidence especially for new or small-scale sellers entering ecommerce." />
             </div>
@@ -195,7 +195,7 @@ export default function TermsAndConditions() {
           {/* 5. Vendor Responsibility */}
           <SectionWrapper delay={0.5}>
             <SectionTitle subtitle="5" title="Vendor Responsibility" icon={<Store size={20} />} />
-            <p className="text-gray-600">Success on Faflories thrives on mutual accountability. As a vendor, you commit to:</p>
+            <p className="text-gray-600">Success on Faflora thrives on mutual accountability. As a vendor, you commit to:</p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Uploading accurate, honest product listings with clear photos, specifications, pricing, and stock levels to prevent overselling or cancellations." />
               <BulletItem text="Ensuring all items are genuine, high-quality, and meet Nigerian consumer standards — no counterfeits or misleading claims." />
@@ -210,14 +210,14 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.55}>
             <SectionTitle subtitle="6" title="Refund Policy" icon={<RefreshCcw size={20} />} />
             <p className="text-gray-600">
-              Customer satisfaction is paramount at Faflories, and our refund policy balances fairness for buyers with protection for honest vendors.
+              Customer satisfaction is paramount at Faflora, and our refund policy balances fairness for buyers with protection for honest vendors.
             </p>
             <div className="mt-6 grid gap-3">
-              <BulletItem text="Customers may initiate returns/refunds for defective, damaged, incorrect, or non-delivered items — typically within 7–14 days of receipt (exact window displayed per order; always check current faflories.com policy)." />
+              <BulletItem text="Customers may initiate returns/refunds for defective, damaged, incorrect, or non-delivered items — typically within 7–14 days of receipt (exact window displayed per order; always check current faflora.com policy)." />
               <BulletItem text="For vendor errors (wrong item, poor quality), you may cover return shipping, and approved refunds deduct from your escrow or future payouts." />
               <BulletItem text="Valid refunds process back to the original payment method, often within 5–10 business days." />
               <BulletItem text="Change-of-mind returns depend on your individual store policy — some vendors offer them for a competitive edge." />
-              <BulletItem text="Faflories mediates fairly, reviewing evidence like photos or tracking data. Vendors with low dispute rates enjoy better platform perks." />
+              <BulletItem text="Faflora mediates fairly, reviewing evidence like photos or tracking data. Vendors with low dispute rates enjoy better platform perks." />
             </div>
             <InfoCard label="Non-refundable items (must be clearly marked in listings):">
               <div className="grid gap-2">
@@ -242,7 +242,7 @@ export default function TermsAndConditions() {
               <BulletItem text="Customer data (orders, browsing patterns, aggregate demographics) enables personalized shopping, targeted ads, delivery coordination, and platform improvements." />
               <BulletItem text="All personal information is encrypted, never sold to third parties, and used strictly for legitimate purposes." />
               <BulletItem text="We comply fully with Nigeria's Data Protection Regulation (NDPR) and international best practices, conducting regular audits." />
-              <BulletItem text="Vendors can access their own data reports, but sensitive customer details are safeguarded at all times. This responsible approach builds trust — buyers shop confidently, vendors benefit from better tools, and the entire Faflories community grows sustainably." />
+              <BulletItem text="Vendors can access their own data reports, but sensitive customer details are safeguarded at all times. This responsible approach builds trust — buyers shop confidently, vendors benefit from better tools, and the entire Faflora community grows sustainably." />
             </div>
           </SectionWrapper>
 
@@ -250,7 +250,7 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.65}>
             <SectionTitle subtitle="8" title="Governing Law" icon={<Scale size={20} />} />
             <p className="text-gray-600 leading-relaxed">
-              These Terms are governed by the laws of the Federal Republic of Nigeria. 
+              These Terms are governed by the laws of the Federal Republic of Nigeria.
               Any disputes arising from or in connection with these Terms shall be resolved by the competent courts of Nigeria.
             </p>
           </SectionWrapper>
@@ -283,7 +283,7 @@ export default function TermsAndConditions() {
                   </h4>
 
                   <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl">
-                    Joining Faflories means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, Faflories isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
+                    Joining Faflora means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, Faflora isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
                   </p>
 
                   {/* Stats strip */}
@@ -304,7 +304,7 @@ export default function TermsAndConditions() {
                   </div>
 
                   <p className="text-white/30 text-xs leading-relaxed max-w-md border-l-2 border-white/10 pl-3">
-                    By continuing to browse or use Faflories, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
+                    By continuing to browse or use Faflora, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
                   </p>
                 </div>
 

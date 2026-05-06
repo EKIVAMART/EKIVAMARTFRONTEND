@@ -131,7 +131,7 @@ const ContactForm = () => {
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!form.name.trim())  e.name = 'Please enter your name';
+    if (!form.name.trim()) e.name = 'Please enter your name';
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       e.email = 'Enter a valid email address';
     if (!category) e.category = 'Please select a reason';
@@ -204,8 +204,8 @@ const ContactForm = () => {
         <Mail size={13} className="text-[#c740b0] mt-0.5 flex-shrink-0" />
         <span>
           Need to share a screenshot or invoice? Email us directly at{' '}
-          <a href="mailto:support@faflories.com" className="text-[#981d87] font-semibold hover:underline">
-            support@faflories.com
+          <a href="mailto:support@faflora.com" className="text-[#981d87] font-semibold hover:underline">
+            support@faflora.com
           </a>{' '}
           with your attachments.
         </span>
@@ -273,10 +273,10 @@ export default function ContactSection() {
               Direct Channels
             </span>
             <div className="space-y-3">
-              <ContactInfoCard icon={Mail}  label="General Email"    value="faflories@outlook.com" href="mailto:faflories@outlook.com" copyable delay={0.14} />
-              <ContactInfoCard icon={Mail}  label="Support Email"    value="support@faflories.com" href="mailto:support@faflories.com" copyable delay={0.18} />
-              <ContactInfoCard icon={Phone} label="Phone / WhatsApp" value="+234 900 699 1040"     href="tel:+2349006991040"           copyable delay={0.22} />
-              <ContactInfoCard icon={Clock} label="Business Hours"   value="24 hours, 7 days a week"                                           delay={0.26} />
+              <ContactInfoCard icon={Mail} label="General Email" value="faflora@outlook.com" href="mailto:faflora@outlook.com" copyable delay={0.14} />
+              <ContactInfoCard icon={Mail} label="Support Email" value="support@faflora.com" href="mailto:support@faflora.com" copyable delay={0.18} />
+              <ContactInfoCard icon={Phone} label="Phone / WhatsApp" value="+234 900 699 1040" href="tel:+2349006991040" copyable delay={0.22} />
+              <ContactInfoCard icon={Clock} label="Business Hours" value="24 hours, 7 days a week" delay={0.26} />
             </div>
           </div>
         </FadeInSection>

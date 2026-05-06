@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/features/auth/authSlice';
@@ -217,10 +218,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             {/* Header - Logo */}
             <div className="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between">
               <div>
-                <div className="text-[#981d87] text-lg font-bold">
-                  Faflories
-                </div>
-                <span className="text-[10px] text-gray-500">BIG MEGA SHOP</span>
+                <Link href="/" className="flex flex-col items-start gap-1">
+                  <Image src="/logo.jpg" alt="Faflora" width={120} height={32} className="object-contain" />
+                </Link>
               </div>
               <button
                 onClick={onClose}
@@ -247,9 +247,8 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 </div>
                 <ChevronDown
                   size={18}
-                  className={`text-gray-400 transition-transform duration-200 ${
-                    showLocationDropdown ? 'rotate-180' : ''
-                  }`}
+                  className={`text-gray-400 transition-transform duration-200 ${showLocationDropdown ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -285,11 +284,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           <button
                             key={location}
                             onClick={() => handleLocationSelect(location)}
-                            className={`w-full text-left px-4 py-3 text-sm transition ${
-                              selectedLocation === location
+                            className={`w-full text-left px-4 py-3 text-sm transition ${selectedLocation === location
                                 ? 'bg-[#981d87] text-white font-semibold'
                                 : 'text-gray-700 hover:bg-gray-50'
-                            }`}
+                              }`}
                           >
                             {location}
                           </button>

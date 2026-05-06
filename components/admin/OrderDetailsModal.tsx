@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag } from 'lucide-react';
+import { X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store } from 'lucide-react';
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
@@ -13,8 +13,18 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
 
   // Mock extended details for the view
   const orderItems = [
-    { name: 'Wireless Bluetooth Headphones', variant: 'Black / One Size', qty: 1, price: 45000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&q=80' },
-    { name: 'Cotton Crewneck T-Shirt', variant: 'Navy Blue / L', qty: 2, price: 15000, category: 'Fashion', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150&q=80' }
+    { 
+      name: 'Wireless Bluetooth Headphones', variant: 'Black / One Size', qty: 1, price: 45000, category: 'Electronics', 
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&q=80', vendor: 'TechHub Solutions', brand: 'Sony', sku: 'WH-1000XM4',
+      preview: 'High-quality wireless audio', description: 'Industry-leading noise cancellation headphones with up to 30 hours of battery life.',
+      origin: 'Japan', condition: 'New', warranty: '1 Year Manufacturer Warranty'
+    },
+    { 
+      name: 'Cotton Crewneck T-Shirt', variant: 'Navy Blue / L', qty: 2, price: 15000, category: 'Fashion', 
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150&q=80', vendor: 'Fashion Forward', brand: 'H&M', sku: 'TS-9821',
+      preview: 'Comfortable everyday wear', description: 'Classic fit crewneck t-shirt made from 100% sustainably sourced cotton.',
+      origin: 'Bangladesh', condition: 'New', material: '100% Cotton'
+    }
   ];
 
   const subtotal = orderItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -80,10 +90,27 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                             <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-gray-100 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <h4 className="font-bold text-slate-800 text-sm truncate">{item.name}</h4>
-                              <p className="text-xs text-gray-500 font-medium mt-0.5">{item.variant}</p>
-                              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">
-                                <Tag size={10} /> {item.category}
-                              </span>
+                              <p className="text-xs text-gray-500 font-medium mt-0.5">{item.variant} • {item.brand} • SKU: {item.sku}</p>
+                              
+                              <div className="mt-2 text-xs text-slate-600 space-y-1">
+                                <p><span className="font-semibold text-slate-700">Preview:</span> {item.preview}</p>
+                                <p className="line-clamp-2"><span className="font-semibold text-slate-700">Description:</span> {item.description}</p>
+                                <p className="flex items-center flex-wrap gap-x-3 text-gray-500 mt-1">
+                                  <span><span className="font-semibold text-slate-700">Origin:</span> {item.origin}</span>
+                                  <span><span className="font-semibold text-slate-700">Condition:</span> {item.condition}</span>
+                                  {item.warranty && <span><span className="font-semibold text-slate-700">Warranty:</span> {item.warranty}</span>}
+                                  {item.material && <span><span className="font-semibold text-slate-700">Material:</span> {item.material}</span>}
+                                </p>
+                              </div>
+
+                              <div className="flex items-center flex-wrap gap-2 mt-2.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">
+                                  <Tag size={10} /> {item.category}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-fuchsia-50 text-[#981d87] rounded text-[10px] font-bold border border-fuchsia-100">
+                                  <Store size={10} /> Sold by: {item.vendor}
+                                </span>
+                              </div>
                             </div>
                           </div>
                           <div className="flex sm:block justify-between items-center w-full sm:w-auto sm:text-right mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">

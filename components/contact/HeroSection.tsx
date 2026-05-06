@@ -42,9 +42,9 @@ export default function HeroSection() {
             <div className="relative inline-flex items-center gap-2.5 mb-9">
               {/* Left tick */}
               <span className="block w-8 h-[1.5px] bg-gradient-to-r from-transparent to-[#ff69e0]/70" />
-              
+
               <span className="text-[10px] font-black uppercase tracking-[4.5px] text-[#ff69e0]/80 px-6 py-2.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm">
-                Faflories · Get in Touch
+                Faflora · Get in Touch
               </span>
 
               {/* Right tick */}
@@ -87,7 +87,7 @@ export default function HeroSection() {
             <p className="mt-6 text-white/55 text-[15px] md:text-[17px] max-w-lg leading-[1.75] font-normal tracking-[0.01em]"
               style={{ fontFamily: "'Palatino Linotype', Georgia, serif" }}
             >
-              Got a question, a complaint, or a great idea? Faflories' support team is standing by — for buyers, vendors, partners, and everyone in between.
+              Got a question, a complaint, or a great idea? Faflora' support team is standing by — for buyers, vendors, partners, and everyone in between.
             </p>
           </FadeInSection>
 
@@ -95,9 +95,9 @@ export default function HeroSection() {
           <FadeInSection type="fadeUp" delay={0.58}>
             <div className="mt-8 flex flex-wrap gap-2.5">
               {[
-                { label: 'Track an Order',  icon: Truck,      href: '/support/topics/orders-tracking' },
-                { label: 'Request Refund',  icon: CreditCard, href: '/support/topics/payments-refunds-withdrawals' },
-                { label: 'Support Center',  icon: LifeBuoy,   href: '/support' },
+                { label: 'Track an Order', icon: Truck, href: '/support/topics/orders-tracking' },
+                { label: 'Request Refund', icon: CreditCard, href: '/support/topics/payments-refunds-withdrawals' },
+                { label: 'Support Center', icon: LifeBuoy, href: '/support' },
               ].map(({ label, icon: Icon, href }) => (
                 <Link
                   key={label}
@@ -137,16 +137,16 @@ export default function HeroSection() {
 
       {/* SVG Slope Divider */}
       <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none">
-        <svg 
-          viewBox="0 0 1440 80" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg" 
-          className="w-full h-full" 
+        <svg
+          viewBox="0 0 1440 80"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full"
           preserveAspectRatio="none"
         >
-          <path 
-            d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" 
-            fill="#fdf8ff" 
+          <path
+            d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z"
+            fill="#fdf8ff"
           />
         </svg>
       </div>

@@ -1,64 +1,753 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
-import ActionModal from '@/components/admin/ActionModal';
+import ActionModal, {
+  ProductCategoryOption,
+  ProductFormData,
+} from '@/components/admin/ActionModal';
+import ImageUploadModal from '@/components/admin/ImageUploadModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
 import OrderDetailsModal from '@/components/admin/OrderDetailsModal';
 import { Plus, Search, Menu } from 'lucide-react';
+import {
+  ApiError,
+  CreateProductDto,
+  ProductCondition,
+  ProductStatus,
+  ReturnShipping,
+  ReturnWindow,
+  WarrantyPeriod,
+  authApi,
+  categoryApi,
+  productApi,
+} from '@/lib/api';
+import { useAppSelector } from '@/lib/hooks';
+import Link from 'next/link';
+import Image from 'next/image';
+
+type AdminProduct = Partial<ProductFormData> & {
+  id: string;
+  name: string;
+  price: number;
+  category?: string;
+  stock: number;
+  image: string;
+  status?: ProductStatus;
+  images?: string[];
+  color?: string;
+  size?: string;
+};
+
+type AdminVendor = {
+  id: number;
+  name: string;
+  type: string;
+  email: string;
+  status: string;
+};
+
+type AdminOrder = {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  items: string;
+  total: number;
+  address: string;
+  date: string;
+  status: 'Ongoing' | 'Delivered' | 'Cancelled' | 'Returned';
+  paymentStatus: 'Paid' | 'Pending' | 'Failed' | 'Refunded';
+};
+
+type ProductRecord = {
+  id?: string | number;
+  _id?: string;
+  vendorId?: string;
+  categoryId?: string;
+  name?: string;
+  title?: string;
+  preview?: string;
+  description?: string;
+  brand?: string;
+  sku?: string;
+  price?: number | { amount?: number };
+  compareAtPrice?: number | { amount?: number };
+  costPerItem?: number | { amount?: number };
+  sellingPrice?: number;
+  originalPrice?: number;
+  category?: string | { id?: string; name?: string; title?: string };
+  stock?: number | { quantity?: number; isInStock?: boolean };
+  quantity?: number;
+  image?: string;
+  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number }>;
+  status?: ProductStatus;
+  condition?: ProductCondition;
+  returnWindow?: ReturnWindow;
+  returnShipping?: ReturnShipping;
+  warrantyPeriod?: WarrantyPeriod;
+  color?: string;
+  size?: string;
+  weight?: number;
+  dimensions?: { length?: number; width?: number; height?: number; unit?: string };
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  discount?: number;
+  discountPercentage?: number;
+};
+
+type ProductPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+type CategoryRecord = {
+  id?: string | number;
+  _id?: string;
+  name?: string;
+  title?: string;
+  slug?: string;
+};
+
+const PRODUCT_PAGE_LIMIT = 20;
+
+const fallbackProducts: AdminProduct[] = [
+  {
+    id: '1',
+    name: 'Lenovo Ideapad Slim 3',
+    price: 45000,
+    category: 'Electronics',
+    stock: 12,
+    image: '/laptop.jpg',
+  },
+];
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value && typeof value === 'object');
+
+const getProductList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+
+  const data = payload.data;
+
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.products)) return data.products;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.products)) return payload.products;
+
+  return [];
+};
+
+const getCategoryList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+
+  const data = payload.data;
+
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.categories)) return data.categories;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.categories)) return payload.categories;
+
+  return [];
+};
+
+const normalizeCategory = (category: unknown): ProductCategoryOption | null => {
+  if (!isRecord(category)) return null;
+
+  const record = category as CategoryRecord;
+  const id = record.id || record._id;
+  const name = record.name || record.title || record.slug;
+
+  if (!id || !name) return null;
+
+  return {
+    id: String(id),
+    name: String(name),
+  };
+};
+
+const getStoredUserId = () => {
+  if (typeof window === 'undefined') return '';
+
+  const candidateKeys = ['user', 'authUser', 'faflora_user', 'userId', 'vendorId'];
+
+  for (const key of candidateKeys) {
+    const value = localStorage.getItem(key);
+    if (!value) continue;
+
+    try {
+      const parsed = JSON.parse(value) as { id?: unknown; user?: { id?: unknown } };
+      const id = parsed.id || parsed.user?.id;
+      if (id) return String(id);
+    } catch {
+      if (key.toLowerCase().includes('id')) return value;
+    }
+  }
+
+  return '';
+};
+
+const getNumber = (value: unknown, fallback: number) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) && numericValue > 0
+    ? numericValue
+    : fallback;
+};
+
+const getProductPagination = (
+  payload: unknown,
+  fallbackCount: number
+): ProductPagination => {
+  if (!isRecord(payload) || !isRecord(payload.data)) {
+    return {
+      page: 1,
+      limit: PRODUCT_PAGE_LIMIT,
+      total: fallbackCount,
+      totalPages: Math.max(1, Math.ceil(fallbackCount / PRODUCT_PAGE_LIMIT)),
+    };
+  }
+
+  const data = payload.data;
+  const page = getNumber(data.page, 1);
+  const limit = getNumber(data.limit, PRODUCT_PAGE_LIMIT);
+  const total = getNumber(data.total, fallbackCount);
+  const totalPages = getNumber(
+    data.totalPages ?? data.totalPage ?? data.pages,
+    Math.max(1, Math.ceil(total / limit))
+  );
+
+  return { page, limit, total, totalPages };
+};
+
+const getCategoryName = (category: ProductRecord['category']) => {
+  if (typeof category === 'string') return category;
+  return category?.name || category?.title || '';
+};
+
+const getMoneyAmount = (value: ProductRecord['price']) => {
+  if (isRecord(value)) return Number(value.amount ?? 0);
+  return Number(value ?? 0);
+};
+
+const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
+  if (isRecord(stock)) return Number(stock.quantity ?? 0);
+  return Number(stock ?? quantity ?? 0);
+};
+
+const getProductImages = (images: ProductRecord['images']) => {
+  if (!Array.isArray(images)) return [];
+
+  return [...images]
+    .sort((a, b) => {
+      if (typeof a === 'string' || typeof b === 'string') return 0;
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return Number(a.order ?? 0) - Number(b.order ?? 0);
+    })
+    .map((image) => (typeof image === 'string' ? image : image.url))
+    .filter((url): url is string => Boolean(url));
+};
+
+const normalizeProduct = (product: unknown): AdminProduct | null => {
+  if (!isRecord(product)) return null;
+
+  const record = product as ProductRecord;
+  const id = record.id || record._id;
+  const name = record.name || record.title;
+
+  if (!id || !name) return null;
+
+  const imageUrls = getProductImages(record.images);
+  const compareAtPrice = getMoneyAmount(record.compareAtPrice);
+  const price = getMoneyAmount(record.price) || Number(record.sellingPrice ?? record.originalPrice ?? 0);
+  const metadata = record.metadata || {};
+  const colours = record.color
+    ? [record.color]
+    : Array.isArray((metadata as { colours?: unknown }).colours)
+      ? ((metadata as { colours: string[] }).colours)
+      : [];
+  const sizes = record.size
+    ? [record.size]
+    : Array.isArray((metadata as { sizes?: unknown }).sizes)
+      ? ((metadata as { sizes: string[] }).sizes)
+      : [];
+
+  return {
+    id: String(id),
+    vendorId: record.vendorId || '',
+    categoryId: record.categoryId || getCategoryName(record.category),
+    name,
+    preview: record.preview || '',
+    description: record.description || '',
+    brand: record.brand || '',
+    sku: record.sku || '',
+    price,
+    compareAtPrice,
+    costPerItem: getMoneyAmount(record.costPerItem),
+    category: getCategoryName(record.category),
+    stock: getStockQuantity(record.stock, record.quantity),
+    inStock: isRecord(record.stock)
+      ? Boolean(record.stock.isInStock)
+      : getStockQuantity(record.stock, record.quantity) > 0,
+    image: record.image || imageUrls[0] || '',
+    images: imageUrls,
+    status: record.status || 'draft',
+    condition: record.condition || 'new',
+    returnWindow: record.returnWindow ? String(record.returnWindow) : 'Use Store Default',
+    whoPaysReturnShipping: record.returnShipping || 'Use Store Default',
+    warrantyPeriod: record.warrantyPeriod || 'Use Store Default',
+    color: record.color,
+    size: record.size,
+    colours,
+    sizes,
+    weight: Number(record.weight ?? 0),
+    dimensions: {
+      length: Number(record.dimensions?.length ?? 0),
+      width: Number(record.dimensions?.width ?? 0),
+      height: Number(record.dimensions?.height ?? 0),
+    },
+    tags: record.tags || [],
+    metadata,
+    discount: record.discount ?? record.discountPercentage ?? 0,
+    currency: 'NGN',
+    subCategoryId: '',
+    origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
+    returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
+    warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
+  };
+};
+
+const getOptionalNumber = (value: unknown) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue > 0
+    ? numberValue
+    : undefined;
+};
+
+const parseReturnWindow = (value: string): ReturnWindow | undefined => {
+  const match = value.match(/\d+/);
+  const parsed = match ? Number(match[0]) : undefined;
+  return parsed === 3 || parsed === 7 || parsed === 14 || parsed === 30
+    ? parsed
+    : undefined;
+};
+
+const getApiErrorMessage = (error: unknown) => {
+  const apiError = error as ApiError;
+  const validationErrors = Array.isArray(apiError.errors)
+    ? apiError.errors.map((item) => `${item.field}: ${item.message}`)
+    : [];
+
+  return [apiError.message, ...validationErrors]
+    .filter(Boolean)
+    .join(' ');
+};
+
+const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
+  const customMetadata: Record<string, unknown> = {
+    ...formData.metadata,
+    origin: formData.origin,
+    returnConditions: formData.returnConditions,
+    warrantyDetails: formData.warrantyDetails,
+  };
+
+  if (formData.colours.length > 1) {
+    customMetadata.colours = formData.colours;
+  }
+
+  if (formData.sizes.length > 1) {
+    customMetadata.sizes = formData.sizes;
+  }
+
+  const payload: CreateProductDto = {
+    vendorId: formData.vendorId,
+    categoryId: formData.categoryId,
+    name: formData.name,
+    preview: formData.preview,
+    description: formData.description,
+    compareAtPrice: formData.compareAtPrice,
+    stock: formData.stock,
+    metadata: customMetadata,
+  };
+
+  if (formData.brand) payload.brand = formData.brand;
+  if (formData.sku) payload.sku = formData.sku;
+  if (formData.currency) payload.currency = formData.currency;
+  if (formData.condition === 'new' || formData.condition === 'used' || formData.condition === 'refurbished') {
+    payload.condition = formData.condition;
+  }
+  if (formData.tags.length) payload.tags = formData.tags;
+  if (formData.colours[0]) payload.color = formData.colours[0];
+  if (formData.sizes[0]) payload.size = formData.sizes[0];
+
+  const returnWindow = parseReturnWindow(formData.returnWindow);
+  if (returnWindow !== undefined) payload.returnWindow = returnWindow;
+  if (
+    formData.whoPaysReturnShipping === 'store' ||
+    formData.whoPaysReturnShipping === 'vendor' ||
+    formData.whoPaysReturnShipping === 'customer'
+  ) {
+    payload.returnShipping = formData.whoPaysReturnShipping;
+  }
+  if (
+    formData.warrantyPeriod === 'none' ||
+    formData.warrantyPeriod === '3 months' ||
+    formData.warrantyPeriod === '6 months' ||
+    formData.warrantyPeriod === '1 year' ||
+    formData.warrantyPeriod === '2 years'
+  ) {
+    payload.warrantyPeriod = formData.warrantyPeriod;
+  }
+
+  const costPerItem = getOptionalNumber(formData.costPerItem);
+  if (costPerItem !== undefined) payload.costPerItem = costPerItem;
+
+  const discount = getOptionalNumber(formData.discount);
+  if (discount !== undefined) payload.discount = discount;
+
+  const weight = getOptionalNumber(formData.weight);
+  if (weight !== undefined) payload.weight = weight;
+
+  const { length, width, height } = formData.dimensions;
+  if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
+    payload.dimensions = {
+      length: Number(length) || 0,
+      width: Number(width) || 0,
+      height: Number(height) || 0,
+      unit: 'cm',
+    };
+  }
+
+  return payload;
+};
 
 export default function AdminPage() {
+  const authUser = useAppSelector((state) => state.auth.user);
   const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [productToPublishId, setProductToPublishId] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productLoadError, setProductLoadError] = useState('');
+  const [productPage, setProductPage] = useState(1);
+  const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
+  const [productTotal, setProductTotal] = useState(fallbackProducts.length);
+  const [productTotalPages, setProductTotalPages] = useState(1);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState('');
+  const [categories, setCategories] = useState<ProductCategoryOption[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
   // Mock Data 
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Lenovo Ideapad Slim 3', price: 45000, category: 'Electronics', stock: 12, image: '/laptop.jpg' },
-  ]);
-  const [vendors, setVendors] = useState([
+  const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
+  const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
-  const [orders, setOrders] = useState<any[]>([
-    { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing' },
-    { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered' },
-    { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing' },
-    { id: '#CM9812', user: { name: 'Orlando Diggs', avatar: 'https://i.pravatar.cc/150?u=orlandodiggs' }, items: '1 item', total: 1200000, address: 'Washburn Baton Rouge', date: 'Apr 24, 2026 • 02:00 PM', status: 'Delivered' },
-    { id: '#CM9811', user: { name: 'Andi Lane', avatar: 'https://i.pravatar.cc/150?u=andilane' }, items: '4 items', total: 65000, address: 'Nest Lane Olivette', date: 'Apr 24, 2026 • 11:45 AM', status: 'Cancelled' },
-    { id: '#CM9810', user: { name: 'Lori Daniels', avatar: 'https://i.pravatar.cc/150?u=loridaniels' }, items: '1 item', total: 32000, address: 'Pin Oak Drive, NY', date: 'Apr 23, 2026 • 05:30 PM', status: 'Delivered' },
-    { id: '#CM9809', user: { name: 'Rene Wells', avatar: 'https://i.pravatar.cc/150?u=renewells' }, items: '2 items', total: 210000, address: 'Broad St, Atlanta', date: 'Apr 23, 2026 • 01:15 PM', status: 'Ongoing' },
-    { id: '#CM9808', user: { name: 'Tom Hardy', avatar: 'https://i.pravatar.cc/150?u=tomhardy' }, items: '5 items', total: 450000, address: 'Main St, Boston', date: 'Apr 22, 2026 • 10:05 AM', status: 'Returned' },
-    { id: '#CM9807', user: { name: 'Sarah Connor', avatar: 'https://i.pravatar.cc/150?u=sarahconnor' }, items: '1 item', total: 180000, address: 'Tech Park, Seattle', date: 'Apr 21, 2026 • 03:45 PM', status: 'Delivered' },
-    { id: '#CM9806', user: { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?u=johnsmith' }, items: '2 items', total: 55000, address: 'Library Ave, Austin', date: 'Apr 20, 2026 • 09:20 AM', status: 'Delivered' },
-    { id: '#CM9805', user: { name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?u=emilyclark' }, items: '1 item', total: 290000, address: 'Home Blvd, Chicago', date: 'Apr 19, 2026 • 02:10 PM', status: 'Cancelled' },
-    { id: '#CM9804', user: { name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?u=michaellee' }, items: '3 items', total: 155000, address: 'Fitness Way, Miami', date: 'Apr 18, 2026 • 11:30 AM', status: 'Delivered' },
-    { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned' },
-    { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered' },
-    { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered' },
+  const [orders] = useState<AdminOrder[]>([
+    { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing', paymentStatus: 'Paid' },
+    { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing', paymentStatus: 'Pending' },
+    { id: '#CM9812', user: { name: 'Orlando Diggs', avatar: 'https://i.pravatar.cc/150?u=orlandodiggs' }, items: '1 item', total: 1200000, address: 'Washburn Baton Rouge', date: 'Apr 24, 2026 • 02:00 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9811', user: { name: 'Andi Lane', avatar: 'https://i.pravatar.cc/150?u=andilane' }, items: '4 items', total: 65000, address: 'Nest Lane Olivette', date: 'Apr 24, 2026 • 11:45 AM', status: 'Cancelled', paymentStatus: 'Failed' },
+    { id: '#CM9810', user: { name: 'Lori Daniels', avatar: 'https://i.pravatar.cc/150?u=loridaniels' }, items: '1 item', total: 32000, address: 'Pin Oak Drive, NY', date: 'Apr 23, 2026 • 05:30 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9809', user: { name: 'Rene Wells', avatar: 'https://i.pravatar.cc/150?u=renewells' }, items: '2 items', total: 210000, address: 'Broad St, Atlanta', date: 'Apr 23, 2026 • 01:15 PM', status: 'Ongoing', paymentStatus: 'Refunded' },
+    { id: '#CM9808', user: { name: 'Tom Hardy', avatar: 'https://i.pravatar.cc/150?u=tomhardy' }, items: '5 items', total: 450000, address: 'Main St, Boston', date: 'Apr 22, 2026 • 10:05 AM', status: 'Returned', paymentStatus: 'Paid' },
+    { id: '#CM9807', user: { name: 'Sarah Connor', avatar: 'https://i.pravatar.cc/150?u=sarahconnor' }, items: '1 item', total: 180000, address: 'Tech Park, Seattle', date: 'Apr 21, 2026 • 03:45 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9806', user: { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?u=johnsmith' }, items: '2 items', total: 55000, address: 'Library Ave, Austin', date: 'Apr 20, 2026 • 09:20 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9805', user: { name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?u=emilyclark' }, items: '1 item', total: 290000, address: 'Home Blvd, Chicago', date: 'Apr 19, 2026 • 02:10 PM', status: 'Cancelled', paymentStatus: 'Failed' },
+    { id: '#CM9804', user: { name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?u=michaellee' }, items: '3 items', total: 155000, address: 'Fitness Way, Miami', date: 'Apr 18, 2026 • 11:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
+    { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
   ]);
 
-  const openModal = (item: any = null) => {
+  const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
     setIsModalOpen(true);
   };
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const resolveCurrentUserId = async () => {
+      const reduxUserId = authUser?.id;
+      if (reduxUserId) {
+        setCurrentUserId(reduxUserId);
+        return;
+      }
+
+      const storedUserId = getStoredUserId();
+      if (storedUserId) {
+        setCurrentUserId(storedUserId);
+        return;
+      }
+
+      if (typeof window === 'undefined' || !localStorage.getItem('accessToken')) {
+        return;
+      }
+
+      try {
+        const response = await authApi.getProfile();
+        const profileUserId = response?.data?.user?.id || response?.data?.id;
+        if (isMounted && profileUserId) {
+          setCurrentUserId(String(profileUserId));
+        }
+      } catch {
+        if (isMounted) {
+          setCurrentUserId('');
+        }
+      }
+    };
+
+    resolveCurrentUserId();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authUser?.id]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+
+      try {
+        const response = await categoryApi.getCategories({
+          page: 1,
+          limit: 100,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        });
+        const fetchedCategories = getCategoryList(response)
+          .map(normalizeCategory)
+          .filter((category): category is ProductCategoryOption => Boolean(category));
+
+        if (isMounted) {
+          setCategories(fetchedCategories);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setProductLoadError(
+            getApiErrorMessage(error) || 'Could not load product categories.'
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCategories(false);
+        }
+      }
+    };
+
+    fetchCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const fetchProducts = async () => {
+    setIsLoadingProducts(true);
+    setProductLoadError('');
+
+    try {
+      const response = await productApi.getAllProducts({
+        page: productPage,
+        limit: PRODUCT_PAGE_LIMIT,
+        searchQuery: searchQuery || undefined,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      });
+      const fetchedProducts = getProductList(response)
+        .map(normalizeProduct)
+        .filter((product): product is AdminProduct => Boolean(product));
+      const pagination = getProductPagination(response, fetchedProducts.length);
+
+      setProducts(fetchedProducts);
+      setProductLimit(pagination.limit);
+      setProductTotal(pagination.total);
+      setProductTotalPages(pagination.totalPages);
+    } catch (error) {
+      setProducts(fallbackProducts);
+      setProductTotal(fallbackProducts.length);
+      setProductTotalPages(1);
+      setProductLoadError(
+        getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+      );
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProducts = async () => {
+      setIsLoadingProducts(true);
+      setProductLoadError('');
+
+      try {
+        const response = await productApi.getAllProducts({
+          page: productPage,
+          limit: PRODUCT_PAGE_LIMIT,
+          searchQuery: searchQuery || undefined,
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
+        });
+        const fetchedProducts = getProductList(response)
+          .map(normalizeProduct)
+          .filter((product): product is AdminProduct => Boolean(product));
+        const pagination = getProductPagination(response, fetchedProducts.length);
+
+        if (!isMounted) return;
+
+        setProducts(fetchedProducts);
+        setProductLimit(pagination.limit);
+        setProductTotal(pagination.total);
+        setProductTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setProducts(fallbackProducts);
+        setProductTotal(fallbackProducts.length);
+        setProductTotalPages(1);
+        setProductLoadError(
+          getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+        );
+      } finally {
+        if (isMounted) {
+          setIsLoadingProducts(false);
+        }
+      }
+    };
+
+    loadProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productPage, searchQuery]);
+
+  const handleSaveProduct = async (formData: ProductFormData) => {
+    if (activeTab !== 'products') return;
+
+    setIsSavingProduct(true);
+    setProductLoadError('');
+
+    try {
+      const productFormData = {
+        ...formData,
+        vendorId: formData.vendorId || currentUserId,
+      };
+
+      if (!productFormData.vendorId) {
+        const message = 'Could not determine the current user ID for vendorId. Please sign in again.';
+        setProductLoadError(message);
+        throw new Error(message);
+      }
+
+      const response = formData.id
+        ? await productApi.updateProduct(formData.id, buildProductPayload(productFormData))
+        : await productApi.createProduct(buildProductPayload(productFormData));
+      const savedProduct = normalizeProduct(response?.data);
+
+      if (savedProduct) {
+        setProducts((prev) => {
+          const existingIndex = prev.findIndex((product) => product.id === savedProduct.id);
+          if (existingIndex < 0) return [savedProduct, ...prev];
+
+          const next = [...prev];
+          next[existingIndex] = savedProduct;
+          return next;
+        });
+      } else {
+        await fetchProducts();
+      }
+    } catch (error) {
+      const message =
+        getApiErrorMessage(error) || 'Could not save product. Please check the product details and try again.';
+      setProductLoadError(message);
+      throw error;
+    } finally {
+      setIsSavingProduct(false);
+    }
+  };
+
+  const handlePublishClick = (id: string) => {
+    setProductToPublishId(id);
+    setIsImageModalOpen(true);
+  };
+
+  const handleImageComplete = async (images: File[]) => {
+    if (!productToPublishId) return;
+
+    try {
+      setIsLoadingProducts(true);
+      setProductLoadError('');
+
+      if (images.length > 0) {
+        await productApi.uploadProductImages(productToPublishId, images);
+      }
+
+      const response = await productApi.publishProduct(productToPublishId);
+      const publishedProduct = normalizeProduct(response?.data);
+
+      if (publishedProduct) {
+        setProducts(prev => prev.map(p => p.id === productToPublishId ? publishedProduct : p));
+      } else {
+        await fetchProducts();
+      }
+    } catch (error) {
+      setProductLoadError(
+        getApiErrorMessage(error) ||
+        'Could not publish product. Products need images and stock before publishing.'
+      );
+      return;
+    } finally {
+      setIsLoadingProducts(false);
+    }
+
+    setIsImageModalOpen(false);
+    setProductToPublishId(null);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    setProductLoadError('');
+
+    try {
+      await productApi.deleteProduct(id);
+      setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      setProductLoadError(
+        getApiErrorMessage(error) || 'Could not delete product. Please try again.'
+      );
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
-      
+
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="text-[#981d87] text-2xl font-bold">Faflories</div>
-          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.jpg" alt="Faflora" width={100} height={28} className="object-contain" />
+            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div 
+            <div
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm cursor-pointer border border-teal-200 shadow-sm"
             >
@@ -70,7 +759,7 @@ export default function AdminPage() {
                 <div className="absolute right-0 mt-3 w-56 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
                   <div className="px-4 py-3 border-b bg-gray-50/50">
                     <p className="text-sm font-bold text-slate-800">Admin User</p>
-                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflories.com</p>
+                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflora.com</p>
                   </div>
                   <button className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-gray-50 transition">
                     Account Settings
@@ -88,11 +777,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={(t) => { setActiveTab(t); setIsSidebarOpen(false); }} 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={(t) => { setActiveTab(t); setIsSidebarOpen(false); }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
@@ -102,7 +791,7 @@ export default function AdminPage() {
             <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
           </div>
           {activeTab !== 'orders' && (
-            <button 
+            <button
               onClick={() => openModal()}
               className="bg-[#981d87] hover:bg-[#7a176c] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
             >
@@ -113,30 +802,65 @@ export default function AdminPage() {
 
         <div className="bg-white p-4 rounded-2xl border mb-6 flex items-center gap-3 shadow-sm">
           <Search size={18} className="text-gray-400" />
-          <input 
-            type="text" 
-            placeholder={`Search across ${activeTab}...`} 
+          <input
+            type="text"
+            placeholder={`Search across ${activeTab}...`}
             className="flex-1 outline-none text-sm font-medium"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setProductPage(1);
+            }}
           />
         </div>
 
         {activeTab === 'products' && (
-          <ProductTable data={products} onEdit={openModal} onDelete={(id: any) => setProducts(products.filter(p => p.id !== id))} searchQuery={searchQuery} />
+          <div className="space-y-3">
+            {(isLoadingProducts || isSavingProduct || productLoadError) && (
+              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
+                  ? 'border-amber-200 bg-amber-50 text-amber-700'
+                  : 'border-gray-200 bg-white text-gray-500'
+                }`}>
+                {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
+              </div>
+            )}
+            <ProductTable
+              data={products}
+              onEdit={openModal}
+              onDelete={handleDeleteProduct}
+              onPublish={handlePublishClick}
+              currentPage={productPage}
+              totalPages={productTotalPages}
+              totalItems={productTotal}
+              itemsPerPage={productLimit}
+              onPageChange={setProductPage}
+              isLoading={isLoadingProducts}
+            />
+          </div>
         )}
         {activeTab === 'vendors' && (
-          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: any) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
         )}
         {activeTab === 'orders' && (
           <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
         )}
 
-        <ActionModal 
-          isOpen={isModalOpen && activeTab !== 'orders'} 
-          onClose={() => setIsModalOpen(false)} 
-          activeTab={activeTab} 
-          editingItem={editingItem} 
+        <ActionModal
+          isOpen={isModalOpen && activeTab !== 'orders'}
+          onClose={() => setIsModalOpen(false)}
+          activeTab={activeTab}
+          editingItem={activeTab === 'products' && editingItem ? editingItem as AdminProduct : undefined}
+          categories={categories}
+          isLoadingCategories={isLoadingCategories}
+          currentUserId={currentUserId}
+          onSave={handleSaveProduct}
+        />
+
+        <ImageUploadModal
+          isOpen={isImageModalOpen}
+          onClose={() => { setIsImageModalOpen(false); setProductToPublishId(null); }}
+          onComplete={handleImageComplete}
+          onSkip={() => handleImageComplete([])}
         />
 
         <OrderDetailsModal
