@@ -420,6 +420,11 @@ export interface CreateProductDto {
   compareAtPrice: number;
   costPerItem?: number;
   stock: number;
+  images?: Array<{
+    url: string;
+    alt?: string;
+    isPrimary?: boolean;
+  }>;
   color?: string;
   size?: string;
   condition?: ProductCondition;
@@ -545,7 +550,15 @@ export const categoryApi = {
     sortOrder?: 'asc' | 'desc';
   } = {}) {
     try {
-      const response = await axiosInstance.get<ApiResponse<any>>(`/categories?page=${params.page || 1}&limit=${params.limit || 20}&sortBy=${params.sortBy || 'name'}&sortOrder=${params.sortOrder || 'asc'}`);
+      const queryParams = new URLSearchParams({
+        page: String(params.page || 1),
+        limit: String(params.limit || 20),
+        sortBy: params.sortBy || 'name',
+        sortOrder: params.sortOrder || 'asc',
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/categories?${queryParams.toString()}`
+      );
       return response.data;
     } catch (error) {
       handleApiError(error);

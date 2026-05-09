@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Plus, Trash2 } from 'lucide-react';
+import { AlertCircle, X, Check, ChevronLeft, ChevronRight, Layers, DollarSign, Info, Plus, Trash2 } from 'lucide-react';
 
 export interface ProductDimensions {
   length: number;
@@ -64,6 +64,96 @@ interface ActionModalProps {
   onSave?: (data: ProductFormData) => void | Promise<void>;
 }
 
+type BackendValidationErrors =
+  | Record<string, string[] | string>
+  | Array<{ field?: string; message?: string }>;
+
+const toNonNegativeInteger = (value: unknown) => {
+  const numberValue = Math.floor(Number(value));
+  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : 0;
+};
+
+const clampDiscount = (value: unknown) => {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue) || numberValue <= 0) return 0;
+  return Math.min(99, numberValue);
+};
+
+const fieldLabels: Record<string, string> = {
+  categoryId: 'Product category',
+  name: 'Product name',
+  preview: 'Preview',
+  description: 'Description',
+  compareAtPrice: 'Original price',
+  stock: 'Stock quantity',
+  brand: 'Brand',
+  returnWindow: 'Return window',
+  returnShipping: 'Return shipping',
+  warrantyPeriod: 'Warranty period',
+  sku: 'SKU',
+  discount: 'Discount',
+  currency: 'Currency',
+  costPerItem: 'Cost per item',
+  condition: 'Condition',
+  weight: 'Weight',
+  color: 'Colour',
+  size: 'Size',
+  dimensions: 'Dimensions',
+  tags: 'Tags',
+  metadata: 'Specifications',
+  vendorId: 'Vendor account',
+};
+
+const sentenceCase = (value: string) =>
+  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+
+const humanizeField = (field?: string) => {
+  if (!field) return 'Product details';
+  const normalized = field.replace(/\[(\d+)\]/g, ' $1').split('.').pop() || field;
+  return fieldLabels[normalized] || sentenceCase(normalized.replace(/([A-Z])/g, ' $1').trim());
+};
+
+const formatSaveError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return ['Could not save this draft. Please review the product details and try again.'];
+  }
+
+  const apiError = error as {
+    message?: unknown;
+    errors?: BackendValidationErrors;
+  };
+  const messages: string[] = [];
+
+  if (Array.isArray(apiError.errors)) {
+    apiError.errors.forEach((item) => {
+      const message = item.message?.trim();
+      if (message) messages.push(`${humanizeField(item.field)}: ${message}`);
+    });
+  } else if (apiError.errors && typeof apiError.errors === 'object') {
+    Object.entries(apiError.errors).forEach(([field, value]) => {
+      const fieldMessages = Array.isArray(value) ? value : [value];
+      fieldMessages.forEach((message) => {
+        if (message) messages.push(`${humanizeField(field)}: ${message}`);
+      });
+    });
+  }
+
+  if (messages.length) return messages;
+
+  if (typeof apiError.message === 'string' && apiError.message.trim()) {
+    return [apiError.message.trim()];
+  }
+
+  return ['Could not save this draft. Please review the product details and try again.'];
+};
+
+const findCategory = (categories: ProductCategoryOption[], value: string) => {
+  const normalizedValue = value.trim().toLowerCase();
+  return categories.find((category) =>
+    category.id === value || category.name.trim().toLowerCase() === normalizedValue
+  );
+};
+
 export default function ActionModal({
   isOpen,
   onClose,
@@ -116,11 +206,20 @@ export default function ActionModal({
   const [tagInput, setTagInput] = useState('');
   const [sizeInput, setSizeInput] = useState('');
   const [colourInput, setColourInput] = useState('');
+  const [saveErrors, setSaveErrors] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const selectedCategory = findCategory(categories, formData.categoryId);
+  const selectedCategoryName = selectedCategory?.name || formData.categoryId;
+  const selectedCategoryValue = selectedCategory?.id || formData.categoryId;
+  const normalizedCategoryName = selectedCategoryName.trim().toLowerCase();
+  const isSelectedCategory = (name: string) =>
+    normalizedCategoryName === name.toLowerCase();
 
   const updateField = <Key extends keyof ProductFormData>(
     key: Key,
     value: ProductFormData[Key]
   ) => {
+    setSaveErrors([]);
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
@@ -178,6 +277,8 @@ export default function ActionModal({
       setTagInput('');
       setSizeInput('');
       setColourInput('');
+      setSaveErrors([]);
+      setIsSaving(false);
       setSeoExpanded(false);
     }
   }, [isOpen, editingItem, currentUserId]);
@@ -192,6 +293,7 @@ export default function ActionModal({
   }, [formData.compareAtPrice, discountPercent]);
 
   const updateMetadata = (key: string, value: any) => {
+    setSaveErrors([]);
     setFormData(prev => ({
       ...prev,
       metadata: { ...prev.metadata, [key]: value }
@@ -246,11 +348,9 @@ export default function ActionModal({
     updateMetadata('seoDescription', `Shop ${formData.name} on Faflora. ${formData.preview.substring(0, 100)}... Get the best deals today.`);
   };
 
-  const handleSaveAsDraft = () => {
-    saveData('draft');
-  };
-
   const saveData = async (statusOverride?: ProductFormData['status']) => {
+    if (isSaving) return;
+
     // Collect custom attributes
     const customObj: Record<string, string> = {};
     customFields.forEach(f => {
@@ -262,6 +362,7 @@ export default function ActionModal({
     const finalData = {
       ...formData,
       discount: discountPercent,
+      stock: toNonNegativeInteger(formData.stock),
       status: statusOverride || formData.status,
       metadata: {
         ...formData.metadata,
@@ -271,8 +372,17 @@ export default function ActionModal({
 
     if (!finalData.price) finalData.price = 0;
 
-    await onSave?.(finalData);
-    handleClose();
+    setSaveErrors([]);
+    setIsSaving(true);
+
+    try {
+      await onSave?.(finalData);
+      handleClose();
+    } catch (error) {
+      setSaveErrors(formatSaveError(error));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -287,6 +397,8 @@ export default function ActionModal({
 
   const handleClose = () => {
     setCurrentStep(1);
+    setSaveErrors([]);
+    setIsSaving(false);
     onClose();
   };
 
@@ -303,8 +415,43 @@ export default function ActionModal({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
+            className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
           >
+            <AnimatePresence>
+              {saveErrors.length > 0 && (
+                <motion.div
+                  role="alertdialog"
+                  aria-modal="false"
+                  initial={{ opacity: 0, y: -14, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -14, scale: 0.98 }}
+                  className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-2xl"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-600">
+                      <AlertCircle size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-red-800">Please fix these details before saving your draft.</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-4">
+                        {saveErrors.map((error, index) => (
+                          <li key={`${error}-${index}`}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSaveErrors([])}
+                      className="rounded-xl p-2 text-red-500 transition hover:bg-red-50"
+                      aria-label="Dismiss validation errors"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Header */}
             <div className="bg-[#981d87] px-5 md:px-8 py-5 md:py-6 text-white flex items-center justify-between">
               <div>
@@ -344,7 +491,6 @@ export default function ActionModal({
             </div>
 
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 md:px-8 py-6 md:py-8 space-y-6 md:space-y-8" onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as any).tagName !== 'TEXTAREA') e.preventDefault() }}>
-
               {/* STEP 1: Basic */}
               {currentStep === 1 && (
                 <div className="space-y-6">
@@ -367,7 +513,7 @@ export default function ActionModal({
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#981d87] ml-1">*</span></label>
                       <select
-                        value={formData.categoryId}
+                        value={selectedCategoryValue}
                         onChange={e => updateField('categoryId', e.target.value)}
                         className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
                         required
@@ -438,7 +584,7 @@ export default function ActionModal({
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
-                      <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                      <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
                     </div>
                   </div>
 
@@ -456,7 +602,7 @@ export default function ActionModal({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#981d87] ml-1">*</span></label>
-                      <input type="number" value={formData.stock || ''} onChange={e => updateField('stock', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                      <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                     </div>
                     <div className="flex items-center pt-2 md:pt-8">
                       <label className="flex items-center gap-3 cursor-pointer">
@@ -593,9 +739,9 @@ export default function ActionModal({
 
                   {/* Dynamic Category Specs */}
                   <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#981d87]">
-                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Category Specifications: {formData.categoryId}</h4>
+                    <h4 className="font-bold text-gray-700 mb-4 text-sm">Category Specifications: {selectedCategoryName || 'Select a category'}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      {formData.categoryId === 'Fashion' && (
+                      {isSelectedCategory('Fashion') && (
                         <>
                           <div>
                             <label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label>
@@ -611,21 +757,21 @@ export default function ActionModal({
                           </div>
                         </>
                       )}
-                      {formData.categoryId === 'Footwear' && (
+                      {isSelectedCategory('Footwear') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Shoe Size Type</label><input type="text" value={formData.metadata.shoeSize || ''} onChange={e => updateMetadata('shoeSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Closure Type</label><input type="text" value={formData.metadata.closureType || ''} onChange={e => updateMetadata('closureType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Bags' && (
+                      {isSelectedCategory('Bags') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Strap Type</label><input type="text" value={formData.metadata.strapType || ''} onChange={e => updateMetadata('strapType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Compartment Details</label><input type="text" value={formData.metadata.compartmentDetails || ''} onChange={e => updateMetadata('compartmentDetails', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Electronics' && (
+                      {isSelectedCategory('Electronics') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Screen Size</label><input type="text" value={formData.metadata.screenSize || ''} onChange={e => updateMetadata('screenSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Storage</label><input type="text" value={formData.metadata.storage || ''} onChange={e => updateMetadata('storage', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
@@ -634,7 +780,7 @@ export default function ActionModal({
                           <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Operating System</label><input type="text" value={formData.metadata.operatingSystem || ''} onChange={e => updateMetadata('operatingSystem', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Groceries' && (
+                      {isSelectedCategory('Groceries') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Pack Size</label><input type="text" value={formData.metadata.packSize || ''} onChange={e => updateMetadata('packSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Expiry Date</label><input type="date" value={formData.metadata.expiryDate || ''} onChange={e => updateMetadata('expiryDate', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
@@ -642,24 +788,24 @@ export default function ActionModal({
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Ingredients</label><input type="text" value={formData.metadata.keyIngredients || ''} onChange={e => updateMetadata('keyIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Beauty' && (
+                      {isSelectedCategory('Beauty') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Skin Type</label><input type="text" value={formData.metadata.skinType || ''} onChange={e => updateMetadata('skinType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Form</label><input type="text" value={formData.metadata.productForm || ''} onChange={e => updateMetadata('productForm', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Ingredients</label><input type="text" value={formData.metadata.keyIngredients || ''} onChange={e => updateMetadata('keyIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Wellness' && (
+                      {isSelectedCategory('Wellness') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Supplement Type</label><input type="text" value={formData.metadata.supplementType || ''} onChange={e => updateMetadata('supplementType', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Serving Size</label><input type="text" value={formData.metadata.servingSize || ''} onChange={e => updateMetadata('servingSize', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                           <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Key Active Ingredients</label><input type="text" value={formData.metadata.keyActiveIngredients || ''} onChange={e => updateMetadata('keyActiveIngredients', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Home & Jewellery' && (
+                      {isSelectedCategory('Home & Jewellery') && (
                         <div className="col-span-2"><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                       )}
-                      {formData.categoryId === 'Home Decor' && (
+                      {isSelectedCategory('Home Decor') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. Wood, Ceramic" /></div>
                           <div>
@@ -679,7 +825,7 @@ export default function ActionModal({
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Care Instructions</label><input type="text" value={formData.metadata.careInstructions || ''} onChange={e => updateMetadata('careInstructions', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Toys and Games' && (
+                      {isSelectedCategory('Toys and Games') && (
                         <>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Age Range</label><input type="text" value={formData.metadata.ageRange || ''} onChange={e => updateMetadata('ageRange', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. 3-5 years" /></div>
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Material</label><input type="text" value={formData.metadata.material || ''} onChange={e => updateMetadata('material', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" /></div>
@@ -689,7 +835,7 @@ export default function ActionModal({
                           <div><label className="text-xs font-bold text-gray-600 mb-1.5 block">Number of Players</label><input type="text" value={formData.metadata.numberOfPlayers || ''} onChange={e => updateMetadata('numberOfPlayers', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm" placeholder="e.g. 2-4 players" /></div>
                         </>
                       )}
-                      {formData.categoryId === 'Sports' && (
+                      {isSelectedCategory('Sports') && (
                         <>
                           <div>
                             <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sport Type</label>
@@ -772,17 +918,17 @@ export default function ActionModal({
               </button>
 
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full md:w-auto">
-                <button type="button" onClick={handleSaveAsDraft} className="flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 rounded-2xl font-bold transition shadow-sm">
-                  Save as Draft
+                <button type="button" onClick={handleClose} className="flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 rounded-2xl font-bold transition shadow-sm">
+                  Cancel
                 </button>
                 {currentStep < totalSteps ? (
-                  <button type="button" onClick={nextStep} className="flex items-center justify-center gap-2 px-8 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition">
+                  <button type="button" onClick={nextStep} disabled={isSaving} className="flex items-center justify-center gap-2 px-8 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] disabled:opacity-60 text-white rounded-2xl font-semibold transition">
                     Next <ChevronRight size={20} />
                   </button>
                 ) : (
-                  <button type="button" onClick={handleSubmit} className="flex items-center justify-center gap-2 px-10 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] text-white rounded-2xl font-semibold transition shadow-lg">
+                  <button type="button" onClick={handleSubmit} disabled={isSaving} className="flex items-center justify-center gap-2 px-10 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] disabled:opacity-60 text-white rounded-2xl font-semibold transition shadow-lg">
                     <Check size={20} />
-                    {editingItem ? 'Update Product' : 'Save Details'}
+                    {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Save Draft'}
                   </button>
                 )}
               </div>
