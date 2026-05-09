@@ -79,7 +79,7 @@ type ProductRecord = {
   costPerItem?: number | { amount?: number };
   sellingPrice?: number;
   originalPrice?: number;
-  category?: string | { id?: string; name?: string; title?: string };
+  category?: string | { id?: string; _id?: string; name?: string; title?: string };
   stock?: number | { quantity?: number; isInStock?: boolean };
   quantity?: number;
   image?: string;
@@ -109,9 +109,12 @@ type ProductPagination = {
 type CategoryRecord = {
   id?: string | number;
   _id?: string;
+  categoryId?: string | number;
+  uuid?: string;
   name?: string;
   title?: string;
   slug?: string;
+  displayName?: string;
 };
 
 const PRODUCT_PAGE_LIMIT = 20;
@@ -153,6 +156,8 @@ const getCategoryList = (payload: unknown): unknown[] => {
   if (isRecord(data) && Array.isArray(data.data)) return data.data;
   if (isRecord(data) && Array.isArray(data.categories)) return data.categories;
   if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (isRecord(data) && Array.isArray(data.items)) return data.items;
+  if (isRecord(data) && Array.isArray(data.results)) return data.results;
   if (Array.isArray(payload.categories)) return payload.categories;
 
   return [];
@@ -162,8 +167,8 @@ const normalizeCategory = (category: unknown): ProductCategoryOption | null => {
   if (!isRecord(category)) return null;
 
   const record = category as CategoryRecord;
-  const id = record.id || record._id;
-  const name = record.name || record.title || record.slug;
+  const id = record.id || record._id || record.categoryId || record.uuid;
+  const name = record.name || record.title || record.displayName || record.slug;
 
   if (!id || !name) return null;
 
@@ -231,14 +236,45 @@ const getCategoryName = (category: ProductRecord['category']) => {
   return category?.name || category?.title || '';
 };
 
+const getCategoryId = (record: ProductRecord) => {
+  if (record.categoryId) return record.categoryId;
+  if (isRecord(record.category) && record.category.id) return String(record.category.id);
+  if (isRecord(record.category) && record.category._id) return String(record.category._id);
+  return getCategoryName(record.category);
+};
+
 const getMoneyAmount = (value: ProductRecord['price']) => {
   if (isRecord(value)) return Number(value.amount ?? 0);
   return Number(value ?? 0);
 };
 
+const toNonNegativeInteger = (value: unknown) => {
+  const numberValue = Math.floor(Number(value));
+  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : 0;
+};
+
+const clampPercentage = (value: unknown) => {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue) || numberValue <= 0) return undefined;
+  return Math.min(99, numberValue);
+};
+
+const resolveCategoryId = (
+  categoryValue: string,
+  categoryOptions: ProductCategoryOption[]
+) => {
+  const normalizedValue = categoryValue.trim().toLowerCase();
+  const matchedCategory = categoryOptions.find((category) =>
+    category.id === categoryValue ||
+    category.name.trim().toLowerCase() === normalizedValue
+  );
+
+  return matchedCategory?.id || categoryValue;
+};
+
 const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
-  if (isRecord(stock)) return Number(stock.quantity ?? 0);
-  return Number(stock ?? quantity ?? 0);
+  if (isRecord(stock)) return toNonNegativeInteger(stock.quantity);
+  return toNonNegativeInteger(stock ?? quantity);
 };
 
 const getProductImages = (images: ProductRecord['images']) => {
@@ -282,7 +318,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
   return {
     id: String(id),
     vendorId: record.vendorId || '',
-    categoryId: record.categoryId || getCategoryName(record.category),
+    categoryId: getCategoryId(record),
     name,
     preview: record.preview || '',
     description: record.description || '',
@@ -350,7 +386,10 @@ const getApiErrorMessage = (error: unknown) => {
     .join(' ');
 };
 
-const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
+const buildProductPayload = (
+  formData: ProductFormData,
+  categoryOptions: ProductCategoryOption[]
+): CreateProductDto => {
   const customMetadata: Record<string, unknown> = {
     ...formData.metadata,
     origin: formData.origin,
@@ -368,12 +407,12 @@ const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
 
   const payload: CreateProductDto = {
     vendorId: formData.vendorId,
-    categoryId: formData.categoryId,
+    categoryId: resolveCategoryId(formData.categoryId, categoryOptions),
     name: formData.name,
     preview: formData.preview,
     description: formData.description,
-    compareAtPrice: formData.compareAtPrice,
-    stock: formData.stock,
+    compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
+    stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
   };
 
@@ -386,6 +425,13 @@ const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
   if (formData.tags.length) payload.tags = formData.tags;
   if (formData.colours[0]) payload.color = formData.colours[0];
   if (formData.sizes[0]) payload.size = formData.sizes[0];
+  if (formData.images?.length) {
+    payload.images = formData.images.map((url, index) => ({
+      url,
+      alt: `${formData.name} image ${index + 1}`,
+      isPrimary: index === 0,
+    }));
+  }
 
   const returnWindow = parseReturnWindow(formData.returnWindow);
   if (returnWindow !== undefined) payload.returnWindow = returnWindow;
@@ -409,7 +455,7 @@ const buildProductPayload = (formData: ProductFormData): CreateProductDto => {
   const costPerItem = getOptionalNumber(formData.costPerItem);
   if (costPerItem !== undefined) payload.costPerItem = costPerItem;
 
-  const discount = getOptionalNumber(formData.discount);
+  const discount = clampPercentage(formData.discount);
   if (discount !== undefined) payload.discount = discount;
 
   const weight = getOptionalNumber(formData.weight);
@@ -526,7 +572,7 @@ export default function AdminPage() {
       try {
         const response = await categoryApi.getCategories({
           page: 1,
-          limit: 100,
+          limit: 20,
           sortBy: 'name',
           sortOrder: 'asc',
         });
@@ -657,8 +703,8 @@ export default function AdminPage() {
       }
 
       const response = formData.id
-        ? await productApi.updateProduct(formData.id, buildProductPayload(productFormData))
-        : await productApi.createProduct(buildProductPayload(productFormData));
+        ? await productApi.updateProduct(formData.id, buildProductPayload(productFormData, categories))
+        : await productApi.createProduct(buildProductPayload(productFormData, categories));
       const savedProduct = normalizeProduct(response?.data);
 
       if (savedProduct) {
