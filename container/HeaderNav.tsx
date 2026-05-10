@@ -151,7 +151,7 @@ export default function Header() {
         y: 0,
         transition: { duration: 0.3, ease: 'easeInOut' },
       }}
-      className={`hidden md:block w-full bg-white border-b border-t transition-all duration-300 ease-in-out z-50 will-change-transform ${
+      className={`hidden md:block w-full bg-white border-b border-t transition-all duration-300 ease-in-out z-40 will-change-transform ${
         isFixed ? 'fixed top-0 left-0 right-0' : 'relative'
       }`}
       style={{
