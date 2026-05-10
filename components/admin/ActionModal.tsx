@@ -453,7 +453,7 @@ export default function ActionModal({
             </AnimatePresence>
 
             {/* Header */}
-            <div className="bg-[#981d87] px-5 md:px-8 py-5 md:py-6 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-5 md:px-8 py-5 md:py-6 text-white flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold">
                   {editingItem ? 'Edit Product' : 'Add New Product'}
@@ -472,19 +472,19 @@ export default function ActionModal({
                   <React.Fragment key={stepNum}>
                     <div className="flex flex-col items-center z-10 bg-white">
                       <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all
-                        ${currentStep > stepNum ? 'bg-[#981d87] border-[#981d87] text-white' : ''}
-                        ${currentStep === stepNum ? 'bg-[#981d87] border-[#981d87] text-white shadow-lg' : ''}
+                        ${currentStep > stepNum ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] border-[#c800ff] text-white' : ''}
+                        ${currentStep === stepNum ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] border-[#c800ff] text-white shadow-lg' : ''}
                         ${currentStep < stepNum ? 'bg-white border-gray-200 text-gray-400' : ''}`}
                       >
                         {currentStep > stepNum ? <Check size={22} strokeWidth={3} /> : stepNum}
                       </div>
-                      <span className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${currentStep >= stepNum ? 'text-[#981d87]' : 'text-gray-400'}`}>
+                      <span className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${currentStep >= stepNum ? 'text-[#c800ff]' : 'text-gray-400'}`}>
                         {stepNum === 1 && 'Basic'}
                         {stepNum === 2 && 'Pricing'}
                         {stepNum === 3 && 'Details'}
                       </span>
                     </div>
-                    {index < 2 && <div className={`flex-1 h-[2px] mt-5 relative -z-0 ${currentStep > stepNum ? 'bg-[#981d87]' : 'bg-gray-100'}`} />}
+                    {index < 2 && <div className={`flex-1 h-[2px] mt-5 relative -z-0 ${currentStep > stepNum ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad]' : 'bg-gray-100'}`} />}
                   </React.Fragment>
                 ))}
               </div>
@@ -495,7 +495,7 @@ export default function ActionModal({
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#981d87] rounded-lg text-white"><Layers size={22} /></div>
+                    <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Layers size={22} /></div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
                       <p className="text-xs text-gray-500">Core product details</p>
@@ -503,7 +503,7 @@ export default function ActionModal({
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#981d87] ml-1">*</span></label>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#c800ff] ml-1">*</span></label>
                     <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                   </div>
 
@@ -511,7 +511,7 @@ export default function ActionModal({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#981d87] ml-1">*</span></label>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
                       <select
                         value={selectedCategoryValue}
                         onChange={e => updateField('categoryId', e.target.value)}
@@ -536,12 +536,12 @@ export default function ActionModal({
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#981d87] ml-1">*</span></label>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
                     <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#981d87] ml-1">*</span></label>
+                    <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
                     <textarea value={formData.description} onChange={e => updateField('description', e.target.value)} rows={5} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
                   </div>
 
@@ -552,13 +552,13 @@ export default function ActionModal({
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
                         {formData.tags.map(t => (
-                          <span key={t} className="bg-[#e9d2e5] text-[#981d87] text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1">
+                          <span key={t} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1">
                             {t} <X size={12} className="cursor-pointer" onClick={() => removeTag(t)} />
                           </span>
                         ))}
-                        <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm" placeholder="Add tag..." />
+                        <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
                       </div>
                     </div>
                   </div>
@@ -570,7 +570,7 @@ export default function ActionModal({
               {currentStep === 2 && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#981d87] rounded-lg text-white"><DollarSign size={22} /></div>
+                    <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
                       <p className="text-xs text-gray-500">Set price, stock, variants and shipping metrics</p>
@@ -579,7 +579,7 @@ export default function ActionModal({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#981d87] ml-1">*</span></label>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
                       <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                     </div>
                     <div>
@@ -590,8 +590,8 @@ export default function ActionModal({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#981d87] ml-1">*</span></label>
-                      <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-bold text-[#981d87]" required />
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                      <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-bold text-[#c800ff]" required />
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
@@ -601,12 +601,12 @@ export default function ActionModal({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#981d87] ml-1">*</span></label>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
                       <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                     </div>
                     <div className="flex items-center pt-2 md:pt-8">
                       <label className="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#981d87] rounded" />
+                        <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded" />
                         <span className="font-bold text-gray-700 text-sm">In Stock</span>
                       </label>
                     </div>
@@ -623,26 +623,26 @@ export default function ActionModal({
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Colours (Press Enter to add)</label>
-                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                      <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
                         {formData.colours.map(c => (
                           <span key={c} className="bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-2">
                             {c} <X size={12} className="cursor-pointer" onClick={() => removeColour(c)} />
                           </span>
                         ))}
-                        <input type="text" value={colourInput} onChange={e => setColourInput(e.target.value)} onKeyDown={addColour} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm" placeholder="e.g. Black, White, Red..." />
+                        <input type="text" value={colourInput} onChange={e => setColourInput(e.target.value)} onKeyDown={addColour} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="e.g. Black, White, Red..." />
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <label className="text-xs font-bold text-gray-600 mb-1.5 block">Available Sizes (Press Enter to add)</label>
-                    <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                    <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
                       {formData.sizes.map(s => (
                         <span key={s} className="bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-2">
                           {s} <X size={12} className="cursor-pointer" onClick={() => removeSize(s)} />
                         </span>
                       ))}
-                      <input type="text" value={sizeInput} onChange={e => setSizeInput(e.target.value)} onKeyDown={addSize} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm" placeholder="e.g. EU 42, 256GB, XL..." />
+                      <input type="text" value={sizeInput} onChange={e => setSizeInput(e.target.value)} onKeyDown={addSize} className="bg-transparent outline-none flex-1 min-w-[120px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="e.g. EU 42, 256GB, XL..." />
                     </div>
                   </div>
 
@@ -671,7 +671,7 @@ export default function ActionModal({
               {currentStep === 3 && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#981d87] rounded-lg text-white"><Info size={22} /></div>
+                    <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
                       <p className="text-xs text-gray-500">Policies, specs, and SEO details</p>
@@ -694,7 +694,7 @@ export default function ActionModal({
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
                         <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
-                          <option value="Use Store Default">Use Store Default</option>
+                          <option value="Use Store Default">Use Faflora Store Default</option>
                           <option value="3">3 days</option>
                           <option value="7 days">7 days</option>
                           <option value="14 days">14 days</option>
@@ -704,8 +704,8 @@ export default function ActionModal({
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
                         <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3]">
-                          <option value="Use Store Default">Use Store Default</option>
-                          <option value="store">Store pays</option>
+                          <option value="Use Store Default">Use Faflora Store Default</option>
+                          <option value="store">Faflora Store pays</option>
                           <option value="vendor">Vendor pays</option>
                           <option value="customer">Customer pays</option>
                         </select>
@@ -723,7 +723,7 @@ export default function ActionModal({
                     <div className="mb-4">
                       <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
                       <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm">
-                        <option value="Use Store Default">Use Store Default</option>
+                        <option value="Use Store Default">Use Faflora Store Default</option>
                         <option value="none">None</option>
                         <option value="3 months">3 months</option>
                         <option value="6 months">6 months</option>
@@ -738,7 +738,7 @@ export default function ActionModal({
                   </div>
 
                   {/* Dynamic Category Specs */}
-                  <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#981d87]">
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
                     <h4 className="font-bold text-gray-700 mb-4 text-sm">Category Specifications: {selectedCategoryName || 'Select a category'}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                       {isSelectedCategory('Fashion') && (
@@ -876,8 +876,8 @@ export default function ActionModal({
                           </button>
                         </div>
                       ))}
-                      <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-bold text-[#981d87] flex items-center gap-1 hover:underline">
-                        <Plus size={16} /> Add Custom Field
+                      <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-bold text-[#c800ff] flex items-center gap-1 hover:underline">
+                        Add Custom Field <Plus size={16} /> 
                       </button>
                     </div>
                   </div>
@@ -922,11 +922,11 @@ export default function ActionModal({
                   Cancel
                 </button>
                 {currentStep < totalSteps ? (
-                  <button type="button" onClick={nextStep} disabled={isSaving} className="flex items-center justify-center gap-2 px-8 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] disabled:opacity-60 text-white rounded-2xl font-semibold transition">
+                  <button type="button" onClick={nextStep} disabled={isSaving} className="flex items-center justify-center gap-2 px-8 py-3 w-full sm:w-auto bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-semibold transition">
                     Next <ChevronRight size={20} />
                   </button>
                 ) : (
-                  <button type="button" onClick={handleSubmit} disabled={isSaving} className="flex items-center justify-center gap-2 px-10 py-3 w-full sm:w-auto bg-[#981d87] hover:bg-[#7a176c] disabled:opacity-60 text-white rounded-2xl font-semibold transition shadow-lg">
+                  <button type="button" onClick={handleSubmit} disabled={isSaving} className="flex items-center justify-center gap-2 px-10 py-3 w-full sm:w-auto bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-semibold transition shadow-lg">
                     <Check size={20} />
                     {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Save Draft'}
                   </button>

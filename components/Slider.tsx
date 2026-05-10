@@ -67,7 +67,7 @@ export default function Slider({
   }
 
   return (
-    <div className="w-[95%] mx-auto pb-9 md:pb-6 lg:pb-7">
+    <div className="w-full">
       <div
         className={`relative overflow-hidden rounded-lg bg-gray-100 ${styles.noSelect}`}
         onTouchStart={onTouchStart}
@@ -91,14 +91,17 @@ export default function Slider({
           ))}
         </div>
 
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+
         {/* LEFT ARROW */}
         {len > 1 && (
           <button
             onClick={prev}
             aria-label="Previous slide"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-3 rounded-full text-white"
+            className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2.5 sm:p-3.5 rounded-full text-white border border-white/30 transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
           >
-            <FiChevronLeft size={24} />
+            <FiChevronLeft size={20} strokeWidth={2.5} />
           </button>
         )}
 
@@ -107,25 +110,34 @@ export default function Slider({
           <button
             onClick={next}
             aria-label="Next slide"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-3 rounded-full text-white"
+            className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2.5 sm:p-3.5 rounded-full text-white border border-white/30 transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
           >
-            <FiChevronRight size={24} />
+            <FiChevronRight size={20} strokeWidth={2.5} />
           </button>
         )}
 
-        {/* DOTS */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {/* DOTS — pill style */}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 items-center">
           {images.map((_, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}
-              className={`w-3 h-3 rounded-full ${
-                i === index ? 'bg-white' : 'bg-white/50'
+              aria-label={`Go to slide ${i + 1}`}
+              className={`rounded-full transition-all duration-300 ${
+                i === index
+                  ? 'w-7 h-2.5 bg-white shadow-md'
+                  : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/75'
               }`}
             />
           ))}
+        </div>
+
+        {/* Slide counter */}
+        <div className="absolute top-4 right-4 sm:right-6 bg-black/30 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
+          {index + 1} / {len}
         </div>
       </div>
     </div>
   );
 }
+

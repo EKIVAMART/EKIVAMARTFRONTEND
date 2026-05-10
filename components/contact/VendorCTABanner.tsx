@@ -7,7 +7,7 @@ export default function VendorCTABanner() {
   return (
     <FadeInSection type="zoom" delay={0.15}>
       <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#981d87]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
         <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#c740b0] opacity-20 blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#ff69e0] opacity-10 blur-[60px] pointer-events-none" />
         <div

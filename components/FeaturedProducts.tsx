@@ -79,12 +79,18 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="py-8 md:py-6 lg:py-8 px-4 md:px-0">
-      <div className="max-w-7xl mx-auto">
+    <section className="w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <h2 className="text-lg font-semibold mb-6 text-black">
-          Featured Products
-        </h2>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="h-px w-6 bg-gradient-to-r from-[#c800ff] to-transparent rounded-full" />
+            <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#c800ff]/80">Picks</span>
+            <span className="h-px w-6 bg-gradient-to-l from-[#c800ff] to-transparent rounded-full" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Featured Products</h2>
+          <p className="mt-1 text-sm text-gray-500">Handpicked for you — swipe to explore</p>
+        </div>
 
         {/* Main Container */}
         <div className="flex flex-col lg:flex-row gap-0">
@@ -97,8 +103,8 @@ const FeaturedProducts = () => {
                 disabled={!canScrollLeft}
                 className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
                   canScrollLeft
-                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-100 active:scale-95 border-gray-300 cursor-pointer'
-                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#c800ff]/30 text-[#c800ff] cursor-pointer'
+                    : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
                 }`}
                 aria-label="Scroll left"
               >
@@ -152,8 +158,8 @@ const FeaturedProducts = () => {
                 disabled={!canScrollRight}
                 className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
                   canScrollRight
-                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-100 active:scale-95 border-gray-300 cursor-pointer'
-                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#c800ff]/30 text-[#c800ff] cursor-pointer'
+                    : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
                 }`}
                 aria-label="Scroll right"
               >

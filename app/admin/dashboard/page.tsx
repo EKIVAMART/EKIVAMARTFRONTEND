@@ -839,19 +839,19 @@ export default function AdminPage() {
           {activeTab !== 'orders' && (
             <button
               onClick={() => openModal()}
-              className="bg-[#981d87] hover:bg-[#7a176c] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
             >
               <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
             </button>
           )}
         </header>
 
-        <div className="bg-white p-4 rounded-2xl border mb-6 flex items-center gap-3 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
           <Search size={18} className="text-gray-400" />
           <input
             type="text"
             placeholder={`Search across ${activeTab}...`}
-            className="flex-1 outline-none text-sm font-medium"
+            className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);

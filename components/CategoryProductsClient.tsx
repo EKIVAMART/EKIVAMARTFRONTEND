@@ -70,7 +70,7 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                   <li key={c}>
                     <a
                       href={`/category/${slugC}`}
-                      className={`block w-full px-3 py-3 rounded-lg transition text-sm ${isActive ? 'bg-[#981d87] text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                      className={`block w-full px-3 py-3 rounded-lg transition text-sm ${isActive ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white' : 'text-gray-700 hover:bg-gray-50'}`}
                     >
                       <span className="capitalize">{c}</span>
                     </a>
@@ -82,8 +82,8 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
             <div className="mt-6">
               <h4 className="font-semibold text-gray-500 mb-3">Filter by price</h4>
               <div className="p-3 bg-white rounded-lg border border-gray-100">
-                <div className="text-sm text-gray-600 mb-2">From: <span className="text-[#981d87] font-semibold">{currency} {minValue}</span></div>
-                <div className="text-sm text-gray-600 mb-4">To: <span className="text-[#981d87] font-semibold">{currency} {maxValue}</span></div>
+                <div className="text-sm text-gray-600 mb-2">From: <span className="text-[#c800ff] font-semibold">{currency} {minValue}</span></div>
+                <div className="text-sm text-gray-600 mb-4">To: <span className="text-[#c800ff] font-semibold">{currency} {maxValue}</span></div>
 
                 <div className="space-y-2">
                   <input
@@ -108,12 +108,12 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
 
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      className="px-3 py-2 rounded-md bg-[#981d87] text-white text-sm"
+                      className="px-3 py-2 rounded-md bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-sm"
                       onClick={() => { setMinValue(globalMin); setMaxValue(globalMax); }}
                     >
                       Reset
                     </button>
-                    <div className="text-sm text-gray-500">Showing <span className="text-[#981d87] font-semibold">{filtered.length}</span></div>
+                    <div className="text-sm text-gray-500">Showing <span className="text-[#c800ff] font-semibold">{filtered.length}</span></div>
                   </div>
                 </div>
               </div>
@@ -123,10 +123,10 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
 
         <section className="md:col-span-3">
           <div className="flex items-center justify-between mb-4">
-            <div className="text-sm text-gray-600">We found <span className="text-[#981d87] font-semibold">{filtered.length}</span> items for you!</div>
+            <div className="text-sm text-gray-600">We found <span className="text-[#c800ff] font-semibold">{filtered.length}</span> items for you!</div>
             <div className="flex items-center gap-3">
-              <button className="text-sm text-gray-600 hover:text-[#981d87]">Filters</button>
-              <button className="text-sm text-gray-600 hover:text-[#981d87]">Sort</button>
+              <button className="text-sm text-gray-600 hover:text-[#c800ff]">Filters</button>
+              <button className="text-sm text-gray-600 hover:text-[#c800ff]">Sort</button>
             </div>
           </div>
 

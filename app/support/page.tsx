@@ -63,7 +63,7 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
       <div className="flex flex-col flex-1 px-7 py-6">
         {/* Fixed-height title area — 2 lines reserved — keeps all cards uniform */}
         <div className="h-[3.6rem] flex items-center mb-2">
-          <h3 className="text-xl font-extrabold text-[#1a0018] group-hover:text-[#981d87] transition-colors leading-tight line-clamp-2">
+          <h3 className="text-xl font-extrabold text-[#1a0018] group-hover:text-[#c800ff] transition-colors leading-tight line-clamp-2">
             {topic.title}
           </h3>
         </div>
@@ -88,7 +88,7 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
 const ContactBanner = () => (
   <FadeInSection type="zoom" delay={0.15}>
     <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#981d87]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
       <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#c740b0] opacity-20 blur-[80px] pointer-events-none" />
       <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#ff69e0] opacity-10 blur-[60px] pointer-events-none" />
       <div
@@ -138,7 +138,7 @@ const SectionHeading = ({
 }) => (
   <FadeInSection type="slideLeft" delay={delay}>
     <div className="flex items-center gap-3 mb-10">
-      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-md">
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-md">
         {icon}
       </div>
       <div>
@@ -178,7 +178,7 @@ export default function SupportHome() {
     >
 
       {/* ══ HERO — Light editorial with geometric art ══ */}
-      <section className="relative bg-white z-10">
+      <section className="relative bg-white z-0">
 
         {/* Geometric SVG art — top right — clipped individually */}
         <div
@@ -201,9 +201,9 @@ export default function SupportHome() {
             <line x1="0" y1="340" x2="520" y2="120" stroke="#e8b8e4" strokeWidth="0.3" />
             {/* Dot cluster top-right corner */}
             <circle cx="498" cy="12" r="4" fill="#c740b0" opacity="0.45" />
-            <circle cx="486" cy="24" r="2.5" fill="#981d87" opacity="0.3" />
+            <circle cx="486" cy="24" r="2.5" fill="#c800ff" opacity="0.3" />
             <circle cx="506" cy="26" r="2" fill="#c740b0" opacity="0.25" />
-            <circle cx="476" cy="14" r="2" fill="#981d87" opacity="0.2" />
+            <circle cx="476" cy="14" r="2" fill="#c800ff" opacity="0.2" />
             {/* Crosshair accent */}
             <line x1="230" y1="400" x2="274" y2="400" stroke="#c740b0" strokeWidth="0.8" opacity="0.45" />
             <line x1="252" y1="378" x2="252" y2="422" stroke="#c740b0" strokeWidth="0.8" opacity="0.45" />
@@ -231,7 +231,7 @@ export default function SupportHome() {
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.022]"
           style={{
-            backgroundImage: 'radial-gradient(circle, #981d87 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #c800ff 1px, transparent 1px)',
             backgroundSize: '28px 28px',
           }}
         />
@@ -242,7 +242,7 @@ export default function SupportHome() {
 
             {/* Eyebrow badge */}
             <FadeInSection type="fadeDown" delay={0.1}>
-              <div className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#981d87] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
+              <div className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#c800ff] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
                 <HelpCircle size={11} />
                 Faflora · Support Center
               </div>
@@ -261,7 +261,7 @@ export default function SupportHome() {
                   colorClass="text-[#c740b0]"
                 />
                 <br />
-                <span className="text-[#981d87]">
+                <span className="text-[#c800ff]">
                   <TypingText
                     text="we help"
                     delay={950}
@@ -274,7 +274,7 @@ export default function SupportHome() {
                     text=" you?"
                     delay={1430}
                     typingSpeed={60}
-                    colorClass="text-[#981d87]"
+                    colorClass="text-[#c800ff]"
                   />
                 </span>
               </h1>
@@ -283,7 +283,7 @@ export default function SupportHome() {
             {/* Rule + subtitle */}
             <FadeInSection type="fadeUp" delay={0.42}>
               <div className="mt-7 flex items-center gap-3">
-                <div className="h-[3px] w-14 rounded-full bg-gradient-to-r from-[#981d87] to-[#c740b0]" />
+                <div className="h-[3px] w-14 rounded-full bg-gradient-to-r from-[#c800ff] to-[#c740b0]" />
                 <div className="h-[3px] w-8 rounded-full bg-[#e8b8e4]" />
                 <div className="h-[3px] w-4 rounded-full bg-[#f0c8ec]" />
               </div>
@@ -310,7 +310,7 @@ export default function SupportHome() {
                 ].map(({ label, dot }) => (
                   <div
                     key={label}
-                    className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#981d87] text-xs font-semibold px-4 py-2 rounded-full"
+                    className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#c800ff] text-xs font-semibold px-4 py-2 rounded-full"
                   >
                     {dot && (
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

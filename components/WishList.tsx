@@ -38,7 +38,7 @@ export default function WishlistPage() {
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-gray-50/50">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
-          <Link href="/" className="text-[#981d87] font-medium hover:underline">
+          <Link href="/" className="text-[#c800ff] font-medium hover:underline">
             Home
           </Link>
           <ChevronRight size={14} className="text-gray-400" />
@@ -52,7 +52,7 @@ export default function WishlistPage() {
           <h1 className="text-3xl font-bold text-slate-800 mb-1">My List</h1>
           <p className="text-gray-500 font-medium">
             There are{' '}
-            <span className="text-[#981d87] font-bold">
+            <span className="text-[#c800ff] font-bold">
               {wishlistData.length}
             </span>{' '}
             products in your Wishlist
@@ -94,7 +94,7 @@ export default function WishlistPage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-[#981d87] cursor-pointer">
+                      <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-[#c800ff] cursor-pointer">
                         {item.name}
                       </h3>
                       <div className="flex items-center gap-1 mt-1">
@@ -131,7 +131,7 @@ export default function WishlistPage() {
                   <div className="col-span-2 md:col-span-1 mt-2 md:mt-0 text-center flex justify-center">
                     <button
                       onClick={() => handleAddToCart(item.id, item.name)}
-                      className="bg-[#981d87] text-white px-4 py-2 rounded-md font-semibold hover:bg-[#7a176c] transition text-sm w-full md:w-auto flex items-center justify-center gap-2"
+                      className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-4 py-2 rounded-md font-semibold hover:from-[#b500e6] hover:to-[#802699] transition text-sm w-full md:w-auto flex items-center justify-center gap-2"
                     >
                       <ShoppingCart size={16} />
                       Add to Cart
@@ -159,7 +159,7 @@ export default function WishlistPage() {
             <p className="text-gray-500 mb-4">Your wishlist is empty.</p>
             <Link
               href="/"
-              className="bg-[#981d87] text-white px-6 py-2 rounded-md font-bold hover:bg-[#7a176c] transition"
+              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-2 rounded-md font-bold hover:from-[#b500e6] hover:to-[#802699] transition"
             >
               Fill it now
             </Link>

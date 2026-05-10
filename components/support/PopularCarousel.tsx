@@ -155,9 +155,9 @@ export default function PopularCarousel() {
           <button
             onClick={() => goTo(current - 1)}
             aria-label="Previous article"
-            className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#981d87] shadow-sm transition-colors"
+            className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#c800ff] shadow-sm transition-colors"
           >
-            <ChevronLeft size={20} className="text-[#981d87]" />
+            <ChevronLeft size={20} className="text-[#c800ff]" />
           </button>
         )}
 
@@ -172,11 +172,11 @@ export default function PopularCarousel() {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-[#fdf3fc]/70 to-transparent" />
 
               {/* Icon */}
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-md mb-6">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-md mb-6">
                 {getArticleIcon(item.topicSlug)}
               </div>
 
-              <p className="text-xl md:text-2xl font-semibold text-gray-900 group-hover:text-[#981d87] transition-colors leading-snug max-w-2xl">
+              <p className="text-xl md:text-2xl font-semibold text-gray-900 group-hover:text-[#c800ff] transition-colors leading-snug max-w-2xl">
                 {item.title}
               </p>
 
@@ -198,9 +198,9 @@ export default function PopularCarousel() {
           <button
             onClick={() => goTo(current + 1)}
             aria-label="Next article"
-            className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#981d87] shadow-sm transition-colors"
+            className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#c800ff] shadow-sm transition-colors"
           >
-            <ChevronRight size={20} className="text-[#981d87]" />
+            <ChevronRight size={20} className="text-[#c800ff]" />
           </button>
         )}
 
@@ -213,7 +213,7 @@ export default function PopularCarousel() {
               aria-label={`Go to article ${i + 1}`}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'w-6 h-2.5 bg-[#981d87]'
+                  ? 'w-6 h-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad]'
                   : 'w-2.5 h-2.5 bg-[#e8b8e4] hover:bg-[#c740b0]/50'
               }`}
             />

@@ -65,7 +65,7 @@ export default function CartPage() {
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-gray-50/50">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
-          <Link href="/" className="text-[#981d87] font-medium hover:underline">
+          <Link href="/" className="text-[#c800ff] font-medium hover:underline">
             Home
           </Link>
           <ChevronRight size={14} className="text-gray-400" />
@@ -78,7 +78,7 @@ export default function CartPage() {
           <h1 className="text-3xl font-bold text-slate-800 mb-1">Your Cart</h1>
           <p className="text-gray-500 font-medium">
             There are{' '}
-            <span className="text-[#981d87] font-bold">{cartItems.length}</span>{' '}
+            <span className="text-[#c800ff] font-bold">{cartItems.length}</span>{' '}
             products in your cart
           </p>
         </section>
@@ -142,7 +142,7 @@ export default function CartPage() {
                       <div className="flex items-center border rounded-lg px-2 py-1 bg-white">
                         <button
                           onClick={() => updateQuantity(item.id, -1)}
-                          className="p-1 hover:text-[#981d87]"
+                          className="p-1 hover:text-[#c800ff]"
                         >
                           <Minus size={14} />
                         </button>
@@ -151,7 +151,7 @@ export default function CartPage() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="p-1 hover:text-[#981d87]"
+                          className="p-1 hover:text-[#c800ff]"
                         >
                           <Plus size={14} />
                         </button>
@@ -159,7 +159,7 @@ export default function CartPage() {
                     </div>
 
                     {/* Subtotal */}
-                    <div className="text-center mt-4 md:mt-0 font-bold text-[#981d87]">
+                    <div className="text-center mt-4 md:mt-0 font-bold text-[#c800ff]">
                       <span className="md:hidden text-gray-400 text-xs block">
                         Subtotal
                       </span>
@@ -197,7 +197,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span className="text-[#981d87] font-bold">Free</span>
+                  <span className="text-[#c800ff] font-bold">Free</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Estimate Tax</span>
@@ -205,13 +205,13 @@ export default function CartPage() {
                 </div>
                 <div className="border-t pt-4 flex justify-between items-center">
                   <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-bold text-[#981d87]">
+                  <span className="text-2xl font-bold text-[#c800ff]">
                     Rs: {totalAmount.toLocaleString()}
                   </span>
                 </div>
               </div>
 
-              <button className="w-full bg-[#981d87] text-white font-bold py-4 rounded-xl mt-8 hover:bg-[#7a176c] transition flex items-center justify-center gap-2">
+              <button className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-bold py-4 rounded-xl mt-8 hover:from-[#b500e6] hover:to-[#802699] transition flex items-center justify-center gap-2">
                 Proceed To Checkout
                 <ShoppingBag size={20} />
               </button>
@@ -239,7 +239,7 @@ export default function CartPage() {
             </p>
             <Link
               href="/"
-              className="bg-[#981d87] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#7a176c] transition"
+              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-8 py-3 rounded-lg font-bold hover:from-[#b500e6] hover:to-[#802699] transition"
             >
               Return To Shop
             </Link>

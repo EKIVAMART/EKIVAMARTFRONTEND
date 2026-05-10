@@ -13,7 +13,8 @@ import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
 import { ProfileModal } from '@/components/auth/ProfileModal';
 import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
-
+import { OTPVerificationModal } from '@/components/auth/OTPVerificationModal';
+import { ResetPasswordModal } from '@/components/auth/ResetPasswordModal';
 /* ---------------- LOCATION SELECTOR (Desktop) ---------------- */
 
 const nigerianStates: string[] = [
@@ -109,7 +110,7 @@ const LocationSelector = (): JSX.Element => {
         className="flex items-center justify-between gap-4 px-4 py-2.5 cursor-pointer bg-white hover:bg-gray-50 transition-all rounded-md border border-gray-300 group"
       >
         <div className="flex items-center gap-1.5 w-full">
-          <FiMapPin className="text-[#981d87] shrink-0" size={15} />
+          <FiMapPin className="text-[#c800ff] shrink-0" size={15} />
           <span className="font-medium text-gray-800 text-[15px] truncate">{selected}</span>
         </div>
         <FaAngleDown className="text-gray-600" size={15} />
@@ -150,7 +151,7 @@ const LocationSelector = (): JSX.Element => {
                   className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors duration-100 border-b border-gray-50 last:border-b-0"
                 >
                   <div className="flex items-center gap-2">
-                    {state === 'All' && <FiMapPin size={14} className="text-[#981d87]" />}
+                    {state === 'All' && <FiMapPin size={14} className="text-[#c800ff]" />}
                     <span className="font-medium">{state}</span>
                   </div>
                 </div>
@@ -174,14 +175,14 @@ const LocationSelector = (): JSX.Element => {
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: #981d87;
+          background-color: #c800ff;
           border-radius: 6px;
           border: 2px solid transparent;
           background-clip: content-box;
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background-color: #7a176c;
+          background-color: #b500e6;
           background-clip: content-box;
         }
       `}</style>
@@ -207,6 +208,10 @@ const Subnavbar = (): JSX.Element => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isOTPVerificationModalOpen, setIsOTPVerificationModalOpen] = useState(false);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetOtp, setResetOtp] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -245,7 +250,7 @@ const Subnavbar = (): JSX.Element => {
 
       {/* ===== MOBILE HEADER ===== */}
       <header
-        className={`md:hidden w-full bg-white text-black z-10 border-2 border-amber-950 transition-all duration-300 ease-in-out overflow-hidden ${showMobileHeader ? 'sticky top-0' : 'fixed -top-full'
+        className={`md:hidden w-full bg-white text-black z-50 border-2 border-amber-950 transition-all duration-300 ease-in-out overflow-hidden ${showMobileHeader ? 'sticky top-0' : 'fixed -top-full'
           }`}
       >
         <div className="px-3 py-3">
@@ -273,12 +278,12 @@ const Subnavbar = (): JSX.Element => {
                   onClick={() => setIsLoginModalOpen(true)}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition group"
                 >
-                  <FiUser size={20} className="text-gray-700 group-hover:text-[#981d87]" />
+                  <FiUser size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
                 </button>
               ) : (
                 <button
                   onClick={() => setIsProfileModalOpen(true)}
-                  className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-[#981d87] text-white flex items-center justify-center text-xs font-semibold"
+                  className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-xs font-semibold"
                 >
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
@@ -286,15 +291,15 @@ const Subnavbar = (): JSX.Element => {
               )}
 
               <Link href="/wishlist" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
-                <FiHeart size={20} className="text-gray-700 group-hover:text-[#981d87]" />
-                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
+                <FiHeart size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
                   {wishlistCount}
                 </span>
               </Link>
 
               <Link href="/cart" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
-                <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#981d87]" />
-                <span className="absolute -top-1 -right-1 bg-[#981d87] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
+                <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
                   {cartCount}
                 </span>
               </Link>
@@ -302,12 +307,12 @@ const Subnavbar = (): JSX.Element => {
           </div>
 
           {/* Search Bar - Mobile */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-transparent focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 focus-within:bg-white transition-all">
             <FiSearch size={18} className="text-gray-500" />
             <input
               type="text"
               placeholder="Search..."
-              className="flex-1 outline-none text-sm text-black bg-transparent"
+              className="flex-1 outline-none text-sm text-black bg-transparent focus:!ring-0 focus:!border-transparent"
             />
           </div>
         </div>
@@ -315,7 +320,7 @@ const Subnavbar = (): JSX.Element => {
 
       {/* ===== DESKTOP HEADER - TOP SECTION ===== */}
       <header
-        className={`hidden md:flex w-full bg-white text-black relative z-20 transition-all duration-300 ease-in-out ${isScrolled ? 'shadow-md' : 'shadow-none'
+        className={`hidden md:flex w-full bg-white text-black relative z-50 transition-all duration-300 ease-in-out ${isScrolled ? 'shadow-md' : 'shadow-none'
           }`}
       >
         <div className="mx-auto w-[95%] flex items-center justify-between gap-4 py-4">
@@ -328,14 +333,14 @@ const Subnavbar = (): JSX.Element => {
           </Link>
 
           {/* Search Bar - Takes up more space */}
-          <div className="flex w-full max-w-xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-[#fcedf9] focus-within:border-[#fcedf9]0 transition group">
+          <div className="flex w-full max-w-xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-[#c800ff]/50 focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition group">
             <input
               type="text"
               placeholder="Search for items..."
-              className="flex-1 outline-none text-sm text-black bg-transparent placeholder-gray-500"
+              className="flex-1 outline-none text-sm text-black bg-transparent placeholder-gray-500 focus:!ring-0 focus:!border-transparent"
             />
             <button className="p-1 hover:bg-gray-100 rounded-lg transition">
-              <FiSearch size={20} className="text-[#981d87]" />
+              <FiSearch size={20} className="text-[#c800ff]" />
             </button>
           </div>
 
@@ -352,15 +357,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiHeart
-                  className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#c800ff] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {wishlistCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-[#981d87] transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#c800ff] transition-colors">
                 Wishlist
               </span>
             </Link>
@@ -371,15 +376,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiShoppingCart
-                  className="w-7 h-7 text-slate-700 group-hover:text-[#981d87] transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#c800ff] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-[#981d87] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-[#981d87] transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#c800ff] transition-colors">
                 Cart
               </span>
             </Link>
@@ -392,9 +397,9 @@ const Subnavbar = (): JSX.Element => {
               >
                 <FiUser
                   size={22}
-                  className="text-gray-700 group-hover:text-[#981d87] transition"
+                  className="text-gray-700 group-hover:text-[#c800ff] transition"
                 />
-                <span className="text-sm text-gray-600 group-hover:text-[#981d87] transition whitespace-nowrap hidden lg:block">
+                <span className="text-sm text-gray-600 group-hover:text-[#c800ff] transition whitespace-nowrap hidden lg:block">
                   Account
                 </span>
               </button>
@@ -403,7 +408,7 @@ const Subnavbar = (): JSX.Element => {
                 onClick={() => setIsProfileModalOpen(true)}
                 className="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition"
               >
-                <div className="w-8 h-8 rounded-full bg-[#981d87] text-white flex items-center justify-center text-sm font-semibold">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-sm font-semibold">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </div>
@@ -431,6 +436,39 @@ const Subnavbar = (): JSX.Element => {
               onClose={() => setIsForgotPasswordModalOpen(false)}
               onSwitchToLogin={() => {
                 setIsForgotPasswordModalOpen(false);
+                setIsLoginModalOpen(true);
+              }}
+              onSuccess={(email) => {
+                setResetEmail(email);
+                setIsForgotPasswordModalOpen(false);
+                setIsOTPVerificationModalOpen(true);
+              }}
+            />
+            <OTPVerificationModal
+              isOpen={isOTPVerificationModalOpen}
+              email={resetEmail}
+              onClose={() => setIsOTPVerificationModalOpen(false)}
+              onBack={() => {
+                setIsOTPVerificationModalOpen(false);
+                setIsForgotPasswordModalOpen(true);
+              }}
+              onSuccess={(otp) => {
+                setResetOtp(otp);
+                setIsOTPVerificationModalOpen(false);
+                setIsResetPasswordModalOpen(true);
+              }}
+            />
+            <ResetPasswordModal
+              isOpen={isResetPasswordModalOpen}
+              email={resetEmail}
+              otp={resetOtp}
+              onClose={() => setIsResetPasswordModalOpen(false)}
+              onBack={() => {
+                setIsResetPasswordModalOpen(false);
+                setIsOTPVerificationModalOpen(true);
+              }}
+              onSuccess={() => {
+                setIsResetPasswordModalOpen(false);
                 setIsLoginModalOpen(true);
               }}
             />

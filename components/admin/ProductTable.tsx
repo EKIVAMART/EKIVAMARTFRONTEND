@@ -158,7 +158,7 @@ export default function ProductTable({
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
                     {p.status === 'draft' && onPublish && (
-                      <button onClick={() => onPublish(p.id)} className="px-3 py-1.5 bg-[#981d87] hover:bg-[#7a176c] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
+                      <button onClick={() => onPublish(p.id)} className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
                     )}
                     <button onClick={() => onEdit(p)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
                     <button onClick={() => onDelete(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
@@ -192,14 +192,14 @@ export default function ProductTable({
                   {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0 uppercase">{p.status.replaceAll('_', ' ')}</span>}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                  <span className="text-sm font-black text-[#981d87]">NGN {p.price.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 border-t border-gray-50 pt-3 mt-1">
               {p.status === 'draft' && onPublish && (
-                <button onClick={() => onPublish(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-[#981d87] text-white hover:bg-[#7a176c] rounded-xl transition text-xs font-bold shadow">
+                <button onClick={() => onPublish(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] rounded-xl transition text-xs font-bold shadow">
                   Publish
                 </button>
               )}

@@ -22,15 +22,15 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 selection:bg-[#981d87] selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 selection:bg-gradient-to-r from-[#c800ff] to-[#912cad] selection:text-white relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#981d87] rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px] opacity-10 pointer-events-none"></div>
 
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative z-10">
         <div className="flex justify-center mb-8">
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <ShieldCheck size={36} className="text-[#981d87]" />
+            <ShieldCheck size={36} className="text-[#c800ff]" />
           </div>
         </div>
 
@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#981d87] focus:ring-4 focus:ring-[#981d87]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="admin@faflora.com"
               />
             </div>
@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
               <label className="text-sm font-bold text-slate-700 block">Password</label>
-              <a href="#" className="text-xs font-semibold text-[#981d87] hover:text-[#7a176c] transition-colors">Forgot?</a>
+              <a href="#" className="text-xs font-semibold text-[#c800ff] hover:text-[#b500e6] transition-colors">Forgot?</a>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -71,7 +71,7 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#981d87] focus:ring-4 focus:ring-[#981d87]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="••••••••"
               />
             </div>
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#981d87] hover:bg-[#7a176c] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
+            className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
           >
             {isLoading ? (
               <Loader2 size={18} className="animate-spin" />

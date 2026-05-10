@@ -214,7 +214,7 @@ export default function ProductCard({
           position: absolute;
           top: 12px;
           right: 12px;
-          background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
+          background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
           color: white;
           border-radius: 12px;
           padding: 8px 12px;
@@ -248,8 +248,8 @@ export default function ProductCard({
           height: 40px;
           border-radius: 50%;
           background: white;
-          border: 2px solid #981d87;
-          color: #981d87;
+          border: 2px solid #c800ff;
+          color: #c800ff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -260,7 +260,7 @@ export default function ProductCard({
         }
 
         .pc-wishlist-btn:hover {
-          background: #981d87;
+          background: #c800ff;
           color: white;
           transform: scale(1.1);
         }
@@ -274,7 +274,7 @@ export default function ProductCard({
           align-items: center;
           gap: 4px;
           background: #fcedf9;
-          color: #981d87;
+          color: #c800ff;
           border: none;
           padding: 6px 14px;
           border-radius: 8px;
@@ -286,7 +286,7 @@ export default function ProductCard({
         }
 
         .pc-add-cart-btn:hover {
-          background: #981d87;
+          background: #c800ff;
           color: white;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(152, 29, 135, 0.2);
@@ -302,7 +302,7 @@ export default function ProductCard({
           bottom: 0;
           left: 0;
           right: 0;
-          background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
+          background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
           color: white;
           padding: 12px;
           display: flex;
@@ -333,7 +333,7 @@ export default function ProductCard({
 
         .pc-category {
           font-size: 11px;
-          color: #981d87;
+          color: #c800ff;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.6px;
@@ -354,7 +354,7 @@ export default function ProductCard({
         }
 
         .pc-card:hover .pc-title {
-          color: #981d87;
+          color: #c800ff;
         }
 
         /* Rating */
@@ -395,7 +395,7 @@ export default function ProductCard({
         }
 
         .pc-location-icon {
-          color: #981d87;
+          color: #c800ff;
           flex-shrink: 0;
         }
 
@@ -437,23 +437,24 @@ export default function ProductCard({
         }
 
         .pc-author {
-          color: #981d87;
+          color: #c800ff;
           font-weight: 700;
           transition: all 0.3s ease;
         }
 
         .pc-card:hover .pc-author {
-          color: #7a176c;
+          color: #b500e6;
         }
 
-        /* Price */
+        /* Price Row */
         .pc-price-row {
           display: flex;
-          align-items: baseline;
-          gap: 10px;
+          align-items: center;
+          justify-content: space-between;
+          gap: 6px;
           margin-top: auto;
-          padding-top: 0;
-          border-top: none;
+          padding-top: 4px;
+          flex-wrap: wrap;
         }
 
         .pc-price {
@@ -465,7 +466,7 @@ export default function ProductCard({
         .pc-current {
           font-size: 18px;
           font-weight: 800;
-          color: #981d87;
+          color: #c800ff;
           letter-spacing: -0.3px;
         }
 
@@ -483,52 +484,11 @@ export default function ProductCard({
           }
 
           .pc-image-wrap {
-            height: 200px;
+            height: 160px;
           }
 
           .pc-body {
-            padding: 12px;
-            gap: 6px;
-          }
-
-          .pc-title {
-            font-size: 13px;
-          }
-
-          .pc-category {
-            font-size: 10px;
-            margin-bottom: 2px;
-          }
-
-          .pc-current {
-            font-size: 15px;
-          }
-
-          .pc-original {
-            font-size: 11px;
-          }
-
-          .pc-author-section {
-            font-size: 11px;
-          }
-
-          .pc-stars {
-            gap: 3px;
-          }
-
-          .star {
-            width: 12px;
-            height: 12px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .pc-image-wrap {
-            height: 180px;
-          }
-
-          .pc-body {
-            padding: 11px;
+            padding: 10px;
             gap: 5px;
           }
 
@@ -536,8 +496,78 @@ export default function ProductCard({
             font-size: 12px;
           }
 
+          .pc-category {
+            font-size: 9px;
+            margin-bottom: 2px;
+          }
+
           .pc-current {
-            font-size: 14px;
+            font-size: 13px;
+          }
+
+          .pc-original {
+            font-size: 10px;
+          }
+
+          .pc-author-section {
+            font-size: 10px;
+          }
+
+          .pc-stars {
+            gap: 2px;
+          }
+
+          .star {
+            width: 10px;
+            height: 10px;
+          }
+
+          .pc-rating-num {
+            font-size: 10px;
+          }
+
+          .pc-location {
+            font-size: 10px;
+            padding: 2px 4px;
+          }
+
+          .pc-add-cart-btn {
+            padding: 5px 10px;
+            font-size: 11px;
+          }
+
+          .pc-wishlist-btn {
+            width: 32px;
+            height: 32px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .pc-image-wrap {
+            height: 140px;
+          }
+
+          .pc-body {
+            padding: 9px;
+            gap: 4px;
+          }
+
+          .pc-title {
+            font-size: 11px;
+          }
+
+          .pc-current {
+            font-size: 12px;
+          }
+
+          .pc-add-cart-btn {
+            padding: 4px 8px;
+            font-size: 10px;
+          }
+
+          .pc-wishlist-btn {
+            width: 28px;
+            height: 28px;
           }
         }
 

@@ -240,7 +240,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm hover:border-[#fcedf9]0 transition"
               >
                 <div className="flex items-center gap-2">
-                  <MapPin size={18} className="text-[#981d87]" />
+                  <MapPin size={18} className="text-[#c800ff]" />
                   <span className="font-semibold text-gray-700">
                     {selectedLocation}
                   </span>
@@ -285,7 +285,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             key={location}
                             onClick={() => handleLocationSelect(location)}
                             className={`w-full text-left px-4 py-3 text-sm transition ${selectedLocation === location
-                                ? 'bg-[#981d87] text-white font-semibold'
+                                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-semibold'
                                 : 'text-gray-700 hover:bg-gray-50'
                               }`}
                           >
@@ -309,7 +309,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <Link
                 href="/"
                 onClick={onClose}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-[#fcedf9] hover:text-[#981d87] transition"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-[#fcedf9] hover:text-[#c800ff] transition"
               >
                 <Home size={20} />
                 <span className="font-semibold text-sm">Home</span>
@@ -325,7 +325,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                       className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="text-gray-500 group-hover:text-[#981d87] transition">
+                        <div className="text-gray-500 group-hover:text-[#c800ff] transition">
                           {category.icon}
                         </div>
                         <span className="font-medium text-sm">
@@ -357,7 +357,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                               key={sub}
                               href={`/category/${category.name.toLowerCase()}`}
                               onClick={onClose}
-                              className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#981d87] hover:bg-white transition"
+                              className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#c800ff] hover:bg-white transition"
                             >
                               {sub}
                             </Link>
@@ -380,7 +380,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#fcedf9] hover:border-[#fcedf9] border border-gray-100 transition group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#981d87] text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
                       {user.firstName?.[0]}
                       {user.lastName?.[0]}
                     </div>
@@ -406,7 +406,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   onClick={() => {
                     onClose();
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-[#981d87] hover:bg-[#7a176c] text-white font-semibold py-2.5 rounded-lg transition"
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white font-semibold py-2.5 rounded-lg transition"
                 >
                   <User size={18} />
                   Sign In

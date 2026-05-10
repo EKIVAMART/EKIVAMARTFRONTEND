@@ -106,7 +106,7 @@ export default function SearchBar() {
       {/* Input row */}
       <div
         className={`flex items-center bg-white rounded-2xl shadow-[0_8px_40px_rgba(152,29,135,0.12)] border transition-all duration-300 overflow-hidden ${focused
-            ? 'border-[#981d87] shadow-[0_8px_40px_rgba(152,29,135,0.22)]'
+            ? 'border-[#c800ff] shadow-[0_8px_40px_rgba(152,29,135,0.22)]'
             : 'border-[#e8b8e4]'
           }`}
       >
@@ -133,7 +133,7 @@ export default function SearchBar() {
         {hasQuery && (
           <button
             onClick={() => { setQuery(''); setFocused(true); }}
-            className="flex-shrink-0 px-3 text-gray-400 hover:text-[#981d87] transition-colors"
+            className="flex-shrink-0 px-3 text-gray-400 hover:text-[#c800ff] transition-colors"
             aria-label="Clear search"
           >
             <X size={16} />
@@ -143,7 +143,7 @@ export default function SearchBar() {
         {/* Search button 
         <button
           onClick={handleSearch}
-          className="flex-shrink-0 m-2 px-4 md:px-6 py-3 bg-gradient-to-r from-[#981d87] to-[#c740b0] text-white text-sm font-extrabold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-md whitespace-nowrap"
+          className="flex-shrink-0 m-2 px-4 md:px-6 py-3 bg-gradient-to-r from-[#c800ff] to-[#c740b0] text-white text-sm font-extrabold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-md whitespace-nowrap"
         >
           <span className="hidden sm:inline">Search</span>
           <span className="sm:hidden">
@@ -168,7 +168,7 @@ export default function SearchBar() {
               </p>
               <Link
                 href="/contact-us"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#981d87] to-[#c740b0] text-white text-xs font-extrabold px-5 py-2.5 rounded-full hover:opacity-90 transition"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#c800ff] to-[#c740b0] text-white text-xs font-extrabold px-5 py-2.5 rounded-full hover:opacity-90 transition"
               >
                 Contact Support <ArrowRight size={13} />
               </Link>
@@ -182,10 +182,10 @@ export default function SearchBar() {
                     onClick={() => setFocused(false)}
                     className="flex items-center gap-4 px-5 py-4 hover:bg-[#fdf3fc] transition-colors border-b border-[#f5e8f5] last:border-b-0 group"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-sm">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-sm">
                       {getArticleIcon(item.topicSlug)}
                     </div>
-                    <p className="flex-1 text-sm text-gray-700 group-hover:text-[#981d87] transition-colors leading-snug">
+                    <p className="flex-1 text-sm text-gray-700 group-hover:text-[#c800ff] transition-colors leading-snug">
                       {item.title}
                     </p>
                     <ArrowRight

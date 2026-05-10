@@ -38,14 +38,15 @@ interface ForgotPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
+  onSuccess: (email: string) => void;
 }
 
 export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   isOpen,
   onClose,
   onSwitchToLogin,
+  onSuccess,
 }) => {
-  const [isSuccess, setIsSuccess] = useState(false);
   const [rateLimitInfo, setRateLimitInfo] = useState<{
     blocked: boolean;
     retryAfter?: number;
@@ -70,8 +71,8 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
-      setIsSuccess(true);
       toast.success('Reset link sent to your email! 📧');
+      onSuccess(data.email);
     } catch (error: unknown) {
       if (isApiError(error) && error.statusCode === 429) {
         const retryAfter = error.retryAfter || 900;
@@ -92,13 +93,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handleSwitchToLogin = () => {
     reset();
-    setIsSuccess(false);
     onSwitchToLogin();
   };
 
   const handleClose = () => {
     reset();
-    setIsSuccess(false);
     onClose();
   };
 
@@ -118,24 +117,21 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       }
     >
       <div className="flex flex-col items-center text-center mb-6 pt-2">
-        <div className="w-14 h-14 bg-[#981d87] rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
+        <div className="w-14 h-14 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
           <Mail className="w-7 h-7 text-white stroke-[2.5]" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          {isSuccess ? "Check your email" : "Reset your password"}
+          Reset your password
         </h2>
         <p className="text-sm text-gray-600">
-          {isSuccess 
-            ? "We've sent a password reset link to your email." 
-            : "Enter your email and we'll send you a reset link."}
+          Enter your email and we'll send you a reset link.
         </p>
       </div>
 
-      {!isSuccess ? (
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4"
-        >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+      >
           {rateLimitInfo.blocked && (
             <div className="flex gap-2 p-2.5 sm:p-3 bg-red-50 border border-red-200 rounded-lg sm:rounded-xl">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0 mt-0.5" />
@@ -173,19 +169,6 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             Send Reset Link
           </Button>
         </form>
-      ) : (
-        <div className="space-y-4">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="w-full"
-            onClick={handleClose}
-          >
-            Close
-          </Button>
-        </div>
-      )}
     </Modal>
   );
 };

@@ -12,7 +12,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
       {/* Blue Header */}
-      <div className="bg-[#981d87] p-8 text-center text-white">
+      <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] p-8 text-center text-white">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">Vendor Registration</h2>
         <p className="text-sm opacity-90 font-medium">
           Faflora a muilti-vendor marketplace platform that connects local vendors with customers, providing a seamless online shopping experience. Join us to expand your reach and grow your business!
@@ -33,7 +33,7 @@ export default function FormWrapper({ children, onNext, onPrev, isLastStep }: Pr
           {onNext || isLastStep ? (
             <button
               onClick={onNext}
-              className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-[#981d87] hover:bg-[#7a176c]' : 'bg-[#981d87] hover:bg-[#7a176c]'}`}
+              className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699]' : 'bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699]'}`}
             >
               {isLastStep ? "Submit Application" : "Next"}
               {isLastStep ? <Check size={18} /> : <ChevronRight size={18} />}

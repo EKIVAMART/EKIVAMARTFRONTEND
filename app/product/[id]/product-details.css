@@ -18,13 +18,13 @@
 }
 
 .pd-breadcrumb a {
-  color: #981d87;
+  color: #c800ff;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .pd-breadcrumb a:hover {
-  color: #7a176c;
+  color: #b500e6;
   text-decoration: underline;
 }
 
@@ -142,12 +142,12 @@
 }
 
 .pd-thumbnail:hover {
-  border-color: #981d87;
+  border-color: #c800ff;
   box-shadow: 0 2px 8px rgba(152, 29, 135, 0.1);
 }
 
 .pd-thumbnail.active {
-  border-color: #981d87;
+  border-color: #c800ff;
   background: #fcedf9;
   box-shadow: 0 2px 12px rgba(152, 29, 135, 0.2);
 }
@@ -232,7 +232,7 @@
 .pd-current-price {
   font-size: 32px;
   font-weight: 700;
-  color: #981d87;
+  color: #c800ff;
 }
 
 .pd-original-price {
@@ -296,15 +296,15 @@
 }
 
 .pd-size-btn:hover {
-  border-color: #981d87;
-  color: #981d87;
+  border-color: #c800ff;
+  color: #c800ff;
   box-shadow: 0 2px 8px rgba(152, 29, 135, 0.1);
 }
 
 .pd-size-btn.active {
-  background: #981d87;
+  background: #c800ff;
   color: white;
-  border-color: #981d87;
+  border-color: #c800ff;
   box-shadow: 0 4px 12px rgba(152, 29, 135, 0.3);
 }
 
@@ -356,7 +356,7 @@
 }
 
 .pd-qty-btn:hover {
-  color: #981d87;
+  color: #c800ff;
   background: #f9fafb;
 }
 
@@ -386,7 +386,7 @@
 .pd-btn-primary {
   flex: 1;
   padding: 14px 24px;
-  background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
+  background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -403,7 +403,7 @@
 }
 
 .pd-btn-primary:hover {
-  background: linear-gradient(135deg, #7a176c 0%, #166534 100%);
+  background: linear-gradient(135deg, #b500e6 0%, #166534 100%);
   box-shadow: 0 6px 20px rgba(152, 29, 135, 0.3);
   transform: translateY(-2px);
 }
@@ -477,12 +477,12 @@
 }
 
 .pd-tab-btn:hover {
-  color: #981d87;
+  color: #c800ff;
   background: #fcedf9;
 }
 
 .pd-tab-btn.active {
-  color: #981d87;
+  color: #c800ff;
 }
 
 .pd-tab-btn.active::after {
@@ -492,7 +492,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #981d87;
+  background: #c800ff;
 }
 
 .pd-tabs-content {
@@ -514,7 +514,7 @@
       rgba(152, 29, 135, 0.03) 0%,
       rgba(152, 29, 135, 0.01) 100%);
   padding: 14px 16px;
-  border-left: 4px solid #981d87;
+  border-left: 4px solid #c800ff;
   border-radius: 6px;
   transition: all 0.3s ease;
 }
@@ -524,7 +524,7 @@
       rgba(152, 29, 135, 0.08) 0%,
       rgba(152, 29, 135, 0.04) 100%);
   transform: translateX(4px);
-  border-left-color: #7a176c;
+  border-left-color: #b500e6;
 }
 
 .pd-tab-pane p:first-child {
@@ -599,7 +599,7 @@
   display: inline-block;
   width: 4px;
   height: 4px;
-  background: #981d87;
+  background: #c800ff;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -614,7 +614,7 @@
 }
 
 .pd-info-value strong {
-  color: #981d87;
+  color: #c800ff;
   font-weight: 700;
 }
 
@@ -622,7 +622,7 @@
 .pd-info-badge {
   display: inline-block;
   background: linear-gradient(135deg, #fcedf9 0%, #dcfce7 100%);
-  color: #7a176c;
+  color: #b500e6;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -736,7 +736,7 @@
 }
 
 .pd-related-item:hover {
-  border-color: #981d87;
+  border-color: #c800ff;
   box-shadow: 0 8px 24px rgba(152, 29, 135, 0.12);
   transform: translateY(-4px);
 }
@@ -771,7 +771,7 @@
 .pd-related-price {
   font-size: 15px;
   font-weight: 700;
-  color: #981d87;
+  color: #c800ff;
   padding: 8px 12px 12px 12px;
   margin: 0;
 }
@@ -1097,7 +1097,7 @@
   height: 54px;
   border-radius: 50%;
   background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  color: #981d87;
+  color: #c800ff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1159,7 +1159,7 @@
 
 .pd-vendor-card:hover .pd-vendor-chevron {
   transform: translateX(4px);
-  color: #981d87;
+  color: #c800ff;
 }
 
 .pd-vendor-footer {

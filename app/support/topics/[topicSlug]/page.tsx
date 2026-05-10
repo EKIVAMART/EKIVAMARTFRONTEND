@@ -75,11 +75,11 @@ const ArticleCard = ({
         </span>
 
         {/* Icon dot */}
-        <div className="relative flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-md shadow-[#981d8730] mb-5">
+        <div className="relative flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-md shadow-[#c800ff30] mb-5">
           <BookOpen size={16} />
         </div>
 
-        <h3 className="relative text-[17px] font-extrabold text-[#1a0018] group-hover:text-[#981d87] transition-colors leading-snug line-clamp-2 mb-3">
+        <h3 className="relative text-[17px] font-extrabold text-[#1a0018] group-hover:text-[#c800ff] transition-colors leading-snug line-clamp-2 mb-3">
           {article.title}
         </h3>
 
@@ -130,14 +130,14 @@ export default async function TopicPage({
             <line x1="0" y1="140" x2="288" y2="0" stroke="#e8b8e4" strokeWidth="0.6" />
             <line x1="0" y1="190" x2="288" y2="50" stroke="#f0c8ec" strokeWidth="0.4" />
             <circle cx="270" cy="8" r="3.5" fill="#c740b0" opacity="0.4" />
-            <circle cx="260" cy="18" r="2" fill="#981d87" opacity="0.3" />
+            <circle cx="260" cy="18" r="2" fill="#c800ff" opacity="0.3" />
           </svg>
         </div>
 
         {/* Dot grid */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.022]"
-          style={{ backgroundImage: 'radial-gradient(circle, #981d87 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+          style={{ backgroundImage: 'radial-gradient(circle, #c800ff 1px, transparent 1px)', backgroundSize: '28px 28px' }}
         />
 
         <div className="relative max-w-6xl mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-14">
@@ -145,18 +145,18 @@ export default async function TopicPage({
           {/* Breadcrumb */}
           <FadeInSection type="fadeDown" delay={0.05}>
             <nav className="flex items-center gap-2 text-xs font-semibold text-gray-400 mb-8 flex-wrap">
-              <Link href="/support" className="hover:text-[#981d87] flex items-center gap-1.5 transition-colors">
+              <Link href="/support" className="hover:text-[#c800ff] flex items-center gap-1.5 transition-colors">
                 <Home size={13} /> Support
               </Link>
               <ChevronRight size={12} className="text-gray-500" />
-              <span className="text-[#981d87]">{topic.title}</span>
+              <span className="text-[#c800ff]">{topic.title}</span>
             </nav>
           </FadeInSection>
 
           <div className="flex items-start gap-6">
             {/* Large topic icon */}
             <FadeInSection type="zoom" delay={0.1}>
-              <div className="flex-shrink-0 lg:w-16 lg:h-16 w-12 h-12 rounded-2xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-xl shadow-[#981d8740] mt-1">
+              <div className="flex-shrink-0 lg:w-16 lg:h-16 w-12 h-12 rounded-2xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-xl shadow-[#c800ff40] mt-1">
                 {icon}
               </div>
             </FadeInSection>
@@ -176,7 +176,7 @@ export default async function TopicPage({
 
               <FadeInSection type="fadeUp" delay={0.28}>
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#981d87] to-[#c740b0]" />
+                  <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#c800ff] to-[#c740b0]" />
                   <div className="h-[3px] w-6 rounded-full bg-[#e8b8e4]" />
                   <div className="h-[3px] w-3 rounded-full bg-[#f0c8ec]" />
                 </div>
@@ -186,7 +186,7 @@ export default async function TopicPage({
               </FadeInSection>
 
               <FadeInSection type="fadeUp" delay={0.38}>
-                <div className="mt-5 inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#981d87] text-xs font-bold px-4 py-2 rounded-full">
+                <div className="mt-5 inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#c800ff] text-xs font-bold px-4 py-2 rounded-full">
                   <BookOpen size={12} />
                   {topic.articles.length} article{topic.articles.length !== 1 ? 's' : ''} in this topic
                 </div>
@@ -225,7 +225,7 @@ export default async function TopicPage({
           <div className="mt-16 flex justify-center">
             <Link
               href="/support"
-              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white border border-[#e8b8e4] hover:border-[#981d87] rounded-full text-sm font-extrabold text-[#981d87] hover:bg-[#fdf3fc] transition-all shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white border border-[#e8b8e4] hover:border-[#c800ff] rounded-full text-sm font-extrabold text-[#c800ff] hover:bg-[#fdf3fc] transition-all shadow-sm hover:shadow-md"
             >
               <ArrowLeft size={16} />
               Back to All Topics
