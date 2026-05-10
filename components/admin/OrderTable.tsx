@@ -171,7 +171,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
                 <td className="p-4 text-right">
                   <button 
                     onClick={() => onViewDetails?.(order)}
-                    className="text-[#981d87] hover:bg-fuchsia-50 px-3 py-1.5 rounded-lg text-xs font-bold transition"
+                    className="text-[#c800ff] hover:bg-fuchsia-50 px-3 py-1.5 rounded-lg text-xs font-bold transition"
                   >
                     Details
                   </button>
@@ -246,7 +246,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
               <div className="pt-2 border-t border-gray-50 mt-2">
                 <button 
                   onClick={() => onViewDetails?.(order)}
-                  className="w-full text-center bg-[#981d87] text-white py-2.5 rounded-xl text-sm font-bold shadow-md shadow-fuchsia-100 hover:opacity-90 transition"
+                  className="w-full text-center bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white py-2.5 rounded-xl text-sm font-bold shadow-md shadow-fuchsia-100 hover:opacity-90 transition"
                 >
                   View Details
                 </button>

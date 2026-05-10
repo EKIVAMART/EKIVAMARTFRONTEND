@@ -50,7 +50,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
             className="bg-[#F8F9FA] w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
           >
             {/* Header */}
-            <div className="bg-[#981d87] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
+            <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="text-2xl font-bold tracking-tight">Order {order.id}</h2>
@@ -81,7 +81,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                   {/* Items List */}
                   <div className="bg-white rounded-2xl border p-6 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                      <Package size={20} className="text-[#981d87]" /> Order Items
+                      <Package size={20} className="text-[#c800ff]" /> Order Items
                     </h3>
                     <div className="space-y-4">
                       {orderItems.map((item, index) => (
@@ -107,7 +107,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">
                                   <Tag size={10} /> {item.category}
                                 </span>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-fuchsia-50 text-[#981d87] rounded text-[10px] font-bold border border-fuchsia-100">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-fuchsia-50 text-[#c800ff] rounded text-[10px] font-bold border border-fuchsia-100">
                                   <Store size={10} /> Sold by: {item.vendor}
                                 </span>
                               </div>
@@ -125,7 +125,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                   {/* Financial Summary */}
                   <div className="bg-white rounded-2xl border p-6 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                      <CreditCard size={20} className="text-[#981d87]" /> Payment Summary
+                      <CreditCard size={20} className="text-[#c800ff]" /> Payment Summary
                     </h3>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between text-gray-600 font-medium">
@@ -142,7 +142,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                       </div>
                       <div className="pt-3 mt-3 border-t flex justify-between items-center">
                         <span className="text-base font-bold text-slate-800">Grand Total</span>
-                        <span className="text-xl font-black text-[#981d87]">₦ {grandTotal.toLocaleString()}</span>
+                        <span className="text-xl font-black text-[#c800ff]">₦ {grandTotal.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -153,7 +153,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                   {/* Customer Info */}
                   <div className="bg-white rounded-2xl border p-6 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                      <User size={20} className="text-[#981d87]" /> Customer Info
+                      <User size={20} className="text-[#c800ff]" /> Customer Info
                     </h3>
                     <div className="flex items-center gap-3 mb-4">
                       <img src={order.user.avatar} alt={order.user.name} className="w-12 h-12 rounded-full object-cover bg-gray-100" />
@@ -171,7 +171,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                   {/* Shipping Address */}
                   <div className="bg-white rounded-2xl border p-6 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                      <MapPin size={20} className="text-[#981d87]" /> Shipping Address
+                      <MapPin size={20} className="text-[#c800ff]" /> Shipping Address
                     </h3>
                     <p className="text-sm text-gray-600 leading-relaxed font-medium">
                       {order.user.name}<br />
@@ -184,10 +184,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                   {/* Billing Address */}
                   <div className="bg-white rounded-2xl border p-6 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                      <CreditCard size={20} className="text-[#981d87]" /> Billing Address
+                      <CreditCard size={20} className="text-[#c800ff]" /> Billing Address
                     </h3>
                     <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                      <span className="text-xs font-bold text-[#981d87] bg-fuchsia-50 px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">Same as Shipping</span><br />
+                      <span className="text-xs font-bold text-[#c800ff] bg-fuchsia-50 px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">Same as Shipping</span><br />
                       {order.user.name}<br />
                       {order.address}<br />
                       State/Province, Zip Code<br />
@@ -207,7 +207,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order }: OrderDetai
                 <option value="Cancelled">Update Status: Cancelled</option>
                 <option value="Returned">Update Status: Returned</option>
               </select>
-              <button className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-[#981d87] hover:bg-[#7a176c] text-white rounded-xl font-bold transition shadow-md shadow-fuchsia-100 text-sm whitespace-nowrap">
+              <button className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white rounded-xl font-bold transition shadow-md shadow-fuchsia-100 text-sm whitespace-nowrap">
                 Save Changes
               </button>
             </div>

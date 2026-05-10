@@ -91,12 +91,12 @@ export default async function ArticlePage({
             <circle cx="210" cy="46" r="180" stroke="#e8b8e4" strokeWidth="0.8" />
             <line x1="0" y1="120" x2="256" y2="0" stroke="#e8b8e4" strokeWidth="0.5" />
             <circle cx="248" cy="8" r="3" fill="#c740b0" opacity="0.4" />
-            <circle cx="238" cy="18" r="1.8" fill="#981d87" opacity="0.3" />
+            <circle cx="238" cy="18" r="1.8" fill="#c800ff" opacity="0.3" />
           </svg>
         </div>
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.02]"
-          style={{ backgroundImage: 'radial-gradient(circle, #981d87 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+          style={{ backgroundImage: 'radial-gradient(circle, #c800ff 1px, transparent 1px)', backgroundSize: '28px 28px' }}
         />
 
         <div className="relative max-w-6xl mx-auto px-6 md:px-12 lg:px-16 py-8">
@@ -104,19 +104,19 @@ export default async function ArticlePage({
           {/* Breadcrumb */}
           <FadeInSection type="fadeDown" delay={0.05}>
             <nav className="flex items-center gap-2 text-xs font-semibold text-gray-400 flex-wrap">
-              <Link href="/support" className="hover:text-[#981d87] flex items-center gap-1.5 transition-colors">
+              <Link href="/support" className="hover:text-[#c800ff] flex items-center gap-1.5 transition-colors">
                 <Home size={13} /> Support
               </Link>
               <ChevronRight size={12} className="text-gray-500" />
               <Link
                 href={`/support/topics/${currentTopic.slug}`}
-                className="hover:text-[#981d87] flex items-center gap-1.5 transition-colors"
+                className="hover:text-[#c800ff] flex items-center gap-1.5 transition-colors"
               >
                 {icon}
                 {currentTopic.title}
               </Link>
               <ChevronRight size={12} className="text-gray-500" />
-              <span className="text-[#981d87] line-clamp-1 max-w-[200px]">
+              <span className="text-[#c800ff] line-clamp-1 max-w-[200px]">
                 {currentArticle.title}
               </span>
             </nav>
@@ -127,9 +127,9 @@ export default async function ArticlePage({
             <div className="mt-5">
               <Link
                 href={`/support/topics/${currentTopic.slug}`}
-                className="inline-flex items-center gap-2 text-sm font-extrabold text-[#981d87] hover:gap-3 transition-all group"
+                className="inline-flex items-center gap-2 text-sm font-extrabold text-[#c800ff] hover:gap-3 transition-all group"
               >
-                <span className="w-7 h-7 rounded-full bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#981d87] flex items-center justify-center transition-colors">
+                <span className="w-7 h-7 rounded-full bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c800ff] flex items-center justify-center transition-colors">
                   <ArrowLeft size={13} />
                 </span>
                 Back to {currentTopic.title}
@@ -162,7 +162,7 @@ export default async function ArticlePage({
                   </span>
 
                   {/* Topic pill */}
-                  <div className="relative inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#981d87] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-6">
+                  <div className="relative inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#c800ff] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-6">
                     {icon}
                     {currentTopic.title}
                   </div>
@@ -175,14 +175,14 @@ export default async function ArticlePage({
                   </h1>
 
                   <div className="flex items-center gap-3">
-                    <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#981d87] to-[#c740b0]" />
+                    <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#c800ff] to-[#c740b0]" />
                     <div className="h-[3px] w-6 rounded-full bg-[#e8b8e4]" />
                   </div>
 
                   <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
                     <Clock size={14} />
                     Last updated:{' '}
-                    <span className="font-semibold text-[#981d87]">
+                    <span className="font-semibold text-[#c800ff]">
                       {currentArticle.lastUpdated}
                     </span>
                   </div>
@@ -202,7 +202,7 @@ export default async function ArticlePage({
                         ),
                         h2: ({ ...props }) => (
                           <h2
-                            className="text-2xl font-extrabold text-[#981d87] mt-10 mb-4 leading-tight"
+                            className="text-2xl font-extrabold text-[#c800ff] mt-10 mb-4 leading-tight"
                             style={{ fontFamily: "'Georgia', serif" }}
                             {...props}
                           />
@@ -222,7 +222,7 @@ export default async function ArticlePage({
                         ),
                         li: ({ ...props }) => (
                           <li className="flex items-start gap-3 text-[16px] leading-relaxed text-gray-600">
-                            <span className="flex-shrink-0 mt-[7px] w-4 h-4 rounded-full bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center shadow-sm">
+                            <span className="flex-shrink-0 mt-[7px] w-4 h-4 rounded-full bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center shadow-sm">
                               <svg width="6" height="5" viewBox="0 0 6 5" fill="none">
                                 <path d="M1 2.5L2.2 4L5 1" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                               </svg>
@@ -231,7 +231,7 @@ export default async function ArticlePage({
                           </li>
                         ),
                         strong: ({ ...props }) => (
-                          <strong className="font-bold text-[#981d87]" {...props} />
+                          <strong className="font-bold text-[#c800ff]" {...props} />
                         ),
                         blockquote: ({ ...props }) => (
                           <blockquote
@@ -241,7 +241,7 @@ export default async function ArticlePage({
                         ),
                         a: ({ ...props }) => (
                           <a
-                            className="text-[#981d87] font-semibold underline underline-offset-2 hover:text-[#c740b0] transition-colors"
+                            className="text-[#c800ff] font-semibold underline underline-offset-2 hover:text-[#c740b0] transition-colors"
                             {...props}
                           />
                         ),
@@ -270,12 +270,12 @@ export default async function ArticlePage({
                       href={`/support/topics/${currentTopic.slug}/${prevArticle.slug}`}
                       className="group flex items-center gap-4 bg-white border border-[#e8b8e4] hover:border-[#c740b0] rounded-2xl px-6 py-5 transition-all hover:shadow-lg"
                     >
-                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c740b0] flex items-center justify-center text-[#981d87] transition-colors">
+                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c740b0] flex items-center justify-center text-[#c800ff] transition-colors">
                         <ArrowLeft size={16} />
                       </div>
                       <div className="min-w-0">
                         <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-0.5">Previous</p>
-                        <p className="text-sm font-bold text-[#1a0018] group-hover:text-[#981d87] transition-colors line-clamp-1">
+                        <p className="text-sm font-bold text-[#1a0018] group-hover:text-[#c800ff] transition-colors line-clamp-1">
                           {prevArticle.title}
                         </p>
                       </div>
@@ -289,14 +289,14 @@ export default async function ArticlePage({
                       href={`/support/topics/${currentTopic.slug}/${nextArticle.slug}`}
                       className="group flex items-center gap-4 bg-white border border-[#e8b8e4] hover:border-[#c740b0] rounded-2xl px-6 py-5 transition-all hover:shadow-lg sm:flex-row-reverse sm:text-right"
                     >
-                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c740b0] flex items-center justify-center text-[#981d87] transition-colors">
+                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] group-hover:border-[#c740b0] flex items-center justify-center text-[#c800ff] transition-colors">
                         <ArrowRight size={16} />
                       </div>
 
                       <div className="min-w-0 flex-1">
                         <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-0.5">Next</p>
                         <p
-                          className="text-sm font-bold text-[#1a0018] group-hover:text-[#981d87] transition-colors 
+                          className="text-sm font-bold text-[#1a0018] group-hover:text-[#c800ff] transition-colors 
                                     line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                           {nextArticle.title}
@@ -319,7 +319,7 @@ export default async function ArticlePage({
                   {/* Sidebar header */}
                   <div className="px-6 py-5 border-b border-[#f5e8f5] bg-gradient-to-r from-[#fdf3fc] to-white">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-sm">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-sm">
                         {icon}
                       </div>
                       <div>
@@ -338,14 +338,14 @@ export default async function ArticlePage({
                           key={article.id}
                           href={`/support/topics/${currentTopic.slug}/${article.slug}`}
                           className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13.5px] transition-all group ${isActive
-                              ? 'bg-gradient-to-r from-[#fdf3fc] to-white text-[#981d87] font-extrabold border border-[#e8b8e4]'
-                              : 'hover:bg-[#fdf8ff] text-gray-600 hover:text-[#981d87]'
+                              ? 'bg-gradient-to-r from-[#fdf3fc] to-white text-[#c800ff] font-extrabold border border-[#e8b8e4]'
+                              : 'hover:bg-[#fdf8ff] text-gray-600 hover:text-[#c800ff]'
                             }`}
                         >
                           {/* Index number */}
                           <span
                             className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black transition-colors ${isActive
-                                ? 'bg-gradient-to-br from-[#981d87] to-[#c740b0] text-white shadow-sm'
+                                ? 'bg-gradient-to-br from-[#c800ff] to-[#c740b0] text-white shadow-sm'
                                 : 'bg-[#f5e8f5] text-[#c740b0] group-hover:bg-[#fdf3fc]'
                               }`}
                           >
@@ -360,7 +360,7 @@ export default async function ArticlePage({
 
                 {/* Need more help card */}
                 <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#981d87]" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
                   <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[#c740b0] opacity-25 blur-[40px] pointer-events-none" />
                   <div className="relative px-6 py-7 text-center">
                     <p className="text-[9px] font-black uppercase tracking-[3px] text-[#f0c8ec] mb-2">Need more help?</p>
@@ -369,7 +369,7 @@ export default async function ArticlePage({
                     </p>
                     <Link
                       href="/contact-us"
-                      className="inline-flex items-center gap-1.5 bg-white text-[#981d87] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-[#f9eaf8] hover:scale-105 active:scale-95 transition-all shadow-md"
+                      className="inline-flex items-center gap-1.5 bg-white text-[#c800ff] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-[#f9eaf8] hover:scale-105 active:scale-95 transition-all shadow-md"
                     >
                       Contact Support <ArrowRight size={12} />
                     </Link>
@@ -379,9 +379,9 @@ export default async function ArticlePage({
                 {/* Back to topic link */}
                 <Link
                   href={`/support/topics/${currentTopic.slug}`}
-                  className="flex items-center gap-2.5 text-sm font-extrabold text-[#981d87] hover:gap-3.5 transition-all group px-1"
+                  className="flex items-center gap-2.5 text-sm font-extrabold text-[#c800ff] hover:gap-3.5 transition-all group px-1"
                 >
-                  <span className="w-7 h-7 rounded-full bg-white border border-[#e8b8e4] group-hover:border-[#981d87] flex items-center justify-center transition-colors">
+                  <span className="w-7 h-7 rounded-full bg-white border border-[#e8b8e4] group-hover:border-[#c800ff] flex items-center justify-center transition-colors">
                     <ArrowLeft size={13} />
                   </span>
                   All {currentTopic.title} articles

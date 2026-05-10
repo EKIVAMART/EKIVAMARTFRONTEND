@@ -23,8 +23,8 @@ export default function CategorySelector({
               onClick={() => onChange(v as Category)}
               className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
                 active
-                  ? 'bg-gradient-to-r from-[#981d87] to-[#c740b0] text-white border-transparent shadow-md shadow-[#981d8730] scale-105'
-                  : 'bg-white text-gray-500 border-[#e8b8e4] hover:border-[#c740b0]/60 hover:text-[#981d87]'
+                  ? 'bg-gradient-to-r from-[#c800ff] to-[#c740b0] text-white border-transparent shadow-md shadow-[#c800ff30] scale-105'
+                  : 'bg-white text-gray-500 border-[#e8b8e4] hover:border-[#c740b0]/60 hover:text-[#c800ff]'
               }`}
             >
               <Icon size={12} />

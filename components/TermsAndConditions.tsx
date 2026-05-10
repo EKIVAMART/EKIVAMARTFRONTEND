@@ -16,7 +16,7 @@ const PrimaryButton = ({ text, onClick }: { text: string; onClick?: () => void }
 );
 
 const SectionIcon = ({ icon }: { icon: React.ReactNode }) => (
-  <div className="flex-shrink-0 mt-1 w-11 h-11 rounded-xl bg-gradient-to-br from-[#981d87] to-[#c740b0] text-white flex items-center justify-center shadow-md shadow-[#981d8730]">
+  <div className="flex-shrink-0 mt-1 w-11 h-11 rounded-xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] text-white flex items-center justify-center shadow-md shadow-[#c800ff30]">
     {icon}
   </div>
 );
@@ -36,7 +36,7 @@ const SectionTitle = ({ subtitle, title, icon }: { subtitle: string; title: stri
 const BulletItem = ({ text }: { text: string }) => (
   <div className="flex items-start gap-3">
     <div className="flex-shrink-0 mt-[7px] w-5 h-5 rounded-full bg-[#f0c8ec] flex items-center justify-center">
-      <div className="w-2 h-2 rounded-full bg-[#981d87]" />
+      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad]" />
     </div>
     <span className="text-gray-600 text-sm md:text-base leading-relaxed">{text}</span>
   </div>
@@ -44,8 +44,8 @@ const BulletItem = ({ text }: { text: string }) => (
 
 const InfoCard = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-[#fdf3fc] to-[#f9eaf8] border border-[#e8b8e4]">
-    <p className="font-bold text-[#981d87] mb-4 flex items-center gap-2">
-      <span className="w-5 h-5 rounded-full bg-[#981d87] text-white flex items-center justify-center text-[10px]">!</span>
+    <p className="font-bold text-[#c800ff] mb-4 flex items-center gap-2">
+      <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-[10px]">!</span>
       {label}
     </p>
     {children}
@@ -54,7 +54,7 @@ const InfoCard = ({ label, children }: { label: string; children: React.ReactNod
 
 const SectionWrapper = ({ children, delay }: { children: React.ReactNode; delay: number }) => (
   <FadeInSection type="fadeUp" delay={delay}>
-    <div className="group relative pl-6 border-l-2 border-[#e8b8e4] hover:border-[#981d87] transition-colors duration-300">
+    <div className="group relative pl-6 border-l-2 border-[#e8b8e4] hover:border-[#c800ff] transition-colors duration-300">
       {children}
     </div>
   </FadeInSection>
@@ -66,7 +66,7 @@ export default function TermsAndConditions() {
 
       {/* ── HERO ── */}
       <section className="relative min-h-[80vh] md:min-h-[90vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#981d87]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
         <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#c740b0] opacity-20 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#3d0060] opacity-30 blur-[100px] pointer-events-none" />
         <div className="absolute top-[30%] right-[15%] w-[28vw] h-[28vw] rounded-full bg-[#ff69e0] opacity-10 blur-[80px] pointer-events-none" />
@@ -120,11 +120,11 @@ export default function TermsAndConditions() {
         {/* Intro */}
         <FadeInSection type="fadeUp" delay={0.2} className="pt-12">
           <div className="relative p-8 rounded-2xl bg-gradient-to-br from-[#f9eaf8] to-white border border-[#e8b8e4] shadow-sm">
-            <div className="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center shadow-md">
+            <div className="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center shadow-md">
               <Shield size={14} className="text-white" />
             </div>
             <p className="text-lg text-gray-700 leading-relaxed">
-              <span className="font-bold text-[#981d87]">Faflora</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, Faflora eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, Faflora provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
+              <span className="font-bold text-[#c800ff]">Faflora</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, Faflora eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, Faflora provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
             </p>
             <p className="mt-5 text-gray-600 leading-relaxed">
               We handle the heavy lifting so you can focus on what matters most: sourcing quality products, delighting customers, and scaling your brand. Our platform supports seamless shopping experiences with features like easy search, secure transactions, fast nationwide delivery partnerships, and innovative options such as partial or installment payments — allowing customers to buy now and pay later without stress. This flexibility boosts conversion rates and helps vendors move more inventory, especially for higher-value items like clothing, accessories, electronics, home goods, and more.
@@ -259,7 +259,7 @@ export default function TermsAndConditions() {
           <FadeInSection type="fadeUp" delay={0.7} className="pt-16">
             <div className="relative overflow-hidden rounded-[28px] w-full">
               {/* Backgrounds */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#1e0020] via-[#5a0a5a] to-[#981d87]" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1e0020] via-[#5a0a5a] to-[#c800ff]" />
               <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 40px)' }} />
               <div className="absolute top-[-40%] left-[-10%] w-[55%] h-[200%] rounded-full bg-[#c740b0] opacity-18 blur-[90px] pointer-events-none" />
               <div className="absolute bottom-[-40%] right-[-5%] w-[40%] h-[180%] rounded-full bg-[#3d0060] opacity-28 blur-[80px] pointer-events-none" />

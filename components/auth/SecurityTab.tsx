@@ -82,12 +82,12 @@ export const SecurityTab: React.FC = () => {
         {/* Success Message */}
         {success && (
           <div className="flex items-center gap-3 p-4 bg-[#fcedf9] border border-[#fcedf9] rounded-xl">
-            <CheckCircle2 className="w-5 h-5 text-[#981d87]" />
+            <CheckCircle2 className="w-5 h-5 text-[#c800ff]" />
             <div>
-              <p className="text-sm font-medium text-[#7a176c]">
+              <p className="text-sm font-medium text-[#b500e6]">
                 Password changed successfully!
               </p>
-              <p className="text-xs text-[#981d87] mt-0.5">
+              <p className="text-xs text-[#c800ff] mt-0.5">
                 All other sessions have been logged out for security
               </p>
             </div>

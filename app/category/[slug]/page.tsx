@@ -112,7 +112,7 @@ export default function CategoryPage() {
     <main className="py-8 sm:py-6">
       <div className="mx-auto w-[90%]">
         <div className="rounded-2xl bg-[#fcedf9] p-5 sm:p-5 mb-5 shadow-sm">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#7a176c] capitalize">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#b500e6] capitalize">
             {active}
           </h1>
           <div className="mt-2 text-sm text-gray-800 flex items-center gap-2">
@@ -161,16 +161,16 @@ export default function CategoryPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-gray-600">
                 We found{' '}
-                <span className="text-[#981d87] font-semibold">
+                <span className="text-[#c800ff] font-semibold">
                   {products.length}
                 </span>{' '}
                 items for you!
               </div>
               <div className="flex items-center gap-3">
-                <button className="text-sm text-gray-600 hover:text-[#981d87]">
+                <button className="text-sm text-gray-600 hover:text-[#c800ff]">
                   Filters
                 </button>
-                <button className="text-sm text-gray-600 hover:text-[#981d87]">
+                <button className="text-sm text-gray-600 hover:text-[#c800ff]">
                   Sort
                 </button>
               </div>

@@ -21,7 +21,7 @@ const FAQItem = ({ q, a, index }: { q: string; a: string; index: number }) => {
         >
           <span
             className={`font-bold text-[14px] sm:text-[15px] leading-snug transition-colors pr-4 ${
-              open ? 'text-[#981d87]' : 'text-[#1a0018] group-hover:text-[#981d87]'
+              open ? 'text-[#c800ff]' : 'text-[#1a0018] group-hover:text-[#c800ff]'
             }`}
           >
             {q}
@@ -48,7 +48,7 @@ export default function FAQSection() {
       <div>
         <FadeInSection type="slideLeft" delay={0.1}>
           <div className="flex items-center gap-3 mb-10">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#981d87] to-[#c740b0] flex items-center justify-center text-white shadow-md">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#c800ff] to-[#c740b0] flex items-center justify-center text-white shadow-md">
               <LifeBuoy size={17} />
             </div>
             <div>
@@ -72,7 +72,7 @@ export default function FAQSection() {
         <FadeInSection type="fadeUp" delay={0.45}>
           <p className="mt-8 text-gray-400 text-sm">
             Still have questions?{' '}
-            <Link href="/support" className="text-[#981d87] font-bold hover:underline">
+            <Link href="/support" className="text-[#c800ff] font-bold hover:underline">
               Browse our full support centre →
             </Link>
           </p>
@@ -97,7 +97,7 @@ export default function FAQSection() {
                 <Link
                   key={label}
                   href={href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#fdf3fc] transition-colors group text-[13px] sm:text-[13.5px] text-gray-600 hover:text-[#981d87] font-medium"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#fdf3fc] transition-colors group text-[13px] sm:text-[13.5px] text-gray-600 hover:text-[#c800ff] font-medium"
                 >
                   <Icon size={14} className="text-[#c740b0]/60 group-hover:text-[#c740b0] transition-colors flex-shrink-0" />
                   {label}

@@ -17,20 +17,14 @@ type Category = {
 };
 
 const categories: Category[] = [
-  { name: 'Fashion', icon: fashion, bg: 'bg-white', slug: 'fashion' },
-  {
-    name: 'Electronics',
-    icon: electronics,
-    bg: 'bg-orange-50',
-    slug: 'electronics',
-  },
+  { name: 'Fashion', icon: fashion, bg: 'bg-fuchsia-50', slug: 'fashion' },
+  { name: 'Electronics', icon: electronics, bg: 'bg-orange-50', slug: 'electronics' },
   { name: 'Bags', icon: bags, bg: 'bg-pink-50', slug: 'bags' },
   { name: 'Footwear', icon: footwear, bg: 'bg-blue-50', slug: 'footwear' },
   { name: 'Groceries', icon: groceries, bg: 'bg-purple-50', slug: 'groceries' },
   { name: 'Beauty', icon: beauty, bg: 'bg-teal-50', slug: 'beauty' },
   { name: 'Wellness', icon: wellness, bg: 'bg-violet-50', slug: 'wellness' },
   { name: 'Jewellery', icon: jewellery, bg: 'bg-[#fcedf9]', slug: 'jewellery' },
-  // Additional categories
   { name: 'Sports', icon: footwear, bg: 'bg-green-50', slug: 'sports' },
   { name: 'Home', icon: electronics, bg: 'bg-yellow-50', slug: 'home' },
   { name: 'Toys', icon: bags, bg: 'bg-red-50', slug: 'toys' },
@@ -39,95 +33,70 @@ const categories: Category[] = [
   { name: 'Pets', icon: groceries, bg: 'bg-rose-50', slug: 'pets' },
 ];
 
+const CategoryCard = ({ category }: { category: Category }) => (
+  <Link
+    href={`/category/${category.slug}`}
+    className="group flex-shrink-0 flex flex-col items-center text-center cursor-pointer"
+  >
+    <div
+      className={`
+        w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-full flex items-center justify-center
+        ${category.bg}
+        transition-all duration-300 ease-out
+        group-hover:scale-110
+        group-hover:shadow-xl
+        group-hover:ring-4
+        group-hover:ring-[#c800ff]/25
+      `}
+    >
+      <Image
+        src={category.icon}
+        alt={category.name}
+        width={48}
+        height={42}
+        className="transition-transform duration-300 group-hover:scale-110 object-contain"
+      />
+    </div>
+    <p className="mt-3 text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-[#c800ff] transition-colors duration-300 whitespace-nowrap">
+      {category.name}
+    </p>
+  </Link>
+);
+
 const FeaturedCategories = () => {
   return (
-    <section className="mx-auto py-8 md:py-6 lg:py-8 overflow-hidden">
-      <h2 className="text-lg font-semibold mb-6 text-black w-[95%] mx-auto">
-        Featured Categories
-      </h2>
+    <section className="overflow-hidden w-full bg-gradient-to-r from-[#fdf4ff] via-[#f5eeff] to-[#fdf4ff] py-8 border-y border-[#e8d5f5]">
+      {/* Section Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="h-px w-8 bg-gradient-to-r from-[#c800ff] to-transparent rounded-full" />
+          <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#c800ff]/80">Browse</span>
+          <span className="h-px w-8 bg-gradient-to-l from-[#c800ff] to-transparent rounded-full" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">
+          Featured Categories
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">Browse our wide range of product categories</p>
+      </div>
 
-      <div className="relative flex overflow-hidden pt-4 pb-4">
+      {/* Marquee */}
+      <div className="relative flex overflow-hidden py-3">
+        {/* Fade edges — match section bg */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-[#fdf4ff] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-[#f5f0ff] to-transparent z-10 pointer-events-none" />
+
         <div className="flex animate-marquee hover:[animation-play-state:paused]">
           {/* First loop */}
-          <div className="flex flex-nowrap gap-8 sm:gap-14 px-4 sm:px-7 min-w-max">
+          <div className="flex flex-nowrap gap-8 sm:gap-12 px-4 sm:px-8 min-w-max">
             {categories.map((category, index) => (
-              <Link
-                key={`${category.name}-${index}`}
-                href={`/category/${category.slug}`}
-                className="group flex-shrink-0 flex flex-col items-center text-center cursor-pointer transition-transform duration-300 hover:-translate-y-2"
-              >
-            <div
-              className={`
-                w-20 h-20 rounded-full flex items-center justify-center 
-                ${category.bg}
-                transition-all duration-300 ease-out
-                group-hover:scale-110
-                group-hover:shadow-lg
-                group-hover:ring-4
-                group-hover:ring-black/10
-              `}
-            >
-              <Image
-                src={category.icon}
-                alt={category.name}
-                width={60}
-                height={50}
-                className="transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-
-            <p
-              className="
-                mt-3 text-sm font-semibold text-black
-                transition-colors duration-300
-                group-hover:text-gray-900
-              "
-            >
-              {category.name}
-            </p>
-          </Link>
-        ))}
+              <CategoryCard key={`a-${category.name}-${index}`} category={category} />
+            ))}
           </div>
-
-          {/* Second loop (duplicate for infinite scroll) */}
-          <div className="flex flex-nowrap gap-8 sm:gap-14 px-4 sm:px-7 min-w-max" aria-hidden="true">
+          {/* Second loop for seamless infinite scroll */}
+          <div className="flex flex-nowrap gap-8 sm:gap-12 px-4 sm:px-8 min-w-max" aria-hidden="true">
             {categories.map((category, index) => (
-              <Link
-                key={`second-${category.name}-${index}`}
-                href={`/category/${category.slug}`}
-                className="group flex-shrink-0 flex flex-col items-center text-center cursor-pointer transition-transform duration-300 hover:-translate-y-2"
-              >
-            <div
-              className={`
-                w-20 h-20 rounded-full flex items-center justify-center 
-                ${category.bg}
-                transition-all duration-300 ease-out
-                group-hover:scale-110
-                group-hover:shadow-lg
-                group-hover:ring-4
-                group-hover:ring-black/10
-              `}
-            >
-              <Image
-                src={category.icon}
-                alt={category.name}
-                width={60}
-                height={50}
-                className="transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-
-            <p
-              className="
-                mt-3 text-sm font-semibold text-black
-                transition-colors duration-300
-                group-hover:text-gray-900
-              "
-            >
-              {category.name}
-            </p>
-          </Link>
-        ))}
+              <CategoryCard key={`b-${category.name}-${index}`} category={category} />
+            ))}
           </div>
         </div>
       </div>

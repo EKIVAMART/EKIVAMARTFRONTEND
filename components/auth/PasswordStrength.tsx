@@ -42,8 +42,8 @@ export const PasswordStrength: React.FC<PasswordStrengthProps> = ({
       };
     return {
       label: 'Strong',
-      color: 'text-[#981d87]',
-      bgColor: 'bg-[#fcedf9]0',
+      color: 'text-green-600',
+      bgColor: 'bg-green-500',
     };
   };
 
@@ -97,7 +97,7 @@ export const PasswordStrength: React.FC<PasswordStrengthProps> = ({
           >
             <div
               className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
-                req.met ? 'bg-[#fcedf9]0' : 'bg-gray-300'
+                req.met ? 'bg-green-500' : 'bg-gray-300'
               }`}
             >
               {req.met ? (
@@ -108,7 +108,7 @@ export const PasswordStrength: React.FC<PasswordStrengthProps> = ({
             </div>
             <span
               className={`text-xs ${
-                req.met ? 'text-[#7a176c] font-medium' : 'text-gray-600'
+                req.met ? 'text-green-600 font-medium' : 'text-gray-600'
               }`}
             >
               {req.label}

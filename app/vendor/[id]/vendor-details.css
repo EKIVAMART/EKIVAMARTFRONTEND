@@ -97,7 +97,7 @@
   height: 120px;
   border-radius: 50%;
   background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  color: #981d87;
+  color: #c800ff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #981d87 0%, #7a176c 100%);
+  background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
   color: white;
   padding: 0.75rem 2.5rem;
   border-radius: 0.75rem;
@@ -395,7 +395,7 @@
 
 .vp-add-to-cart-btn {
   width: 100%;
-  background-color: #981d87;
+  background-color: #c800ff;
   color: white;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -580,8 +580,8 @@
 
 .vp-review-add-btn:hover {
   background-color: #f1f5f9;
-  color: #981d87;
-  border-color: #981d87;
+  color: #c800ff;
+  border-color: #c800ff;
 }
 
 /* Categories Tab */
@@ -619,7 +619,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #981d87;
+  color: #c800ff;
 }
 
 .vp-category-info h3 {
