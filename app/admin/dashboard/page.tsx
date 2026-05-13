@@ -6,6 +6,7 @@ import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
 } from '@/components/admin/ActionModal';
+import CategoriesModal from '@/components/admin/CategoriesModal';
 import ImageUploadModal from '@/components/admin/ImageUploadModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
@@ -480,6 +481,7 @@ export default function AdminPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [productToPublishId, setProductToPublishId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
@@ -837,12 +839,22 @@ export default function AdminPage() {
             <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
           </div>
           {activeTab !== 'orders' && (
-            <button
-              onClick={() => openModal()}
-              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
-            >
-              <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
-            </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              {activeTab === 'products' && (
+                <button
+                  onClick={() => setIsCategoriesModalOpen(true)}
+                  className="bg-white text-[#912cad] border border-[#c800ff]/30 hover:border-[#c800ff] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                >
+                  All Categories
+                </button>
+              )}
+              <button
+                onClick={() => openModal()}
+                className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+              >
+                <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
+              </button>
+            </div>
           )}
         </header>
 
@@ -900,6 +912,13 @@ export default function AdminPage() {
           isLoadingCategories={isLoadingCategories}
           currentUserId={currentUserId}
           onSave={handleSaveProduct}
+        />
+
+        <CategoriesModal
+          isOpen={isCategoriesModalOpen}
+          onClose={() => {
+            setIsCategoriesModalOpen(false);
+          }}
         />
 
         <ImageUploadModal

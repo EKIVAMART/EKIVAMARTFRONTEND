@@ -544,7 +544,7 @@ export const productApi = {
 
 export const categoryApi = {
   async getCategories(params: {
-    page?: number; 
+    page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
@@ -552,7 +552,7 @@ export const categoryApi = {
     try {
       const queryParams = new URLSearchParams({
         page: String(params.page || 1),
-        limit: String(params.limit || 20),
+        limit: String(params.limit || 100),
         sortBy: params.sortBy || 'name',
         sortOrder: params.sortOrder || 'asc',
       });
@@ -563,6 +563,106 @@ export const categoryApi = {
     } catch (error) {
       handleApiError(error);
     }
-  }
+  },
 
+  async getCategoryById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async createCategory(data: { name: string; description?: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/categories', data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateCategory(id: string, data: { name?: string; description?: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/categories/${id}`, data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteCategory(id: string) {
+    try {
+      await axiosInstance.delete(`/categories/${id}`);
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async publishCategory(id: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/categories/${id}/publish`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async uploadCategoryImage(id: string, file: File) {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/categories/${id}/image`,
+        formData
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getSubcategories(categoryId: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/categories/${categoryId}/subcategories`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async createSubcategory(categoryId: string, data: { name: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/categories/${categoryId}/subcategories`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateSubcategory(categoryId: string, subId: string, data: { name: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/categories/${categoryId}/subcategories/${subId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteSubcategory(categoryId: string, subId: string) {
+    try {
+      await axiosInstance.delete(`/categories/${categoryId}/subcategories/${subId}`);
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 }
