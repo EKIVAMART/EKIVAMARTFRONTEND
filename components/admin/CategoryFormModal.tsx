@@ -13,10 +13,6 @@ interface CategoryFormModalProps {
   onSuccess: () => void;
 }
 
-interface CategoryData {
-  isActive?: boolean;
-  imageUrl?: string;
-}
 
 export default function CategoryFormModal({ isOpen, onClose, editingCategory, onSuccess }: CategoryFormModalProps) {
   const [name, setName] = useState('');
@@ -41,7 +37,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
         setImagePreview(editingCategory.image || '');
         setCurrentImageUrl(editingCategory.image || '');
         setImageFile(null);
-        setIsPublished((editingCategory as CategoryData).isActive || false);
+        setIsPublished(editingCategory.isActive || false);
       } else {
         setName('');
         setDescription('');
@@ -129,8 +125,11 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             editingCategory.id, 
             imageFile
           );
-          setCurrentImageUrl(uploadResponse.data.imageUrl);
-          setImagePreview(uploadResponse.data.imageUrl);
+          const newImageUrl = uploadResponse?.data?.imageUrl;
+          if (newImageUrl) {
+            setCurrentImageUrl(newImageUrl);
+            setImagePreview(newImageUrl);
+          }
           setImageFile(null);
           setSuccessMessage('Category saved and image uploaded successfully');
         } else {
@@ -144,13 +143,17 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
         });
 
         // Upload image if provided
-        if (imageFile) {
+        const newCategoryId = createResponse?.data?.id;
+        if (imageFile && newCategoryId) {
           const uploadResponse = await categoryApi.uploadCategoryImage(
-            createResponse.data.id, 
+            newCategoryId, 
             imageFile
           );
-          setCurrentImageUrl(uploadResponse.data.imageUrl);
-          setImagePreview(uploadResponse.data.imageUrl);
+          const newImageUrl = uploadResponse?.data?.imageUrl;
+          if (newImageUrl) {
+            setCurrentImageUrl(newImageUrl);
+            setImagePreview(newImageUrl);
+          }
           setSuccessMessage('Category created and image uploaded successfully');
         } else {
           setSuccessMessage('Category created successfully (image required to publish)');

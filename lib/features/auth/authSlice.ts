@@ -8,7 +8,13 @@ interface User {
   profilePicture?: string;
   role: string;
   isEmailVerified: boolean;
+  isTwoFactorEnabled?: boolean;
+  phoneNumber?: string;
+  lastLoginAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
 
 interface AuthState {
   user: User | null;
@@ -22,7 +28,8 @@ const initialState: AuthState = {
   user: null,
   accessToken: typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
   refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null,
-  isAuthenticated: false,
+  // If a token exists in localStorage, treat the session as authenticated until verified or expired
+  isAuthenticated: typeof window !== 'undefined' ? !!localStorage.getItem('accessToken') : false,
   loading: true,
 };
 

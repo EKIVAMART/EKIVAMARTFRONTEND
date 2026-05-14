@@ -1,31 +1,102 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { authApi, ApiError } from '@/lib/api';
+import { setCredentials } from '@/lib/features/auth/authSlice';
+import { useAppDispatch } from '@/lib/hooks';
+
+const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'];
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    // Simulate API call and login
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Step 1: Login to get tokens + user info
+      // Backend returns: { success, data: { accessToken, refreshToken, id, email, role, firstName, ... } }
+      const res = await authApi.login({ email, password });
+      const payload = res?.data ?? res;
+
+      const accessToken: string =
+        payload?.accessToken ?? payload?.tokens?.accessToken ?? payload?.token ?? '';
+      const refreshToken: string =
+        payload?.refreshToken ?? payload?.tokens?.refreshToken ?? '';
+
+      if (!accessToken) {
+        setError('Login failed — no access token returned. Please try again.');
+        return;
+      }
+
+      // Step 2: Save token to localStorage immediately so /auth/me can use it
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('accessToken', accessToken);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      }
+
+      // Step 3: Fetch full profile from /auth/me — role and all fields are directly in data
+      // GET /auth/me → { success, data: { id, email, role, firstName, lastName, avatar, ... } }
+      const profileRes = await authApi.getProfile();
+      const profile = profileRes?.data ?? profileRes;
+
+      const role: string = profile?.role ?? payload?.role ?? '';
+
+      // Role check — only admin / super_admin can access the panel
+      if (!ADMIN_ROLES.includes(role)) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setError('Access denied. This portal is restricted to administrators only.');
+        return;
+      }
+
+      // Step 4: Persist full profile to Redux (also syncs localStorage)
+      dispatch(setCredentials({
+        user: {
+          id: profile?.id ?? payload?.id ?? '',
+          email: profile?.email ?? email,
+          firstName: profile?.firstName ?? payload?.firstName ?? '',
+          lastName: profile?.lastName ?? payload?.lastName ?? '',
+          profilePicture: profile?.avatar ?? undefined,
+          role,
+          isEmailVerified: profile?.isEmailVerified ?? payload?.isEmailVerified ?? true,
+        },
+        accessToken,
+        refreshToken,
+      }));
+
       router.push('/admin/dashboard');
-    }, 1500);
+
+    } catch (err) {
+      const apiError = err as ApiError;
+      if (apiError.statusCode === 401) {
+        setError('Invalid email or password. Please try again.');
+      } else if (apiError.statusCode === 429) {
+        setError('Too many attempts. Please wait a moment and try again.');
+      } else {
+        setError(apiError.message || 'An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 selection:bg-gradient-to-r from-[#c800ff] to-[#912cad] selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px] opacity-10 pointer-events-none"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-20 pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative z-10">
         <div className="flex justify-center mb-8">
@@ -39,6 +110,13 @@ export default function AdminLoginPage() {
           <p className="text-slate-500 text-sm mt-2 font-medium">Verify your credentials to continue</p>
         </div>
 
+        {error && (
+          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-medium">
+            <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-slate-700 block">Email Address</label>
@@ -50,9 +128,10 @@ export default function AdminLoginPage() {
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setError(''); }}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="admin@faflora.com"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -70,16 +149,17 @@ export default function AdminLoginPage() {
                 type="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="••••••••"
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !email || !password}
             className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
           >
             {isLoading ? (
@@ -104,3 +184,4 @@ export default function AdminLoginPage() {
     </div>
   );
 }
+

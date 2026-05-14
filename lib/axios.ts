@@ -6,8 +6,8 @@ import { setCredentials, logout } from '@/lib/features/auth/authSlice';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:5000/api/v1'
-  // 'https://fafloriesbackend-5.onrender.com/api/v1';
+  //'http://localhost:5000/api/v1'
+  'https://fafloriesbackend-5.onrender.com/api/v1';
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -21,17 +21,34 @@ export const axiosInstance = axios.create({
 // Request interceptor - Add auth token to requests
 axiosInstance.interceptors.request.use(
   (config: any) => {
-    const state = store.getState();
-    const token =
-      state.auth.accessToken ||
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('accessToken')
-        : null);
+    try {
+      // Primary: read from localStorage — shared across all store instances
+      let token: string | null = null;
 
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (typeof window !== 'undefined') {
+        token = localStorage.getItem('accessToken');
+      }
+
+      // Fallback: read from the module-level store singleton
+      if (!token) {
+        const state = store.getState();
+        token = state?.auth?.accessToken ?? null;
+      }
+
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // If store isn't ready, try localStorage directly
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('accessToken');
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
     }
 
+    // For FormData requests, remove Content-Type so browser sets it with boundary
     if (
       typeof FormData !== 'undefined' &&
       config.data instanceof FormData &&
