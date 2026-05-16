@@ -609,13 +609,28 @@ export const categoryApi = {
     }
   },
 
-  async uploadCategoryImage(id: string, file: File) {
+  async uploadCategoryImage(id: string, file: File, altText?: string) {
     try {
       const formData = new FormData();
       formData.append('image', file);
+      if (altText) {
+        formData.append('alt', altText);
+      }
       const response = await axiosInstance.post<ApiResponse<any>>(
-        `/categories/${id}/image`,
+        `/categories/${id}/images`,
         formData
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteCategoryImage(id: string, imageUrl: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(
+        `/categories/${id}/images`,
+        { data: { imageUrl } }
       );
       return response.data;
     } catch (error) {
