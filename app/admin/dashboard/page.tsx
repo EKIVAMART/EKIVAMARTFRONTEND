@@ -799,15 +799,15 @@ export default function AdminPage() {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm cursor-pointer border border-teal-200 shadow-sm"
             >
-              A
+              {authUser?.firstName?.[0] || 'A'}
             </div>
             {isProfileOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
                 <div className="absolute right-0 mt-3 w-56 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
                   <div className="px-4 py-3 border-b bg-gray-50/50">
-                    <p className="text-sm font-bold text-slate-800">Admin User</p>
-                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflora.com</p>
+                    <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
+                    <p className="text-xs text-gray-500 font-medium truncate">{authUser?.email || 'admin@faflora.com'}</p>
                   </div>
                   <button className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-gray-50 transition">
                     Account Settings

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from './ProductCard';
 import { useProducts } from '@/lib/hooks';
@@ -37,6 +37,11 @@ export default function ProductsSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get unique categories from products - limit to 7
   const CATEGORY_TABS = useMemo(() => {
@@ -92,9 +97,10 @@ export default function ProductsSection() {
                              product.location?.toLowerCase() === selectedLocation.toLowerCase();
       return matchesCategory && matchesLocation;
     });
-    // Return at most 10 random products from the category
+    // Return at most 10 random products from the category, but avoid shuffling during SSR to prevent hydration errors
+    if (!mounted) return filtered.slice(0, 10);
     return getRandomItems(filtered, 10);
-  }, [products, activeCategory, selectedLocation]);
+  }, [products, activeCategory, selectedLocation, mounted]);
 
   return (
     <section className="w-full">

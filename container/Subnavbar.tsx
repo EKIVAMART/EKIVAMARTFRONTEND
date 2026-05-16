@@ -200,6 +200,11 @@ const Subnavbar = (): JSX.Element => {
 
   const wishlistCount = wishlistItems.length;
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -271,9 +276,8 @@ const Subnavbar = (): JSX.Element => {
               </Link>
             </div>
 
-            {/* Account & Cart Icons */}
             <div className="flex items-center gap-2">
-              {!isAuthenticated ? (
+              {(!mounted || !isAuthenticated || !user) ? (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition group"
@@ -390,7 +394,7 @@ const Subnavbar = (): JSX.Element => {
             </Link>
 
             {/* Account */}
-            {!isAuthenticated ? (
+            {(!mounted || !isAuthenticated || !user) ? (
               <button
                 onClick={() => setIsLoginModalOpen(true)}
                 className="flex flex-wrap gap-3 items-center justify-center group"

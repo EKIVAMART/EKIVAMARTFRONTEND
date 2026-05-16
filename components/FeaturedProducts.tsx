@@ -15,6 +15,11 @@ const FeaturedProducts = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Helper function to shuffle array and get random items
   const getRandomItems = <T,>(array: T[], count: number) => {
@@ -28,8 +33,10 @@ const FeaturedProducts = () => {
       return selectedLocation === 'All' || 
              product.location?.toLowerCase() === selectedLocation.toLowerCase();
     });
+    // Return at most 10 random products, but avoid shuffling during SSR to prevent hydration errors
+    if (!mounted) return filtered.slice(0, 10);
     return getRandomItems(filtered, 10);
-  }, [products, selectedLocation]);
+  }, [products, selectedLocation, mounted]);
 
   // Check scroll position and update button states
   const checkScroll = () => {
