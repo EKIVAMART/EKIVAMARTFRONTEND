@@ -543,11 +543,21 @@ export const productApi = {
 };
 
 export const categoryApi = {
+  /**
+   * Get all categories
+   * GET /api/v1/categories
+   * 
+   * For ADMIN, SUPER_ADMIN, and VENDOR roles: returns all categories including inactive
+   * For CUSTOMER and public users: returns only active categories
+   * 
+   * The backend will determine which categories to return based on the userRole parameter
+   */
   async getCategories(params: {
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    userRole?: string;
   } = {}) {
     try {
       const queryParams = new URLSearchParams({
@@ -556,6 +566,13 @@ export const categoryApi = {
         sortBy: params.sortBy || 'name',
         sortOrder: params.sortOrder || 'asc',
       });
+      
+      // Include userRole to enable backend role-based filtering
+      // Backend will use this to determine which categories to return
+      if (params.userRole) {
+        queryParams.append('userRole', params.userRole);
+      }
+      
       const response = await axiosInstance.get<ApiResponse<any>>(
         `/categories?${queryParams.toString()}`
       );

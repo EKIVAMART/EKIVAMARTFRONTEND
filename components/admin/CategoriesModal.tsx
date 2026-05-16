@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Layers, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { categoryApi, ApiError } from '@/lib/api';
+import { useAppSelector } from '@/lib/hooks';
 import CategoryFormModal from './CategoryFormModal';
 import SubcategoryModal from './SubcategoryModal';
 import PublishCategoryModal from './PublishCategoryModal';
@@ -31,6 +32,7 @@ const fallbackCategories: Category[] = [
 ];
 
 export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProps) {
+  const user = useAppSelector(state => state.auth.user);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,11 +51,23 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  /**
+   * Fetch all categories
+   * 
+   * For ADMIN, SUPER_ADMIN, and VENDOR roles: fetches all categories including inactive
+   * For CUSTOMER and public users: fetches only active categories
+   * 
+   * The backend determines which categories to return based on the userRole parameter
+   */
   const fetchCategories = async () => {
     setIsLoading(true);
     setError('');
     try {
-      const res = await categoryApi.getCategories({ limit: 100 });
+      // Send userRole to backend for role-based category filtering
+      const res = await categoryApi.getCategories({ 
+        limit: 100,
+        userRole: user?.role 
+      });
       let data: any[] = [];
       if (res?.data && Array.isArray(res.data)) {
         data = res.data;
