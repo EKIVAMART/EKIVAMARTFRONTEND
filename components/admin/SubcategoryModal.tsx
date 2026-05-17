@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Check } from 'lucide-react';
 import { categoryApi, ApiError } from '@/lib/api';
+import { toast } from 'react-hot-toast';
 import { Category } from './CategoriesModal';
 
 interface SubcategoryModalProps {
@@ -15,6 +16,7 @@ interface SubcategoryModalProps {
 interface Subcategory {
   id: string;
   name: string;
+  isActive: boolean;
 }
 
 export default function SubcategoryModal({ isOpen, onClose, category, onSubcategoryUpdate }: SubcategoryModalProps) {
@@ -23,9 +25,9 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
   const [error, setError] = useState('');
   
   const fallbackSubcategories: Subcategory[] = [
-    { id: 'sub-f1', name: 'Sample Subcategory 1' },
-    { id: 'sub-f2', name: 'Sample Subcategory 2' },
-    { id: 'sub-f3', name: 'Sample Subcategory 3' },
+    { id: 'sub-f1', name: 'Sample Subcategory 1', isActive: true },
+    { id: 'sub-f2', name: 'Sample Subcategory 2', isActive: true },
+    { id: 'sub-f3', name: 'Draft Subcategory 3', isActive: false },
   ];
   
   // Add new state
@@ -50,20 +52,32 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsLoading(true);
     setError('');
     try {
-      const res = await categoryApi.getSubcategories(category.id);
+      const res = await categoryApi.getCategories({ limit: 1000 });
       
-      let data: any[] = [];
+      let allCats: any[] = [];
       if (res?.data && Array.isArray(res.data)) {
-        data = res.data;
-      } else if (res?.data?.subcategories && Array.isArray(res.data.subcategories)) {
-        data = res.data.subcategories;
+        allCats = res.data;
       } else if (res?.data?.data && Array.isArray(res.data.data)) {
-        data = res.data.data;
+        allCats = res.data.data;
+      } else if (res?.data?.categories && Array.isArray(res.data.categories)) {
+        allCats = res.data.categories;
+      } else if (res?.data?.docs && Array.isArray(res.data.docs)) {
+        allCats = res.data.docs;
+      }
+
+      const targetCategory = allCats.find((c: any) => 
+        String(c.id || c._id || c.categoryId || c.uuid) === String(category.id)
+      );
+
+      let data: any[] = [];
+      if (targetCategory?.subcategories && Array.isArray(targetCategory.subcategories)) {
+        data = targetCategory.subcategories;
       }
 
       let formatted = data.map((s: any) => ({
         id: String(s.id || s._id || s.uuid),
-        name: s.name || s.title || 'Unknown'
+        name: s.name || s.title || 'Unknown',
+        isActive: Boolean(s.isActive ?? s.is_active ?? (s.status === 'published'))
       }));
 
       if (formatted.length === 0) {
@@ -87,13 +101,15 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsAdding(true);
     setError('');
     try {
-      await categoryApi.createSubcategory(category.id, { name: newSubcategoryName.trim() });
+      await categoryApi.createCategory({ name: newSubcategoryName.trim(), id: category.id });
       setNewSubcategoryName('');
       await fetchSubcategories();
       onSubcategoryUpdate();
+      toast.success('Subcategory created successfully!');
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to add subcategory');
+      toast.error(apiError.message || 'Failed to add subcategory');
     } finally {
       setIsAdding(false);
     }
@@ -110,13 +126,15 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsSavingEdit(true);
     setError('');
     try {
-      await categoryApi.updateSubcategory(category.id, editingId, { name: editName.trim() });
+      await categoryApi.updateCategory(editingId, { name: editName.trim() });
       setEditingId(null);
       await fetchSubcategories();
       onSubcategoryUpdate();
+      toast.success('Subcategory updated successfully!');
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to update subcategory');
+      toast.error(apiError.message || 'Failed to update subcategory');
     } finally {
       setIsSavingEdit(false);
     }
@@ -126,14 +144,30 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setDeletingId(id);
     setError('');
     try {
-      await categoryApi.deleteSubcategory(category.id, id);
+      await categoryApi.deleteCategory(id);
       await fetchSubcategories();
       onSubcategoryUpdate();
+      toast.success('Subcategory deleted successfully!');
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to delete subcategory');
+      toast.error(apiError.message || 'Failed to delete subcategory');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handlePublish = async (id: string) => {
+    setError('');
+    try {
+      await categoryApi.publishCategory(id);
+      await fetchSubcategories();
+      onSubcategoryUpdate();
+      toast.success('Subcategory published successfully!');
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || 'Failed to publish subcategory');
+      toast.error(apiError.message || 'Failed to publish subcategory');
     }
   };
 
@@ -229,8 +263,23 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                     </div>
                   ) : (
                     <>
-                      <span className="font-medium text-slate-700 text-sm">{sub.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700 text-sm">{sub.name}</span>
+                        {!sub.isActive && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+                            Draft
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!sub.isActive && (
+                          <button
+                            onClick={() => handlePublish(sub.id)}
+                            className="text-xs font-bold px-2 py-1 bg-fuchsia-50 text-[#912cad] hover:bg-fuchsia-100 rounded-lg transition mr-1"
+                          >
+                            Publish
+                          </button>
+                        )}
                         <button
                           onClick={() => startEditing(sub)}
                           className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"

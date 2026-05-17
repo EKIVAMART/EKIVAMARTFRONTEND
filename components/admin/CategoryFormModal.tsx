@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Upload, Plus, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 import { categoryApi, ApiError } from '@/lib/api';
 import { Category } from './CategoriesModal';
 
@@ -57,9 +58,9 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Validate file size (5MB max as per documentation)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('File size must be less than 5MB');
+      // Validate file size (10MB max as per documentation)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
         return;
       }
 
@@ -90,20 +91,64 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
         setImageFile(null);
         setIsPublished(false);
         setSuccessMessage('Image deleted successfully');
+        toast.success('Image deleted successfully');
         setTimeout(() => setSuccessMessage(''), 3000);
       }
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'An error occurred while deleting the image');
+      toast.error(apiError.message || 'An error occurred while deleting the image');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSaveImage = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!editingCategory || !imageFile) return;
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const uploadResponse = await categoryApi.uploadCategoryImage(
+        editingCategory.id, 
+        imageFile
+      );
+      const newImageUrl = uploadResponse?.data?.imageUrl;
+      if (newImageUrl) {
+        setCurrentImageUrl(newImageUrl);
+        setImagePreview(newImageUrl);
+      }
+      setImageFile(null);
+      setSuccessMessage('Image uploaded successfully');
+      toast.success('Image uploaded successfully');
+      setTimeout(() => {
+        onSuccess();
+      }, 1500);
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || 'An error occurred while uploading the image');
+      toast.error(apiError.message || 'An error occurred while uploading the image');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImageFile(null);
+    setImagePreview(currentImageUrl);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       setError('Category name is required');
+      return;
+    }
+    if (!description.trim()) {
+      setError('Category description is required');
       return;
     }
 
@@ -113,28 +158,14 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
     try {
       if (editingCategory) {
-        // Update category metadata
+        // Update category metadata only
         await categoryApi.updateCategory(editingCategory.id, { 
           name: name.trim(), 
           description: description.trim() 
         });
 
-        // Upload new image if selected
-        if (imageFile) {
-          const uploadResponse = await categoryApi.uploadCategoryImage(
-            editingCategory.id, 
-            imageFile
-          );
-          const newImageUrl = uploadResponse?.data?.imageUrl;
-          if (newImageUrl) {
-            setCurrentImageUrl(newImageUrl);
-            setImagePreview(newImageUrl);
-          }
-          setImageFile(null);
-          setSuccessMessage('Category saved and image uploaded successfully');
-        } else {
-          setSuccessMessage('Category updated successfully');
-        }
+        setSuccessMessage('Category info updated successfully');
+        toast.success('Category info updated successfully');
       } else {
         // Create new category
         const createResponse = await categoryApi.createCategory({ 
@@ -155,8 +186,10 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             setImagePreview(newImageUrl);
           }
           setSuccessMessage('Category created and image uploaded successfully');
+          toast.success('Category created and image uploaded successfully');
         } else {
           setSuccessMessage('Category created successfully (image required to publish)');
+          toast.success('Category created successfully');
         }
 
         // Update editingCategory state so publish button appears
@@ -175,6 +208,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'An error occurred while saving the category');
+      toast.error(apiError.message || 'An error occurred while saving the category');
     } finally {
       setIsLoading(false);
     }
@@ -195,6 +229,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
         await categoryApi.publishCategory(editingCategory.id);
         setIsPublished(true);
         setSuccessMessage('Category published successfully!');
+        toast.success('Category published successfully!');
         setTimeout(() => {
           onSuccess();
           onClose();
@@ -203,6 +238,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'An error occurred while publishing the category');
+      toast.error(apiError.message || 'An error occurred while publishing the category');
     } finally {
       setIsPublishing(false);
     }
@@ -269,28 +305,51 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                         <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                       </div>
                       <div className="flex gap-2 justify-center">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            fileInputRef.current?.click();
-                          }}
-                          className="text-xs font-bold text-[#912cad] hover:text-[#c800ff] px-3 py-1 border border-[#c800ff]/30 rounded-lg hover:bg-fuchsia-50 transition"
-                        >
-                          Change Image
-                        </button>
-                        {currentImageUrl && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteImage();
-                            }}
-                            disabled={isLoading}
-                            className="text-xs font-bold text-red-600 hover:text-red-700 px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
-                          >
-                            Delete Image
-                          </button>
+                        {imageFile ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={handleSaveImage}
+                              disabled={isLoading}
+                              className="text-xs font-bold text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg transition disabled:opacity-50 flex items-center gap-1"
+                            >
+                              <CheckCircle size={14} /> Save Image
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleCancelImage}
+                              disabled={isLoading}
+                              className="text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg transition disabled:opacity-50"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                fileInputRef.current?.click();
+                              }}
+                              className="text-xs font-bold text-[#912cad] hover:text-[#c800ff] px-3 py-1 border border-[#c800ff]/30 rounded-lg hover:bg-fuchsia-50 transition"
+                            >
+                              Change Image
+                            </button>
+                            {currentImageUrl && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteImage();
+                                }}
+                                disabled={isLoading}
+                                className="text-xs font-bold text-red-600 hover:text-red-700 px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
+                              >
+                                Delete Image
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -300,7 +359,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                         <Upload size={24} />
                       </div>
                       <p className="text-sm font-bold text-[#912cad]">Click to upload image</p>
-                      <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF or WebP (Max 5MB)</p>
+                      <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF or WebP (Max 10MB)</p>
                     </div>
                   )}
                   <input 
@@ -330,13 +389,14 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+              <label htmlFor="description" className="block text-sm font-bold text-slate-700 mb-2">Description <span className="text-red-500">*</span></label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition bg-white text-slate-800 min-h-[100px]"
                 placeholder="Brief description of the category..."
+                required
               />
             </div>
 
@@ -365,25 +425,16 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             )}
           </button>
 
-          {/* Publish Button - Only for existing categories with images */}
-          {editingCategory && currentImageUrl && (
+          {/* Publish Button - Only for existing categories with images and NOT yet published */}
+          {editingCategory && currentImageUrl && !isPublished && (
             <button
               type="button"
               onClick={handlePublishCategory}
-              disabled={isPublished || isLoading || isPublishing}
-              className={`flex-1 py-3 font-bold rounded-xl transition flex items-center justify-center shadow-lg ${
-                isPublished
-                  ? 'bg-green-50 border border-green-200 text-green-700 cursor-default'
-                  : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-green-100 disabled:opacity-70'
-              }`}
+              disabled={isLoading || isPublishing}
+              className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl transition flex items-center justify-center shadow-lg shadow-green-100 disabled:opacity-70"
             >
               {isPublishing ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : isPublished ? (
-                <>
-                  <CheckCircle size={18} className="mr-2" />
-                  Published
-                </>
               ) : (
                 'Publish Category'
               )}

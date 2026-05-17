@@ -7,6 +7,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 import { categoryApi, ApiError } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
 import CategoryFormModal from './CategoryFormModal';
@@ -97,7 +98,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           {!isDraft && (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#912cad] border border-fuchsia-100">
               <Layers size={10} />
-              {category.subcategoryCount === 1 ? '1 Sub' : `${category.subcategoryCount ?? 0} Subs`}
+              {category.subcategoryCount === 1 ? '1 Subcategory' : `${category.subcategoryCount ?? 0} Subcategories`}
             </span>
           )}
 
@@ -113,33 +114,39 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
       {/* Actions */}
       <div className={`px-4 py-3 border-t flex flex-col gap-2 ${isDraft ? 'bg-amber-50/40 border-amber-100' : 'bg-gray-50/50 border-gray-100'}`}>
         {isDraft ? (
-          // Draft: only Publish (requires image upload first)
-          <button
-            onClick={() => onPublish(category.id)}
-            className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
-          >
-            <Upload size={13} />
-            {category.image ? 'Publish Category' : 'Upload Image & Publish'}
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); onPublish(category.id); }}
+              className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
+            >
+              <Upload size={13} />
+              {category.image ? 'Publish Category' : 'Upload Image & Publish'}
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
+              className="w-full bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+            >
+              <Trash2 size={13} /> Delete Draft
+            </button>
+          </div>
         ) : (
-          // Published: Edit, Subcategories, Delete
           <div className="flex items-center gap-2">
             <button
-              onClick={() => onSubcategories(category)}
+              onClick={(e) => { e.stopPropagation(); onSubcategories(category); }}
               className="flex-1 bg-white border border-fuchsia-200 text-[#912cad] hover:bg-fuchsia-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
               title="Manage Subcategories"
             >
               <Layers size={13} /> Subcategories
             </button>
             <button
-              onClick={() => onEdit(category)}
+              onClick={(e) => { e.stopPropagation(); onEdit(category); }}
               className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
               title="Edit Category"
             >
               <Edit size={13} /> Edit
             </button>
             <button
-              onClick={() => onDelete(category.id)}
+              onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
               className="flex-none bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 p-2 rounded-xl transition"
               title="Delete Category"
             >
@@ -259,9 +266,11 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
       await categoryApi.deleteCategory(id);
       setCategories(prev => prev.filter(c => c.id !== id));
       setDeletingId(null);
+      toast.success('Category deleted successfully');
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to delete category');
+      toast.error(apiError.message || 'Failed to delete category');
     } finally {
       setIsDeleting(false);
     }
@@ -285,7 +294,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">All Categories</h2>
             <p className="text-sm text-gray-500 font-medium mt-0.5">
-              {published.length} published · {drafts.length} draft
+              {published.length} published · {drafts.length} draft{drafts.length !== 1 ? 's' : ''}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -395,7 +404,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
                 </div>
                 <div className="relative flex justify-center">
                   <span className="bg-[#F8F9FA] px-4 text-xs text-gray-400 font-bold uppercase tracking-widest">
-                    Draft Categories
+                    {drafts.length === 1 ? 'Draft Category' : 'Draft Categories'}
                   </span>
                 </div>
               </div>
@@ -406,7 +415,9 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-300 flex items-center justify-center flex-shrink-0">
                     <Clock size={16} className="text-white" />
                   </div>
-                  <h3 className="font-black text-slate-700 text-base tracking-tight">Draft Categories</h3>
+                  <h3 className="font-black text-slate-700 text-base tracking-tight">
+                    {drafts.length === 1 ? 'Draft Category' : 'Draft Categories'}
+                  </h3>
                   <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-600">
                     {drafts.length}
                   </span>

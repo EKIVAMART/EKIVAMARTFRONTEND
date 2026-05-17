@@ -639,46 +639,4 @@ export const categoryApi = {
     }
   },
 
-  async getSubcategories(categoryId: string) {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(
-        `/categories/${categoryId}/subcategories`
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async createSubcategory(categoryId: string, data: { name: string }) {
-    try {
-      const response = await axiosInstance.post<ApiResponse<any>>(
-        `/categories/${categoryId}/subcategories`,
-        data
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async updateSubcategory(categoryId: string, subId: string, data: { name: string }) {
-    try {
-      const response = await axiosInstance.patch<ApiResponse<any>>(
-        `/categories/${categoryId}/subcategories/${subId}`,
-        data
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  async deleteSubcategory(categoryId: string, subId: string) {
-    try {
-      await axiosInstance.delete(`/categories/${categoryId}/subcategories/${subId}`);
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
 }

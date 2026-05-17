@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 import { categoryApi, ApiError } from '@/lib/api';
 
 interface PublishCategoryModalProps {
@@ -15,12 +16,7 @@ interface PublishCategoryModalProps {
 export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSuccess }: PublishCategoryModalProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
-  
-  // Dynamic subcategories
-  const [subcategories, setSubcategories] = useState<{ id: string; value: string }[]>([
-    { id: Date.now().toString(), value: '' }
-  ]);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -31,7 +27,6 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
     if (isOpen) {
       setImageFile(null);
       setImagePreview('');
-      setSubcategories([{ id: Date.now().toString(), value: '' }]);
       setError('');
       setIsLoading(false);
     }
@@ -40,21 +35,17 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
+        return;
+      }
+
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      setError('');
     }
-  };
-
-  const addSubcategoryField = () => {
-    setSubcategories(prev => [...prev, { id: Date.now().toString(), value: '' }]);
-  };
-
-  const removeSubcategoryField = (id: string) => {
-    setSubcategories(prev => prev.filter(sub => sub.id !== id));
-  };
-
-  const updateSubcategoryField = (id: string, value: string) => {
-    setSubcategories(prev => prev.map(sub => sub.id === id ? { ...sub, value } : sub));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,20 +66,16 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
         await categoryApi.uploadCategoryImage(categoryId, imageFile);
       }
       
-      // 2. Create Subcategories
-      const validSubcategories = subcategories.filter(sub => sub.value.trim());
-      for (const sub of validSubcategories) {
-        await categoryApi.createSubcategory(categoryId, { name: sub.value.trim() });
-      }
-
-      // 3. Publish Category
+      // 2. Publish Category
       await categoryApi.publishCategory(categoryId);
 
+      toast.success('Category published successfully!');
       onSuccess();
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'An error occurred while publishing the category');
+      toast.error(apiError.message || 'An error occurred while publishing the category');
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +91,7 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight">Publish Category</h2>
-            <p className="text-sm text-gray-500 font-medium mt-1">Add image and subcategories before publishing</p>
+            <p className="text-sm text-gray-500 font-medium mt-1">Add an image before publishing</p>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-xl transition">
             <X size={20} />
@@ -139,7 +126,7 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
                   </div>
                 )}
                 <p className="text-sm font-bold text-[#912cad]">Click to {imagePreview ? 'change' : 'upload'} image</p>
-                <p className="text-xs text-gray-500 mt-1">PNG, JPG or WEBP (Max 2MB)</p>
+                <p className="text-xs text-gray-500 mt-1">PNG, JPG or WEBP (Max 10MB)</p>
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -150,41 +137,7 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
               </div>
             </div>
 
-            {/* Dynamic Subcategories */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-bold text-slate-700">Subcategories</label>
-                <button 
-                  type="button" 
-                  onClick={addSubcategoryField}
-                  className="text-xs font-bold text-[#c800ff] hover:text-[#912cad] flex items-center gap-1 bg-fuchsia-50 px-2 py-1 rounded-md transition"
-                >
-                  <Plus size={14} /> Add Another
-                </button>
-              </div>
-              <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                {subcategories.map((sub, index) => (
-                  <div key={sub.id} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={sub.value}
-                      onChange={(e) => updateSubcategoryField(sub.id, e.target.value)}
-                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition"
-                      placeholder={`Subcategory ${index + 1}`}
-                    />
-                    {subcategories.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSubcategoryField(sub.id)}
-                        className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+
           </form>
         </div>
 
