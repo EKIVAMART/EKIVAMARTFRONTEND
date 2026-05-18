@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 import { store } from '@/lib/store';
-import { setCredentials, logout } from '@/lib/features/auth/authSlice';
+import { setCredentials, logout, setTokens } from '@/lib/features/auth/authSlice';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -138,8 +138,7 @@ axiosInstance.interceptors.response.use(
 
         // Update tokens in store
         store.dispatch(
-          setCredentials({
-            user: state.auth.user!,
+          setTokens({
             accessToken,
             refreshToken: newRefreshToken,
           })

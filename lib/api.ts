@@ -574,7 +574,7 @@ export const categoryApi = {
     }
   },
 
-  async createCategory(data: { name: string; description?: string; id?: string | null }) {
+  async createCategory(data: { name: string; description?: string; id?: string | null; parentId?: string | null }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>('/categories', data);
       return response.data;
@@ -639,4 +639,12 @@ export const categoryApi = {
     }
   },
 
+  async getSubcategories(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories/${id}/children`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 }

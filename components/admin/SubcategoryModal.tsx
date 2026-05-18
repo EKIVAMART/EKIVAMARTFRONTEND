@@ -24,11 +24,6 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   
-  const fallbackSubcategories: Subcategory[] = [
-    { id: 'sub-f1', name: 'Sample Subcategory 1', isActive: true },
-    { id: 'sub-f2', name: 'Sample Subcategory 2', isActive: true },
-    { id: 'sub-f3', name: 'Draft Subcategory 3', isActive: false },
-  ];
   
   // Add new state
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
@@ -41,6 +36,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
 
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (isOpen && category.id) {
@@ -52,43 +48,32 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsLoading(true);
     setError('');
     try {
-      const res = await categoryApi.getCategories({ limit: 1000 });
+      const res: any = await categoryApi.getSubcategories(category.id);
       
-      let allCats: any[] = [];
-      if (res?.data && Array.isArray(res.data)) {
-        allCats = res.data;
+      let rawData: any[] = [];
+      if (Array.isArray(res)) {
+        rawData = res;
+      } else if (res?.data && Array.isArray(res.data)) {
+        rawData = res.data;
       } else if (res?.data?.data && Array.isArray(res.data.data)) {
-        allCats = res.data.data;
-      } else if (res?.data?.categories && Array.isArray(res.data.categories)) {
-        allCats = res.data.categories;
-      } else if (res?.data?.docs && Array.isArray(res.data.docs)) {
-        allCats = res.data.docs;
+        rawData = res.data.data;
+      } else if (res?.data?.children && Array.isArray(res.data.children)) {
+        rawData = res.data.children;
+      } else if (res?.children && Array.isArray(res.children)) {
+        rawData = res.children;
       }
 
-      const targetCategory = allCats.find((c: any) => 
-        String(c.id || c._id || c.categoryId || c.uuid) === String(category.id)
-      );
-
-      let data: any[] = [];
-      if (targetCategory?.subcategories && Array.isArray(targetCategory.subcategories)) {
-        data = targetCategory.subcategories;
-      }
-
-      let formatted = data.map((s: any) => ({
+      let formatted = rawData.map((s: any) => ({
         id: String(s.id || s._id || s.uuid),
         name: s.name || s.title || 'Unknown',
         isActive: Boolean(s.isActive ?? s.is_active ?? (s.status === 'published'))
       }));
-
-      if (formatted.length === 0) {
-        formatted = fallbackSubcategories;
-      }
       
       setSubcategories(formatted);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message || 'Failed to load subcategories. Showing fallback data.');
-      setSubcategories(fallbackSubcategories);
+      setError(apiError.message || 'Failed to load subcategories.');
+      setSubcategories([]);
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +86,11 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsAdding(true);
     setError('');
     try {
-      await categoryApi.createCategory({ name: newSubcategoryName.trim(), id: category.id });
+      await categoryApi.createCategory({ 
+        name: newSubcategoryName.trim(), 
+        id: category.id,
+        parentId: category.id
+      });
       setNewSubcategoryName('');
       await fetchSubcategories();
       onSubcategoryUpdate();
@@ -141,19 +130,20 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
   };
 
   const handleDelete = async (id: string) => {
-    setDeletingId(id);
+    setIsDeleting(true);
     setError('');
     try {
       await categoryApi.deleteCategory(id);
       await fetchSubcategories();
       onSubcategoryUpdate();
       toast.success('Subcategory deleted successfully!');
+      setDeletingId(null);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to delete subcategory');
       toast.error(apiError.message || 'Failed to delete subcategory');
     } finally {
-      setDeletingId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -271,34 +261,32 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {!sub.isActive && (
+                      <div className="flex items-center gap-2">
+                        {!sub.isActive ? (
                           <button
                             onClick={() => handlePublish(sub.id)}
-                            className="text-xs font-bold px-2 py-1 bg-fuchsia-50 text-[#912cad] hover:bg-fuchsia-100 rounded-lg transition mr-1"
+                            className="text-xs font-bold px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200/80 rounded-xl transition-all flex items-center gap-1.5"
                           >
-                            Publish
+                            <Check size={14} /> Publish
                           </button>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => startEditing(sub)}
+                              className="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition border border-blue-100/50 flex items-center justify-center"
+                              title="Edit"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              onClick={() => setDeletingId(sub.id)}
+                              className="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-xl transition border border-red-100/50 flex items-center justify-center"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
                         )}
-                        <button
-                          onClick={() => startEditing(sub)}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(sub.id)}
-                          disabled={deletingId === sub.id}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                          title="Delete"
-                        >
-                          {deletingId === sub.id ? (
-                            <div className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
-                          ) : (
-                            <Trash2 size={16} />
-                          )}
-                        </button>
                       </div>
                     </>
                   )}
@@ -308,6 +296,40 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
           )}
         </div>
       </div>
+
+      {/* ── Subcategory Delete Confirmation ── */}
+      {deletingId && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeletingId(null)} />
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <Trash2 size={22} className="text-red-600" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Subcategory?</h3>
+            <p className="text-gray-500 text-sm mb-6 text-center">
+              This will permanently delete the subcategory. This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingId(null)}
+                className="flex-1 py-2.5 border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deletingId)}
+                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-60 animate-pulse-subtle"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

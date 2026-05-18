@@ -25,9 +25,12 @@ import {
   categoryApi,
   productApi,
 } from '@/lib/api';
-import { useAppSelector } from '@/lib/hooks';
+import { useAppSelector, useAppDispatch } from '@/lib/hooks';
+import { setUser } from '@/lib/features/auth/authSlice';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 type AdminProduct = Partial<ProductFormData> & {
   id: string;
@@ -477,6 +480,9 @@ const buildProductPayload = (
 
 export default function AdminPage() {
   const authUser = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -529,31 +535,51 @@ export default function AdminPage() {
     let isMounted = true;
 
     const resolveCurrentUserId = async () => {
+      setIsCheckingAuth(true);
       const reduxUserId = authUser?.id;
       if (reduxUserId) {
         setCurrentUserId(reduxUserId);
+        setIsCheckingAuth(false);
         return;
       }
 
       const storedUserId = getStoredUserId();
       if (storedUserId) {
         setCurrentUserId(storedUserId);
+        setIsCheckingAuth(false);
         return;
       }
 
       if (typeof window === 'undefined' || !localStorage.getItem('accessToken')) {
+        setIsCheckingAuth(false);
         return;
       }
 
       try {
         const response = await authApi.getProfile();
-        const profileUserId = response?.data?.user?.id || response?.data?.id;
+        const profileData = response?.data ?? response;
+        const profileUserId = profileData?.user?.id || profileData?.id;
         if (isMounted && profileUserId) {
           setCurrentUserId(String(profileUserId));
+          dispatch(
+            setUser({
+              id: String(profileUserId),
+              email: profileData?.email || profileData?.user?.email || '',
+              firstName: profileData?.firstName || profileData?.user?.firstName || '',
+              lastName: profileData?.lastName || profileData?.user?.lastName || '',
+              profilePicture: profileData?.avatar || profileData?.profilePicture || undefined,
+              role: profileData?.role || profileData?.user?.role || '', // Strict role check, no admin fallback
+              isEmailVerified: profileData?.isEmailVerified ?? true,
+            })
+          );
         }
       } catch {
         if (isMounted) {
           setCurrentUserId('');
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingAuth(false);
         }
       }
     };
@@ -563,7 +589,7 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [authUser?.id]);
+  }, [authUser?.id, dispatch]);
 
   useEffect(() => {
     let isMounted = true;
@@ -781,6 +807,89 @@ export default function AdminPage() {
       );
     }
   };
+
+  const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'];
+  const hasAdminRole = authUser && ADMIN_ROLES.includes(authUser.role);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
+
+  // Trigger redirect for unauthenticated users
+  useEffect(() => {
+    if (!isCheckingAuth && !hasToken && !authUser) {
+      toast.error('Session expired. Please log in again.');
+      router.push('/admin/login');
+    }
+  }, [isCheckingAuth, hasToken, authUser, router]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#c800ff]/20 border-t-[#c800ff] rounded-full animate-spin" />
+          <p className="text-sm font-bold text-slate-600 animate-pulse">Verifying credentials...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 1. Session expired / No token / No user
+  if (!hasToken && !authUser) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
+        
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+          <div className="flex justify-center mb-6">
+            <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+              <svg className="w-12 h-12 text-red-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Session Expired</h2>
+          <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
+            Your login session has expired or you are not authorized to view this page. Please log in again to continue.
+          </p>
+          <button
+            onClick={() => router.push('/admin/login')}
+            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Logged in, but unauthorized role
+  if (authUser && !hasAdminRole) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
+        
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+          <div className="flex justify-center mb-6">
+            <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
+              <svg className="w-12 h-12 text-[#c800ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Unauthorized Access</h2>
+          <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
+            You do not have administrative privileges to access this dashboard. This portal is restricted to authorized admins only.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">

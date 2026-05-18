@@ -27,14 +27,10 @@ export interface Category {
   isActive: boolean;
   subcategories?: any[];
   subcategoryCount?: number;
+  subcategoryDraftCounts?: number;
 }
 
-const fallbackCategories: Category[] = [
-  { id: 'f1', name: 'Electronics', description: 'Gadgets, phones, laptops and tech accessories.', image: '', isActive: true, subcategoryCount: 5 },
-  { id: 'f2', name: 'Fashion', description: 'Clothing, shoes, bags, and jewelry for all ages.', image: '', isActive: true, subcategoryCount: 12 },
-  { id: 'f3', name: 'Home & Kitchen', description: 'Furniture, appliances, decor, and cookware.', image: '', isActive: false, subcategoryCount: 0 },
-  { id: 'f4', name: 'Beauty', description: 'Skincare, makeup, and personal care products.', image: '', isActive: false, subcategoryCount: 0 },
-];
+
 
 // ─── Category Card ──────────────────────────────────────────────────────────
 interface CategoryCardProps {
@@ -55,11 +51,24 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           : 'bg-white border-gray-100 shadow-sm hover:shadow-md hover:border-fuchsia-100'
       }`}
     >
+      {/* Floating Status Badge */}
+      <div className="absolute top-3 right-3 z-10">
+        {isDraft ? (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200/80 shadow-sm">
+            <Clock size={9} /> Draft
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-sm">
+            <CheckCircle2 size={9} /> Published
+          </span>
+        )}
+      </div>
+
       {/* Status ribbon */}
       <div className={`h-1.5 w-full ${isDraft ? 'bg-gradient-to-r from-amber-400 to-yellow-300' : 'bg-gradient-to-r from-[#c800ff] to-[#912cad]'}`} />
 
       {/* Body */}
-      <div className="p-5 flex flex-col items-center text-center flex-1">
+      <div className="p-5 pt-8 flex flex-col items-center text-center flex-1">
         {/* Avatar */}
         <div
           className={`w-20 h-20 rounded-full overflow-hidden mb-4 ring-4 relative flex items-center justify-center text-white text-3xl font-black uppercase flex-shrink-0 ${
@@ -76,35 +85,49 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
         </div>
 
         {/* Name + desc */}
-        <h3 className="font-bold text-slate-800 text-base line-clamp-1 w-full">{category.name}</h3>
+        <h3 className="font-bold text-slate-800 text-base line-clamp-2 w-full break-words min-h-[3rem] flex items-center justify-center">{category.name}</h3>
         {category.description && (
           <p className="text-xs text-gray-400 mt-1 line-clamp-2 w-full">{category.description}</p>
         )}
 
         {/* Badges */}
         <div className="mt-3 flex flex-wrap gap-2 justify-center">
-          {/* Status badge */}
-          {isDraft ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
-              <Clock size={10} /> Draft
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-200">
-              <CheckCircle2 size={10} /> Published
-            </span>
-          )}
+          {/* Subcategory Counts */}
+          {!isDraft && (() => {
+            const publishedCount = category.subcategoryCount ?? 0;
+            const draftCount = category.subcategoryDraftCounts ?? 0;
+            const totalSubcategories = publishedCount + draftCount;
 
-          {/* Subcategory count — only for published */}
-          {!isDraft && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#912cad] border border-fuchsia-100">
-              <Layers size={10} />
-              {category.subcategoryCount === 1 ? '1 Subcategory' : `${category.subcategoryCount ?? 0} Subcategories`}
-            </span>
-          )}
+            if (totalSubcategories === 0) {
+              return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-50 text-gray-400 border border-gray-100">
+                  <Layers size={10} />
+                  0 Subcategories
+                </span>
+              );
+            }
+
+            return (
+              <>
+                {publishedCount > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#912cad] border border-fuchsia-100 animate-in fade-in duration-200">
+                    <Layers size={10} />
+                    {publishedCount} {publishedCount === 1 ? 'Subcategory' : 'Subcategories'}
+                  </span>
+                )}
+                {draftCount > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 animate-in fade-in duration-200">
+                    <Clock size={10} />
+                    {draftCount} {draftCount === 1 ? 'Draft Sub' : 'Draft Subs'}
+                  </span>
+                )}
+              </>
+            );
+          })()}
 
           {/* No image warning for draft */}
           {isDraft && !category.image && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100 animate-in fade-in duration-200">
               <AlertCircle size={10} /> No Image
             </span>
           )}
@@ -224,13 +247,14 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
         isActive: Boolean(item.isActive ?? item.is_active ?? (item.status === 'published')),
         subcategories: item.subcategories || [],
         subcategoryCount: item.subcategoryCount ?? (Array.isArray(item.subcategories) ? item.subcategories.length : 0),
+        subcategoryDraftCounts: item.subcategoryDraftCounts ?? item.subcategoryDraftCount ?? 0,
       }));
 
-      setCategories(formatted.length > 0 ? formatted : fallbackCategories);
+      setCategories(formatted);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || 'Failed to load categories.');
-      setCategories(fallbackCategories);
+      setCategories([]);
     } finally {
       setIsLoading(false);
     }
@@ -457,7 +481,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeletingId(null)} />
           <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
               <Trash2 size={22} className="text-red-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Category?</h3>

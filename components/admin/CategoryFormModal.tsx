@@ -204,6 +204,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
       setTimeout(() => {
         onSuccess();
+        onClose();
       }, 1500);
     } catch (err) {
       const apiError = err as ApiError;
@@ -354,7 +355,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                       </div>
                     </div>
                   ) : (
-                    <div>
+                    <div className="flex flex-col items-center justify-center text-center">
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
                         <Upload size={24} />
                       </div>
