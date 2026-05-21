@@ -260,8 +260,8 @@ const ChipSelector = ({
               type="button"
               onClick={() => handleToggle(opt)}
               className={`text-xs px-2.5 py-1 rounded-lg border font-bold transition-all ${isSelected
-                  ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white border-transparent shadow-sm'
-                  : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white border-transparent shadow-sm'
+                : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                 }`}
             >
               {opt}
@@ -339,7 +339,8 @@ export default function ActionModal({
 
   const QuickAddButton = () => (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes quick-add-shine {
           0% { left: -150%; }
           50% { left: 150%; }
@@ -448,7 +449,7 @@ export default function ActionModal({
         </div>
         <div>
           <h3 className="font-bold text-lg text-gray-800">Quick Add Form</h3>
-          <p className="text-xs text-gray-500">Provide the 6 required core product details to instantly create your product draft.</p>
+          <p className="text-xs text-gray-500">Provide the required core product details to instantly create your product draft.</p>
         </div>
       </div>
 
@@ -1044,483 +1045,483 @@ export default function ActionModal({
 
                     <input type="hidden" value={formData.vendorId} readOnly />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
-                <select
-                  value={selectedCategoryValue}
-                  onChange={e => {
-                    updateField('categoryId', e.target.value);
-                    updateField('subCategoryId', ''); // Clear subcategory on change
-                  }}
-                  className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
-                  required
-                  disabled={isLoadingCategories}
-                >
-                  <option value="">
-                    {isLoadingCategories ? 'Loading categories...' : 'Select category'}
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
-                <select
-                  value={formData.subCategoryId}
-                  onChange={e => updateField('subCategoryId', e.target.value)}
-                  className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
-                  required
-                  disabled={isLoadingSubcategories || !formData.categoryId}
-                >
-                  <option value="">
-                    {!formData.categoryId
-                      ? 'Please select a category first'
-                      : isLoadingSubcategories
-                        ? 'Loading subcategories...'
-                        : 'Select subcategory'
-                    }
-                  </option>
-                  {subcategories.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
-              <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
-              <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
-                {/* Editor Header Toolbar */}
-                <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => applyFormat('bold')}
-                      className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                      title="Bold"
-                    >
-                      <b>B</b>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyFormat('italic')}
-                      className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs italic text-gray-700 transition"
-                      title="Italic"
-                    >
-                      <i>I</i>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyFormat('underline')}
-                      className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs underline text-gray-700 transition"
-                      title="Underline"
-                    >
-                      <u>U</u>
-                    </button>
-                    <div className="w-[1px] h-4 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => applyFormat('bullet')}
-                      className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                      title="Bulleted List"
-                    >
-                      • List
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyFormat('number')}
-                      className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                      title="Numbered List"
-                    >
-                      1. List
-                    </button>
-                  </div>
-                  <div className="flex bg-gray-200 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setEditorMode('write')}
-                      className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
-                    >
-                      Write
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditorMode('preview')}
-                      className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
-                    >
-                      Preview
-                    </button>
-                  </div>
-                </div>
-
-                {editorMode === 'write' ? (
-                  <textarea
-                    ref={descriptionRef}
-                    value={formData.description}
-                    onChange={e => updateField('description', e.target.value)}
-                    rows={6}
-                    className="w-full p-4 bg-transparent outline-none border-0 focus:ring-0 text-sm resize-y"
-                    placeholder="Describe your product here..."
-                    required
-                  />
-                ) : (
-                  <div
-                    className="w-full min-h-[144px] p-4 bg-white text-sm prose max-w-none overflow-y-auto max-h-[300px]"
-                    dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(formData.description) }}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
-                <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
-                  {formData.tags.map(t => (
-                    <span key={t} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
-                      {t} <X size={12} className="cursor-pointer text-[#c800ff] hover:text-red-500 transition" onClick={() => removeTag(t)} />
-                    </span>
-                  ))}
-                  <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
-              <div className="flex gap-3">
-                <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
-                <button
-                  type="button"
-                  onClick={generateSKU}
-                  className="px-5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-2xl shadow-md transition"
-                >
-                  Auto-Generate SKU
-                </button>
-              </div>
-              <p className="text-[11px] text-gray-400 font-medium mt-2 leading-relaxed">
-                SKU is a unique code used for inventory tracking. <br />
-                Example: <span className="font-bold text-gray-500">GADG-IPHONE-256GB</span> or <span className="font-bold text-gray-500">FASH-TSHIRT-BLACK-M</span>.
-                You can auto-generate it, type your own, or leave it blank if unsure.
-              </p>
-            </div>
-        </div>
-      )}
-
-      {/* STEP 2: Pricing & Inventory */}
-      {currentStep === 2 && (
-        <div className="space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
-            <div>
-              <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
-              <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
-              <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
-              <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
-              <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#c800ff]" required />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
-              <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
-              <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
-            </div>
-            <div className="flex items-center pt-2 md:pt-8">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded border-gray-300 focus:ring-[#c800ff]" />
-                <span className="font-bold text-gray-700 text-sm">In Stock</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 3: Additional Details & Specifications */}
-      {currentStep === 3 && (
-        <div className="space-y-8 animate-in fade-in duration-200">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
-            <div>
-              <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
-              <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
-            </div>
-          </div>
-
-          {/* General Origin */}
-          <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-            <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
-              <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium" />
-            </div>
-          </div>
-
-          {/* Return Policy */}
-          <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-            <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
-                <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                  <option value="Use Store Default">Use Faflora Store Default</option>
-                  <option value="3">3 days</option>
-                  <option value="7 days">7 days</option>
-                  <option value="14 days">14 days</option>
-                  <option value="30 days">30 days</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
-                <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3] font-bold text-gray-700">
-                  <option value="Use Store Default">Use Faflora Store Default</option>
-                  <option value="store">Faflora Store pays</option>
-                  <option value="vendor">Vendor pays</option>
-                  <option value="customer">Customer pays</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
-              <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
-            </div>
-          </div>
-
-          {/* Warranty */}
-          <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-            <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
-            <div className="mb-4">
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
-              <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                <option value="Use Store Default">Use Faflora Store Default</option>
-                <option value="none">None</option>
-                <option value="3 months">3 months</option>
-                <option value="6 months">6 months</option>
-                <option value="1 year">1 year</option>
-                <option value="2 years">2 years</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
-              <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
-            </div>
-          </div>
-
-          {/* Dynamic Category Specifications + Custom Fields */}
-          <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
-            <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
-              {selectedCategoryName || 'General'} Specifications
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-              {renderCategoryInputs(selectedCategoryName)}
-
-              {/* Unified weight & dimension inputs nested in specs based on category */}
-              {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
-                <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
-                  <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formData.weight || ''}
-                          onChange={(e) => updateField('weight', Number(e.target.value))}
-                          onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                          className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                          placeholder="Value"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
                         <select
-                          value={formData.weightUnit || 'kg'}
-                          onChange={(e) => updateField('weightUnit', e.target.value)}
-                          className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24"
+                          value={selectedCategoryValue}
+                          onChange={e => {
+                            updateField('categoryId', e.target.value);
+                            updateField('subCategoryId', ''); // Clear subcategory on change
+                          }}
+                          className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                          required
+                          disabled={isLoadingCategories}
                         >
-                          <option value="kg">kg</option>
-                          <option value="g">g</option>
+                          <option value="">
+                            {isLoadingCategories ? 'Loading categories...' : 'Select category'}
+                          </option>
+                          {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
+                        <select
+                          value={formData.subCategoryId}
+                          onChange={e => updateField('subCategoryId', e.target.value)}
+                          className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                          required
+                          disabled={isLoadingSubcategories || !formData.categoryId}
+                        >
+                          <option value="">
+                            {!formData.categoryId
+                              ? 'Please select a category first'
+                              : isLoadingSubcategories
+                                ? 'Loading subcategories...'
+                                : 'Select subcategory'
+                            }
+                          </option>
+                          {subcategories.map((sub) => (
+                            <option key={sub.id} value={sub.id}>
+                              {sub.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
+
                     <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Dimensions Measurement Unit</label>
-                      <select
-                        value={formData.dimensionsUnit || 'cm'}
-                        onChange={(e) => updateField('dimensionsUnit', e.target.value)}
-                        className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700"
-                      >
-                        <option value="cm">cm</option>
-                        <option value="inches">inches</option>
-                      </select>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
+                      <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
+                      <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
+                        {/* Editor Header Toolbar */}
+                        <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => applyFormat('bold')}
+                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                              title="Bold"
+                            >
+                              <b>B</b>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyFormat('italic')}
+                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs italic text-gray-700 transition"
+                              title="Italic"
+                            >
+                              <i>I</i>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyFormat('underline')}
+                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs underline text-gray-700 transition"
+                              title="Underline"
+                            >
+                              <u>U</u>
+                            </button>
+                            <div className="w-[1px] h-4 bg-gray-300 mx-1" />
+                            <button
+                              type="button"
+                              onClick={() => applyFormat('bullet')}
+                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                              title="Bulleted List"
+                            >
+                              • List
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyFormat('number')}
+                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                              title="Numbered List"
+                            >
+                              1. List
+                            </button>
+                          </div>
+                          <div className="flex bg-gray-200 rounded-lg p-0.5">
+                            <button
+                              type="button"
+                              onClick={() => setEditorMode('write')}
+                              className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                            >
+                              Write
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditorMode('preview')}
+                              className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                            >
+                              Preview
+                            </button>
+                          </div>
+                        </div>
+
+                        {editorMode === 'write' ? (
+                          <textarea
+                            ref={descriptionRef}
+                            value={formData.description}
+                            onChange={e => updateField('description', e.target.value)}
+                            rows={6}
+                            className="w-full p-4 bg-transparent outline-none border-0 focus:ring-0 text-sm resize-y"
+                            placeholder="Describe your product here..."
+                            required
+                          />
+                        ) : (
+                          <div
+                            className="w-full min-h-[144px] p-4 bg-white text-sm prose max-w-none overflow-y-auto max-h-[300px]"
+                            dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(formData.description) }}
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
+                        <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
+                        <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                          {formData.tags.map(t => (
+                            <span key={t} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                              {t} <X size={12} className="cursor-pointer text-[#c800ff] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                            </span>
+                          ))}
+                          <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
+                      <div className="flex gap-3">
+                        <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
+                        <button
+                          type="button"
+                          onClick={generateSKU}
+                          className="px-5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-2xl shadow-md transition"
+                        >
+                          Auto-Generate SKU
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-gray-400 font-medium mt-2 leading-relaxed">
+                        SKU is a unique code used for inventory tracking. <br />
+                        Example: <span className="font-bold text-gray-500">GADG-IPHONE-256GB</span> or <span className="font-bold text-gray-500">FASH-TSHIRT-BLACK-M</span>.
+                        You can auto-generate it, type your own, or leave it blank if unsure.
+                      </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block">Length</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={formData.dimensions.length || ''}
-                        onChange={(e) => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })}
-                        onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                        className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                        placeholder="L"
-                      />
+                )}
+
+                {/* STEP 2: Pricing & Inventory */}
+                {currentStep === 2 && (
+                  <div className="space-y-8">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
+                        <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block">Width</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={formData.dimensions.width || ''}
-                        onChange={(e) => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })}
-                        onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                        className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                        placeholder="W"
-                      />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                        <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
+                        <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block">Height</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={formData.dimensions.height || ''}
-                        onChange={(e) => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })}
-                        onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                        className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                        placeholder="H"
-                      />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                        <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#c800ff]" required />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
+                        <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
+                        <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
+                      </div>
+                      <div className="flex items-center pt-2 md:pt-8">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded border-gray-300 focus:ring-[#c800ff]" />
+                          <span className="font-bold text-gray-700 text-sm">In Stock</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
 
-            {/* Custom Attributes Fields Grid — always at the bottom of specs */}
-            <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
-              <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
-              {customFields.map((field, index) => (
-                <div key={index} className="flex flex-col sm:flex-row gap-3">
-                  <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
-                    const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
-                  }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
-                  <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
-                    const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
-                  }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
-                  <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#c800ff] flex items-center gap-1.5 hover:underline mt-2">
-                <Plus size={15} /> Add Custom Field
-              </button>
-            </div>
-          </div>
+                {/* STEP 3: Additional Details & Specifications */}
+                {currentStep === 3 && (
+                  <div className="space-y-8 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
+                        <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
+                      </div>
+                    </div>
 
-          {/* SEO collapsed layout */}
-          <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
-            <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
-              <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
-              <span className="text-gray-400 text-xs font-bold">{seoExpanded ? 'Collapse' : 'Expand'}</span>
-            </button>
-            {seoExpanded && (
-              <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
-                <div className="flex justify-end">
-                  <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-xl hover:bg-[#e1eff8] transition">
-                    Auto-Generate from Product Data
-                  </button>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
-                  <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
-                  <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
+                    {/* General Origin */}
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
+                        <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium" />
+                      </div>
+                    </div>
+
+                    {/* Return Policy */}
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
+                          <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
+                            <option value="Use Store Default">Use Faflora Store Default</option>
+                            <option value="3">3 days</option>
+                            <option value="7 days">7 days</option>
+                            <option value="14 days">14 days</option>
+                            <option value="30 days">30 days</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
+                          <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3] font-bold text-gray-700">
+                            <option value="Use Store Default">Use Faflora Store Default</option>
+                            <option value="store">Faflora Store pays</option>
+                            <option value="vendor">Vendor pays</option>
+                            <option value="customer">Customer pays</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
+                        <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
+                      </div>
+                    </div>
+
+                    {/* Warranty */}
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
+                      <div className="mb-4">
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
+                        <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
+                          <option value="Use Store Default">Use Faflora Store Default</option>
+                          <option value="none">None</option>
+                          <option value="3 months">3 months</option>
+                          <option value="6 months">6 months</option>
+                          <option value="1 year">1 year</option>
+                          <option value="2 years">2 years</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
+                        <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
+                      </div>
+                    </div>
+
+                    {/* Dynamic Category Specifications + Custom Fields */}
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
+                      <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
+                        {selectedCategoryName || 'General'} Specifications
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        {renderCategoryInputs(selectedCategoryName)}
+
+                        {/* Unified weight & dimension inputs nested in specs based on category */}
+                        {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
+                          <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
+                            <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.weight || ''}
+                                    onChange={(e) => updateField('weight', Number(e.target.value))}
+                                    onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                    className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    placeholder="Value"
+                                  />
+                                  <select
+                                    value={formData.weightUnit || 'kg'}
+                                    onChange={(e) => updateField('weightUnit', e.target.value)}
+                                    className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24"
+                                  >
+                                    <option value="kg">kg</option>
+                                    <option value="g">g</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Dimensions Measurement Unit</label>
+                                <select
+                                  value={formData.dimensionsUnit || 'cm'}
+                                  onChange={(e) => updateField('dimensionsUnit', e.target.value)}
+                                  className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700"
+                                >
+                                  <option value="cm">cm</option>
+                                  <option value="inches">inches</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Length</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={formData.dimensions.length || ''}
+                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })}
+                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                  placeholder="L"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Width</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={formData.dimensions.width || ''}
+                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })}
+                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                  placeholder="W"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Height</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={formData.dimensions.height || ''}
+                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })}
+                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                  placeholder="H"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Custom Attributes Fields Grid — always at the bottom of specs */}
+                      <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
+                        <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
+                        {customFields.map((field, index) => (
+                          <div key={index} className="flex flex-col sm:flex-row gap-3">
+                            <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
+                              const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
+                            }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
+                            <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
+                              const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
+                            }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
+                            <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#c800ff] flex items-center gap-1.5 hover:underline mt-2">
+                          <Plus size={15} /> Add Custom Field
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* SEO collapsed layout */}
+                    <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
+                      <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
+                        <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
+                        <span className="text-gray-400 text-xs font-bold">{seoExpanded ? 'Collapse' : 'Expand'}</span>
+                      </button>
+                      {seoExpanded && (
+                        <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
+                          <div className="flex justify-end">
+                            <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-xl hover:bg-[#e1eff8] transition">
+                              Auto-Generate from Product Data
+                            </button>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
+                            <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
+                            <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                )}
+              </form>
+            )}
+
+            {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
+            {!quickAddMode && (
+              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="flex items-center justify-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-bold transition"
+                >
+                  <ChevronLeft size={20} /> Previous
+                </button>
+
+                <div className="flex gap-3 md:gap-4">
+                  {currentStep < totalSteps ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      disabled={isSaving}
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
+                    >
+                      Next <ChevronRight size={20} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSaving}
+                      className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
+                    >
+                      <Check size={20} strokeWidth={3} />
+                      {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Create Product'}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
-          </div>
-
-        </div>
-      )}
-    </form>
-  )}
-
-            {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
-  {!quickAddMode && (
-    <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
-      <button
-        type="button"
-        onClick={prevStep}
-        disabled={currentStep === 1}
-        className="flex items-center justify-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-bold transition"
-      >
-        <ChevronLeft size={20} /> Previous
-      </button>
-
-      <div className="flex gap-3 md:gap-4">
-        {currentStep < totalSteps ? (
-          <button
-            type="button"
-            onClick={nextStep}
-            disabled={isSaving}
-            className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
-          >
-            Next <ChevronRight size={20} />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSaving}
-            className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
-          >
-            <Check size={20} strokeWidth={3} />
-            {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Create Product'}
-          </button>
-        )}
-      </div>
-    </div>
-  )}
           </motion.div >
         </div >
       )
-}
+      }
     </AnimatePresence >
   );
 }
