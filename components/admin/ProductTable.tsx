@@ -8,7 +8,7 @@ interface Product {
   stock: number;
   image: string;
   category?: string;
-  status?: 'draft' | 'active' | 'inactive' | 'out_of_stock' | 'discontinued';
+  status?: 'draft' | 'active' | 'published' | 'inactive' | 'out_of_stock' | 'discontinued';
 }
 
 interface ProductTableProps {
@@ -24,6 +24,27 @@ interface ProductTableProps {
   onPageChange?: (page: number) => void;
   isLoading?: boolean;
 }
+
+const getStatusBadge = (status?: Product['status']) => {
+  if (!status) return null;
+
+  const isPublished = status === 'active' || status === 'published';
+
+  if (isPublished) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Published
+      </span>
+    );
+  }
+
+  return (
+    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase">
+      {status.replaceAll('_', ' ')}
+    </span>
+  );
+};
 
 export default function ProductTable({
   data,
@@ -148,7 +169,7 @@ export default function ProductTable({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
-                    {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mt-0.5 uppercase">{p.status.replaceAll('_', ' ')}</span>}
+                    <div className="mt-0.5 w-fit">{getStatusBadge(p.status)}</div>
                   </div>
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-slate-700">NGN {p.price.toLocaleString()}</td>
@@ -189,7 +210,7 @@ export default function ProductTable({
               <div className="flex-1 min-w-0 pt-1">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
-                  {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0 uppercase">{p.status.replaceAll('_', ' ')}</span>}
+                  {getStatusBadge(p.status)}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>

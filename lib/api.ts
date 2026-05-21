@@ -350,6 +350,7 @@ export const authApi = {
 export type ProductStatus =
   | 'draft'
   | 'active'
+  | 'published'
   | 'inactive'
   | 'out_of_stock'
   | 'discontinued';
@@ -437,6 +438,7 @@ export interface CreateProductDto {
   };
   tags?: string[];
   metadata?: Record<string, any>;
+  origin?: string;
 }
 
 export type UpdateProductDto = Partial<CreateProductDto>;

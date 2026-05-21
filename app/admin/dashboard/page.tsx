@@ -5,6 +5,7 @@ import Sidebar from '@/components/admin/Sidebar';
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
+  categoryIncludesWeightAndDimensions,
 } from '@/components/admin/ActionModal';
 import CategoriesModal from '@/components/admin/CategoriesModal';
 import ImageUploadModal from '@/components/admin/ImageUploadModal';
@@ -167,18 +168,21 @@ const getCategoryList = (payload: unknown): unknown[] => {
   return [];
 };
 
-const normalizeCategory = (category: unknown): ProductCategoryOption | null => {
+const normalizeCategory = (category: unknown): (ProductCategoryOption & { isActive: boolean }) | null => {
   if (!isRecord(category)) return null;
 
-  const record = category as CategoryRecord;
+  const record = category as CategoryRecord & { isActive?: boolean; is_active?: boolean; status?: string };
   const id = record.id || record._id || record.categoryId || record.uuid;
   const name = record.name || record.title || record.displayName || record.slug;
 
   if (!id || !name) return null;
 
+  const isActive = Boolean(record.isActive ?? record.is_active ?? (record.status ? record.status === 'published' : true));
+
   return {
     id: String(id),
     name: String(name),
+    isActive,
   };
 };
 
@@ -394,38 +398,52 @@ const buildProductPayload = (
   formData: ProductFormData,
   categoryOptions: ProductCategoryOption[]
 ): CreateProductDto => {
+  const selectedCategory = categoryOptions.find(
+    (c) => c.id === formData.categoryId
+  );
+  const categoryName = selectedCategory?.name || '';
+  const includesWeightAndDimensions = categoryIncludesWeightAndDimensions(categoryName);
+
   const customMetadata: Record<string, unknown> = {
     ...formData.metadata,
-    origin: formData.origin,
     returnConditions: formData.returnConditions,
     warrantyDetails: formData.warrantyDetails,
   };
 
-  if (formData.colours.length > 1) {
+  if (includesWeightAndDimensions) {
+    customMetadata.weightUnit = (formData as any).weightUnit || 'kg';
+  }
+
+  // Ensure origin is completely removed from metadata
+  delete customMetadata.origin;
+
+  if (formData.colours.length > 0) {
     customMetadata.colours = formData.colours;
   }
 
-  if (formData.sizes.length > 1) {
+  if (formData.sizes.length > 0) {
     customMetadata.sizes = formData.sizes;
   }
 
+  const resolvedCategoryId = formData.subCategoryId && formData.subCategoryId !== ''
+    ? formData.subCategoryId
+    : resolveCategoryId(formData.categoryId, categoryOptions);
+
   const payload: CreateProductDto = {
     vendorId: formData.vendorId,
-    categoryId: resolveCategoryId(formData.categoryId, categoryOptions),
+    categoryId: resolvedCategoryId,
     name: formData.name,
     preview: formData.preview,
     description: formData.description,
     compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
     stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
+    origin: formData.origin,
   };
 
   if (formData.brand) payload.brand = formData.brand;
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
-  if (formData.condition === 'new' || formData.condition === 'used' || formData.condition === 'refurbished') {
-    payload.condition = formData.condition;
-  }
   if (formData.tags.length) payload.tags = formData.tags;
   if (formData.colours[0]) payload.color = formData.colours[0];
   if (formData.sizes[0]) payload.size = formData.sizes[0];
@@ -462,17 +480,20 @@ const buildProductPayload = (
   const discount = clampPercentage(formData.discount);
   if (discount !== undefined) payload.discount = discount;
 
-  const weight = getOptionalNumber(formData.weight);
-  if (weight !== undefined) payload.weight = weight;
+  // Only include weight and dimensions if whitelisted category
+  if (includesWeightAndDimensions) {
+    const weight = getOptionalNumber(formData.weight);
+    if (weight !== undefined) payload.weight = weight;
 
-  const { length, width, height } = formData.dimensions;
-  if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
-    payload.dimensions = {
-      length: Number(length) || 0,
-      width: Number(width) || 0,
-      height: Number(height) || 0,
-      unit: 'cm',
-    };
+    const { length, width, height } = formData.dimensions;
+    if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
+      payload.dimensions = {
+        length: Number(length) || 0,
+        width: Number(width) || 0,
+        height: Number(height) || 0,
+        unit: (formData as any).dimensionsUnit || 'cm',
+      };
+    }
   }
 
   return payload;
@@ -606,7 +627,8 @@ export default function AdminPage() {
         });
         const fetchedCategories = getCategoryList(response)
           .map(normalizeCategory)
-          .filter((category): category is ProductCategoryOption => Boolean(category));
+          .filter((category): category is (ProductCategoryOption & { isActive: boolean }) => Boolean(category))
+          .filter((category) => category.isActive);
 
         if (isMounted) {
           setCategories(fetchedCategories);
