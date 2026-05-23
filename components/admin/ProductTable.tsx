@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Edit3, Trash2, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Edit3, Trash2, ArrowUpDown, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -8,6 +8,7 @@ interface Product {
   stock: number;
   image: string;
   category?: string;
+  subCategory?: string;
   status?: 'draft' | 'active' | 'published' | 'inactive' | 'out_of_stock' | 'discontinued';
 }
 
@@ -15,6 +16,7 @@ interface ProductTableProps {
   data: Product[];
   onEdit: (item: Product) => void;
   onDelete: (id: string) => void;
+  onView?: (item: Product) => void;
   onPublish?: (id: string) => void;
   searchQuery?: string;
   currentPage?: number;
@@ -50,6 +52,7 @@ export default function ProductTable({
   data,
   onEdit,
   onDelete,
+  onView,
   onPublish,
   searchQuery = '',
   currentPage: serverPage,
@@ -158,7 +161,7 @@ export default function ProductTable({
           </thead>
           <tbody>
             {paginatedData.length > 0 ? paginatedData.map((p) => (
-              <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50/50 transition">
+              <tr key={p.id} onClick={() => onView?.(p)} className="border-b last:border-0 hover:bg-gray-50/50 transition cursor-pointer">
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border p-1 shrink-0 relative">
                     {p.image ? (
@@ -169,7 +172,14 @@ export default function ProductTable({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
-                    <div className="mt-0.5 w-fit">{getStatusBadge(p.status)}</div>
+                    <div className="flex items-center gap-2 mt-0.5 w-fit">
+                      {getStatusBadge(p.status)}
+                      {(p.category || p.subCategory) && (
+                        <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                          {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-slate-700">NGN {p.price.toLocaleString()}</td>
@@ -179,10 +189,13 @@ export default function ProductTable({
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
                     {p.status === 'draft' && onPublish && (
-                      <button onClick={() => onPublish(p.id)} className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
+                      <button onClick={(e) => { e.stopPropagation(); onPublish(p.id); }} className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
                     )}
-                    <button onClick={() => onEdit(p)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
-                    <button onClick={() => onDelete(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
+                    {onView && (
+                      <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="p-2 hover:bg-emerald-50 text-emerald-500 rounded-lg transition"><Eye size={18}/></button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
+                    <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
                   </div>
                 </td>
               </tr>
@@ -198,7 +211,7 @@ export default function ProductTable({
       {/* Mobile Card View */}
       <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
         {paginatedData.length > 0 ? paginatedData.map((p) => (
-          <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
+          <div key={p.id} onClick={() => onView?.(p)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 cursor-pointer hover:border-fuchsia-200 transition">
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden border p-2 shrink-0">
                 {p.image ? (
@@ -212,6 +225,13 @@ export default function ProductTable({
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
                   {getStatusBadge(p.status)}
                 </div>
+                {(p.category || p.subCategory) && (
+                  <div className="mt-1">
+                    <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                      {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
+                    </span>
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
@@ -220,14 +240,19 @@ export default function ProductTable({
             </div>
             <div className="flex justify-end gap-3 border-t border-gray-50 pt-3 mt-1">
               {p.status === 'draft' && onPublish && (
-                <button onClick={() => onPublish(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] rounded-xl transition text-xs font-bold shadow">
+                <button onClick={(e) => { e.stopPropagation(); onPublish(p.id); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] rounded-xl transition text-xs font-bold shadow">
                   Publish
                 </button>
               )}
-              <button onClick={() => onEdit(p)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-xs font-bold">
+              {onView && (
+                <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition text-xs font-bold">
+                  <Eye size={16}/> View
+                </button>
+              )}
+              <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-xs font-bold">
                 <Edit3 size={16}/> Edit
               </button>
-              <button onClick={() => onDelete(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition text-xs font-bold">
+              <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition text-xs font-bold">
                 <Trash2 size={16}/> Delete
               </button>
             </div>

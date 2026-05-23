@@ -9,9 +9,13 @@ interface ImageUploadModalProps {
   onClose: () => void;
   onComplete: (images: { file: File; alt: string }[]) => void;
   onSkip: () => void;
+  mode?: 'publish' | 'add';
+  existingImagesCount?: number;
 }
 
-export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }: ImageUploadModalProps) {
+export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, mode = 'publish', existingImagesCount = 0 }: ImageUploadModalProps) {
+  const isPublishMode = mode !== 'add';
+  const maxAllowed = 10 - existingImagesCount;
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [alts, setAlts] = useState<string[]>([]);
@@ -36,12 +40,12 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
     const files = Array.from(e.target.files || []);
     const allowedFiles = files
       .filter((file) => file.size <= 5 * 1024 * 1024)
-      .slice(0, Math.max(0, 10 - imageFiles.length));
+      .slice(0, Math.max(0, maxAllowed - imageFiles.length));
     const newPreviews = allowedFiles.map(file => URL.createObjectURL(file));
 
-    setImageFiles(prev => [...prev, ...allowedFiles].slice(0, 10));
-    setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 10));
-    setAlts(prev => [...prev, ...new Array(allowedFiles.length).fill('')].slice(0, 10));
+    setImageFiles(prev => [...prev, ...allowedFiles].slice(0, maxAllowed));
+    setImagePreviews(prev => [...prev, ...newPreviews].slice(0, maxAllowed));
+    setAlts(prev => [...prev, ...new Array(allowedFiles.length).fill('')].slice(0, maxAllowed));
   };
 
   const removeImage = (index: number) => {
@@ -80,8 +84,8 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
             {/* Header */}
             <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold">Upload Product Images</h2>
-                <p className="text-sm opacity-90 mt-1">Add visuals to publish your product</p>
+                <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add More Images'}</h2>
+                <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload additional images for this product'}</p>
               </div>
               <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
                 <X size={26} />
@@ -93,14 +97,18 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                 <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><ImageIcon size={22} /></div>
                 <div>
                   <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
-                  <p className="text-xs text-gray-500">Upload up to 10 images. The first image will be the cover.</p>
+                  <p className="text-xs text-gray-500">
+                    {isPublishMode 
+                      ? 'Upload up to 10 images. The first image will be the cover.' 
+                      : `Upload up to ${maxAllowed} more images.`}
+                  </p>
                 </div>
               </div>
 
               <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-[#fcedf9] rounded-3xl p-12 bg-[#F8FDFF] flex flex-col items-center cursor-pointer hover:bg-[#F0F9FA] transition">
                 <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white p-4 rounded-2xl mb-4"><Upload size={36} /></div>
                 <p className="font-bold text-gray-700">Click to upload or drag & drop</p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP • Max 10 images</p>
+                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP • Max {maxAllowed} images</p>
               </div>
               <input type="file" ref={fileInputRef} multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
 
@@ -110,7 +118,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                     <div key={i} className="flex flex-col gap-2">
                       <div className="relative group rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm aspect-square bg-gray-50 flex items-center justify-center">
                         <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
-                        {i === 0 && (
+                        {i === 0 && existingImagesCount === 0 && (
                           <div className="absolute top-2 left-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[10px] font-bold px-2 py-1 rounded-md shadow">
                             COVER
                           </div>
@@ -121,7 +129,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                       </div>
                       <input 
                         type="text" 
-                        placeholder="Required Alt Text..." 
+                        placeholder="Alt text (e.g. 'Red shoes') - for SEO..." 
                         required 
                         value={alts[i] || ''} 
                         onChange={(e) => {
@@ -138,7 +146,13 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
             </div>
 
             {/* Footer */}
-            <div className="px-8 py-6 border-t bg-gray-50 flex justify-end items-center relative z-10">
+            <div className="px-8 py-6 border-t bg-gray-50 flex justify-between items-center relative z-10">
+              
+              <div className="text-red-500 text-xs font-bold w-1/2">
+                {imagePreviews.length > 0 && alts.some(alt => !alt.trim()) && (
+                  <p>Please provide alt text for all images to continue.</p>
+                )}
+              </div>
 
               <button 
                 type="button" 
@@ -150,7 +164,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                 }`}
                 disabled={imagePreviews.length === 0 || alts.some(alt => !alt.trim())}
               >
-                <Check size={20} /> Publish Product
+                <Check size={20} /> {isPublishMode ? 'Publish Product' : 'Upload Images'}
               </button>
             </div>
           </motion.div>

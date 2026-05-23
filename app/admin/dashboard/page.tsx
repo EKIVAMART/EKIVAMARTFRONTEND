@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
 import ActionModal, {
   ProductCategoryOption,
@@ -10,6 +10,7 @@ import ActionModal, {
 } from '@/components/admin/ActionModal';
 import CategoriesModal from '@/components/admin/CategoriesModal';
 import ImageUploadModal from '@/components/admin/ImageUploadModal';
+import ViewProductModal from '@/components/admin/ViewProductModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
@@ -45,6 +46,8 @@ type AdminProduct = Partial<ProductFormData> & {
   images?: ProductImage[];
   color?: string;
   size?: string;
+  subCategoryId?: string;
+  subCategory?: string;
 };
 
 type AdminVendor = {
@@ -86,10 +89,12 @@ type ProductRecord = {
   sellingPrice?: number;
   originalPrice?: number;
   category?: string | { id?: string; _id?: string; name?: string; title?: string };
+  subCategoryId?: string;
+  subCategory?: string | { id?: string; _id?: string; name?: string; title?: string };
   stock?: number | { quantity?: number; isInStock?: boolean };
   quantity?: number;
   image?: string;
-  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number }>;
+  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number; alt?: string }>;
   status?: ProductStatus;
   condition?: ProductCondition;
   returnWindow?: ReturnWindow;
@@ -184,6 +189,10 @@ const normalizeCategory = (category: unknown): (ProductCategoryOption & { isActi
     id: String(id),
     name: String(name),
     isActive,
+    subcategories: Array.isArray((record as any).subcategories) ? (record as any).subcategories.map((s: any) => ({
+      id: String(s.id || s._id || s.categoryId || s.uuid),
+      name: String(s.name || s.title || s.displayName || 'Unknown Subcategory'),
+    })) : [],
   };
 };
 
@@ -297,6 +306,7 @@ const getProductImagesFull = (images: ProductRecord['images']): ProductImage[] =
         url: image.url || '',
         order: image.order ?? idx,
         isPrimary: image.isPrimary,
+        alt: image.alt || '',
       };
     })
     .filter(img => Boolean(img.url))
@@ -370,7 +380,8 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     metadata,
     discount: record.discount ?? record.discountPercentage ?? 0,
     currency: 'NGN',
-    subCategoryId: '',
+    subCategoryId: record.subCategoryId || '',
+    subCategory: getCategoryName(record.subCategory),
     origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
     returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
     warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
@@ -526,6 +537,8 @@ export default function AdminPage() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [productToPublishId, setProductToPublishId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
+  const [viewingItem, setViewingItem] = useState<AdminProduct | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productLoadError, setProductLoadError] = useState('');
@@ -537,6 +550,10 @@ export default function AdminPage() {
   const [currentUserId, setCurrentUserId] = useState('');
   const [categories, setCategories] = useState<ProductCategoryOption[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [filterCategoryId, setFilterCategoryId] = useState('all');
+  const [filterSubcategoryId, setFilterSubcategoryId] = useState('all');
+  const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
+  const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
@@ -565,6 +582,40 @@ export default function AdminPage() {
     setEditingItem(item);
     setIsModalOpen(true);
   };
+
+  const openViewModal = (item: AdminProduct) => {
+    setViewingItem(item);
+    setIsViewModalOpen(true);
+  };
+
+  const resolvedProducts = useMemo(() => {
+    return products.map((p) => {
+      let resolvedCategory = p.category || '';
+      let resolvedSubCategory = p.subCategory || '';
+
+      if (p.categoryId) {
+        // First check if this categoryId is a known subcategory in our map
+        const subEntry = subcategoryMap.get(p.categoryId);
+        if (subEntry) {
+          resolvedCategory = subEntry.categoryName;
+          resolvedSubCategory = subEntry.subCategoryName;
+        } else {
+          // Check if categoryId is a top-level category
+          const parentCat = categories.find((c) => c.id === p.categoryId);
+          if (parentCat) {
+            resolvedCategory = parentCat.name;
+            resolvedSubCategory = '';
+          }
+        }
+      }
+
+      return {
+        ...p,
+        category: resolvedCategory,
+        subCategory: resolvedSubCategory,
+      };
+    });
+  }, [products, categories, subcategoryMap]);
 
   useEffect(() => {
     let isMounted = true;
@@ -646,6 +697,30 @@ export default function AdminPage() {
 
         if (isMounted) {
           setCategories(fetchedCategories);
+
+          // Also fetch subcategories for each category and build a lookup map
+          const map = new Map<string, { categoryName: string; subCategoryName: string }>();
+          try {
+            await Promise.all(
+              fetchedCategories.map(async (cat) => {
+                try {
+                  const subRes = await categoryApi.getSubcategories(cat.id);
+                  const subs = getCategoryList(subRes)
+                    .map(normalizeCategory)
+                    .filter((s): s is (ProductCategoryOption & { isActive: boolean }) => Boolean(s));
+                  subs.forEach((sub) => {
+                    map.set(sub.id, { categoryName: cat.name, subCategoryName: sub.name });
+                  });
+                } catch {
+                  // Subcategories unavailable for this category — skip
+                }
+              })
+            );
+          } catch {
+            // Best-effort, no crash
+          }
+
+          if (isMounted) setSubcategoryMap(map);
         }
       } catch (error) {
         if (isMounted) {
@@ -676,6 +751,7 @@ export default function AdminPage() {
         page: productPage,
         limit: PRODUCT_PAGE_LIMIT,
         searchQuery: searchQuery || undefined,
+        categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
@@ -712,6 +788,7 @@ export default function AdminPage() {
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
+          categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
           sortBy: 'createdAt',
           sortOrder: 'desc',
         });
@@ -746,7 +823,35 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [productPage, searchQuery]);
+  }, [productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (filterCategoryId === 'all') {
+      setFilterSubcategories([]);
+      setFilterSubcategoryId('all');
+      return;
+    }
+
+    const fetchSubs = async () => {
+      try {
+        const response = await categoryApi.getSubcategories(filterCategoryId);
+        const list = getCategoryList(response)
+          .map(normalizeCategory)
+          .filter((c): c is (ProductCategoryOption & { isActive: boolean }) => Boolean(c))
+          .filter(c => c.isActive);
+        if (isMounted) {
+          setFilterSubcategories(list);
+          setFilterSubcategoryId('all');
+        }
+      } catch (error) {
+        console.error('Error fetching filter subcategories', error);
+        if (isMounted) setFilterSubcategories([]);
+      }
+    };
+    void fetchSubs();
+    return () => { isMounted = false; };
+  }, [filterCategoryId]);
 
   const handleSaveProduct = async (formData: ProductFormData) => {
     if (activeTab !== 'products') return;
@@ -1020,6 +1125,39 @@ export default function AdminPage() {
         </div>
 
         {activeTab === 'products' && (
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <select
+              value={filterCategoryId}
+              onChange={(e) => {
+                setFilterCategoryId(e.target.value);
+                setProductPage(1);
+              }}
+              className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+
+            <select
+              value={filterSubcategoryId}
+              onChange={(e) => {
+                setFilterSubcategoryId(e.target.value);
+                setProductPage(1);
+              }}
+              disabled={filterCategoryId === 'all'}
+              className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+            >
+              <option value="all">All Subcategories</option>
+              {filterSubcategories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {activeTab === 'products' && (
           <div className="space-y-3">
             {(isLoadingProducts || isSavingProduct || productLoadError) && (
               <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
@@ -1030,8 +1168,9 @@ export default function AdminPage() {
               </div>
             )}
             <ProductTable
-              data={products}
+              data={resolvedProducts}
               onEdit={openModal}
+              onView={openViewModal}
               onDelete={handleDeleteProduct}
               onPublish={handlePublishClick}
               currentPage={productPage}
@@ -1059,6 +1198,12 @@ export default function AdminPage() {
           isLoadingCategories={isLoadingCategories}
           currentUserId={currentUserId}
           onSave={handleSaveProduct}
+        />
+
+        <ViewProductModal
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+          product={viewingItem}
         />
 
         <CategoriesModal
