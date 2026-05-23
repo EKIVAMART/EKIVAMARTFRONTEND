@@ -7,19 +7,21 @@ import { X, Upload, Check, ImageIcon } from 'lucide-react';
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (images: File[]) => void;
+  onComplete: (images: { file: File; alt: string }[]) => void;
   onSkip: () => void;
 }
 
 export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }: ImageUploadModalProps) {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [alts, setAlts] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clearSelectedImages = () => {
     imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
     setImagePreviews([]);
     setImageFiles([]);
+    setAlts([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -39,6 +41,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
 
     setImageFiles(prev => [...prev, ...allowedFiles].slice(0, 10));
     setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 10));
+    setAlts(prev => [...prev, ...new Array(allowedFiles.length).fill('')].slice(0, 10));
   };
 
   const removeImage = (index: number) => {
@@ -47,15 +50,19 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
     URL.revokeObjectURL(newPreviews[index]);
     newPreviews.splice(index, 1);
     newFiles.splice(index, 1);
+    const newAlts = [...alts];
+    newAlts.splice(index, 1);
     setImagePreviews(newPreviews);
     setImageFiles(newFiles);
+    setAlts(newAlts);
   };
 
   const handleComplete = () => {
     if (imageFiles.length === 0) {
       onSkip();
     } else {
-      onComplete(imageFiles);
+      const payload = imageFiles.map((file, i) => ({ file, alt: alts[i] || '' }));
+      onComplete(payload);
     }
     clearSelectedImages();
   };
@@ -98,18 +105,32 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
               <input type="file" ref={fileInputRef} multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
 
               {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-3 md:grid-cols-5 gap-4 mt-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   {imagePreviews.map((preview, i) => (
-                    <div key={i} className="relative group rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm aspect-square bg-gray-50 flex items-center justify-center">
-                      <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
-                      {i === 0 && (
-                        <div className="absolute top-2 left-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[10px] font-bold px-2 py-1 rounded-md shadow">
-                          COVER
-                        </div>
-                      )}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(i); }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow opacity-0 group-hover:opacity-100 transition-opacity m-3">
-                        <X size={14} strokeWidth={3} />
-                      </button>
+                    <div key={i} className="flex flex-col gap-2">
+                      <div className="relative group rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm aspect-square bg-gray-50 flex items-center justify-center">
+                        <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                        {i === 0 && (
+                          <div className="absolute top-2 left-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[10px] font-bold px-2 py-1 rounded-md shadow">
+                            COVER
+                          </div>
+                        )}
+                        <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(i); }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow opacity-0 group-hover:opacity-100 transition-opacity m-3">
+                          <X size={14} strokeWidth={3} />
+                        </button>
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder="Required Alt Text..." 
+                        required 
+                        value={alts[i] || ''} 
+                        onChange={(e) => {
+                          const newAlts = [...alts];
+                          newAlts[i] = e.target.value;
+                          setAlts(newAlts);
+                        }}
+                        className="w-full text-xs p-2 border rounded-lg outline-none focus:border-[#912cad]" 
+                      />
                     </div>
                   ))}
                 </div>
@@ -127,7 +148,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip }
                     ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white' 
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
-                disabled={imagePreviews.length === 0}
+                disabled={imagePreviews.length === 0 || alts.some(alt => !alt.trim())}
               >
                 <Check size={20} /> Publish Product
               </button>

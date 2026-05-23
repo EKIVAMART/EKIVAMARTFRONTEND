@@ -507,16 +507,64 @@ export const productApi = {
     }
   },
 
-  async uploadProductImages(id: string, files: File[]) {
+  async uploadProductImages(id: string, files: File[], alts?: string[]) {
     try {
       const formData = new FormData();
-      files.forEach((file) => {
+      files.forEach((file, index) => {
         formData.append('images', file);
+        if (alts && alts[index]) {
+          formData.append('alts', alts[index]);
+        }
       });
 
       const response = await axiosInstance.post<ApiResponse<any>>(
         `/products/${id}/images`,
         formData
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateProductImage(
+    id: string,
+    data: { order: number; newOrder?: number; alt?: string; isPrimary?: boolean; image?: File }
+  ) {
+    try {
+      let payload: any;
+      let headers = {};
+
+      if (data.image) {
+        const formData = new FormData();
+        formData.append('image', data.image);
+        formData.append('order', String(data.order));
+        if (data.newOrder !== undefined) formData.append('newOrder', String(data.newOrder));
+        if (data.alt !== undefined) formData.append('alt', data.alt);
+        if (data.isPrimary !== undefined) formData.append('isPrimary', String(data.isPrimary));
+        
+        payload = formData;
+        headers = { 'Content-Type': 'multipart/form-data' };
+      } else {
+        payload = data;
+      }
+
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/products/${id}/images`,
+        payload,
+        { headers }
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteProductImage(id: string, imageUrl: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(
+        `/products/${id}/images`,
+        { data: { imageUrl } } as any
       );
       return response.data;
     } catch (error) {

@@ -5,6 +5,7 @@ import Sidebar from '@/components/admin/Sidebar';
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
+  ProductImage,
   categoryIncludesWeightAndDimensions,
 } from '@/components/admin/ActionModal';
 import CategoriesModal from '@/components/admin/CategoriesModal';
@@ -41,7 +42,7 @@ type AdminProduct = Partial<ProductFormData> & {
   stock: number;
   image: string;
   status?: ProductStatus;
-  images?: string[];
+  images?: ProductImage[];
   color?: string;
   size?: string;
 };
@@ -285,18 +286,25 @@ const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
   return toNonNegativeInteger(stock ?? quantity);
 };
 
-const getProductImages = (images: ProductRecord['images']) => {
+const getProductImagesFull = (images: ProductRecord['images']): ProductImage[] => {
   if (!Array.isArray(images)) return [];
 
   return [...images]
+    .map((image, idx) => {
+      if (typeof image === 'string') return { url: image, order: idx };
+      return {
+        key: image.url || '', // use url as key fallback
+        url: image.url || '',
+        order: image.order ?? idx,
+        isPrimary: image.isPrimary,
+      };
+    })
+    .filter(img => Boolean(img.url))
     .sort((a, b) => {
-      if (typeof a === 'string' || typeof b === 'string') return 0;
       if (a.isPrimary) return -1;
       if (b.isPrimary) return 1;
-      return Number(a.order ?? 0) - Number(b.order ?? 0);
-    })
-    .map((image) => (typeof image === 'string' ? image : image.url))
-    .filter((url): url is string => Boolean(url));
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
 };
 
 const normalizeProduct = (product: unknown): AdminProduct | null => {
@@ -308,7 +316,8 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
 
   if (!id || !name) return null;
 
-  const imageUrls = getProductImages(record.images);
+  const imageObjects = getProductImagesFull(record.images);
+  const imageUrls = imageObjects.map(img => img.url);
   const compareAtPrice = getMoneyAmount(record.compareAtPrice);
   const price = getMoneyAmount(record.price) || Number(record.sellingPrice ?? record.originalPrice ?? 0);
   const metadata = record.metadata || {};
@@ -341,7 +350,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
       ? Boolean(record.stock.isInStock)
       : getStockQuantity(record.stock, record.quantity) > 0,
     image: record.image || imageUrls[0] || '',
-    images: imageUrls,
+    images: imageObjects,
     status: record.status || 'draft',
     condition: record.condition || 'new',
     returnWindow: record.returnWindow ? String(record.returnWindow) : 'Use Store Default',
@@ -448,11 +457,16 @@ const buildProductPayload = (
   if (formData.colours[0]) payload.color = formData.colours[0];
   if (formData.sizes[0]) payload.size = formData.sizes[0];
   if (formData.images?.length) {
-    payload.images = formData.images.map((url, index) => ({
-      url,
-      alt: `${formData.name} image ${index + 1}`,
-      isPrimary: index === 0,
-    }));
+    payload.images = formData.images.map((img, index) => {
+      if (typeof img === 'string') {
+        return {
+          url: img,
+          alt: `${formData.name} image ${index + 1}`,
+          isPrimary: index === 0,
+        };
+      }
+      return img;
+    });
   }
 
   const returnWindow = parseReturnWindow(formData.returnWindow);
@@ -784,7 +798,7 @@ export default function AdminPage() {
     setIsImageModalOpen(true);
   };
 
-  const handleImageComplete = async (images: File[]) => {
+  const handleImageComplete = async (images: { file: File; alt: string }[]) => {
     if (!productToPublishId) return;
 
     try {
@@ -792,7 +806,9 @@ export default function AdminPage() {
       setProductLoadError('');
 
       if (images.length > 0) {
-        await productApi.uploadProductImages(productToPublishId, images);
+        const files = images.map(img => img.file);
+        const alts = images.map(img => img.alt);
+        await productApi.uploadProductImages(productToPublishId, files, alts);
       }
 
       const response = await productApi.publishProduct(productToPublishId);

@@ -4,8 +4,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, AlertCircle, X, Check, Layers, DollarSign, Info, ChevronLeft, ChevronRight, Trash2, Zap } from 'lucide-react';
-import { categoryApi } from '@/lib/api';
+import { Plus, AlertCircle, X, Check, Layers, DollarSign, Info, ChevronLeft, ChevronRight, Trash2, Zap, Image as ImageIcon, UploadCloud, GripVertical, CheckCircle2, Edit2 } from 'lucide-react';
+import { categoryApi, productApi } from '@/lib/api';
+import { toast } from 'react-hot-toast';
+import ImageUploadModal from './ImageUploadModal';
 
 export interface ProductDimensions {
   length: number;
@@ -61,9 +63,17 @@ export interface ProductFormData {
   warrantyPeriod: string;
   warrantyDetails: string;
   status: 'draft' | 'active' | 'published' | 'inactive' | 'out_of_stock' | 'discontinued';
-  images?: string[];
+  images?: ProductImage[];
   weightUnit?: string;
   dimensionsUnit?: string;
+}
+
+export interface ProductImage {
+  key?: string;
+  url: string;
+  order: number;
+  isPrimary?: boolean;
+  alt?: string;
 }
 
 export type EditableProduct = Partial<ProductFormData>;
@@ -291,7 +301,8 @@ export default function ActionModal({
   onSave
 }: ActionModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const totalSteps = (editingItem?.id && editingItem?.status !== 'draft') ? 4 : 3;
 
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
@@ -336,6 +347,28 @@ export default function ActionModal({
   const [quickAddMode, setQuickAddMode] = useState(false);
   const [editorMode, setEditorMode] = useState<'write' | 'preview'>('write');
   const [seoExpanded, setSeoExpanded] = useState(false);
+
+  // Step 4 Image Management State
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isReordering, setIsReordering] = useState(false);
+  const [reorderImages, setReorderImages] = useState<ProductImage[]>([]);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isImageActionLoading, setIsImageActionLoading] = useState(false);
+  const [editingAltIndex, setEditingAltIndex] = useState<number | null>(null);
+  const [altTextInput, setAltTextInput] = useState('');
+  const [imageToDelete, setImageToDelete] = useState<ProductImage | null>(null);
+  
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const replaceInputRef = React.useRef<HTMLInputElement>(null);
+
+  const sortImages = (images: ProductImage[]): ProductImage[] => {
+    if (!Array.isArray(images)) return [];
+    return [...images].sort((a, b) => {
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
+  };
 
   const QuickAddButton = () => (
     <>
@@ -967,561 +1000,1165 @@ export default function ActionModal({
     return errors;
   };
 
+  const handleImageModalComplete = async (images: { file: File; alt: string }[]) => {
+    if (!images.length || !formData.id) return;
+    setIsUploadModalOpen(false);
+    setIsImageUploading(true);
+    setSaveErrors([]);
+    try {
+      const files = images.map(i => i.file);
+      const alts = images.map(i => i.alt);
+      const res = await productApi.uploadProductImages(formData.id, files, alts);
+      if (res?.data?.images || res?.data) {
+         const newImages = res.data.images || res.data;
+         updateField('images', sortImages(newImages));
+         toast.success('Images uploaded successfully!');
+      }
+    } catch (err: any) {
+      setSaveErrors([err.message || 'Failed to upload images']);
+      toast.error(err.message || 'Failed to upload images');
+    } finally {
+      setIsImageUploading(false);
+    }
+  };
+
+  const handleImageReplace = async (e: React.ChangeEvent<HTMLInputElement>) => {
+     if (!e.target.files?.length || !formData.id) return;
+     const file = e.target.files[0];
+     const currentImage = formData.images?.[selectedImageIndex];
+     if (!currentImage) return;
+
+     const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
+
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         image: file
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          toast.success('Image replaced successfully!');
+       }
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to replace image']);
+       toast.error(err.message || 'Failed to replace image');
+     } finally {
+       setIsImageActionLoading(false);
+       if (replaceInputRef.current) replaceInputRef.current.value = '';
+     }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!imageToDelete || !formData.id) return;
+    setIsImageActionLoading(true);
+    setSaveErrors([]);
+    try {
+      const urlToDelete = typeof imageToDelete === 'string' ? imageToDelete : (imageToDelete as any).url;
+      const res = await productApi.deleteProductImage(formData.id, urlToDelete);
+      if (res?.data?.images || res?.data) {
+         const newImages = res.data.images || res.data;
+         updateField('images', sortImages(newImages));
+         toast.success('Image deleted successfully!');
+      }
+      setImageToDelete(null);
+      setSelectedImageIndex(0);
+    } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to delete image']);
+       toast.error(err.message || 'Failed to delete image');
+    } finally {
+       setIsImageActionLoading(false);
+    }
+  };
+
+  const handleSetCoverImage = async () => {
+     const currentImage = formData.images?.[selectedImageIndex];
+     if (!currentImage || !formData.id) return;
+     const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
+     
+     const previousPrimary = formData.images?.find((img) => typeof img !== 'string' && img.isPrimary);
+     const prevOrder = previousPrimary ? (typeof previousPrimary === 'string' ? null : previousPrimary.order) : null;
+
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       if (prevOrder !== null && prevOrder !== undefined && prevOrder !== order) {
+         await productApi.updateProductImage(formData.id, {
+           order: prevOrder,
+           isPrimary: false
+         });
+       }
+
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         isPrimary: true
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          setSelectedImageIndex(0); // Focus on the new cover image!
+          toast.success('Cover image updated successfully!');
+       }
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to set cover image']);
+       toast.error(err.message || 'Failed to set cover image');
+     } finally {
+       setIsImageActionLoading(false);
+     }
+  };
+
+  const handleSaveAltText = async () => {
+     if (editingAltIndex === null) return;
+     const currentImage = formData.images?.[editingAltIndex];
+     if (!currentImage || !formData.id) return;
+     const order = typeof currentImage === 'string' ? editingAltIndex : (currentImage.order ?? editingAltIndex);
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         alt: altTextInput
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          toast.success('Alt text updated successfully!');
+       }
+       setEditingAltIndex(null);
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to update alt text']);
+       toast.error(err.message || 'Failed to update alt text');
+     } finally {
+       setIsImageActionLoading(false);
+     }
+  };
+
+  const handleSaveReorder = async () => {
+    if (!formData.id) return;
+    setIsImageActionLoading(true);
+    setSaveErrors([]);
+    try {
+      // Find the first image that has moved to a new order and use that for the API call
+      // The API expects one shift at a time, so doing one bulk is hard if backend shifts array.
+      // For a robust UI, we should apply one shift.
+      let movedImage = null;
+      let newOrder = 0;
+      
+      const original = formData.images || [];
+      for (let i = 0; i < reorderImages.length; i++) {
+         if (reorderImages[i].url !== original[i]?.url) {
+            // Find where it came from
+            const oldIndex = original.findIndex(img => img.url === reorderImages[i].url);
+            if (oldIndex !== i) {
+               movedImage = original[oldIndex];
+               newOrder = i;
+               break; // Just handle one move for now if backend shifts
+            }
+         }
+      }
+
+      if (movedImage) {
+        const res = await productApi.updateProductImage(formData.id, {
+          order: movedImage.order,
+          newOrder: newOrder
+        });
+        if (res?.data?.images || res?.data) {
+           const newImages = res.data.images || res.data;
+           updateField('images', sortImages(newImages));
+           toast.success('Image order saved successfully!');
+        }
+      }
+      setIsReordering(false);
+    } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to save new order']);
+       toast.error(err.message || 'Failed to save new order');
+    } finally {
+       setIsImageActionLoading(false);
+      if (!formData.tags.includes(tagInput.trim())) updateField('tags', [...formData.tags, tagInput.trim()]);
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (t: string) => updateField('tags', formData.tags.filter(x => x !== t));
+
+  const validateStep = (step: number): string[] => {
+    const errors: string[] = [];
+    if (step === 1) {
+      if (!formData.name.trim()) errors.push('Product name is required.');
+      if (!formData.categoryId) errors.push('Product category is required.');
+    } else if (step === 2) {
+      if (!formData.compareAtPrice || formData.compareAtPrice <= 0) errors.push('Original price is required.');
+      if (formData.stock === undefined || formData.stock < 0) errors.push('Stock is required.');
+    }
+    return errors;
+  };
+
+  const handleImageModalComplete = async (images: { file: File; alt: string }[]) => {
+    if (!images.length || !formData.id) return;
+    setIsUploadModalOpen(false);
+    setIsImageUploading(true);
+    setSaveErrors([]);
+    try {
+      const files = images.map(i => i.file);
+      const alts = images.map(i => i.alt);
+      const res = await productApi.uploadProductImages(formData.id, files, alts);
+      if (res?.data?.images || res?.data) {
+         const newImages = res.data.images || res.data;
+         updateField('images', sortImages(newImages));
+         toast.success('Images uploaded successfully!');
+      }
+    } catch (err: any) {
+      setSaveErrors([err.message || 'Failed to upload images']);
+      toast.error(err.message || 'Failed to upload images');
+    } finally {
+      setIsImageUploading(false);
+    }
+  };
+
+  const handleImageReplace = async (e: React.ChangeEvent<HTMLInputElement>) => {
+     if (!e.target.files?.length || !formData.id) return;
+     const file = e.target.files[0];
+     const currentImage = formData.images?.[selectedImageIndex];
+     if (!currentImage) return;
+
+     const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
+
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         image: file
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          toast.success('Image replaced successfully!');
+       }
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to replace image']);
+       toast.error(err.message || 'Failed to replace image');
+     } finally {
+       setIsImageActionLoading(false);
+       if (replaceInputRef.current) replaceInputRef.current.value = '';
+     }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!imageToDelete || !formData.id) return;
+    setIsImageActionLoading(true);
+    setSaveErrors([]);
+    try {
+      const urlToDelete = typeof imageToDelete === 'string' ? imageToDelete : (imageToDelete as any).url;
+      const res = await productApi.deleteProductImage(formData.id, urlToDelete);
+      if (res?.data?.images || res?.data) {
+         const newImages = res.data.images || res.data;
+         updateField('images', sortImages(newImages));
+         toast.success('Image deleted successfully!');
+      }
+      setImageToDelete(null);
+      setSelectedImageIndex(0);
+    } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to delete image']);
+       toast.error(err.message || 'Failed to delete image');
+    } finally {
+       setIsImageActionLoading(false);
+    }
+  };
+
+  const handleSetCoverImage = async () => {
+     const currentImage = formData.images?.[selectedImageIndex];
+     if (!currentImage || !formData.id) return;
+     const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
+     
+     const previousPrimary = formData.images?.find((img) => typeof img !== 'string' && img.isPrimary);
+     const prevOrder = previousPrimary ? (typeof previousPrimary === 'string' ? null : previousPrimary.order) : null;
+
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       if (prevOrder !== null && prevOrder !== undefined && prevOrder !== order) {
+         await productApi.updateProductImage(formData.id, {
+           order: prevOrder,
+           isPrimary: false
+         });
+       }
+
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         isPrimary: true
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          setSelectedImageIndex(0); // Focus on the new cover image!
+          toast.success('Cover image updated successfully!');
+       }
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to set cover image']);
+       toast.error(err.message || 'Failed to set cover image');
+     } finally {
+       setIsImageActionLoading(false);
+     }
+  };
+
+  const handleSaveAltText = async () => {
+     if (editingAltIndex === null) return;
+     const currentImage = formData.images?.[editingAltIndex];
+     if (!currentImage || !formData.id) return;
+     const order = typeof currentImage === 'string' ? editingAltIndex : (currentImage.order ?? editingAltIndex);
+     setIsImageActionLoading(true);
+     setSaveErrors([]);
+     try {
+       const res = await productApi.updateProductImage(formData.id, {
+         order: order,
+         alt: altTextInput
+       });
+       if (res?.data?.images || res?.data) {
+          const newImages = res.data.images || res.data;
+          updateField('images', sortImages(newImages));
+          toast.success('Alt text updated successfully!');
+       }
+       setEditingAltIndex(null);
+     } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to update alt text']);
+       toast.error(err.message || 'Failed to update alt text');
+     } finally {
+       setIsImageActionLoading(false);
+     }
+  };
+
+  const handleSaveReorder = async () => {
+    if (!formData.id) return;
+    setIsImageActionLoading(true);
+    setSaveErrors([]);
+    try {
+      // Find the first image that has moved to a new order and use that for the API call
+      // The API expects one shift at a time, so doing one bulk is hard if backend shifts array.
+      // For a robust UI, we should apply one shift.
+      let movedImage = null;
+      let newOrder = 0;
+      
+      const original = formData.images || [];
+      for (let i = 0; i < reorderImages.length; i++) {
+         if (reorderImages[i].url !== original[i]?.url) {
+            // Find where it came from
+            const oldIndex = original.findIndex(img => img.url === reorderImages[i].url);
+            if (oldIndex !== i) {
+               movedImage = original[oldIndex];
+               newOrder = i;
+               break; // Just handle one move for now if backend shifts
+            }
+         }
+      }
+
+      if (movedImage) {
+        const res = await productApi.updateProductImage(formData.id, {
+          order: movedImage.order,
+          newOrder: newOrder
+        });
+        if (res?.data?.images || res?.data) {
+           const newImages = res.data.images || res.data;
+           updateField('images', sortImages(newImages));
+           toast.success('Image order saved successfully!');
+        }
+      }
+      setIsReordering(false);
+    } catch (err: any) {
+       setSaveErrors([err.message || 'Failed to save new order']);
+       toast.error(err.message || 'Failed to save new order');
+    } finally {
+       setIsImageActionLoading(false);
+    }
+  };
+
   if (activeTab !== 'products') return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
-          >
-            <AnimatePresence>
-              {saveErrors.length > 0 && (
-                <motion.div className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-2xl">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-800">Please fix these details before saving.</p>
-                      <ul className="mt-2 list-disc space-y-1 pl-4">
-                        {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
-                      </ul>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <div key="modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
+            >
+              <AnimatePresence>
+                {saveErrors.length > 0 && (
+                  <motion.div className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-2xl">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-red-800">Please fix these details before saving.</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-4">
+                          {saveErrors.map((error, index) => <li key={`error-${index}`}>{error}</li>)}
+                        </ul>
+                      </div>
+                      <button type="button" onClick={() => setSaveErrors([])} className="rounded-xl p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
                     </div>
-                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-xl p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold">{editingItem ? 'Edit Product' : 'Add New Product'}</h2>
-                <p className="text-sm opacity-90 mt-1">
-                  {quickAddMode ? 'Quick Add Mode' : `Step ${currentStep} of ${totalSteps}`}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {!editingItem && !quickAddMode && <QuickAddButton />}
-                {quickAddMode && (
+              <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{editingItem ? 'Edit Product' : 'Add New Product'}</h2>
+                  <p className="text-sm opacity-90 mt-1">
+                    {quickAddMode ? 'Quick Add Mode' : `Step ${currentStep} of ${totalSteps}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {!editingItem && !quickAddMode && <QuickAddButton />}
+                  {quickAddMode && (
+                    <button
+                      type="button"
+                      onClick={() => setQuickAddMode(false)}
+                      className="px-3.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                    >
+                      Switch to Detailed Form
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={() => setQuickAddMode(false)}
-                    className="px-3.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                    onClick={handleClose}
+                    className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition"
+                    aria-label="Close modal"
                   >
-                    Switch to Detailed Form
+                    <X size={22} />
                   </button>
-                )}
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition"
-                  aria-label="Close modal"
-                >
-                  <X size={22} />
-                </button>
+                </div>
               </div>
-            </div>
 
-            {quickAddMode ? (
-              renderQuickAddForm()
-            ) : (
-              <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 min-h-0">
-                {currentStep === 1 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Layers size={22} /></div>
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
-                        <p className="text-xs text-gray-500">Core product details</p>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#c800ff] ml-1">*</span></label>
-                      <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
-                    </div>
-
-                    <input type="hidden" value={formData.vendorId} readOnly />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
-                        <select
-                          value={selectedCategoryValue}
-                          onChange={e => {
-                            updateField('categoryId', e.target.value);
-                            updateField('subCategoryId', ''); // Clear subcategory on change
-                          }}
-                          className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
-                          required
-                          disabled={isLoadingCategories}
-                        >
-                          <option value="">
-                            {isLoadingCategories ? 'Loading categories...' : 'Select category'}
-                          </option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
-                        <select
-                          value={formData.subCategoryId}
-                          onChange={e => updateField('subCategoryId', e.target.value)}
-                          className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
-                          required
-                          disabled={isLoadingSubcategories || !formData.categoryId}
-                        >
-                          <option value="">
-                            {!formData.categoryId
-                              ? 'Please select a category first'
-                              : isLoadingSubcategories
-                                ? 'Loading subcategories...'
-                                : 'Select subcategory'
-                            }
-                          </option>
-                          {subcategories.map((sub) => (
-                            <option key={sub.id} value={sub.id}>
-                              {sub.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
-                      <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
-                      <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
-                        {/* Editor Header Toolbar */}
-                        <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => applyFormat('bold')}
-                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                              title="Bold"
-                            >
-                              <b>B</b>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => applyFormat('italic')}
-                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs italic text-gray-700 transition"
-                              title="Italic"
-                            >
-                              <i>I</i>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => applyFormat('underline')}
-                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs underline text-gray-700 transition"
-                              title="Underline"
-                            >
-                              <u>U</u>
-                            </button>
-                            <div className="w-[1px] h-4 bg-gray-300 mx-1" />
-                            <button
-                              type="button"
-                              onClick={() => applyFormat('bullet')}
-                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                              title="Bulleted List"
-                            >
-                              • List
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => applyFormat('number')}
-                              className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
-                              title="Numbered List"
-                            >
-                              1. List
-                            </button>
+              {quickAddMode ? (
+                renderQuickAddForm()
+              ) : (
+                <div className="flex flex-col flex-grow min-h-0">
+                  {/* Step Indicator */}
+                  <div className="px-6 md:px-8 pt-6 pb-2 border-b border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center justify-between">
+                       {[
+                         { step: 1, title: 'Basic Information', desc: 'Core product details' },
+                         { step: 2, title: 'Pricing & Inventory', desc: 'Set price, stock levels, and costs' },
+                         { step: 3, title: 'Additional Details', desc: 'Policies, category specifications, and SEO metadata' },
+                         ...(totalSteps === 4 ? [{ step: 4, title: 'Images', desc: 'Manage product gallery' }] : [])
+                       ].map((s) => (
+                          <div key={s.step} className="flex flex-col items-center flex-1 relative">
+                             {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#c800ff]' : 'bg-gray-200'}`} />}
+                             <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#c800ff] text-white shadow-md shadow-[#c800ff]/30 ring-4 ring-[#c800ff]/10' : currentStep > s.step ? 'bg-[#912cad] text-white' : 'bg-gray-200 text-gray-500'}`}>
+                                {currentStep > s.step ? <Check size={14} /> : s.step}
+                             </div>
+                             <div className="mt-2 text-center hidden md:block">
+                                <p className={`text-[11px] font-bold ${currentStep >= s.step ? 'text-gray-800' : 'text-gray-400'}`}>{s.title}</p>
+                                <p className="text-[9px] text-gray-400 mt-0.5">{s.desc}</p>
+                             </div>
                           </div>
-                          <div className="flex bg-gray-200 rounded-lg p-0.5">
-                            <button
-                              type="button"
-                              onClick={() => setEditorMode('write')}
-                              className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
-                            >
-                              Write
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditorMode('preview')}
-                              className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
-                            >
-                              Preview
-                            </button>
-                          </div>
-                        </div>
-
-                        {editorMode === 'write' ? (
-                          <textarea
-                            ref={descriptionRef}
-                            value={formData.description}
-                            onChange={e => updateField('description', e.target.value)}
-                            rows={6}
-                            className="w-full p-4 bg-transparent outline-none border-0 focus:ring-0 text-sm resize-y"
-                            placeholder="Describe your product here..."
-                            required
-                          />
-                        ) : (
-                          <div
-                            className="w-full min-h-[144px] p-4 bg-white text-sm prose max-w-none overflow-y-auto max-h-[300px]"
-                            dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(formData.description) }}
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
-                        <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                        <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
-                          {formData.tags.map(t => (
-                            <span key={t} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
-                              {t} <X size={12} className="cursor-pointer text-[#c800ff] hover:text-red-500 transition" onClick={() => removeTag(t)} />
-                            </span>
-                          ))}
-                          <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
-                      <div className="flex gap-3">
-                        <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
-                        <button
-                          type="button"
-                          onClick={generateSKU}
-                          className="px-5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-2xl shadow-md transition"
-                        >
-                          Auto-Generate SKU
-                        </button>
-                      </div>
-                      <p className="text-[11px] text-gray-400 font-medium mt-2 leading-relaxed">
-                        SKU is a unique code used for inventory tracking. <br />
-                        Example: <span className="font-bold text-gray-500">GADG-IPHONE-256GB</span> or <span className="font-bold text-gray-500">FASH-TSHIRT-BLACK-M</span>.
-                        You can auto-generate it, type your own, or leave it blank if unsure.
-                      </p>
+                       ))}
                     </div>
                   </div>
-                )}
 
-                {/* STEP 2: Pricing & Inventory */}
-                {currentStep === 2 && (
-                  <div className="space-y-8">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
-                        <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
-                        <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
-                        <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
-                        <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#c800ff]" required />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
-                        <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
-                        <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
-                      </div>
-                      <div className="flex items-center pt-2 md:pt-8">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded border-gray-300 focus:ring-[#c800ff]" />
-                          <span className="font-bold text-gray-700 text-sm">In Stock</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* STEP 3: Additional Details & Specifications */}
-                {currentStep === 3 && (
-                  <div className="space-y-8 animate-in fade-in duration-200">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
-                        <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
-                      </div>
-                    </div>
-
-                    {/* General Origin */}
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                      <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
-                        <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium" />
-                      </div>
-                    </div>
-
-                    {/* Return Policy */}
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                      <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
+                  <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 min-h-0">
+                  {currentStep === 1 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Layers size={22} /></div>
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
-                          <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                            <option value="Use Store Default">Use Faflora Store Default</option>
-                            <option value="3">3 days</option>
-                            <option value="7 days">7 days</option>
-                            <option value="14 days">14 days</option>
-                            <option value="30 days">30 days</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
-                          <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3] font-bold text-gray-700">
-                            <option value="Use Store Default">Use Faflora Store Default</option>
-                            <option value="store">Faflora Store pays</option>
-                            <option value="vendor">Vendor pays</option>
-                            <option value="customer">Customer pays</option>
-                          </select>
+                          <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
+                          <p className="text-xs text-gray-500">Core product details</p>
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
-                        <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#c800ff] ml-1">*</span></label>
+                        <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                       </div>
-                    </div>
 
-                    {/* Warranty */}
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                      <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
-                      <div className="mb-4">
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
-                        <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                          <option value="Use Store Default">Use Faflora Store Default</option>
-                          <option value="none">None</option>
-                          <option value="3 months">3 months</option>
-                          <option value="6 months">6 months</option>
-                          <option value="1 year">1 year</option>
-                          <option value="2 years">2 years</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
-                        <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
-                      </div>
-                    </div>
+                      <input type="hidden" value={formData.vendorId} readOnly />
 
-                    {/* Dynamic Category Specifications + Custom Fields */}
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
-                      <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
-                        {selectedCategoryName || 'General'} Specifications
-                      </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                        {renderCategoryInputs(selectedCategoryName)}
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
+                          <select
+                            value={selectedCategoryValue}
+                            onChange={e => {
+                              updateField('categoryId', e.target.value);
+                              updateField('subCategoryId', ''); // Clear subcategory on change
+                            }}
+                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            required
+                            disabled={isLoadingCategories}
+                          >
+                            <option value="">
+                              {isLoadingCategories ? 'Loading categories...' : 'Select category'}
+                            </option>
+                            {categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
+                          <select
+                            value={formData.subCategoryId}
+                            onChange={e => updateField('subCategoryId', e.target.value)}
+                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            required
+                            disabled={isLoadingSubcategories || !formData.categoryId}
+                          >
+                            <option value="">
+                              {!formData.categoryId
+                                ? 'Please select a category first'
+                                : isLoadingSubcategories
+                                  ? 'Loading subcategories...'
+                                  : 'Select subcategory'
+                              }
+                            </option>
+                            {subcategories.map((sub) => (
+                              <option key={sub.id} value={sub.id}>
+                                {sub.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
 
-                        {/* Unified weight & dimension inputs nested in specs based on category */}
-                        {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
-                          <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
-                            <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div>
-                                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
-                                <div className="flex gap-2">
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.weight || ''}
-                                    onChange={(e) => updateField('weight', Number(e.target.value))}
-                                    onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                    className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                                    placeholder="Value"
-                                  />
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
+                        <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
+                        <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
+                          {/* Editor Header Toolbar */}
+                          <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => applyFormat('bold')}
+                                className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                                title="Bold"
+                              >
+                                <b>B</b>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyFormat('italic')}
+                                className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs italic text-gray-700 transition"
+                                title="Italic"
+                              >
+                                <i>I</i>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyFormat('underline')}
+                                className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs underline text-gray-700 transition"
+                                title="Underline"
+                              >
+                                <u>U</u>
+                              </button>
+                              <div className="w-[1px] h-4 bg-gray-300 mx-1" />
+                              <button
+                                type="button"
+                                onClick={() => applyFormat('bullet')}
+                                className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                                title="Bulleted List"
+                              >
+                                • List
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyFormat('number')}
+                                className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"
+                                title="Numbered List"
+                              >
+                                1. List
+                              </button>
+                            </div>
+                            <div className="flex bg-gray-200 rounded-lg p-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setEditorMode('write')}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                              >
+                                Write
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditorMode('preview')}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                              >
+                                Preview
+                              </button>
+                            </div>
+                          </div>
+
+                          {editorMode === 'write' ? (
+                            <textarea
+                              ref={descriptionRef}
+                              value={formData.description}
+                              onChange={e => updateField('description', e.target.value)}
+                              rows={6}
+                              className="w-full p-4 bg-transparent outline-none border-0 focus:ring-0 text-sm resize-y"
+                              placeholder="Describe your product here..."
+                              required
+                            />
+                          ) : (
+                            <div
+                              className="w-full min-h-[144px] p-4 bg-white text-sm prose max-w-none overflow-y-auto max-h-[300px]"
+                              dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(formData.description) }}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
+                          <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
+                          <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                            {formData.tags.map(t => (
+                              <span key={t} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                                {t} <X size={12} className="cursor-pointer text-[#c800ff] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                              </span>
+                            ))}
+                            <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
+                        <div className="flex gap-3">
+                          <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
+                          <button
+                            type="button"
+                            onClick={generateSKU}
+                            className="px-5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-2xl shadow-md transition"
+                          >
+                            Auto-Generate SKU
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-gray-400 font-medium mt-2 leading-relaxed">
+                          SKU is a unique code used for inventory tracking. <br />
+                          Example: <span className="font-bold text-gray-500">GADG-IPHONE-256GB</span> or <span className="font-bold text-gray-500">FASH-TSHIRT-BLACK-M</span>.
+                          You can auto-generate it, type your own, or leave it blank if unsure.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* STEP 2: Pricing & Inventory */}
+                  {currentStep === 2 && (
+                    <div className="space-y-8">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
+                          <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                          <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
+                          <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#c800ff]" required />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
+                          <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
+                          <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
+                        </div>
+                        <div className="flex items-center pt-2 md:pt-8">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded border-gray-300 focus:ring-[#c800ff]" />
+                            <span className="font-bold text-gray-700 text-sm">In Stock</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* STEP 3: Additional Details & Specifications */}
+                  {currentStep === 3 && (
+                    <div className="space-y-8 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
+                          <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
+                        </div>
+                      </div>
+
+                      {/* General Origin */}
+                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                        <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
+                          <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium" />
+                        </div>
+                      </div>
+
+                      {/* Return Policy */}
+                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                        <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
+                            <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
+                              <option value="Use Store Default">Use Faflora Store Default</option>
+                              <option value="3">3 days</option>
+                              <option value="7 days">7 days</option>
+                              <option value="14 days">14 days</option>
+                              <option value="30 days">30 days</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
+                            <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3] font-bold text-gray-700">
+                              <option value="Use Store Default">Use Faflora Store Default</option>
+                              <option value="store">Faflora Store pays</option>
+                              <option value="vendor">Vendor pays</option>
+                              <option value="customer">Customer pays</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
+                          <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
+                        </div>
+                      </div>
+
+                      {/* Warranty */}
+                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                        <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
+                        <div className="mb-4">
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
+                          <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
+                            <option value="Use Store Default">Use Faflora Store Default</option>
+                            <option value="none">None</option>
+                            <option value="3 months">3 months</option>
+                            <option value="6 months">6 months</option>
+                            <option value="1 year">1 year</option>
+                            <option value="2 years">2 years</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
+                          <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
+                        </div>
+                      </div>
+
+                      {/* Dynamic Category Specifications + Custom Fields */}
+                      <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
+                        <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
+                          {selectedCategoryName || 'General'} Specifications
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                          {renderCategoryInputs(selectedCategoryName)}
+
+                          {/* Unified weight & dimension inputs nested in specs based on category */}
+                          {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
+                            <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
+                              <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={formData.weight || ''}
+                                      onChange={(e) => updateField('weight', Number(e.target.value))}
+                                      onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                      className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                      placeholder="Value"
+                                    />
+                                    <select
+                                      value={formData.weightUnit || 'kg'}
+                                      onChange={(e) => updateField('weightUnit', e.target.value)}
+                                      className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24"
+                                    >
+                                      <option value="kg">kg</option>
+                                      <option value="g">g</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-xs font-bold text-gray-600 mb-1.5 block">Dimensions Measurement Unit</label>
                                   <select
-                                    value={formData.weightUnit || 'kg'}
-                                    onChange={(e) => updateField('weightUnit', e.target.value)}
-                                    className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24"
+                                    value={formData.dimensionsUnit || 'cm'}
+                                    onChange={(e) => updateField('dimensionsUnit', e.target.value)}
+                                    className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700"
                                   >
-                                    <option value="kg">kg</option>
-                                    <option value="g">g</option>
+                                    <option value="cm">cm</option>
+                                    <option value="inches">inches</option>
                                   </select>
                                 </div>
                               </div>
-                              <div>
-                                <label className="text-xs font-bold text-gray-600 mb-1.5 block">Dimensions Measurement Unit</label>
-                                <select
-                                  value={formData.dimensionsUnit || 'cm'}
-                                  onChange={(e) => updateField('dimensionsUnit', e.target.value)}
-                                  className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700"
-                                >
-                                  <option value="cm">cm</option>
-                                  <option value="inches">inches</option>
-                                </select>
+                              <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                  <label className="text-xs font-bold text-gray-500 mb-1 block">Length</label>
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    value={formData.dimensions.length || ''}
+                                    onChange={(e) => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })}
+                                    onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    placeholder="L"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs font-bold text-gray-500 mb-1 block">Width</label>
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    value={formData.dimensions.width || ''}
+                                    onChange={(e) => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })}
+                                    onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    placeholder="W"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs font-bold text-gray-500 mb-1 block">Height</label>
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    value={formData.dimensions.height || ''}
+                                    onChange={(e) => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })}
+                                    onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
+                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    placeholder="H"
+                                  />
+                                </div>
                               </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
-                              <div>
-                                <label className="text-xs font-bold text-gray-500 mb-1 block">Length</label>
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.dimensions.length || ''}
-                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })}
-                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                                  placeholder="L"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-bold text-gray-500 mb-1 block">Width</label>
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.dimensions.width || ''}
-                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })}
-                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                                  placeholder="W"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-bold text-gray-500 mb-1 block">Height</label>
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.dimensions.height || ''}
-                                  onChange={(e) => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })}
-                                  onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                  className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
-                                  placeholder="H"
-                                />
-                              </div>
+                          )}
+                        </div>
+
+                        {/* Custom Attributes Fields Grid — always at the bottom of specs */}
+                        <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
+                          <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
+                          {customFields.map((field, index) => (
+                            <div key={index} className="flex flex-col sm:flex-row gap-3">
+                              <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
+                                const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
+                              }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
+                              <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
+                                const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
+                              }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
+                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          ))}
+                          <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#c800ff] flex items-center gap-1.5 hover:underline mt-2">
+                            <Plus size={15} /> Add Custom Field
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* SEO collapsed layout */}
+                      <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
+                        <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
+                          <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
+                          <span className="text-gray-400 text-xs font-bold">{seoExpanded ? 'Collapse' : 'Expand'}</span>
+                        </button>
+                        {seoExpanded && (
+                          <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
+                            <div className="flex justify-end">
+                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-xl hover:bg-[#e1eff8] transition">
+                                Auto-Generate from Product Data
+                              </button>
+                            </div>
+                            <div>
+                              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
+                              <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
+                            </div>
+                            <div>
+                              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
+                              <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
                             </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Custom Attributes Fields Grid — always at the bottom of specs */}
-                      <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
-                        <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
-                        {customFields.map((field, index) => (
-                          <div key={index} className="flex flex-col sm:flex-row gap-3">
-                            <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
-                              const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
-                            }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
-                            <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
-                              const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
-                            }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
-                            <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        ))}
-                        <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#c800ff] flex items-center gap-1.5 hover:underline mt-2">
-                          <Plus size={15} /> Add Custom Field
-                        </button>
-                      </div>
                     </div>
+                  )}
 
-                    {/* SEO collapsed layout */}
-                    <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
-                      <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
-                        <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
-                        <span className="text-gray-400 text-xs font-bold">{seoExpanded ? 'Collapse' : 'Expand'}</span>
-                      </button>
-                      {seoExpanded && (
-                        <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
-                          <div className="flex justify-end">
-                            <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-xl hover:bg-[#e1eff8] transition">
-                              Auto-Generate from Product Data
-                            </button>
+                  {/* STEP 4: Images (Only for Published Products) */}
+                  {currentStep === 4 && (
+                    <div className="space-y-6 animate-in fade-in duration-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white">
+                            <ImageIcon size={22} />
                           </div>
                           <div>
-                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
-                            <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
-                          </div>
-                          <div>
-                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
-                            <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
+                            <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
+                            <p className="text-xs text-gray-500">Manage, replace, and reorder images.</p>
                           </div>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReorderImages(formData.images || []);
+                            setIsReordering(true);
+                          }}
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs flex items-center gap-2 transition"
+                        >
+                          <GripVertical size={16} /> Change Order
+                        </button>
+                      </div>
+
+                      {isReordering ? (
+                        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                          <h4 className="font-bold text-gray-800 mb-4">Reorder Images</h4>
+                          <p className="text-xs text-gray-500 mb-4">Drag and drop images below to reorder them.</p>
+                          <div className="space-y-3">
+                            {reorderImages.map((img, idx) => {
+                               const url = typeof img === 'string' ? img : img?.url;
+                               const alt = typeof img === 'string' ? '' : img?.alt;
+                               const isPrimary = typeof img === 'string' ? false : img?.isPrimary;
+                               return (
+                               <div 
+                                                               key={`reorder-${idx}`}
+                                 draggable
+                                 onDragStart={(e) => e.dataTransfer.setData('text/plain', idx.toString())}
+                                 onDragOver={(e) => e.preventDefault()}
+                                 onDrop={(e) => {
+                                   e.preventDefault();
+                                   const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+                                   if (isNaN(fromIdx) || fromIdx === idx) return;
+                                   const newImages = [...reorderImages];
+                                   const [moved] = newImages.splice(fromIdx, 1);
+                                   newImages.splice(idx, 0, moved);
+                                   setReorderImages(newImages);
+                                 }}
+                                 className="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 cursor-move"
+                               >
+                                  <GripVertical className="text-gray-400" size={20} />
+                                  <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                                     <img src={url} alt={alt || 'Product image'} className="w-full h-full object-cover" />
+                                  </div>
+                                  <div className="flex-1">
+                                     <p className="font-bold text-sm">Image {idx + 1}</p>
+                                     {alt && <p className="text-xs text-gray-500 mt-0.5">{alt}</p>}
+                                     {isPrimary && <span className="text-[10px] font-bold text-[#c800ff] bg-[#f0e1f7] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
+                                  </div>
+                               </div>
+                               );
+                            })}
+                          </div>
+                          <div className="flex justify-end gap-3 mt-6">
+                             <button type="button" onClick={() => setIsReordering(false)} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-50">Cancel</button>
+                             <button type="button" onClick={handleSaveReorder} disabled={isImageActionLoading} className="px-5 py-2.5 bg-[#c800ff] text-white rounded-xl font-bold text-sm hover:bg-[#b500e6] disabled:opacity-60">{isImageActionLoading ? 'Saving...' : 'Save New Order'}</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
+                           {/* Main Image Window */}
+                           <div className="relative w-full max-w-lg aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group mb-6">
+                              {formData.images && formData.images.length > 0 ? (
+                                 <img src={typeof formData.images[selectedImageIndex] === 'string' ? formData.images[selectedImageIndex] : (formData.images[selectedImageIndex] as any)?.url} alt="Main preview" className="w-full h-full object-contain" />
+                              ) : (
+                                 <div className="text-gray-400 flex flex-col items-center gap-2">
+                                    <ImageIcon size={48} strokeWidth={1} />
+                                    <span className="text-sm font-medium">No images uploaded</span>
+                                 </div>
+                              )}
+
+                              {formData.images && formData.images.length > 1 && (
+                                 <>
+                                   <button type="button" onClick={() => setSelectedImageIndex(prev => Math.max(0, prev - 1))} disabled={selectedImageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-r-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
+                                      <ChevronLeft size={24} />
+                                   </button>
+                                   <button type="button" onClick={() => setSelectedImageIndex(prev => Math.min((formData.images?.length || 1) - 1, prev + 1))} disabled={selectedImageIndex === (formData.images?.length || 1) - 1} className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-l-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
+                                      <ChevronRight size={24} />
+                                   </button>
+                                 </>
+                              )}
+
+                              {formData.images && formData.images.length > 0 && typeof formData.images[selectedImageIndex] !== 'string' && (formData.images[selectedImageIndex] as any)?.isPrimary && (
+                                 <div className="absolute top-4 left-4 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
+                                   <CheckCircle2 size={14} /> Cover Image
+                                 </div>
+                              )}
+                           </div>
+
+                           <div className="text-xs font-semibold text-gray-500 mb-3 bg-purple-50 text-purple-700 px-3.5 py-1.5 rounded-full border border-purple-100 shadow-sm flex items-center gap-1.5">
+                              <span>{(formData.images?.length || 0)} / 10 Images Uploaded</span>
+                              <span>•</span>
+                              <span className="font-extrabold">{10 - (formData.images?.length || 0)} more can be added</span>
+                            </div>
+
+                           {/* Thumbnails */}
+                           <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-2xl mb-8">
+                              {formData.images?.map((img, idx) => {
+                                 const url = typeof img === 'string' ? img : (img as any)?.url;
+                                 return (
+                                 <button
+                                   key={url || idx}
+                                   type="button"
+                                   onClick={() => setSelectedImageIndex(idx)}
+                                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === idx ? 'border-[#c800ff] shadow-md scale-110' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
+                                 >
+                                    <img src={url} className="w-full h-full object-cover" alt="" />
+                                 </button>
+                                 );
+                              })}
+                              {(formData.images?.length || 0) < 10 && (
+                                 <button
+                                   type="button"
+                                   onClick={() => setIsUploadModalOpen(true)}
+                                   className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#c800ff] text-gray-400 hover:text-[#c800ff] flex items-center justify-center transition-all bg-white"
+                                 >
+                                    <Plus size={24} />
+                                 </button>
+                              )}
+                           </div>
+
+                           {/* Action Buttons */}
+                           {formData.images && formData.images.length > 0 && (() => {
+                              const currentImg = formData.images[selectedImageIndex];
+                              const isPrimary = typeof currentImg === 'string' ? false : (currentImg as any)?.isPrimary;
+                              const hasAlt = typeof currentImg === 'string' ? false : Boolean((currentImg as any)?.alt);
+                              const altText = typeof currentImg === 'string' ? '' : (currentImg as any)?.alt || '';
+                              
+                              return (
+                              <div className="flex flex-wrap justify-center gap-3 w-full">
+                                 <button type="button" onClick={() => replaceInputRef.current?.click()} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                    <UploadCloud size={16} /> Change Image
+                                 </button>
+                                 {!isPrimary && (
+                                    <button type="button" onClick={handleSetCoverImage} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                       <Check size={16} /> Set as Cover
+                                    </button>
+                                 )}
+                                 <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                    <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
+                                 </button>
+                                 <button type="button" onClick={() => setImageToDelete(currentImg as any)} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                    <Trash2 size={16} /> Delete
+                                 </button>
+                              </div>
+                              );
+                           })()}
+
+                           {/* Alt text edit popup inline */}
+                           {editingAltIndex !== null && (
+                              <div className="mt-6 w-full max-w-md bg-white p-4 rounded-2xl shadow-sm border border-[#e4d3e0] animate-in fade-in zoom-in-95">
+                                 <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text</label>
+                                 <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-xl border focus:border-[#c800ff] outline-none text-sm mb-3" />
+                                 <div className="flex justify-end gap-2">
+                                    <button type="button" onClick={() => setEditingAltIndex(null)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
+                                    <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#c800ff] text-white rounded-lg hover:bg-[#b500e6]">{isImageActionLoading ? 'Saving...' : 'Save Alt Text'}</button>
+                                 </div>
+                              </div>
+                           )}
+
+                        </div>
                       )}
+
+                      {/* Hidden inputs */}
+                      <input type="file" ref={replaceInputRef} accept="image/*" onChange={handleImageReplace} className="hidden" />
+                      
+                      {/* Delete Confirmation */}
+                      {imageToDelete && (
+                         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                            <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
+                               <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                                  <Trash2 size={24} />
+                               </div>
+                               <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Delete Image?</h4>
+                               <p className="text-center text-sm text-gray-500 mb-6">Are you sure you want to remove this product image? This action cannot be undone.</p>
+                               <div className="flex gap-3">
+                                  <button type="button" onClick={() => setImageToDelete(null)} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
+                                  <button type="button" onClick={handleDeleteImage} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold transition">{isImageActionLoading ? 'Deleting...' : 'Delete'}</button>
+                               </div>
+                            </div>
+                         </div>
+                      )}
+
                     </div>
-
-                  </div>
-                )}
-              </form>
-            )}
-
-            {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
-            {!quickAddMode && (
-              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="flex items-center justify-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-bold transition"
-                >
-                  <ChevronLeft size={20} /> Previous
-                </button>
-
-                <div className="flex gap-3 md:gap-4">
-                  {currentStep < totalSteps ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      disabled={isSaving}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
-                    >
-                      Next <ChevronRight size={20} />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      disabled={isSaving}
-                      className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
-                    >
-                      <Check size={20} strokeWidth={3} />
-                      {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Create Product'}
-                    </button>
                   )}
+                </form>
                 </div>
-              </div>
-            )}
-          </motion.div >
-        </div >
-      )
-      }
-    </AnimatePresence >
+              )}
+
+              {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
+              {!quickAddMode && (
+                <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    disabled={currentStep === 1}
+                    className="flex items-center justify-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-bold transition"
+                  >
+                    <ChevronLeft size={20} /> Previous
+                  </button>
+
+                  <div className="flex gap-3 md:gap-4">
+                    {currentStep < totalSteps ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={isSaving}
+                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
+                      >
+                        Next <ChevronRight size={20} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isSaving}
+                        className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
+                      >
+                        <Check size={20} strokeWidth={3} />
+                        {isSaving ? 'Saving...' : editingItem ? 'Update Product' : 'Create Product'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div >
+          </div>
+        )}
+      </AnimatePresence>
+      
+      <ImageUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onComplete={handleImageModalComplete}
+        onSkip={() => setIsUploadModalOpen(false)}
+      />
+    </>
   );
 }
