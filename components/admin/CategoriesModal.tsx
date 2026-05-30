@@ -12,7 +12,6 @@ import { categoryApi, ApiError } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
 import CategoryFormModal from './CategoryFormModal';
 import SubcategoryModal from './SubcategoryModal';
-import PublishCategoryModal from './PublishCategoryModal';
 
 interface CategoriesModalProps {
   isOpen: boolean;
@@ -39,7 +38,7 @@ interface CategoryCardProps {
   onEdit: (cat: Category) => void;
   onDelete: (id: string) => void;
   onSubcategories: (cat: Category) => void;
-  onPublish: (id: string) => void;
+  onPublish: (cat: Category) => void;
 }
 
 function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, onPublish }: CategoryCardProps) {
@@ -139,18 +138,26 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
         {isDraft ? (
           <div className="flex flex-col gap-2">
             <button
-              onClick={(e) => { e.stopPropagation(); onPublish(category.id); }}
+              onClick={(e) => { e.stopPropagation(); onPublish(category); }}
               className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
             >
               <Upload size={13} />
-              {category.image ? 'Publish Category' : 'Upload Image & Publish'}
+              Publish Category
             </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
-              className="w-full bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
-            >
-              <Trash2 size={13} /> Delete Draft
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit(category); }}
+                className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+              >
+                <Edit size={13} /> Edit
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
+                className="flex-1 bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+              >
+                <Trash2 size={13} /> Delete Draft
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-2">
@@ -212,8 +219,6 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
   const [viewingCategory, setViewingCategory] = useState<Category | null>(null);
-  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [publishingCategory, setPublishingCategory] = useState<Category | null>(null);
 
   // Delete confirm
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -302,7 +307,25 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
 
   const openEdit = (cat: Category) => { setEditingCategory(cat); setIsFormOpen(true); };
   const openSubcategories = (cat: Category) => { setViewingCategory(cat); setIsSubcategoryModalOpen(true); };
-  const openPublish = (cat: Category) => { setPublishingCategory(cat); setIsPublishModalOpen(true); };
+  
+  const handlePublishDirectly = async (cat: Category) => {
+    if (!cat.image) {
+      toast.error('Please upload an image before publishing this category. Click Edit to add an image.');
+      return;
+    }
+    const toastId = toast.loading('Publishing category…');
+    setIsLoading(true);
+    try {
+      await categoryApi.publishCategory(cat.id);
+      toast.success('Category published successfully!', { id: toastId });
+      fetchCategories();
+    } catch (err) {
+      const apiError = err as ApiError;
+      toast.error(apiError.message || 'Failed to publish category.', { id: toastId });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -465,7 +488,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
                         onEdit={openEdit}
                         onDelete={(id) => setDeletingId(id)}
                         onSubcategories={openSubcategories}
-                        onPublish={() => openPublish(cat)}
+                        onPublish={handlePublishDirectly}
                       />
                     ))}
                   </div>
@@ -527,14 +550,6 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           onSubcategoryUpdate={fetchCategories}
         />
       )}
-
-      {/* ── Publish Modal (also handles image upload for drafts) ── */}
-      <PublishCategoryModal
-        isOpen={isPublishModalOpen}
-        onClose={() => { setIsPublishModalOpen(false); setPublishingCategory(null); }}
-        categoryId={publishingCategory?.id ?? null}
-        onSuccess={fetchCategories}
-      />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
   authApi,
   categoryApi,
   productApi,
+  uploadImages,
 } from '@/lib/api';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import { setUser } from '@/lib/features/auth/authSlice';
@@ -439,10 +440,16 @@ const buildProductPayload = (
 
   if (formData.colours.length > 0) {
     customMetadata.colours = formData.colours;
+    customMetadata.color = formData.colours[0];
   }
 
   if (formData.sizes.length > 0) {
     customMetadata.sizes = formData.sizes;
+    customMetadata.size = formData.sizes[0];
+  }
+
+  if (formData.condition) {
+    customMetadata.condition = formData.condition;
   }
 
   const resolvedCategoryId = formData.subCategoryId && formData.subCategoryId !== ''
@@ -465,18 +472,23 @@ const buildProductPayload = (
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
   if (formData.tags.length) payload.tags = formData.tags;
-  if (formData.colours[0]) payload.color = formData.colours[0];
-  if (formData.sizes[0]) payload.size = formData.sizes[0];
+  
   if (formData.images?.length) {
     payload.images = formData.images.map((img, index) => {
       if (typeof img === 'string') {
         return {
           url: img,
-          alt: `${formData.name} image ${index + 1}`,
+          altText: `${formData.name} image ${index + 1}`,
           isPrimary: index === 0,
+          order: index,
         };
       }
-      return img;
+      return {
+        url: img.url,
+        altText: img.alt || (img as any).altText || `${formData.name} image ${index + 1}`,
+        isPrimary: img.isPrimary || index === 0,
+        order: img.order ?? index,
+      };
     });
   }
 
@@ -505,14 +517,14 @@ const buildProductPayload = (
   const discount = clampPercentage(formData.discount);
   if (discount !== undefined) payload.discount = discount;
 
-  // Only include weight and dimensions if whitelisted category
+  // Only include weight and dimensions if whitelisted category, added to metadata
   if (includesWeightAndDimensions) {
     const weight = getOptionalNumber(formData.weight);
-    if (weight !== undefined) payload.weight = weight;
+    if (weight !== undefined) customMetadata.weight = weight;
 
     const { length, width, height } = formData.dimensions;
     if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
-      payload.dimensions = {
+      customMetadata.dimensions = {
         length: Number(length) || 0,
         width: Number(width) || 0,
         height: Number(height) || 0,
@@ -547,6 +559,7 @@ export default function AdminPage() {
   const [productTotal, setProductTotal] = useState(fallbackProducts.length);
   const [productTotalPages, setProductTotalPages] = useState(1);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [publishingProductId, setPublishingProductId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState('');
   const [categories, setCategories] = useState<ProductCategoryOption[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
@@ -898,24 +911,61 @@ export default function AdminPage() {
     }
   };
 
-  const handlePublishClick = (id: string) => {
-    setProductToPublishId(id);
-    setIsImageModalOpen(true);
+  const handlePublishClick = async (id: string) => {
+    const product = products.find(p => p.id === id);
+    if (product && product.images && product.images.length > 0) {
+      const toastId = toast.loading('Publishing product…');
+      setPublishingProductId(id);
+      try {
+        const response = await productApi.publishProduct(id);
+        const publishedProduct = normalizeProduct(response?.data);
+        if (publishedProduct) {
+          setProducts(prev => prev.map(p => p.id === id ? publishedProduct : p));
+        } else {
+          await fetchProducts();
+        }
+        toast.success('Product published successfully!', { id: toastId });
+      } catch (error) {
+        toast.error('Failed to publish product.', { id: toastId });
+        setProductLoadError(
+          getApiErrorMessage(error) ||
+          'Could not publish product. Products need images and stock before publishing.'
+        );
+      } finally {
+        setPublishingProductId(null);
+      }
+    } else {
+      setProductToPublishId(id);
+      setIsImageModalOpen(true);
+    }
   };
 
   const handleImageComplete = async (images: { file: File; alt: string }[]) => {
     if (!productToPublishId) return;
+    setIsImageModalOpen(false);
+
+    const toastId = toast.loading('Uploading images…');
+    setPublishingProductId(productToPublishId);
 
     try {
-      setIsLoadingProducts(true);
       setProductLoadError('');
 
       if (images.length > 0) {
-        const files = images.map(img => img.file);
-        const alts = images.map(img => img.alt);
-        await productApi.uploadProductImages(productToPublishId, files, alts);
+        toast.loading('Uploading images to storage…', { id: toastId });
+        const uploaded = await uploadImages(
+          images.map(img => ({ file: img.file, altText: img.alt })),
+          'products'
+        );
+        toast.loading('Saving image data…', { id: toastId });
+        await productApi.updateProduct(productToPublishId, { images: uploaded });
+      } else {
+        toast.error('Images are required to publish this product.', { id: toastId });
+        setProductToPublishId(null);
+        setPublishingProductId(null);
+        return;
       }
 
+      toast.loading('Publishing product…', { id: toastId });
       const response = await productApi.publishProduct(productToPublishId);
       const publishedProduct = normalizeProduct(response?.data);
 
@@ -924,18 +974,17 @@ export default function AdminPage() {
       } else {
         await fetchProducts();
       }
+      toast.success('Product published successfully!', { id: toastId });
     } catch (error) {
+      toast.error('Failed to publish product.', { id: toastId });
       setProductLoadError(
         getApiErrorMessage(error) ||
         'Could not publish product. Products need images and stock before publishing.'
       );
-      return;
     } finally {
-      setIsLoadingProducts(false);
+      setPublishingProductId(null);
+      setProductToPublishId(null);
     }
-
-    setIsImageModalOpen(false);
-    setProductToPublishId(null);
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -1173,6 +1222,7 @@ export default function AdminPage() {
               onView={openViewModal}
               onDelete={handleDeleteProduct}
               onPublish={handlePublishClick}
+              publishingProductId={publishingProductId}
               currentPage={productPage}
               totalPages={productTotalPages}
               totalItems={productTotal}

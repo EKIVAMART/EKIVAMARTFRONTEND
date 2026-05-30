@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, AlertCircle, X, Check, Layers, DollarSign, Info, ChevronLeft, ChevronRight, Trash2, Zap, Image as ImageIcon, UploadCloud, GripVertical, CheckCircle2, Edit2 } from 'lucide-react';
-import { categoryApi, productApi } from '@/lib/api';
+import { categoryApi, productApi, requestUploadUrls, uploadFileToStorage } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import ImageUploadModal from './ImageUploadModal';
 
@@ -74,6 +74,7 @@ export interface ProductImage {
   order: number;
   isPrimary?: boolean;
   alt?: string;
+  file?: File;
 }
 
 export type EditableProduct = Partial<ProductFormData>;
@@ -303,7 +304,8 @@ export default function ActionModal({
 }: ActionModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const totalSteps = (editingItem?.id && editingItem?.status !== 'draft') ? 4 : 3;
+  const [stagedImages, setStagedImages] = useState<ProductImage[]>([]);
+  const totalSteps = 4;
 
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
@@ -345,6 +347,7 @@ export default function ActionModal({
   const [tagInput, setTagInput] = useState('');
   const [saveErrors, setSaveErrors] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   const [quickAddMode, setQuickAddMode] = useState(false);
   const [editorMode, setEditorMode] = useState<'write' | 'preview'>('write');
   const [seoExpanded, setSeoExpanded] = useState(false);
@@ -355,6 +358,7 @@ export default function ActionModal({
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isReordering, setIsReordering] = useState(false);
   const [reorderImages, setReorderImages] = useState<ProductImage[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isImageActionLoading, setIsImageActionLoading] = useState(false);
   const [editingAltIndex, setEditingAltIndex] = useState<number | null>(null);
@@ -441,33 +445,102 @@ export default function ActionModal({
 
   const saveData = async (statusOverride?: ProductFormData['status']) => {
     if (isSaving) return;
-    const customObj: Record<string, string> = {};
-    customFields.forEach(f => {
-      if (f.key.trim() && f.value.trim()) {
-        customObj[f.key.trim()] = f.value.trim();
-      }
-    });
-
-    const finalData = {
-      ...formData,
-      discount: discountPercent,
-      stock: toNonNegativeInteger(formData.stock),
-      status: statusOverride || formData.status,
-      metadata: {
-        ...formData.metadata,
-        customAttributes: customObj
-      }
-    };
-
+    
     setIsSaving(true);
+    setSaveErrors([]);
+
     try {
+      // ─── Step 4 Image Upload Flow ──────────────────────────────────────────
+      // Collect all staged images that have local File objects (batch upload)
+      const uploadedImages: Array<{ url: string; altText: string; isPrimary: boolean; order: number }> = [];
+      const filesToUpload = stagedImages.filter(img => img.file);
+
+      if (filesToUpload.length > 0) {
+        setLoadingMessage(`Preparing for upload (${filesToUpload.length} image${filesToUpload.length > 1 ? 's' : ''})…`);
+        // Batch-request all upload URLs in a single call
+        const uploadRequests = filesToUpload.map(img => ({
+          fileName: img.file!.name,
+          mimeType: img.file!.type as any,
+          folder: 'products' as const,
+          expiresIn: 3600,
+          isPublic: true,
+        }));
+
+        const uploadResults = await requestUploadUrls(uploadRequests);
+
+        if (!uploadResults || uploadResults.length !== filesToUpload.length) {
+          throw new Error('Failed to request upload URLs for all images.');
+        }
+
+        // Upload each file to its signed URL
+        for (let i = 0; i < filesToUpload.length; i++) {
+          const img = filesToUpload[i];
+          const result = uploadResults[i];
+          setLoadingMessage(`Uploading image ${i + 1} of ${filesToUpload.length}…`);
+          try {
+            await uploadFileToStorage(result, img.file!);
+          } catch (err) {
+            toast.error(`Failed to upload image: ${img.file!.name}`);
+            throw err;
+          }
+          // Use the returned url from uploadResult
+          const globalIdx = stagedImages.indexOf(img);
+          uploadedImages.push({
+            url: result.url,
+            altText: img.alt || formData.name,
+            isPrimary: img.isPrimary || false,
+            order: globalIdx,
+          });
+        }
+      }
+
+      // Add already-uploaded images (no File object)
+      stagedImages.forEach((img, i) => {
+        if (!img.file) {
+          uploadedImages.push({
+            url: img.url,
+            altText: img.alt || formData.name,
+            isPrimary: img.isPrimary || false,
+            order: i,
+          });
+        }
+      });
+
+      // Re-sort by original order index
+      uploadedImages.sort((a, b) => a.order - b.order);
+      // Re-index orders to 0..n
+      uploadedImages.forEach((img, i) => { img.order = i; });
+
+      // ─── Construct Payload ─────────────────────────────────────────────────
+      const customObj: Record<string, string> = {};
+      customFields.forEach(f => {
+        if (f.key.trim() && f.value.trim()) {
+          customObj[f.key.trim()] = f.value.trim();
+        }
+      });
+
+      setLoadingMessage(editingItem ? 'Updating product…' : 'Creating product draft…');
+
+      const finalData = {
+        ...formData,
+        images: uploadedImages as any,
+        discount: discountPercent,
+        stock: toNonNegativeInteger(formData.stock),
+        status: statusOverride || formData.status,
+        metadata: {
+          ...formData.metadata,
+          customAttributes: customObj
+        }
+      };
+
       await onSave?.(finalData as any);
       toast.success(editingItem ? 'Product updated successfully!' : 'Product created successfully!');
       closeModalAndReset();
-    } catch (error) {
+    } catch (error: any) {
       setSaveErrors(formatSaveError(error));
     } finally {
       setIsSaving(false);
+      setLoadingMessage('');
     }
   };
 
@@ -667,6 +740,7 @@ export default function ActionModal({
     setCurrentStep(1);
     setSaveErrors([]);
     setIsSaving(false);
+    setLoadingMessage('');
     setQuickAddMode(false);
     setHasUnsavedChanges(false);
     setShowCancelConfirm(false);
@@ -904,6 +978,8 @@ export default function ActionModal({
           setCustomFields([]);
         }
 
+        setStagedImages(sortImages(editingItem.images || []));
+
         if (editingItem.categoryId) {
           categoryApi.getCategoryById(editingItem.categoryId).then(res => {
             if (!isMounted) return;
@@ -962,6 +1038,7 @@ export default function ActionModal({
         });
         setDiscountPercent(0);
         setCustomFields([]);
+        setStagedImages([]);
       }
     }
     return () => { isMounted = false; };
@@ -1016,36 +1093,41 @@ export default function ActionModal({
     return errors;
   };
 
-  const handleImageModalComplete = async (images: { file: File; alt: string }[]) => {
-    if (!images.length || !formData.id) return;
+  const handleImageModalComplete = (images: { file: File; alt: string }[]) => {
+    if (!images.length) return;
     setIsUploadModalOpen(false);
-    setIsImageUploading(true);
-    setSaveErrors([]);
-    try {
-      const files = images.map(i => i.file);
-      const alts = images.map(i => i.alt);
-      const res = await productApi.uploadProductImages(formData.id, files, alts);
-      if (res?.data?.images || res?.data) {
-        const newImages = res.data.images || res.data;
-        updateField('images', sortImages(newImages));
-        toast.success('Images uploaded successfully!');
+    setSelectedImageIndex(0);
+    
+    const newStaged: ProductImage[] = images.map((img, idx) => {
+      const order = stagedImages.length + idx;
+      return {
+        url: URL.createObjectURL(img.file),
+        order,
+        isPrimary: stagedImages.length === 0 && idx === 0,
+        alt: img.alt,
+        file: img.file,
+      };
+    });
+
+    setStagedImages(prev => {
+      const updated = [...prev, ...newStaged];
+      if (updated.length > 0 && !updated.some(img => img.isPrimary)) {
+        updated[0].isPrimary = true;
       }
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to upload images']);
-      toast.error(err.message || 'Failed to upload images');
-    } finally {
-      setIsImageUploading(false);
-    }
+      return updated;
+    });
+    setHasUnsavedChanges(true);
+    toast.success('Images added to gallery draft.');
   };
 
   const handleImageReplace = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length || !formData.id) return;
+    if (!e.target.files?.length) return;
     const file = e.target.files[0];
-    const currentImage = formData.images?.[selectedImageIndex];
+    const currentImage = stagedImages[selectedImageIndex];
     if (!currentImage) return;
 
-    const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
-    const alt = typeof currentImage === 'string' ? '' : (currentImage.alt || '');
+    const order = currentImage.order ?? selectedImageIndex;
+    const alt = currentImage.alt || '';
 
     setImageToReplace({
       file,
@@ -1064,162 +1146,95 @@ export default function ActionModal({
     setImageToReplace(null);
   };
 
-  const handleConfirmReplace = async () => {
-    if (!imageToReplace || !formData.id) return;
+  const handleConfirmReplace = () => {
+    if (!imageToReplace) return;
     
     if (!imageToReplace.alt.trim()) {
       toast.error('Alt text is required for the new image.');
       return;
     }
 
-    setIsImageActionLoading(true);
-    setSaveErrors([]);
-    try {
-      const res = await productApi.updateProductImage(formData.id, {
-        order: imageToReplace.order,
-        image: imageToReplace.file,
-        alt: imageToReplace.alt
-      });
-      if (res?.data?.images || res?.data) {
-        const newImages = res.data.images || res.data;
-        updateField('images', sortImages(newImages));
-        toast.success('Image replaced successfully!');
+    setStagedImages(prev => {
+      const updated = [...prev];
+      if (updated[selectedImageIndex]) {
+        updated[selectedImageIndex] = {
+          ...updated[selectedImageIndex],
+          url: imageToReplace.preview,
+          alt: imageToReplace.alt,
+          file: imageToReplace.file,
+        };
       }
-      handleCancelReplace();
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to replace image']);
-      toast.error(err.message || 'Failed to replace image');
-    } finally {
-      setIsImageActionLoading(false);
-    }
+      return updated;
+    });
+    setHasUnsavedChanges(true);
+    toast.success('Image replaced in draft.');
+    setImageToReplace(null);
   };
 
   const handleDeleteImage = async () => {
-    if (!imageToDelete || !formData.id) return;
-    setIsImageActionLoading(true);
-    setSaveErrors([]);
-    try {
-      const urlToDelete = typeof imageToDelete === 'string' ? imageToDelete : (imageToDelete as any).url;
-      const res = await productApi.deleteProductImage(formData.id, urlToDelete);
-      if (res?.data?.images || res?.data) {
-        const newImages = res.data.images || res.data;
-        updateField('images', sortImages(newImages));
-        toast.success('Image deleted successfully!');
+    if (!imageToDelete) return;
+
+    if (imageToDelete.url && !imageToDelete.file && formData.id) {
+      try {
+        await productApi.deleteProductImage(formData.id, imageToDelete.url);
+      } catch (error) {
+        console.error('Error deleting image from backend:', error);
       }
-      setImageToDelete(null);
-      setSelectedImageIndex(0);
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to delete image']);
-      toast.error(err.message || 'Failed to delete image');
-    } finally {
-      setIsImageActionLoading(false);
     }
+
+    setStagedImages(prev => {
+      const filtered = prev.filter((_, idx) => idx !== selectedImageIndex);
+      const updated = filtered.map((img, idx) => ({
+        ...img,
+        order: idx,
+        isPrimary: idx === 0,
+      }));
+      return updated;
+    });
+    setHasUnsavedChanges(true);
+    setImageToDelete(null);
+    setSelectedImageIndex(0);
+    toast.success('Image deleted from draft.');
   };
 
-  const handleSetCoverImage = async () => {
-    const currentImage = formData.images?.[selectedImageIndex];
-    if (!currentImage || !formData.id) return;
-    const order = typeof currentImage === 'string' ? selectedImageIndex : (currentImage.order ?? selectedImageIndex);
-
-    const previousPrimary = formData.images?.find((img) => typeof img !== 'string' && img.isPrimary);
-    const prevOrder = previousPrimary ? (typeof previousPrimary === 'string' ? null : previousPrimary.order) : null;
-
-    setIsImageActionLoading(true);
-    setSaveErrors([]);
-    try {
-      if (prevOrder !== null && prevOrder !== undefined && prevOrder !== order) {
-        await productApi.updateProductImage(formData.id, {
-          order: prevOrder,
-          isPrimary: false
-        });
-      }
-
-      const res = await productApi.updateProductImage(formData.id, {
-        order: order,
-        isPrimary: true
-      });
-      if (res?.data?.images || res?.data) {
-        const newImages = res.data.images || res.data;
-        updateField('images', sortImages(newImages));
-        setSelectedImageIndex(0); // Focus on the new cover image!
-        toast.success('Cover image updated successfully!');
-      }
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to set cover image']);
-      toast.error(err.message || 'Failed to set cover image');
-    } finally {
-      setIsImageActionLoading(false);
-    }
+  const handleSetCoverImage = () => {
+    setStagedImages(prev => {
+      const updated = prev.map((img, idx) => ({
+        ...img,
+        isPrimary: idx === selectedImageIndex,
+      }));
+      return sortImages(updated);
+    });
+    setSelectedImageIndex(0);
+    setHasUnsavedChanges(true);
+    toast.success('Cover image updated in draft.');
   };
 
-  const handleSaveAltText = async () => {
+  const handleSaveAltText = () => {
     if (editingAltIndex === null) return;
-    const currentImage = formData.images?.[editingAltIndex];
-    if (!currentImage || !formData.id) return;
-    const order = typeof currentImage === 'string' ? editingAltIndex : (currentImage.order ?? editingAltIndex);
-    setIsImageActionLoading(true);
-    setSaveErrors([]);
-    try {
-      const res = await productApi.updateProductImage(formData.id, {
-        order: order,
-        alt: altTextInput
-      });
-      if (res?.data?.images || res?.data) {
-        const newImages = res.data.images || res.data;
-        updateField('images', sortImages(newImages));
-        toast.success('Alt text updated successfully!');
-      }
-      setEditingAltIndex(null);
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to update alt text']);
-      toast.error(err.message || 'Failed to update alt text');
-    } finally {
-      setIsImageActionLoading(false);
+    if (!altTextInput.trim()) {
+      toast.error('Alt text is required.');
+      return;
     }
+
+    setStagedImages(prev => {
+      const updated = [...prev];
+      if (updated[editingAltIndex]) {
+        updated[editingAltIndex].alt = altTextInput.trim();
+      }
+      return updated;
+    });
+    setHasUnsavedChanges(true);
+    setEditingAltIndex(null);
+    toast.success('Alt text updated in draft.');
   };
 
-  const handleSaveReorder = async () => {
-    if (!formData.id) return;
-    setIsImageActionLoading(true);
-    setSaveErrors([]);
-    try {
-      // Find the first image that has moved to a new order and use that for the API call
-      // The API expects one shift at a time, so doing one bulk is hard if backend shifts array.
-      // For a robust UI, we should apply one shift.
-      let movedImage = null;
-      let newOrder = 0;
-
-      const original = formData.images || [];
-      for (let i = 0; i < reorderImages.length; i++) {
-        if (reorderImages[i].url !== original[i]?.url) {
-          // Find where it came from
-          const oldIndex = original.findIndex(img => img.url === reorderImages[i].url);
-          if (oldIndex !== i) {
-            movedImage = original[oldIndex];
-            newOrder = i;
-            break; // Just handle one move for now if backend shifts
-          }
-        }
-      }
-
-      if (movedImage) {
-        const res = await productApi.updateProductImage(formData.id, {
-          order: movedImage.order,
-          newOrder: newOrder
-        });
-        if (res?.data?.images || res?.data) {
-          const newImages = res.data.images || res.data;
-          updateField('images', sortImages(newImages));
-          toast.success('Image order saved successfully!');
-        }
-      }
-      setIsReordering(false);
-    } catch (err: any) {
-      setSaveErrors([err.message || 'Failed to save new order']);
-      toast.error(err.message || 'Failed to save new order');
-    } finally {
-      setIsImageActionLoading(false);
-    }
+  const handleSaveReorder = () => {
+    setStagedImages(reorderImages.map((img, idx) => ({ ...img, order: idx, isPrimary: idx === 0 })));
+    setIsReordering(false);
+    setSelectedImageIndex(0);
+    setHasUnsavedChanges(true);
+    toast.success('Image order updated in draft.');
   };
 
   if (activeTab !== 'products') return null;
@@ -1646,14 +1661,16 @@ export default function ActionModal({
                                       className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
                                       placeholder="Value"
                                     />
-                                    <select
-                                      value={formData.weightUnit || 'kg'}
-                                      onChange={(e) => updateField('weightUnit', e.target.value)}
-                                      className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24"
-                                    >
-                                      <option value="kg">kg</option>
-                                      <option value="g">g</option>
-                                    </select>
+                                    {(formData.weight > 0) && (
+                                      <select
+                                        value={formData.weightUnit || 'kg'}
+                                        onChange={(e) => updateField('weightUnit', e.target.value)}
+                                        className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24 animate-in fade-in zoom-in-95 duration-150"
+                                      >
+                                        <option value="kg">kg</option>
+                                        <option value="g">g</option>
+                                      </select>
+                                    )}
                                   </div>
                                 </div>
                                 <div>
@@ -1776,7 +1793,7 @@ export default function ActionModal({
                         <button
                           type="button"
                           onClick={() => {
-                            setReorderImages(formData.images || []);
+                            setReorderImages(stagedImages || []);
                             setIsReordering(true);
                           }}
                           className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs flex items-center gap-2 transition"
@@ -1788,34 +1805,49 @@ export default function ActionModal({
                       {isReordering ? (
                         <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
                           <h4 className="font-bold text-gray-800 mb-4">Reorder Images</h4>
-                          <p className="text-xs text-gray-500 mb-4">Drag and drop images below to reorder them.</p>
+                          <p className="text-xs text-gray-500 mb-4">Drag images to reorder them. The first image will become the cover.</p>
                           <div className="space-y-3">
                             {reorderImages.map((img, idx) => {
-                              const url = typeof img === 'string' ? img : img?.url;
-                              const alt = typeof img === 'string' ? '' : img?.alt;
-                              const isPrimary = typeof img === 'string' ? false : img?.isPrimary;
+                              const url = img?.url;
+                              const alt = img?.alt;
+                              const isPrimary = img?.isPrimary;
                               return (
                                 <div
                                   key={url || `reorder-${idx}`}
-                                  draggable
-                                  onDragStart={(e) => e.dataTransfer.setData('text/plain', idx.toString())}
-                                  onDragOver={(e) => e.preventDefault()}
+                                  draggable={true}
+                                  onDragStart={(e) => {
+                                    setDraggedIndex(idx);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                    e.dataTransfer.setData('text/plain', idx.toString());
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggedIndex(null);
+                                  }}
+                                  onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.dataTransfer.dropEffect = 'move';
+                                    if (draggedIndex !== null && draggedIndex !== idx) {
+                                      const newImages = [...reorderImages];
+                                      const [moved] = newImages.splice(draggedIndex, 1);
+                                      newImages.splice(idx, 0, moved);
+                                      setReorderImages(newImages);
+                                      setDraggedIndex(idx);
+                                    }
+                                  }}
                                   onDrop={(e) => {
                                     e.preventDefault();
-                                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-                                    if (isNaN(fromIdx) || fromIdx === idx) return;
-                                    const newImages = [...reorderImages];
-                                    const [moved] = newImages.splice(fromIdx, 1);
-                                    newImages.splice(idx, 0, moved);
-                                    setReorderImages(newImages);
+                                    setDraggedIndex(null);
                                   }}
-                                  className="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 cursor-move"
+                                  className={`flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border cursor-grab active:cursor-grabbing select-none hover:border-[#c800ff]/30 hover:shadow-md transition-all ${
+                                    draggedIndex === idx ? 'opacity-40 border-[#c800ff] scale-[0.98]' : 'border-gray-100'
+                                  }`}
+                                  style={{ touchAction: 'none' }}
                                 >
-                                  <GripVertical className="text-gray-400" size={20} />
-                                  <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                                  <GripVertical className="text-gray-400 flex-shrink-0" size={20} />
+                                  <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 pointer-events-none">
                                     <img src={url} alt={alt || 'Product image'} className="w-full h-full object-cover" />
                                   </div>
-                                  <div className="flex-1">
+                                  <div className="flex-1 pointer-events-none">
                                     <p className="font-bold text-sm">Image {idx + 1}</p>
                                     {alt && <p className="text-xs text-gray-500 mt-0.5">{alt}</p>}
                                     {isPrimary && <span className="text-[10px] font-bold text-[#c800ff] bg-[#f0e1f7] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
@@ -1826,34 +1858,43 @@ export default function ActionModal({
                           </div>
                           <div className="flex justify-end gap-3 mt-6">
                             <button type="button" onClick={() => setIsReordering(false)} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-50">Cancel</button>
-                            <button type="button" onClick={handleSaveReorder} disabled={isImageActionLoading} className="px-5 py-2.5 bg-[#c800ff] text-white rounded-xl font-bold text-sm hover:bg-[#b500e6] disabled:opacity-60">{isImageActionLoading ? 'Saving...' : 'Save New Order'}</button>
+                            <button type="button" onClick={handleSaveReorder} className="px-5 py-2.5 bg-[#c800ff] text-white rounded-xl font-bold text-sm hover:bg-[#b500e6]">Save New Order</button>
                           </div>
                         </div>
                       ) : (
                         <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
                           {/* Main Image Window */}
                           <div className="relative w-full max-w-lg aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group mb-6">
-                            {formData.images && formData.images.length > 0 ? (
-                              <img src={typeof formData.images[selectedImageIndex] === 'string' ? formData.images[selectedImageIndex] : (formData.images[selectedImageIndex] as any)?.url} alt="Main preview" className="w-full h-full object-contain" />
-                            ) : (
+                            {stagedImages && stagedImages.length > 0 ? (() => {
+                              const safeIdx = Math.min(selectedImageIndex, stagedImages.length - 1);
+                              const previewUrl = stagedImages[safeIdx]?.url;
+                              return previewUrl ? (
+                                <img src={previewUrl} alt="Main preview" className="w-full h-full object-contain" />
+                              ) : (
+                                <div className="text-gray-400 flex flex-col items-center gap-2">
+                                  <ImageIcon size={48} strokeWidth={1} />
+                                  <span className="text-sm font-medium">No preview available</span>
+                                </div>
+                              );
+                            })() : (
                               <div className="text-gray-400 flex flex-col items-center gap-2">
                                 <ImageIcon size={48} strokeWidth={1} />
                                 <span className="text-sm font-medium">No images uploaded</span>
                               </div>
                             )}
 
-                            {formData.images && formData.images.length > 1 && (
+                            {stagedImages && stagedImages.length > 1 && (
                               <>
                                 <button type="button" onClick={() => setSelectedImageIndex(prev => Math.max(0, prev - 1))} disabled={selectedImageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-r-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
                                   <ChevronLeft size={24} />
                                 </button>
-                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.min((formData.images?.length || 1) - 1, prev + 1))} disabled={selectedImageIndex === (formData.images?.length || 1) - 1} className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-l-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
+                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.min((stagedImages?.length || 1) - 1, prev + 1))} disabled={selectedImageIndex === (stagedImages?.length || 1) - 1} className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-l-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
                                   <ChevronRight size={24} />
                                 </button>
                               </>
                             )}
 
-                            {formData.images && formData.images.length > 0 && typeof formData.images[selectedImageIndex] !== 'string' && (formData.images[selectedImageIndex] as any)?.isPrimary && (
+                            {stagedImages && stagedImages.length > 0 && stagedImages[Math.min(selectedImageIndex, stagedImages.length - 1)]?.isPrimary && (
                               <div className="absolute top-4 left-4 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
                                 <CheckCircle2 size={14} /> Cover Image
                               </div>
@@ -1861,15 +1902,15 @@ export default function ActionModal({
                           </div>
 
                           <div className="text-xs font-semibold text-gray-500 mb-3 bg-purple-50 text-purple-700 px-3.5 py-1.5 rounded-full border border-purple-100 shadow-sm flex items-center gap-1.5">
-                            <span>{(formData.images?.length || 0)} / 10 Images Uploaded</span>
+                            <span>{(stagedImages?.length || 0)} / 10 Images Uploaded</span>
                             <span>•</span>
-                            <span className="font-extrabold">{10 - (formData.images?.length || 0)} more can be added</span>
+                            <span className="font-extrabold">{10 - (stagedImages?.length || 0)} more can be added</span>
                           </div>
 
                           {/* Thumbnails */}
                           <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-2xl mb-8">
-                            {formData.images?.map((img, idx) => {
-                              const url = typeof img === 'string' ? img : (img as any)?.url;
+                            {stagedImages?.map((img, idx) => {
+                              const url = img?.url;
                               return (
                                 <button
                                   key={idx}
@@ -1881,10 +1922,13 @@ export default function ActionModal({
                                 </button>
                               );
                             })}
-                            {(formData.images?.length || 0) < 10 && (
+                            {(stagedImages?.length || 0) < 10 && (
                               <button
                                 type="button"
-                                onClick={() => setIsUploadModalOpen(true)}
+                                onClick={() => {
+                                  setReorderImages(stagedImages);
+                                  setIsUploadModalOpen(true);
+                                }}
                                 className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#c800ff] text-gray-400 hover:text-[#c800ff] flex items-center justify-center transition-all bg-white"
                               >
                                 <Plus size={24} />
@@ -1893,26 +1937,26 @@ export default function ActionModal({
                           </div>
 
                           {/* Action Buttons */}
-                          {formData.images && formData.images.length > 0 && (() => {
-                            const currentImg = formData.images[selectedImageIndex];
-                            const isPrimary = typeof currentImg === 'string' ? false : (currentImg as any)?.isPrimary;
-                            const hasAlt = typeof currentImg === 'string' ? false : Boolean((currentImg as any)?.alt);
-                            const altText = typeof currentImg === 'string' ? '' : (currentImg as any)?.alt || '';
+                          {stagedImages && stagedImages.length > 0 && (() => {
+                            const currentImg = stagedImages[selectedImageIndex];
+                            const isPrimary = currentImg?.isPrimary;
+                            const hasAlt = Boolean(currentImg?.alt);
+                            const altText = currentImg?.alt || '';
 
                             return (
                               <div className="flex flex-wrap justify-center gap-3 w-full">
-                                <button type="button" onClick={() => replaceInputRef.current?.click()} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                <button type="button" onClick={() => replaceInputRef.current?.click()} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                   <UploadCloud size={16} /> Change Image
                                 </button>
                                 {!isPrimary && (
-                                  <button type="button" onClick={handleSetCoverImage} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                  <button type="button" onClick={handleSetCoverImage} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                     <Check size={16} /> Set as Cover
                                   </button>
                                 )}
-                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                   <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
                                 </button>
-                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} disabled={isImageActionLoading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-bold flex items-center gap-2 transition disabled:opacity-60">
+                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                   <Trash2 size={16} /> Delete
                                 </button>
                               </div>
@@ -1926,7 +1970,7 @@ export default function ActionModal({
                               <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-xl border focus:border-[#c800ff] outline-none text-sm mb-3" />
                               <div className="flex justify-end gap-2">
                                 <button type="button" onClick={() => setEditingAltIndex(null)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
-                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#c800ff] text-white rounded-lg hover:bg-[#b500e6]">{isImageActionLoading ? 'Saving...' : 'Save Alt Text'}</button>
+                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#c800ff] text-white rounded-lg hover:bg-[#b500e6]">Save Alt Text</button>
                               </div>
                             </div>
                           )}
@@ -1966,33 +2010,50 @@ export default function ActionModal({
                 <button
                   type="button"
                   onClick={prevStep}
-                  disabled={currentStep === 1}
+                  disabled={currentStep === 1 || isSaving || isImageActionLoading || isImageUploading}
                   className="flex items-center justify-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-40 font-bold transition"
                 >
                   <ChevronLeft size={20} /> Previous
                 </button>
 
-                <div className="flex gap-3 md:gap-4">
-                  {currentStep < totalSteps ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      disabled={isSaving || isImageActionLoading || isImageUploading}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
-                    >
-                      Next <ChevronRight size={20} />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      disabled={isSaving || isImageActionLoading || isImageUploading}
-                      className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
-                    >
-                      <Check size={20} strokeWidth={3} />
-                      {isSaving || isImageActionLoading || isImageUploading ? 'Saving...' : editingItem ? 'Update Product' : 'Create Product'}
-                    </button>
+                <div className="flex flex-col items-end gap-1">
+                  {(isSaving || isImageUploading || isImageActionLoading) && loadingMessage && (
+                    <span className="text-xs text-[#912cad] font-semibold animate-pulse text-right">{loadingMessage}</span>
                   )}
+                  <div className="flex gap-3 md:gap-4">
+                    {currentStep < totalSteps ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={isSaving || isImageActionLoading || isImageUploading}
+                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
+                      >
+                        Next <ChevronRight size={20} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isSaving || isImageActionLoading || isImageUploading}
+                        className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
+                      >
+                        {isSaving || isImageActionLoading || isImageUploading ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            {loadingMessage || 'Processing…'}
+                          </>
+                        ) : (
+                          <>
+                            <Check size={20} strokeWidth={3} />
+                            {editingItem ? 'Update Product' : 'Create Product'}
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -2007,7 +2068,7 @@ export default function ActionModal({
         onComplete={handleImageModalComplete}
         onSkip={() => setIsUploadModalOpen(false)}
         mode="add"
-        existingImagesCount={formData.images?.length || 0}
+        existingImagesCount={stagedImages?.length || 0}
       />
 
       {imageToReplace && (

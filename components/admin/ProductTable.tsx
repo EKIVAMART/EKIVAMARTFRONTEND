@@ -18,6 +18,7 @@ interface ProductTableProps {
   onDelete: (id: string) => void;
   onView?: (item: Product) => void;
   onPublish?: (id: string) => void;
+  publishingProductId?: string | null;
   searchQuery?: string;
   currentPage?: number;
   totalPages?: number;
@@ -54,6 +55,7 @@ export default function ProductTable({
   onDelete,
   onView,
   onPublish,
+  publishingProductId,
   searchQuery = '',
   currentPage: serverPage,
   totalPages: serverTotalPages,
@@ -189,7 +191,21 @@ export default function ProductTable({
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
                     {p.status === 'draft' && onPublish && (
-                      <button onClick={(e) => { e.stopPropagation(); onPublish(p.id); }} className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
+                        disabled={publishingProductId === p.id}
+                        className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
+                      >
+                        {publishingProductId === p.id ? (
+                          <>
+                            <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            Publishing…
+                          </>
+                        ) : 'Publish'}
+                      </button>
                     )}
                     {onView && (
                       <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="p-2 hover:bg-emerald-50 text-emerald-500 rounded-lg transition"><Eye size={18}/></button>
@@ -240,8 +256,20 @@ export default function ProductTable({
             </div>
             <div className="flex justify-end gap-3 border-t border-gray-50 pt-3 mt-1">
               {p.status === 'draft' && onPublish && (
-                <button onClick={(e) => { e.stopPropagation(); onPublish(p.id); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] rounded-xl transition text-xs font-bold shadow">
-                  Publish
+                <button
+                  onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
+                  disabled={publishingProductId === p.id}
+                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 rounded-xl transition text-xs font-bold shadow"
+                >
+                  {publishingProductId === p.id ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Publishing…
+                    </>
+                  ) : 'Publish'}
                 </button>
               )}
               {onView && (

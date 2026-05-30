@@ -3,6 +3,47 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box } from 'lucide-react';
 import { ProductImage } from './ActionModal';
 
+const parseMarkdownToHtml = (markdown: string): string => {
+  if (!markdown) return '';
+  let html = markdown
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  html = html.replace(/_([^_]+)_/g, '<u>$1</u>');
+  html = html.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>');
+
+  const lines = html.split('\n');
+  const outputLines: string[] = [];
+  let inUl = false;
+  let inOl = false;
+
+  for (const line of lines) {
+    const bulletMatch = line.match(/^- (.*)/);
+    const numberedMatch = line.match(/^\d+\.\s+(.*)/);
+
+    if (bulletMatch) {
+      if (inOl) { outputLines.push('</ol>'); inOl = false; }
+      if (!inUl) { outputLines.push('<ul style="list-style-type:disc;padding-left:1.5rem;margin:0.25rem 0">'); inUl = true; }
+      outputLines.push(`<li style="padding-left:0.25rem">${bulletMatch[1]}</li>`);
+    } else if (numberedMatch) {
+      if (inUl) { outputLines.push('</ul>'); inUl = false; }
+      if (!inOl) { outputLines.push('<ol style="list-style-type:decimal;padding-left:1.5rem;margin:0.25rem 0">'); inOl = true; }
+      outputLines.push(`<li style="padding-left:0.25rem">${numberedMatch[1]}</li>`);
+    } else {
+      if (inUl) { outputLines.push('</ul>'); inUl = false; }
+      if (inOl) { outputLines.push('</ol>'); inOl = false; }
+      outputLines.push(line === '' ? '<br />' : `<p style="margin:0 0 0.25rem 0">${line}</p>`);
+    }
+  }
+  if (inUl) outputLines.push('</ul>');
+  if (inOl) outputLines.push('</ol>');
+
+  return outputLines.join('');
+};
+
 interface ViewProductModalProps {
   product: any;
   isOpen: boolean;
@@ -21,18 +62,31 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
   const mainImage = images[selectedImageIndex];
   const mainImageUrl = mainImage ? (typeof mainImage === 'string' ? mainImage : mainImage.url) : '';
 
+  const weightVal = Number(product.weight ?? product.metadata?.weight ?? 0);
+  const weightUnitVal = product.weightUnit ?? product.metadata?.weightUnit ?? 'kg';
+
   const compulsoryInfo = [
-    { label: 'Price', value: `NGN ${Number(product.price).toLocaleString()}` },
-    { label: 'Original Price', value: product.compareAtPrice ? `NGN ${Number(product.compareAtPrice).toLocaleString()}` : '-' },
+    { label: 'Final Price', value: `NGN ${Number(product.price).toLocaleString()}` },
+    { label: 'Initial Price', value: product.compareAtPrice ? `NGN ${Number(product.compareAtPrice).toLocaleString()}` : '-' },
+    { label: 'Discount', value: product.discount ? `${product.discount}%` : '-' },
     { label: 'Stock', value: `${product.stock} items` },
     { label: 'SKU', value: product.sku || '-' },
     { label: 'Brand', value: product.brand || '-' },
-    { label: 'Condition', value: product.condition ? product.condition.charAt(0).toUpperCase() + product.condition.slice(1) : '-' },
+    { label: 'Preview', value: product.preview || '-', isFullWidth: true },
   ];
 
   const metadataEntries = Object.entries(product.metadata || {}).filter(([key, value]) => {
-    // Filter out some internal or already displayed keys if needed
-    if (key === 'customAttributes' || key === 'colours' || key === 'sizes') return false;
+    // Filter out internal or already displayed keys
+    if (
+      key === 'customAttributes' ||
+      key === 'colours' ||
+      key === 'sizes' ||
+      key === 'weight' ||
+      key === 'weightUnit' ||
+      key === 'dimensions' ||
+      key === 'dimensionsUnit' ||
+      key === 'condition'
+    ) return false;
     return Boolean(value);
   });
 
@@ -147,9 +201,14 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                   <h4 className="text-sm font-bold text-indigo-900 mb-2 flex items-center gap-2">
                     <Info size={16} className="text-indigo-500" /> Description
                   </h4>
-                  <p className="text-sm text-indigo-900/70 whitespace-pre-line leading-relaxed">
-                    {product.description || product.preview || 'No description provided.'}
-                  </p>
+                  {product.description || product.preview ? (
+                    <div
+                      className="text-sm text-indigo-900/70 leading-relaxed prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(product.description || product.preview) }}
+                    />
+                  ) : (
+                    <p className="text-sm text-indigo-900/70">No description provided.</p>
+                  )}
                 </div>
               </div>
 
@@ -159,9 +218,9 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                 {/* Compulsory Info Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {compulsoryInfo.map((item, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/50 hover:border-fuchsia-200 hover:shadow-fuchsia-50 transition-all">
+                    <div key={idx} className={`bg-white p-4 rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/50 hover:border-fuchsia-200 hover:shadow-fuchsia-50 transition-all ${item.isFullWidth ? 'col-span-2 sm:col-span-3' : ''}`}>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
-                      <p className="text-sm font-black text-slate-800">{item.value}</p>
+                      <p className={`text-sm text-slate-800 ${item.isFullWidth ? 'font-medium leading-relaxed' : 'font-black'}`}>{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -180,6 +239,11 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                     <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
                       <Package size={16} className="text-slate-400" />
                       <span className="text-xs font-bold text-slate-600">Origin: <span className="text-slate-800">{product.origin}</span></span>
+                    </div>
+                  )}
+                  {weightVal > 0 && (
+                    <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                      <span className="text-xs font-bold text-slate-800">{weightVal}{weightUnitVal}</span>
                     </div>
                   )}
                 </div>
@@ -225,7 +289,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                 </div>
 
                 {/* Additional Info Table */}
-                {(metadataEntries.length > 0 || (Number(product.weight) > 0) || (product.dimensions && (Number(product.dimensions.length) > 0 || Number(product.dimensions.width) > 0 || Number(product.dimensions.height) > 0))) && (
+                {(metadataEntries.length > 0 || (product.dimensions && (Number(product.dimensions.length) > 0 || Number(product.dimensions.width) > 0 || Number(product.dimensions.height) > 0))) && (
                   <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
                     <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
                       <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -234,12 +298,6 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                       </h3>
                     </div>
                     <div className="divide-y divide-slate-100">
-                      {Number(product.weight) > 0 && (
-                        <div className="flex items-center px-6 py-3.5 hover:bg-slate-50/50 transition-colors">
-                          <div className="w-1/3 text-xs font-bold text-slate-500 uppercase tracking-wider">Weight</div>
-                          <div className="w-2/3 text-sm font-semibold text-slate-800">{product.weight} {product.weightUnit || 'kg'}</div>
-                        </div>
-                      )}
                       {product.dimensions && (Number(product.dimensions.length) > 0 || Number(product.dimensions.width) > 0 || Number(product.dimensions.height) > 0) && (
                         <div className="flex items-center px-6 py-3.5 hover:bg-slate-50/50 transition-colors">
                           <div className="w-1/3 text-xs font-bold text-slate-500 uppercase tracking-wider">Dimensions</div>

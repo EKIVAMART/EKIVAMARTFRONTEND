@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Check, ImageIcon } from 'lucide-react';
 
@@ -19,7 +19,22 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [alts, setAlts] = useState<string[]>([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const preventDefault = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('dragover', preventDefault);
+    window.addEventListener('drop', preventDefault);
+    return () => {
+      window.removeEventListener('dragover', preventDefault);
+      window.removeEventListener('drop', preventDefault);
+    };
+  }, []);
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   const clearSelectedImages = () => {
     imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
@@ -36,16 +51,57 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
     onClose();
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const processFiles = useCallback((files: File[]) => {
+    const oversized = files.filter(f => f.size > MAX_FILE_SIZE);
+    if (oversized.length > 0) {
+      // Show info about rejected files but don't block valid ones
+      console.warn(`${oversized.length} file(s) exceed 10MB and were skipped.`);
+    }
+
     const allowedFiles = files
-      .filter((file) => file.size <= 5 * 1024 * 1024)
+      .filter((file) => file.size <= MAX_FILE_SIZE)
       .slice(0, Math.max(0, maxAllowed - imageFiles.length));
     const newPreviews = allowedFiles.map(file => URL.createObjectURL(file));
 
     setImageFiles(prev => [...prev, ...allowedFiles].slice(0, maxAllowed));
     setImagePreviews(prev => [...prev, ...newPreviews].slice(0, maxAllowed));
     setAlts(prev => [...prev, ...new Array(allowedFiles.length).fill('')].slice(0, maxAllowed));
+  }, [imageFiles.length, maxAllowed]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    processFiles(files);
+    // Reset input so same file can be re-selected
+    if (e.target) e.target.value = '';
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+    setIsDraggingOver(true);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (files.length > 0) {
+      processFiles(files);
+    }
   };
 
   const removeImage = (index: number) => {
@@ -84,8 +140,8 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
             {/* Header */}
             <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add More Images'}</h2>
-                <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload additional images for this product'}</p>
+                <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
+                <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
               </div>
               <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
                 <X size={26} />
@@ -98,17 +154,31 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
                 <div>
                   <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
                   <p className="text-xs text-gray-500">
-                    {isPublishMode 
-                      ? 'Upload up to 10 images. The first image will be the cover.' 
-                      : `Upload up to ${maxAllowed} more images.`}
+                    Upload up to {maxAllowed} images. The first image will be the cover. Max 10MB per image.
                   </p>
                 </div>
               </div>
 
-              <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-[#fcedf9] rounded-3xl p-12 bg-[#F8FDFF] flex flex-col items-center cursor-pointer hover:bg-[#F0F9FA] transition">
-                <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white p-4 rounded-2xl mb-4"><Upload size={36} /></div>
-                <p className="font-bold text-gray-700">Click to upload or drag & drop</p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP • Max {maxAllowed} images</p>
+              {/* Drop Zone */}
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-3xl p-12 flex flex-col items-center cursor-pointer transition-all select-none ${
+                  isDraggingOver
+                    ? 'border-[#c800ff] bg-[#f5e6ff] scale-[1.01]'
+                    : 'border-[#fcedf9] bg-[#F8FDFF] hover:bg-[#F0F9FA] hover:border-[#e4aeff]'
+                }`}
+              >
+                <div className={`text-white p-4 rounded-2xl mb-4 transition-all ${isDraggingOver ? 'bg-[#c800ff] scale-110' : 'bg-gradient-to-r from-[#c800ff] to-[#912cad]'}`}>
+                  <Upload size={36} />
+                </div>
+                <p className="font-bold text-gray-700">
+                  {isDraggingOver ? 'Drop images here!' : 'Click to upload or drag & drop'}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP • Max {maxAllowed} images • 10MB each</p>
               </div>
               <input type="file" ref={fileInputRef} multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
 

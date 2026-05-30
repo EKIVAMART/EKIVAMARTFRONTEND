@@ -62,9 +62,10 @@ export default function PublishCategoryModal({ isOpen, onClose, categoryId, onSu
 
     try {
       // 1. Upload Image
-      if (imageFile) {
-        await categoryApi.uploadCategoryImage(categoryId, imageFile);
-      }
+      // Deprecated: Category image is now uploaded via CategoryFormModal using direct storage signed URL flow.
+      // if (imageFile) {
+      //   await categoryApi.uploadCategoryImage(categoryId, imageFile);
+      // }
       
       // 2. Publish Category
       await categoryApi.publishCategory(categoryId);

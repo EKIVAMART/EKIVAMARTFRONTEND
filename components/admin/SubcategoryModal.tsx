@@ -23,8 +23,8 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  
+
+
   // Add new state
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
@@ -49,7 +49,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setError('');
     try {
       const res: any = await categoryApi.getSubcategories(category.id);
-      
+
       let rawData: any[] = [];
       if (Array.isArray(res)) {
         rawData = res;
@@ -68,7 +68,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
         name: s.name || s.title || 'Unknown',
         isActive: Boolean(s.isActive ?? s.is_active ?? (s.status === 'published'))
       }));
-      
+
       setSubcategories(formatted);
     } catch (err) {
       const apiError = err as ApiError;
@@ -86,8 +86,8 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     setIsAdding(true);
     setError('');
     try {
-      await categoryApi.createCategory({ 
-        name: newSubcategoryName.trim(), 
+      await categoryApi.createCategory({
+        name: newSubcategoryName.trim(),
         id: category.id,
         parentId: category.id
       });
@@ -167,7 +167,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
-        
+
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight">Subcategories</h2>
