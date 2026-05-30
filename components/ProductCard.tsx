@@ -12,8 +12,8 @@ type ProductCardProps = {
   title: string;
   rating?: number;
   author?: string;
-  price: number;
-  originalPrice?: number;
+  price: number | { amount: number; currency?: string };
+  originalPrice?: number | { amount: number; currency?: string };
   currency?: string;
   href?: string;
   location?: string;
@@ -38,8 +38,12 @@ export default function ProductCard({
   const fullStars = Math.floor(rating);
   const halfStar = rating - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-  const discount = originalPrice
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+
+  const priceVal = typeof price === 'object' && price !== null ? (price as any).amount : (price ?? 0);
+  const originalPriceVal = typeof originalPrice === 'object' && originalPrice !== null ? (originalPrice as any).amount : originalPrice;
+
+  const discount = originalPriceVal
+    ? Math.round(((originalPriceVal - priceVal) / originalPriceVal) * 100)
     : 0;
 
   return (
@@ -118,12 +122,12 @@ export default function ProductCard({
           <div className="pc-price">
             <span className="pc-current">
               {currency}
-              {price.toLocaleString()}
+              {priceVal.toLocaleString()}
             </span>
-            {originalPrice && (
+            {originalPriceVal && originalPriceVal > priceVal && (
               <span className="pc-original">
                 {currency}
-                {originalPrice.toLocaleString()}
+                {originalPriceVal.toLocaleString()}
               </span>
             )}
           </div>

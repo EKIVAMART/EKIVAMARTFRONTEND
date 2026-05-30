@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
+import DashboardView from '@/components/admin/DashboardView';
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
@@ -49,6 +50,8 @@ type AdminProduct = Partial<ProductFormData> & {
   size?: string;
   subCategoryId?: string;
   subCategory?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 type AdminVendor = {
@@ -109,6 +112,8 @@ type ProductRecord = {
   metadata?: Record<string, unknown>;
   discount?: number;
   discountPercentage?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 
 type ProductPagination = {
@@ -386,6 +391,8 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
     returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
     warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
+    createdAt: record.createdAt ? new Date(record.createdAt).toISOString() : new Date().toISOString(),
+    updatedAt: record.updatedAt ? new Date(record.updatedAt).toISOString() : new Date().toISOString(),
   };
 };
 
@@ -541,7 +548,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1134,109 +1141,115 @@ export default function AdminPage() {
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
-            <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
-          </div>
-          {activeTab !== 'orders' && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              {activeTab === 'products' && (
-                <button
-                  onClick={() => setIsCategoriesModalOpen(true)}
-                  className="bg-white text-[#912cad] border border-[#c800ff]/30 hover:border-[#c800ff] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
-                >
-                  All Categories
-                </button>
+        {activeTab === 'dashboard' ? (
+          <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : (
+          <>
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
+                <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
+              </div>
+              {activeTab !== 'orders' && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  {activeTab === 'products' && (
+                    <button
+                      onClick={() => setIsCategoriesModalOpen(true)}
+                      className="bg-white text-[#912cad] border border-[#c800ff]/30 hover:border-[#c800ff] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      All Categories
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openModal()}
+                    className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+                  >
+                    <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
+                  </button>
+                </div>
               )}
-              <button
-                onClick={() => openModal()}
-                className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
-              >
-                <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
-              </button>
+            </header>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
+              <Search size={18} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder={`Search across ${activeTab}...`}
+                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setProductPage(1);
+                }}
+              />
             </div>
-          )}
-        </header>
 
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder={`Search across ${activeTab}...`}
-            className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setProductPage(1);
-            }}
-          />
-        </div>
+            {activeTab === 'products' && (
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <select
+                  value={filterCategoryId}
+                  onChange={(e) => {
+                    setFilterCategoryId(e.target.value);
+                    setProductPage(1);
+                  }}
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
 
-        {activeTab === 'products' && (
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <select
-              value={filterCategoryId}
-              onChange={(e) => {
-                setFilterCategoryId(e.target.value);
-                setProductPage(1);
-              }}
-              className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1"
-            >
-              <option value="all">All Categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-
-            <select
-              value={filterSubcategoryId}
-              onChange={(e) => {
-                setFilterSubcategoryId(e.target.value);
-                setProductPage(1);
-              }}
-              disabled={filterCategoryId === 'all'}
-              className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
-            >
-              <option value="all">All Subcategories</option>
-              {filterSubcategories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {activeTab === 'products' && (
-          <div className="space-y-3">
-            {(isLoadingProducts || isSavingProduct || productLoadError) && (
-              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
-                  ? 'border-amber-200 bg-amber-50 text-amber-700'
-                  : 'border-gray-200 bg-white text-gray-500'
-                }`}>
-                {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
+                <select
+                  value={filterSubcategoryId}
+                  onChange={(e) => {
+                    setFilterSubcategoryId(e.target.value);
+                    setProductPage(1);
+                  }}
+                  disabled={filterCategoryId === 'all'}
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                  <option value="all">All Subcategories</option>
+                  {filterSubcategories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
             )}
-            <ProductTable
-              data={resolvedProducts}
-              onEdit={openModal}
-              onView={openViewModal}
-              onDelete={handleDeleteProduct}
-              onPublish={handlePublishClick}
-              publishingProductId={publishingProductId}
-              currentPage={productPage}
-              totalPages={productTotalPages}
-              totalItems={productTotal}
-              itemsPerPage={productLimit}
-              onPageChange={setProductPage}
-              isLoading={isLoadingProducts}
-            />
-          </div>
-        )}
-        {activeTab === 'vendors' && (
-          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
-        )}
-        {activeTab === 'orders' && (
-          <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+
+            {activeTab === 'products' && (
+              <div className="space-y-3">
+                {(isLoadingProducts || isSavingProduct || productLoadError) && (
+                  <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
+                      ? 'border-amber-200 bg-amber-50 text-amber-700'
+                      : 'border-gray-200 bg-white text-gray-500'
+                    }`}>
+                    {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
+                  </div>
+                )}
+                <ProductTable
+                  data={resolvedProducts}
+                  onEdit={openModal}
+                  onView={openViewModal}
+                  onDelete={handleDeleteProduct}
+                  onPublish={handlePublishClick}
+                  publishingProductId={publishingProductId}
+                  currentPage={productPage}
+                  totalPages={productTotalPages}
+                  totalItems={productTotal}
+                  itemsPerPage={productLimit}
+                  onPageChange={setProductPage}
+                  isLoading={isLoadingProducts}
+                />
+              </div>
+            )}
+            {activeTab === 'vendors' && (
+              <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+            )}
+            {activeTab === 'orders' && (
+              <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+            )}
+          </>
         )}
 
         <ActionModal

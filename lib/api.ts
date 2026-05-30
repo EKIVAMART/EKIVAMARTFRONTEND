@@ -198,7 +198,7 @@ const extractSessions = (payload: unknown): AuthSessionRecord[] => {
 };
 
 // Handle API errors
-const handleApiError = (error: unknown): never => {
+function handleApiError(error: unknown): never {
   // Check if this is an axios error by checking for response property
   if (error && typeof error === 'object' && 'response' in error) {
     const axiError = error as any;

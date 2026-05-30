@@ -10,6 +10,8 @@ interface Product {
   category?: string;
   subCategory?: string;
   status?: 'draft' | 'active' | 'published' | 'inactive' | 'out_of_stock' | 'discontinued';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface ProductTableProps {
@@ -65,7 +67,7 @@ export default function ProductTable({
   isLoading = false,
 }: ProductTableProps) {
   const [localPage, setLocalPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<string>('createdAt-desc');
   const isServerPaginated = Boolean(onPageChange);
   const currentPage = serverPage || localPage;
 
@@ -81,13 +83,28 @@ export default function ProductTable({
       );
     }
 
-    // Sort by Price as an example
+    // Sort options
+    const [field, direction] = sortBy.split('-');
     result.sort((a, b) => {
-      return sortOrder === 'asc' ? a.price - b.price : b.price - a.price;
+      let comparison = 0;
+      if (field === 'price') {
+        comparison = a.price - b.price;
+      } else if (field === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (field === 'createdAt') {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        comparison = dateA - dateB;
+      } else if (field === 'updatedAt') {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        comparison = dateA - dateB;
+      }
+      return direction === 'asc' ? comparison : -comparison;
     });
 
     return result;
-  }, [data, searchQuery, sortOrder]);
+  }, [data, searchQuery, sortBy]);
 
   const totalPages =
     serverTotalPages || Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
@@ -104,10 +121,6 @@ export default function ProductTable({
     (currentPage - 1) * itemsPerPage + paginatedData.length,
     displayTotal
   );
-
-  const handleSortToggle = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-  };
 
   React.useEffect(() => {
     if (isServerPaginated) {
@@ -129,35 +142,77 @@ export default function ProductTable({
     setLocalPage(nextPage);
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return 'N/A';
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
       {/* Desktop Action Bar */}
-      <div className="hidden md:flex justify-end items-center p-4 border-b bg-white">
-        <button 
-          onClick={handleSortToggle}
-          className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-500 flex items-center gap-2 text-sm font-medium"
-        >
-          <ArrowUpDown size={16} />
-          Sort by Price
-        </button>
+      <div className="hidden md:flex justify-between items-center p-4 border-b bg-white">
+        <h2 className="text-lg font-bold text-slate-800">Products</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-semibold">Sort By</span>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-gray-50 border border-gray-200 text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff]"
+          >
+            <option value="createdAt-desc">Newest Created</option>
+            <option value="createdAt-asc">Oldest Created</option>
+            <option value="updatedAt-desc">Recent Updated</option>
+            <option value="updatedAt-asc">Oldest Updated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
       </div>
 
       {/* Mobile Action Bar */}
-      <div className="md:hidden flex justify-between items-center p-4 border-b bg-gray-50/50">
-        <h2 className="text-lg font-bold text-slate-800">Products</h2>
-        <button onClick={handleSortToggle} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg bg-white border">
-          <ArrowUpDown size={18} />
-        </button>
+      <div className="md:hidden flex flex-col gap-2 p-4 border-b bg-gray-50/50">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold text-slate-800">Products</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-semibold shrink-0">Sort By</span>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full bg-white border text-sm font-medium text-slate-700 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
+          >
+            <option value="createdAt-desc">Newest Created</option>
+            <option value="createdAt-asc">Oldest Created</option>
+            <option value="updatedAt-desc">Recent Updated</option>
+            <option value="updatedAt-asc">Oldest Updated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
       </div>
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead className="bg-gray-50/50 border-b">
             <tr>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Product</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Price</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Stock</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Created At</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Last Updated</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-right">Actions</th>
             </tr>
           </thead>
@@ -186,7 +241,13 @@ export default function ProductTable({
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-slate-700">NGN {p.price.toLocaleString()}</td>
                 <td className="p-4 text-center">
-                  <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{p.stock} In Stock</span>
+                  <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap">{p.stock} In Stock</span>
+                </td>
+                <td className="p-4 text-center text-xs font-medium text-slate-500">
+                  {formatDate(p.createdAt)}
+                </td>
+                <td className="p-4 text-center text-xs font-medium text-slate-500">
+                  {formatDate(p.updatedAt)}
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
@@ -217,7 +278,7 @@ export default function ProductTable({
               </tr>
             )) : (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500 font-medium">No products found.</td>
+                <td colSpan={6} className="p-8 text-center text-gray-500 font-medium">No products found.</td>
               </tr>
             )}
           </tbody>
@@ -251,6 +312,10 @@ export default function ProductTable({
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
+                </div>
+                <div className="mt-2 space-y-0.5 border-t pt-2 border-gray-100 text-[10px] text-gray-400 font-medium">
+                  <div>Created: {formatDate(p.createdAt)}</div>
+                  <div>Updated: {formatDate(p.updatedAt)}</div>
                 </div>
               </div>
             </div>
@@ -335,4 +400,3 @@ export default function ProductTable({
     </div>
   );
 }
-

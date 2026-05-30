@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ProductFiltersProps {
   onPriceChange?: (min: number, max: number) => void;
@@ -26,6 +26,15 @@ const ProductFilters = ({
     initialMaxPrice ?? globalMax
   );
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
+
+  // Sync state with parent props when they change
+  useEffect(() => {
+    setMinPrice(initialMinPrice ?? globalMin);
+  }, [initialMinPrice, globalMin]);
+
+  useEffect(() => {
+    setMaxPrice(initialMaxPrice ?? globalMax);
+  }, [initialMaxPrice, globalMax]);
 
   const handleMinChange = (newMin: number) => {
     if (newMin <= maxPrice) {
@@ -62,10 +71,9 @@ const ProductFilters = ({
     );
   };
 
-  const minPercentage =
-    ((minPrice - globalMin) / (globalMax - globalMin)) * 100;
-  const maxPercentage =
-    ((maxPrice - globalMin) / (globalMax - globalMin)) * 100;
+  const range = (globalMax || 0) - (globalMin || 0);
+  const minPercentage = range > 0 ? (((minPrice || 0) - (globalMin || 0)) / range) * 100 : 0;
+  const maxPercentage = range > 0 ? (((maxPrice || 0) - (globalMin || 0)) / range) * 100 : 100;
 
   return (
     <div className="flex flex-col w-[70%] space-y-4">
@@ -95,26 +103,26 @@ const ProductFilters = ({
               {/* Min slider */}
               <input
                 type="range"
-                min={globalMin}
-                max={globalMax}
-                value={minPrice}
+                min={Number.isNaN(Number(globalMin)) ? 0 : Number(globalMin)}
+                max={Number.isNaN(Number(globalMax)) ? 100000 : Number(globalMax)}
+                value={Number.isNaN(Number(minPrice)) ? 0 : Number(minPrice)}
                 onChange={(e) => handleMinChange(Number(e.target.value))}
                 className="absolute w-full h-2 top-0 appearance-none cursor-pointer pointer-events-auto slider slider-min"
                 style={{
-                  zIndex: minPrice > (globalMin + globalMax) / 2 ? 1 : 0,
+                  zIndex: minPrice > ((Number(globalMin) || 0) + (Number(globalMax) || 100000)) / 2 ? 1 : 0,
                 }}
               />
 
               {/* Max slider */}
               <input
                 type="range"
-                min={globalMin}
-                max={globalMax}
-                value={maxPrice}
+                min={Number.isNaN(Number(globalMin)) ? 0 : Number(globalMin)}
+                max={Number.isNaN(Number(globalMax)) ? 100000 : Number(globalMax)}
+                value={Number.isNaN(Number(maxPrice)) ? 100000 : Number(maxPrice)}
                 onChange={(e) => handleMaxChange(Number(e.target.value))}
                 className="absolute w-full h-2 top-0 appearance-none cursor-pointer pointer-events-auto slider slider-max"
                 style={{
-                  zIndex: maxPrice < (globalMin + globalMax) / 2 ? 0 : 1,
+                  zIndex: maxPrice < ((Number(globalMin) || 0) + (Number(globalMax) || 100000)) / 2 ? 0 : 1,
                 }}
               />
             </div>

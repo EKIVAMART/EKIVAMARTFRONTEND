@@ -47,7 +47,7 @@ export default function SpecialCategories() {
             {specialCategories.map((category, index) => (
               <Link
                 key={`${category.slug}-${index}-1`}
-                href={`/category/${category.slug}`}
+                href={`/categories/${category.slug}`}
                 className="group relative overflow-hidden rounded-2xl w-56 sm:w-64 md:w-72 shrink-0 shadow-md hover:shadow-xl transition-shadow duration-300"
               >
                 <Image
@@ -71,7 +71,7 @@ export default function SpecialCategories() {
             {specialCategories.map((category, index) => (
               <Link
                 key={`${category.slug}-${index}-2`}
-                href={`/category/${category.slug}`}
+                href={`/categories/${category.slug}`}
                 className="group relative overflow-hidden rounded-2xl w-56 sm:w-64 md:w-72 shrink-0 shadow-md hover:shadow-xl transition-shadow duration-300"
               >
                 <Image

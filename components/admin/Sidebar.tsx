@@ -16,7 +16,6 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
 
   return (
     <>
-      {/* Mobile Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-[45] md:hidden backdrop-blur-sm transition-opacity"
@@ -24,7 +23,6 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
         />
       )}
 
-      {/* Sidebar Content */}
       <aside className={`
         fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r flex flex-col z-50
         transition-transform duration-300 ease-in-out
@@ -50,7 +48,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           <SidebarLink icon={<Package size={20} />} label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
           <SidebarLink icon={<ShoppingCart size={20} />} label="Orders" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
           <SidebarLink icon={<Users size={20} />} label="Vendor Settings" active={activeTab === 'vendors'} onClick={() => setActiveTab('vendors')} />
-          <SidebarLink icon={<Settings size={20} />} label="Settings" active={false} onClick={() => { }} />
+          <SidebarLink icon={<Settings size={20} />} label="Settings" active={false} onClick={() => {}} />
         </nav>
         <div className="p-6 border-t mt-auto">
           <div className="flex items-center gap-3">

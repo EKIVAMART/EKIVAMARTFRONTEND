@@ -88,7 +88,6 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
     try {
       await categoryApi.createCategory({
         name: newSubcategoryName.trim(),
-        id: category.id,
         parentId: category.id
       });
       setNewSubcategoryName('');

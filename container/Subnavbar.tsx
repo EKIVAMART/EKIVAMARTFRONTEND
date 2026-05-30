@@ -193,12 +193,19 @@ const LocationSelector = (): JSX.Element => {
 /* ================== MAIN SUBNAVBAR COMPONENT ================== */
 
 const Subnavbar = (): JSX.Element => {
+  const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const cartCount = useCartCount();
   const wishlistItems = useWishlist();
 
   const wishlistCount = wishlistItems.length;
+
+  const [mainSearchQuery, setMainSearchQuery] = useState('');
+  const handleSearch = (query: string) => {
+    if (!query.trim()) return;
+    router.push(`/categories/shop?search=${encodeURIComponent(query.trim())}`);
+  };
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -312,12 +319,28 @@ const Subnavbar = (): JSX.Element => {
 
           {/* Search Bar - Mobile */}
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-transparent focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 focus-within:bg-white transition-all">
-            <FiSearch size={18} className="text-gray-500" />
+            <FiSearch size={18} className="text-gray-500 shrink-0" />
             <input
               type="text"
               placeholder="Search..."
+              value={mainSearchQuery}
+              onChange={(e) => setMainSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearch(mainSearchQuery);
+              }}
               className="flex-1 outline-none text-sm text-black bg-transparent focus:!ring-0 focus:!border-transparent"
             />
+            {mainSearchQuery && (
+              <button
+                onClick={() => setMainSearchQuery('')}
+                className="p-0.5 text-gray-400 hover:text-gray-700 transition shrink-0"
+                aria-label="Clear search"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -341,9 +364,28 @@ const Subnavbar = (): JSX.Element => {
             <input
               type="text"
               placeholder="Search for items..."
+              value={mainSearchQuery}
+              onChange={(e) => setMainSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearch(mainSearchQuery);
+              }}
               className="flex-1 outline-none text-sm text-black bg-transparent placeholder-gray-500 focus:!ring-0 focus:!border-transparent"
             />
-            <button className="p-1 hover:bg-gray-100 rounded-lg transition">
+            {mainSearchQuery && (
+              <button
+                onClick={() => setMainSearchQuery('')}
+                className="p-1 mr-1 text-gray-400 hover:text-gray-600 transition rounded-lg hover:bg-gray-100"
+                aria-label="Cancel search"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
+            <button 
+              onClick={() => handleSearch(mainSearchQuery)}
+              className="p-1 hover:bg-gray-100 rounded-lg transition"
+            >
               <FiSearch size={20} className="text-[#c800ff]" />
             </button>
           </div>

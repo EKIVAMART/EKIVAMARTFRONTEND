@@ -6,19 +6,80 @@ import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { assets } from '@/assets/assets';
 import ProductCard from './ProductCard';
-import { useProducts } from '@/lib/hooks';
+import { productApi } from '@/lib/api';
+
+interface Rating {
+  id: string;
+  rating: number;
+  review: string;
+  user: {
+    name: string;
+    image: string;
+  };
+}
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  compareAtPrice?: number;
+  mrp?: number;
+  discount?: number;
+  preview?: string;
+  description?: string;
+  images?: Array<{ url: string; altText: string; isPrimary: boolean; order: number }>;
+  category?: { id: string; name: string } | string;
+  categoryId: string;
+  store?: { id: string; name: string; logo?: string };
+  storeId?: string;
+  location?: string;
+  rating?: Rating[] | number;
+  stock: number;
+}
 
 const FeaturedProducts = () => {
-  const products = useProducts();
   const searchParams = useSearchParams();
   const selectedLocation = searchParams.get('location') || 'All';
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    let isMounted = true;
+    const fetchFeatured = async () => {
+      try {
+        const res = await productApi.getAllProducts({
+          status: 'active',
+          limit: 100,
+        });
+
+        let list: Product[] = [];
+        if (res?.data && Array.isArray(res.data)) {
+          list = res.data;
+        } else if (res?.data?.data && Array.isArray(res.data.data)) {
+          list = res.data.data;
+        } else if (res?.data?.products && Array.isArray(res.data.products)) {
+          list = res.data.products;
+        }
+
+        if (isMounted) {
+          setProducts(list);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch featured products:', err);
+        if (isMounted) setLoading(false);
+      }
+    };
+    void fetchFeatured();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Helper function to shuffle array and get random items
@@ -27,7 +88,7 @@ const FeaturedProducts = () => {
     return shuffled.slice(0, count);
   };
 
-  // Get 10 random products from useProducts hook, filtered by location if selected
+  // Get 10 random products from backend products, filtered by location if selected
   const featuredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       return selectedLocation === 'All' || 
@@ -57,13 +118,17 @@ const FeaturedProducts = () => {
       setTimeout(checkScroll, 100);
       return () => container.removeEventListener('scroll', checkScroll);
     }
-  }, []);
+  }, [loading]);
 
   // Calculate average rating
-  const calculateAverageRating = (ratings: Array<{ rating: number }>) => {
-    if (!ratings || ratings.length === 0) return 0;
-    const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
-    return sum / ratings.length;
+  const calculateAverageRating = (ratings: Rating[] | number | undefined) => {
+    if (!ratings) return 4.2;
+    if (Array.isArray(ratings)) {
+      if (ratings.length === 0) return 4.2;
+      const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
+      return sum / ratings.length;
+    }
+    return ratings;
   };
 
   const scroll = (direction: 'left' | 'right') => {
@@ -101,7 +166,7 @@ const FeaturedProducts = () => {
 
         {/* Main Container */}
         <div className="flex flex-col lg:flex-row gap-0">
-          {/* Products Carousel - Constrained Container with Padels */}
+          {/* Products Carousel - Constrained Container with Paddles */}
           <div className="flex-1 overflow-hidden">
             <div className="relative w-full group">
               {/* Left Paddle Button */}
@@ -137,26 +202,46 @@ const FeaturedProducts = () => {
                   }
                 `}</style>
 
-                {featuredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="shrink-0 w-72"
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <ProductCard
-                      id={product.id}
-                      image={product.images[0]}
-                      category={product.category}
-                      title={product.name}
-                      rating={calculateAverageRating(product.rating)}
-                      author={product.store.name}
-                      location={product.location}
-                      price={product.price}
-                      originalPrice={product.mrp}
-                      href={`/product/${product.id}`}
-                    />
-                  </div>
-                ))}
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="shrink-0 w-72 h-[320px] bg-white border border-gray-100 rounded-2xl animate-pulse flex flex-col p-4 gap-4"
+                    >
+                      <div className="w-full h-40 bg-gray-100 rounded-xl" />
+                      <div className="h-4 bg-gray-200 rounded w-1/3" />
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2 mt-auto" />
+                    </div>
+                  ))
+                ) : featuredProducts.map((product) => {
+                  const coverImage = product.images && product.images.length > 0 
+                    ? product.images.find(img => img.isPrimary)?.url || product.images[0].url 
+                    : '/placeholder.png';
+                  const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category || 'Fashion');
+                  const storeName = product.store?.name || product.storeId || 'Faflories Store';
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="shrink-0 w-72"
+                      style={{ scrollSnapAlign: 'start' }}
+                    >
+                      <ProductCard
+                        id={product.id}
+                        image={coverImage}
+                        category={prodCat}
+                        title={product.name}
+                        rating={calculateAverageRating(product.rating)}
+                        author={storeName}
+                        location={product.location || 'Lagos'}
+                        price={product.price}
+                        originalPrice={product.compareAtPrice || product.mrp}
+                        href={`/products/${product.id}`}
+                      />
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Right Paddle Button */}

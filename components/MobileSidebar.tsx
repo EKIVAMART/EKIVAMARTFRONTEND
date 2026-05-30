@@ -18,63 +18,89 @@ import {
   Smartphone,
   Backpack,
   Footprints,
-  Apple,
   Sparkles,
   Heart,
   Gem,
   Home,
   Search,
   User,
+  Tv,
+  Camera,
+  Gamepad,
+  Music,
+  Headphones,
+  Blend,
+  CookingPot,
+  Lamp,
+  Sofa,
+  ShoppingBasket,
+  Scissors,
+  Bath,
+  HeartPulse,
+  Dumbbell,
+  Puzzle,
+  Baby,
+  PawPrint,
+  Car,
+  Book,
+  Wrench,
+  Leaf,
+  Briefcase,
+  Bolt,
+  Package,
 } from 'lucide-react';
+import { categoryApi } from '@/lib/api';
 
-interface Category {
-  name: string;
-  icon: React.ReactNode;
-  subcategories: string[];
+const categoryIconMap: Record<string, any> = {
+  'fashion': ShoppingBag,
+  'footwear': Footprints,
+  'bags & luggage': Backpack,
+  'bags': Backpack,
+  'jewelry & fashion accessories': Gem,
+  'jewelry': Gem,
+  'jewellery': Gem,
+  'mobile phones & accessories': Smartphone,
+  'computers & accessories': LaptopIconPlaceholder(),
+  'electronics': Tv,
+  'photography & video': Camera,
+  'gaming': Gamepad,
+  'musical instruments': Music,
+  'audio equipment': Headphones,
+  'home appliances': Blend,
+  'home & kitchen': CookingPot,
+  'home decor': Lamp,
+  'furniture': Sofa,
+  'groceries & food': ShoppingBasket,
+  'groceries': ShoppingBasket,
+  'beauty & cosmetics': Sparkles,
+  'beauty': Sparkles,
+  'hair care & extensions': Scissors,
+  'personal care': Bath,
+  'health & wellness': HeartPulse,
+  'wellness': Heart,
+  'sports & fitness': Dumbbell,
+  'sports': Dumbbell,
+  'toys & games': Puzzle,
+  'toys': Puzzle,
+  'baby products': Baby,
+  'pet supplies': PawPrint,
+  'automotive': Car,
+  'books & stationery': Book,
+  'tools & home improvement': Wrench,
+  'garden & outdoor': Leaf,
+  'office & school supplies': Briefcase,
+  'solar & electrical': Bolt,
+};
+
+function LaptopIconPlaceholder() {
+  return Smartphone;
 }
 
-const categories: Category[] = [
-  {
-    name: 'Fashion',
-    icon: <ShoppingBag size={20} />,
-    subcategories: ['Men', 'Women', 'Kids', 'Accessories'],
-  },
-  {
-    name: 'Electronics',
-    icon: <Smartphone size={20} />,
-    subcategories: ['Laptops', 'Smartphones', 'Accessories', 'Smart Watch'],
-  },
-  {
-    name: 'Bags',
-    icon: <Backpack size={20} />,
-    subcategories: ['Men Bags', 'Women Bags', 'Travel Bags', 'Backpacks'],
-  },
-  {
-    name: 'Footwear',
-    icon: <Footprints size={20} />,
-    subcategories: ['Men Shoes', 'Women Shoes', 'Sneakers', 'Formal Shoes'],
-  },
-  {
-    name: 'Groceries',
-    icon: <Apple size={20} />,
-    subcategories: ['Fruits', 'Vegetables', 'Dairy', 'Snacks'],
-  },
-  {
-    name: 'Beauty',
-    icon: <Sparkles size={20} />,
-    subcategories: ['Skincare', 'Makeup', 'Haircare', 'Fragrances'],
-  },
-  {
-    name: 'Wellness',
-    icon: <Heart size={20} />,
-    subcategories: ['Supplements', 'Fitness', 'Health', 'Personal Care'],
-  },
-  {
-    name: 'Jewellery',
-    icon: <Gem size={20} />,
-    subcategories: ['Gold', 'Silver', 'Diamonds', 'Accessories'],
-  },
-];
+const getCategoryIcon = (name: string) => {
+  const norm = name.toLowerCase().trim();
+  const IconComponent = categoryIconMap[norm] || categoryIconMap[norm.replace(/&/g, 'and')] || Package;
+  return <IconComponent size={20} />;
+};
 
 const allLocations = [
   'All',
@@ -131,6 +157,87 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isOpen) {
+      const fetchCats = async () => {
+        try {
+          const res = await categoryApi.getCategories({ limit: 100 });
+          let data: any[] = [];
+          if (res?.data && Array.isArray(res.data)) {
+            data = res.data;
+          } else if (res?.data?.data && Array.isArray(res.data.data)) {
+            data = res.data.data;
+          } else if (res?.data?.categories && Array.isArray(res.data.categories)) {
+            data = res.data.categories;
+          } else if (res?.data?.docs && Array.isArray(res.data.docs)) {
+            data = res.data.docs;
+          }
+
+          const publishedData = data.filter((item: any) => {
+            const isPublished = Boolean(item.isActive ?? item.is_active ?? (item.status === 'published' || item.status === 'active'));
+            const isDraft = item.status === 'draft';
+            return isPublished && !isDraft;
+          });
+
+          // Separate parents
+          const parents = publishedData.filter((item: any) => !item.parentId);
+          
+          // Fetch subcategories for each parent using categoryApi.getSubcategories
+          const formatted = await Promise.all(
+            parents.map(async (parent: any) => {
+              const parentId = String(parent.id || parent._id || parent.categoryId || parent.uuid);
+              let subData: any[] = [];
+              try {
+                const subRes = await categoryApi.getSubcategories(parentId);
+                if (subRes?.data && Array.isArray(subRes.data)) {
+                  subData = subRes.data;
+                } else if (subRes?.data?.data && Array.isArray(subRes.data.data)) {
+                  subData = subRes.data.data;
+                } else if (subRes?.data?.categories && Array.isArray(subRes.data.categories)) {
+                  subData = subRes.data.categories;
+                } else if (subRes?.data?.docs && Array.isArray(subRes.data.docs)) {
+                  subData = subRes.data.docs;
+                } else if (Array.isArray(subRes)) {
+                  subData = subRes;
+                }
+              } catch (err) {
+                console.error(`Failed to fetch subcategories for parent ${parentId}:`, err);
+              }
+
+              const subcategories = subData.filter((item: any) => {
+                const isPublished = Boolean(item.isActive ?? item.is_active ?? (item.status === 'published' || item.status === 'active'));
+                const isDraft = item.status === 'draft';
+                return isPublished && !isDraft;
+              }).map((sub: any) => ({
+                id: String(sub.id || sub._id || sub.categoryId || sub.uuid),
+                name: sub.name || sub.title || sub.displayName || 'Unknown',
+                slug: (sub.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+              }));
+
+              return {
+                id: parentId,
+                name: parent.name || parent.title || parent.displayName || 'Unknown',
+                slug: (parent.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+                subcategories,
+              };
+            })
+          );
+
+          if (isMounted) {
+            setCategories(formatted);
+          }
+        } catch (err) {
+          console.error('Failed to fetch sidebar categories:', err);
+        }
+      };
+      void fetchCats();
+    }
+    return () => { isMounted = false; };
+  }, [isOpen]);
+
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState(locationParam);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -285,8 +392,8 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             key={location}
                             onClick={() => handleLocationSelect(location)}
                             className={`w-full text-left px-4 py-3 text-sm transition ${selectedLocation === location
-                                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-semibold'
-                                : 'text-gray-700 hover:bg-gray-50'
+                              ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-semibold'
+                              : 'text-gray-700 hover:bg-gray-50'
                               }`}
                           >
                             {location}
@@ -317,56 +424,63 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
               {/* Categories */}
               <div>
-                {categories.map((category) => (
-                  <div key={category.name}>
-                    {/* Category Button */}
-                    <button
-                      onClick={() => handleCategoryClick(category.name)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-gray-500 group-hover:text-[#c800ff] transition">
-                          {category.icon}
-                        </div>
-                        <span className="font-medium text-sm">
-                          {category.name}
-                        </span>
-                      </div>
-                      <motion.div
-                        animate={{
-                          rotate: expandedCategory === category.name ? 90 : 0,
-                        }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronRight size={18} className="text-gray-400" />
-                      </motion.div>
-                    </button>
-
-                    {/* Subcategories */}
-                    <AnimatePresence>
-                      {expandedCategory === category.name && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden bg-gray-50"
+                {categories.length > 0 ? (
+                  categories.map((category) => {
+                    const iconNode = getCategoryIcon(category.name);
+                    return (
+                      <div key={category.id}>
+                        {/* Category Button */}
+                        <button
+                          onClick={() => handleCategoryClick(category.name)}
+                          className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition group"
                         >
-                          {category.subcategories.map((sub) => (
-                            <Link
-                              key={sub}
-                              href={`/category/${category.name.toLowerCase()}`}
-                              onClick={onClose}
-                              className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#c800ff] hover:bg-white transition"
+                          <div className="flex items-center gap-3">
+                            <div className="text-gray-500 group-hover:text-[#c800ff] transition">
+                              {iconNode}
+                            </div>
+                            <span className="font-semibold text-sm text-gray-800">
+                              {category.name}
+                            </span>
+                          </div>
+                          <motion.div
+                            animate={{
+                              rotate: expandedCategory === category.name ? 90 : 0,
+                            }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronRight size={18} className="text-gray-400" />
+                          </motion.div>
+                        </button>
+
+                        {/* Subcategories */}
+                        <AnimatePresence>
+                          {expandedCategory === category.name && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden bg-gray-50"
                             >
-                              {sub}
-                            </Link>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
+                              {category.subcategories.map((sub: any) => (
+                                <Link
+                                  key={sub.id}
+                                  href={`/categories/${category.slug}?subcategory=${sub.slug}`}
+                                  onClick={onClose}
+                                  className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#c800ff] hover:bg-white transition font-medium"
+                                >
+                                  {sub.name}
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="px-4 py-6 text-center text-xs text-gray-400">Loading categories...</div>
+                )}
               </div>
             </div>
 
