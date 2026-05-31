@@ -23,9 +23,115 @@ interface AuthSessionRecord {
   current?: boolean;
 }
 
+// ─── Image Upload Types ───────────────────────────────────────────────────────
+
+export interface UploadRequest {
+  fileName: string;
+  mimeType: 'image/jpeg' | 'image/jpg' | 'image/png' | 'image/gif' | 'image/webp';
+  folder: 'products' | 'categories';
+  expiresIn?: number;
+  isPublic?: boolean;
+}
+
+export interface UploadUrlResponse {
+  uploadUrl: string;
+  key: string;
+  url: string;
+  method: 'PUT' | 'POST';
+  expiresIn: number;
+  expiresAt: string;
+  headers?: Record<string, string>;
+  fields?: Record<string, string>;
+}
+
+/**
+ * Request signed upload URLs from the backend.
+ * Returns one UploadUrlResponse per requested file.
+ */
+export async function requestUploadUrls(
+  files: UploadRequest[]
+): Promise<UploadUrlResponse[]> {
+  try {
+    const response = await axiosInstance.post<ApiResponse<UploadUrlResponse[]>>(
+      '/products/upload-url',
+      files
+    );
+    const data = response.data?.data;
+    if (!Array.isArray(data)) {
+      throw { message: 'Unexpected response from upload URL endpoint', statusCode: 500 } as ApiError;
+    }
+    return data;
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+/**
+ * Upload a single file directly to the storage provider (S3 or Cloudinary)
+ * based on the method returned in the UploadUrlResponse.
+ */
+export async function uploadFileToStorage(
+  item: UploadUrlResponse,
+  file: File
+): Promise<void> {
+  if (item.method === 'PUT') {
+    // S3-style: PUT with raw body
+    await fetch(item.uploadUrl, {
+      method: 'PUT',
+      headers: item.headers ?? { 'Content-Type': file.type },
+      body: file,
+    });
+  } else {
+    // Cloudinary-style: POST with multipart FormData
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(item.fields ?? {})) {
+      formData.append(key, String(value));
+    }
+    formData.append('file', file);
+    await fetch(item.uploadUrl, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+}
+
+/**
+ * Convenience helper — takes an array of { file, altText } pairs,
+ * requests upload URLs, uploads to storage, and returns the image
+ * objects ready to send to product/category create or update endpoints.
+ */
+export async function uploadImages(
+  images: { file: File; altText: string }[],
+  folder: 'products' | 'categories'
+): Promise<{ url: string; altText: string; isPrimary: boolean; order: number }[]> {
+  if (!images.length) return [];
+
+  const requests: UploadRequest[] = images.map(({ file }) => ({
+    fileName: file.name,
+    mimeType: file.type as UploadRequest['mimeType'],
+    folder,
+    expiresIn: 3600,
+    isPublic: true,
+  }));
+
+  const uploadItems = await requestUploadUrls(requests);
+
+  await Promise.all(
+    uploadItems.map((item, idx) => uploadFileToStorage(item, images[idx].file))
+  );
+
+  return uploadItems.map((item, idx) => ({
+    url: item.url,
+    altText: images[idx].altText,
+    isPrimary: idx === 0,
+    order: idx,
+  }));
+}
+
+// ─── Internal helpers ─────────────────────────────────────────────────────────
+
 const getAuthRedirectUrl = (path: string) => {
   const baseUrl = axiosInstance.defaults.baseURL?.replace(/\/$/, '');
-
   return baseUrl ? `${baseUrl}${path}` : path;
 };
 
@@ -33,7 +139,6 @@ const redirectToAuthProvider = (path: string) => {
   if (typeof window === 'undefined') {
     throw new Error('Social login is only available in the browser');
   }
-
   window.location.assign(getAuthRedirectUrl(path));
 };
 
@@ -93,7 +198,7 @@ const extractSessions = (payload: unknown): AuthSessionRecord[] => {
 };
 
 // Handle API errors
-const handleApiError = (error: unknown): never => {
+function handleApiError(error: unknown): never {
   // Check if this is an axios error by checking for response property
   if (error && typeof error === 'object' && 'response' in error) {
     const axiError = error as any;
@@ -346,10 +451,12 @@ export const authApi = {
   }
 };
 
-// Product API
+// ─── Product API ──────────────────────────────────────────────────────────────
+
 export type ProductStatus =
   | 'draft'
   | 'active'
+  | 'published'
   | 'inactive'
   | 'out_of_stock'
   | 'discontinued';
@@ -404,37 +511,33 @@ export interface ProductSearchParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+/**
+ * Matches the new CreateProductDto from the backend.
+ * Extra fields (weight, dimensions, color, size, condition) must go under metadata.
+ */
 export interface CreateProductDto {
-  vendorId?: string;
+  vendorId: string;
   categoryId: string;
   name: string;
   preview: string;
   description: string;
+  origin: string;
   brand?: string;
   returnWindow?: ReturnWindow;
   returnShipping?: ReturnShipping;
   warrantyPeriod?: WarrantyPeriod;
+  images?: Array<{
+    url: string;
+    altText: string;
+    isPrimary: boolean;
+    order: number;
+  }>;
   sku?: string;
   discount?: number;
   currency?: string;
   compareAtPrice: number;
   costPerItem?: number;
   stock: number;
-  images?: Array<{
-    url: string;
-    alt?: string;
-    isPrimary?: boolean;
-  }>;
-  color?: string;
-  size?: string;
-  condition?: ProductCondition;
-  weight?: number;
-  dimensions?: {
-    length: number;
-    width: number;
-    height: number;
-    unit: string;
-  };
   tags?: string[];
   metadata?: Record<string, any>;
 }
@@ -482,15 +585,11 @@ export const productApi = {
 
   async createProduct(body: CreateProductDto) {
     try {
-       const response = await axiosInstance.post<ApiResponse<any>>(`/products`, body);
+      const response = await axiosInstance.post<ApiResponse<any>>(`/products`, body);
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
-  },
-
-  async createProducts(body: CreateProductDto) {
-    return this.createProduct(body);
   },
 
   async updateProduct(id: string, body: UpdateProductDto) {
@@ -505,16 +604,11 @@ export const productApi = {
     }
   },
 
-  async uploadProductImages(id: string, files: File[]) {
+  async deleteProductImage(id: string, imageUrl: string) {
     try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('images', file);
-      });
-
-      const response = await axiosInstance.post<ApiResponse<any>>(
+      const response = await axiosInstance.delete<ApiResponse<any>>(
         `/products/${id}/images`,
-        formData
+        { data: { imageUrl } } as any
       );
       return response.data;
     } catch (error) {
@@ -542,9 +636,20 @@ export const productApi = {
   },
 };
 
+// ─── Category API ─────────────────────────────────────────────────────────────
+
+export interface CreateCategoryDto {
+  name: string;
+  description?: string;
+  parentId?: string;
+  displayOrder?: number;
+  /** Public URL from the storage provider — obtained via requestUploadUrls + uploadFileToStorage */
+  imageUrl?: string;
+}
+
 export const categoryApi = {
   async getCategories(params: {
-    page?: number; 
+    page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
@@ -552,7 +657,7 @@ export const categoryApi = {
     try {
       const queryParams = new URLSearchParams({
         page: String(params.page || 1),
-        limit: String(params.limit || 20),
+        limit: String(params.limit || 100),
         sortBy: params.sortBy || 'name',
         sortOrder: params.sortOrder || 'asc',
       });
@@ -563,6 +668,83 @@ export const categoryApi = {
     } catch (error) {
       handleApiError(error);
     }
-  }
+  },
 
+  async getCategoryById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
+   * Create a new category.
+   * imageUrl should be the public URL returned from storage upload.
+   */
+  async createCategory(data: CreateCategoryDto) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/categories', data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
+   * Update a category (draft or published).
+   * Pass image.url + image.altText when updating the category image.
+   */
+  async updateCategory(id: string, data: {
+    name?: string;
+    description?: string;
+    image?: { url: string; altText: string };
+  }) {
+    try {
+      // PATCH /categories — id goes in the body, not the URL path
+      const response = await axiosInstance.patch<ApiResponse<any>>('/categories', { id, ...data });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteCategory(id: string) {
+    try {
+      await axiosInstance.delete(`/categories/${id}`);
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async publishCategory(id: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/categories/${id}/publish`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteCategoryImage(id: string, imageUrl: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(
+        `/categories/${id}/images`,
+        { data: { imageUrl } } as any
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getSubcategories(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/categories/${id}/children`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 }

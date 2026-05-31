@@ -2,6 +2,7 @@ import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X } from 'luci
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAppSelector } from '@/lib/hooks';
 
 interface SidebarProps {
   activeTab: string;
@@ -11,9 +12,10 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
+  const authUser = useAppSelector((state) => state.auth.user);
+
   return (
     <>
-      {/* Mobile Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-[45] md:hidden backdrop-blur-sm transition-opacity"
@@ -21,7 +23,6 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
         />
       )}
 
-      {/* Sidebar Content */}
       <aside className={`
         fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r flex flex-col z-50
         transition-transform duration-300 ease-in-out
@@ -47,14 +48,16 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           <SidebarLink icon={<Package size={20} />} label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
           <SidebarLink icon={<ShoppingCart size={20} />} label="Orders" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
           <SidebarLink icon={<Users size={20} />} label="Vendor Settings" active={activeTab === 'vendors'} onClick={() => setActiveTab('vendors')} />
-          <SidebarLink icon={<Settings size={20} />} label="Settings" active={false} onClick={() => { }} />
+          <SidebarLink icon={<Settings size={20} />} label="Settings" active={false} onClick={() => {}} />
         </nav>
         <div className="p-6 border-t mt-auto">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600">A</div>
+            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600">
+              {authUser?.firstName?.[0] || 'A'}
+            </div>
             <div>
-              <p className="text-sm font-bold text-slate-800">Admin User</p>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Super Admin</p>
+              <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</p>
             </div>
           </div>
         </div>

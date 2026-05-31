@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
+import DashboardView from '@/components/admin/DashboardView';
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
+  ProductImage,
+  categoryIncludesWeightAndDimensions,
 } from '@/components/admin/ActionModal';
+import CategoriesModal from '@/components/admin/CategoriesModal';
 import ImageUploadModal from '@/components/admin/ImageUploadModal';
+import ViewProductModal from '@/components/admin/ViewProductModal';
 import ProductTable from '@/components/admin/ProductTable';
 import VendorTable from '@/components/admin/VendorTable';
 import OrderTable from '@/components/admin/OrderTable';
@@ -23,10 +28,14 @@ import {
   authApi,
   categoryApi,
   productApi,
+  uploadImages,
 } from '@/lib/api';
-import { useAppSelector } from '@/lib/hooks';
+import { useAppSelector, useAppDispatch } from '@/lib/hooks';
+import { setUser } from '@/lib/features/auth/authSlice';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 type AdminProduct = Partial<ProductFormData> & {
   id: string;
@@ -36,9 +45,13 @@ type AdminProduct = Partial<ProductFormData> & {
   stock: number;
   image: string;
   status?: ProductStatus;
-  images?: string[];
+  images?: ProductImage[];
   color?: string;
   size?: string;
+  subCategoryId?: string;
+  subCategory?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 type AdminVendor = {
@@ -80,10 +93,12 @@ type ProductRecord = {
   sellingPrice?: number;
   originalPrice?: number;
   category?: string | { id?: string; _id?: string; name?: string; title?: string };
+  subCategoryId?: string;
+  subCategory?: string | { id?: string; _id?: string; name?: string; title?: string };
   stock?: number | { quantity?: number; isInStock?: boolean };
   quantity?: number;
   image?: string;
-  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number }>;
+  images?: Array<string | { url?: string; isPrimary?: boolean; order?: number; alt?: string }>;
   status?: ProductStatus;
   condition?: ProductCondition;
   returnWindow?: ReturnWindow;
@@ -97,6 +112,8 @@ type ProductRecord = {
   metadata?: Record<string, unknown>;
   discount?: number;
   discountPercentage?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 
 type ProductPagination = {
@@ -163,18 +180,25 @@ const getCategoryList = (payload: unknown): unknown[] => {
   return [];
 };
 
-const normalizeCategory = (category: unknown): ProductCategoryOption | null => {
+const normalizeCategory = (category: unknown): (ProductCategoryOption & { isActive: boolean }) | null => {
   if (!isRecord(category)) return null;
 
-  const record = category as CategoryRecord;
+  const record = category as CategoryRecord & { isActive?: boolean; is_active?: boolean; status?: string };
   const id = record.id || record._id || record.categoryId || record.uuid;
   const name = record.name || record.title || record.displayName || record.slug;
 
   if (!id || !name) return null;
 
+  const isActive = Boolean(record.isActive ?? record.is_active ?? (record.status ? record.status === 'published' : true));
+
   return {
     id: String(id),
     name: String(name),
+    isActive,
+    subcategories: Array.isArray((record as any).subcategories) ? (record as any).subcategories.map((s: any) => ({
+      id: String(s.id || s._id || s.categoryId || s.uuid),
+      name: String(s.name || s.title || s.displayName || 'Unknown Subcategory'),
+    })) : [],
   };
 };
 
@@ -277,18 +301,26 @@ const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
   return toNonNegativeInteger(stock ?? quantity);
 };
 
-const getProductImages = (images: ProductRecord['images']) => {
+const getProductImagesFull = (images: ProductRecord['images']): ProductImage[] => {
   if (!Array.isArray(images)) return [];
 
   return [...images]
+    .map((image, idx) => {
+      if (typeof image === 'string') return { url: image, order: idx };
+      return {
+        key: image.url || '', // use url as key fallback
+        url: image.url || '',
+        order: image.order ?? idx,
+        isPrimary: image.isPrimary,
+        alt: image.alt || '',
+      };
+    })
+    .filter(img => Boolean(img.url))
     .sort((a, b) => {
-      if (typeof a === 'string' || typeof b === 'string') return 0;
       if (a.isPrimary) return -1;
       if (b.isPrimary) return 1;
-      return Number(a.order ?? 0) - Number(b.order ?? 0);
-    })
-    .map((image) => (typeof image === 'string' ? image : image.url))
-    .filter((url): url is string => Boolean(url));
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
 };
 
 const normalizeProduct = (product: unknown): AdminProduct | null => {
@@ -300,7 +332,8 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
 
   if (!id || !name) return null;
 
-  const imageUrls = getProductImages(record.images);
+  const imageObjects = getProductImagesFull(record.images);
+  const imageUrls = imageObjects.map(img => img.url);
   const compareAtPrice = getMoneyAmount(record.compareAtPrice);
   const price = getMoneyAmount(record.price) || Number(record.sellingPrice ?? record.originalPrice ?? 0);
   const metadata = record.metadata || {};
@@ -333,7 +366,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
       ? Boolean(record.stock.isInStock)
       : getStockQuantity(record.stock, record.quantity) > 0,
     image: record.image || imageUrls[0] || '',
-    images: imageUrls,
+    images: imageObjects,
     status: record.status || 'draft',
     condition: record.condition || 'new',
     returnWindow: record.returnWindow ? String(record.returnWindow) : 'Use Store Default',
@@ -353,10 +386,13 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     metadata,
     discount: record.discount ?? record.discountPercentage ?? 0,
     currency: 'NGN',
-    subCategoryId: '',
+    subCategoryId: record.subCategoryId || '',
+    subCategory: getCategoryName(record.subCategory),
     origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
     returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
     warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
+    createdAt: record.createdAt ? new Date(record.createdAt).toISOString() : new Date().toISOString(),
+    updatedAt: record.updatedAt ? new Date(record.updatedAt).toISOString() : new Date().toISOString(),
   };
 };
 
@@ -390,47 +426,77 @@ const buildProductPayload = (
   formData: ProductFormData,
   categoryOptions: ProductCategoryOption[]
 ): CreateProductDto => {
+  const selectedCategory = categoryOptions.find(
+    (c) => c.id === formData.categoryId
+  );
+  const categoryName = selectedCategory?.name || '';
+  const includesWeightAndDimensions = categoryIncludesWeightAndDimensions(categoryName);
+
   const customMetadata: Record<string, unknown> = {
     ...formData.metadata,
-    origin: formData.origin,
     returnConditions: formData.returnConditions,
     warrantyDetails: formData.warrantyDetails,
   };
 
-  if (formData.colours.length > 1) {
-    customMetadata.colours = formData.colours;
+  if (includesWeightAndDimensions) {
+    customMetadata.weightUnit = (formData as any).weightUnit || 'kg';
   }
 
-  if (formData.sizes.length > 1) {
-    customMetadata.sizes = formData.sizes;
+  // Ensure origin is completely removed from metadata
+  delete customMetadata.origin;
+
+  if (formData.colours.length > 0) {
+    customMetadata.colours = formData.colours;
+    customMetadata.color = formData.colours[0];
   }
+
+  if (formData.sizes.length > 0) {
+    customMetadata.sizes = formData.sizes;
+    customMetadata.size = formData.sizes[0];
+  }
+
+  if (formData.condition) {
+    customMetadata.condition = formData.condition;
+  }
+
+  const resolvedCategoryId = formData.subCategoryId && formData.subCategoryId !== ''
+    ? formData.subCategoryId
+    : resolveCategoryId(formData.categoryId, categoryOptions);
 
   const payload: CreateProductDto = {
     vendorId: formData.vendorId,
-    categoryId: resolveCategoryId(formData.categoryId, categoryOptions),
+    categoryId: resolvedCategoryId,
     name: formData.name,
     preview: formData.preview,
     description: formData.description,
     compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
     stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
+    origin: formData.origin,
   };
 
   if (formData.brand) payload.brand = formData.brand;
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
-  if (formData.condition === 'new' || formData.condition === 'used' || formData.condition === 'refurbished') {
-    payload.condition = formData.condition;
-  }
   if (formData.tags.length) payload.tags = formData.tags;
-  if (formData.colours[0]) payload.color = formData.colours[0];
-  if (formData.sizes[0]) payload.size = formData.sizes[0];
+  
   if (formData.images?.length) {
-    payload.images = formData.images.map((url, index) => ({
-      url,
-      alt: `${formData.name} image ${index + 1}`,
-      isPrimary: index === 0,
-    }));
+    payload.images = formData.images.map((img, index) => {
+      if (typeof img === 'string') {
+        return {
+          url: img,
+          altText: `${formData.name} image ${index + 1}`,
+          isPrimary: index === 0,
+          order: index,
+        };
+      }
+      return {
+        url: img.url,
+        altText: img.alt || (img as any).altText || `${formData.name} image ${index + 1}`,
+        isPrimary: img.isPrimary || index === 0,
+        order: img.order ?? index,
+      };
+    });
   }
 
   const returnWindow = parseReturnWindow(formData.returnWindow);
@@ -458,17 +524,20 @@ const buildProductPayload = (
   const discount = clampPercentage(formData.discount);
   if (discount !== undefined) payload.discount = discount;
 
-  const weight = getOptionalNumber(formData.weight);
-  if (weight !== undefined) payload.weight = weight;
+  // Only include weight and dimensions if whitelisted category, added to metadata
+  if (includesWeightAndDimensions) {
+    const weight = getOptionalNumber(formData.weight);
+    if (weight !== undefined) customMetadata.weight = weight;
 
-  const { length, width, height } = formData.dimensions;
-  if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
-    payload.dimensions = {
-      length: Number(length) || 0,
-      width: Number(width) || 0,
-      height: Number(height) || 0,
-      unit: 'cm',
-    };
+    const { length, width, height } = formData.dimensions;
+    if ([length, width, height].some(value => getOptionalNumber(value) !== undefined)) {
+      customMetadata.dimensions = {
+        length: Number(length) || 0,
+        width: Number(width) || 0,
+        height: Number(height) || 0,
+        unit: (formData as any).dimensionsUnit || 'cm',
+      };
+    }
   }
 
   return payload;
@@ -476,13 +545,19 @@ const buildProductPayload = (
 
 export default function AdminPage() {
   const authUser = useAppSelector((state) => state.auth.user);
-  const [activeTab, setActiveTab] = useState<'products' | 'vendors' | 'orders'>('products');
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [productToPublishId, setProductToPublishId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
+  const [viewingItem, setViewingItem] = useState<AdminProduct | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productLoadError, setProductLoadError] = useState('');
@@ -491,9 +566,14 @@ export default function AdminPage() {
   const [productTotal, setProductTotal] = useState(fallbackProducts.length);
   const [productTotalPages, setProductTotalPages] = useState(1);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [publishingProductId, setPublishingProductId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState('');
   const [categories, setCategories] = useState<ProductCategoryOption[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [filterCategoryId, setFilterCategoryId] = useState('all');
+  const [filterSubcategoryId, setFilterSubcategoryId] = useState('all');
+  const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
+  const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
@@ -523,35 +603,89 @@ export default function AdminPage() {
     setIsModalOpen(true);
   };
 
+  const openViewModal = (item: AdminProduct) => {
+    setViewingItem(item);
+    setIsViewModalOpen(true);
+  };
+
+  const resolvedProducts = useMemo(() => {
+    return products.map((p) => {
+      let resolvedCategory = p.category || '';
+      let resolvedSubCategory = p.subCategory || '';
+
+      if (p.categoryId) {
+        // First check if this categoryId is a known subcategory in our map
+        const subEntry = subcategoryMap.get(p.categoryId);
+        if (subEntry) {
+          resolvedCategory = subEntry.categoryName;
+          resolvedSubCategory = subEntry.subCategoryName;
+        } else {
+          // Check if categoryId is a top-level category
+          const parentCat = categories.find((c) => c.id === p.categoryId);
+          if (parentCat) {
+            resolvedCategory = parentCat.name;
+            resolvedSubCategory = '';
+          }
+        }
+      }
+
+      return {
+        ...p,
+        category: resolvedCategory,
+        subCategory: resolvedSubCategory,
+      };
+    });
+  }, [products, categories, subcategoryMap]);
+
   useEffect(() => {
     let isMounted = true;
 
     const resolveCurrentUserId = async () => {
+      setIsCheckingAuth(true);
       const reduxUserId = authUser?.id;
       if (reduxUserId) {
         setCurrentUserId(reduxUserId);
+        setIsCheckingAuth(false);
         return;
       }
 
       const storedUserId = getStoredUserId();
       if (storedUserId) {
         setCurrentUserId(storedUserId);
+        setIsCheckingAuth(false);
         return;
       }
 
       if (typeof window === 'undefined' || !localStorage.getItem('accessToken')) {
+        setIsCheckingAuth(false);
         return;
       }
 
       try {
         const response = await authApi.getProfile();
-        const profileUserId = response?.data?.user?.id || response?.data?.id;
+        const profileData = response?.data ?? response;
+        const profileUserId = profileData?.user?.id || profileData?.id;
         if (isMounted && profileUserId) {
           setCurrentUserId(String(profileUserId));
+          dispatch(
+            setUser({
+              id: String(profileUserId),
+              email: profileData?.email || profileData?.user?.email || '',
+              firstName: profileData?.firstName || profileData?.user?.firstName || '',
+              lastName: profileData?.lastName || profileData?.user?.lastName || '',
+              profilePicture: profileData?.avatar || profileData?.profilePicture || undefined,
+              role: profileData?.role || profileData?.user?.role || '', // Strict role check, no admin fallback
+              isEmailVerified: profileData?.isEmailVerified ?? true,
+            })
+          );
         }
       } catch {
         if (isMounted) {
           setCurrentUserId('');
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingAuth(false);
         }
       }
     };
@@ -561,7 +695,7 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [authUser?.id]);
+  }, [authUser?.id, dispatch]);
 
   useEffect(() => {
     let isMounted = true;
@@ -578,10 +712,35 @@ export default function AdminPage() {
         });
         const fetchedCategories = getCategoryList(response)
           .map(normalizeCategory)
-          .filter((category): category is ProductCategoryOption => Boolean(category));
+          .filter((category): category is (ProductCategoryOption & { isActive: boolean }) => Boolean(category))
+          .filter((category) => category.isActive);
 
         if (isMounted) {
           setCategories(fetchedCategories);
+
+          // Also fetch subcategories for each category and build a lookup map
+          const map = new Map<string, { categoryName: string; subCategoryName: string }>();
+          try {
+            await Promise.all(
+              fetchedCategories.map(async (cat) => {
+                try {
+                  const subRes = await categoryApi.getSubcategories(cat.id);
+                  const subs = getCategoryList(subRes)
+                    .map(normalizeCategory)
+                    .filter((s): s is (ProductCategoryOption & { isActive: boolean }) => Boolean(s));
+                  subs.forEach((sub) => {
+                    map.set(sub.id, { categoryName: cat.name, subCategoryName: sub.name });
+                  });
+                } catch {
+                  // Subcategories unavailable for this category — skip
+                }
+              })
+            );
+          } catch {
+            // Best-effort, no crash
+          }
+
+          if (isMounted) setSubcategoryMap(map);
         }
       } catch (error) {
         if (isMounted) {
@@ -612,6 +771,7 @@ export default function AdminPage() {
         page: productPage,
         limit: PRODUCT_PAGE_LIMIT,
         searchQuery: searchQuery || undefined,
+        categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
@@ -648,6 +808,7 @@ export default function AdminPage() {
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
+          categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
           sortBy: 'createdAt',
           sortOrder: 'desc',
         });
@@ -682,7 +843,35 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [productPage, searchQuery]);
+  }, [productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (filterCategoryId === 'all') {
+      setFilterSubcategories([]);
+      setFilterSubcategoryId('all');
+      return;
+    }
+
+    const fetchSubs = async () => {
+      try {
+        const response = await categoryApi.getSubcategories(filterCategoryId);
+        const list = getCategoryList(response)
+          .map(normalizeCategory)
+          .filter((c): c is (ProductCategoryOption & { isActive: boolean }) => Boolean(c))
+          .filter(c => c.isActive);
+        if (isMounted) {
+          setFilterSubcategories(list);
+          setFilterSubcategoryId('all');
+        }
+      } catch (error) {
+        console.error('Error fetching filter subcategories', error);
+        if (isMounted) setFilterSubcategories([]);
+      }
+    };
+    void fetchSubs();
+    return () => { isMounted = false; };
+  }, [filterCategoryId]);
 
   const handleSaveProduct = async (formData: ProductFormData) => {
     if (activeTab !== 'products') return;
@@ -729,22 +918,61 @@ export default function AdminPage() {
     }
   };
 
-  const handlePublishClick = (id: string) => {
-    setProductToPublishId(id);
-    setIsImageModalOpen(true);
+  const handlePublishClick = async (id: string) => {
+    const product = products.find(p => p.id === id);
+    if (product && product.images && product.images.length > 0) {
+      const toastId = toast.loading('Publishing product…');
+      setPublishingProductId(id);
+      try {
+        const response = await productApi.publishProduct(id);
+        const publishedProduct = normalizeProduct(response?.data);
+        if (publishedProduct) {
+          setProducts(prev => prev.map(p => p.id === id ? publishedProduct : p));
+        } else {
+          await fetchProducts();
+        }
+        toast.success('Product published successfully!', { id: toastId });
+      } catch (error) {
+        toast.error('Failed to publish product.', { id: toastId });
+        setProductLoadError(
+          getApiErrorMessage(error) ||
+          'Could not publish product. Products need images and stock before publishing.'
+        );
+      } finally {
+        setPublishingProductId(null);
+      }
+    } else {
+      setProductToPublishId(id);
+      setIsImageModalOpen(true);
+    }
   };
 
-  const handleImageComplete = async (images: File[]) => {
+  const handleImageComplete = async (images: { file: File; alt: string }[]) => {
     if (!productToPublishId) return;
+    setIsImageModalOpen(false);
+
+    const toastId = toast.loading('Uploading images…');
+    setPublishingProductId(productToPublishId);
 
     try {
-      setIsLoadingProducts(true);
       setProductLoadError('');
 
       if (images.length > 0) {
-        await productApi.uploadProductImages(productToPublishId, images);
+        toast.loading('Uploading images to storage…', { id: toastId });
+        const uploaded = await uploadImages(
+          images.map(img => ({ file: img.file, altText: img.alt })),
+          'products'
+        );
+        toast.loading('Saving image data…', { id: toastId });
+        await productApi.updateProduct(productToPublishId, { images: uploaded });
+      } else {
+        toast.error('Images are required to publish this product.', { id: toastId });
+        setProductToPublishId(null);
+        setPublishingProductId(null);
+        return;
       }
 
+      toast.loading('Publishing product…', { id: toastId });
       const response = await productApi.publishProduct(productToPublishId);
       const publishedProduct = normalizeProduct(response?.data);
 
@@ -753,18 +981,17 @@ export default function AdminPage() {
       } else {
         await fetchProducts();
       }
+      toast.success('Product published successfully!', { id: toastId });
     } catch (error) {
+      toast.error('Failed to publish product.', { id: toastId });
       setProductLoadError(
         getApiErrorMessage(error) ||
         'Could not publish product. Products need images and stock before publishing.'
       );
-      return;
     } finally {
-      setIsLoadingProducts(false);
+      setPublishingProductId(null);
+      setProductToPublishId(null);
     }
-
-    setIsImageModalOpen(false);
-    setProductToPublishId(null);
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -779,6 +1006,89 @@ export default function AdminPage() {
       );
     }
   };
+
+  const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'];
+  const hasAdminRole = authUser && ADMIN_ROLES.includes(authUser.role);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
+
+  // Trigger redirect for unauthenticated users
+  useEffect(() => {
+    if (!isCheckingAuth && !hasToken && !authUser) {
+      toast.error('Session expired. Please log in again.');
+      router.push('/admin/login');
+    }
+  }, [isCheckingAuth, hasToken, authUser, router]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#c800ff]/20 border-t-[#c800ff] rounded-full animate-spin" />
+          <p className="text-sm font-bold text-slate-600 animate-pulse">Verifying credentials...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 1. Session expired / No token / No user
+  if (!hasToken && !authUser) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
+        
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+          <div className="flex justify-center mb-6">
+            <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+              <svg className="w-12 h-12 text-red-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Session Expired</h2>
+          <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
+            Your login session has expired or you are not authorized to view this page. Please log in again to continue.
+          </p>
+          <button
+            onClick={() => router.push('/admin/login')}
+            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Logged in, but unauthorized role
+  if (authUser && !hasAdminRole) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
+        
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+          <div className="flex justify-center mb-6">
+            <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
+              <svg className="w-12 h-12 text-[#c800ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Unauthorized Access</h2>
+          <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
+            You do not have administrative privileges to access this dashboard. This portal is restricted to authorized admins only.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
@@ -797,15 +1107,15 @@ export default function AdminPage() {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm cursor-pointer border border-teal-200 shadow-sm"
             >
-              A
+              {authUser?.firstName?.[0] || 'A'}
             </div>
             {isProfileOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
                 <div className="absolute right-0 mt-3 w-56 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
                   <div className="px-4 py-3 border-b bg-gray-50/50">
-                    <p className="text-sm font-bold text-slate-800">Admin User</p>
-                    <p className="text-xs text-gray-500 font-medium truncate">admin@faflora.com</p>
+                    <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
+                    <p className="text-xs text-gray-500 font-medium truncate">{authUser?.email || 'admin@faflora.com'}</p>
                   </div>
                   <button className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-gray-50 transition">
                     Account Settings
@@ -831,64 +1141,115 @@ export default function AdminPage() {
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
-            <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
-          </div>
-          {activeTab !== 'orders' && (
-            <button
-              onClick={() => openModal()}
-              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
-            >
-              <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
-            </button>
-          )}
-        </header>
+        {activeTab === 'dashboard' ? (
+          <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : (
+          <>
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
+                <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
+              </div>
+              {activeTab !== 'orders' && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  {activeTab === 'products' && (
+                    <button
+                      onClick={() => setIsCategoriesModalOpen(true)}
+                      className="bg-white text-[#912cad] border border-[#c800ff]/30 hover:border-[#c800ff] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      All Categories
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openModal()}
+                    className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+                  >
+                    <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
+                  </button>
+                </div>
+              )}
+            </header>
 
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder={`Search across ${activeTab}...`}
-            className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setProductPage(1);
-            }}
-          />
-        </div>
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
+              <Search size={18} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder={`Search across ${activeTab}...`}
+                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setProductPage(1);
+                }}
+              />
+            </div>
 
-        {activeTab === 'products' && (
-          <div className="space-y-3">
-            {(isLoadingProducts || isSavingProduct || productLoadError) && (
-              <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
-                  ? 'border-amber-200 bg-amber-50 text-amber-700'
-                  : 'border-gray-200 bg-white text-gray-500'
-                }`}>
-                {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
+            {activeTab === 'products' && (
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <select
+                  value={filterCategoryId}
+                  onChange={(e) => {
+                    setFilterCategoryId(e.target.value);
+                    setProductPage(1);
+                  }}
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={filterSubcategoryId}
+                  onChange={(e) => {
+                    setFilterSubcategoryId(e.target.value);
+                    setProductPage(1);
+                  }}
+                  disabled={filterCategoryId === 'all'}
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                  <option value="all">All Subcategories</option>
+                  {filterSubcategories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
             )}
-            <ProductTable
-              data={products}
-              onEdit={openModal}
-              onDelete={handleDeleteProduct}
-              onPublish={handlePublishClick}
-              currentPage={productPage}
-              totalPages={productTotalPages}
-              totalItems={productTotal}
-              itemsPerPage={productLimit}
-              onPageChange={setProductPage}
-              isLoading={isLoadingProducts}
-            />
-          </div>
-        )}
-        {activeTab === 'vendors' && (
-          <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
-        )}
-        {activeTab === 'orders' && (
-          <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+
+            {activeTab === 'products' && (
+              <div className="space-y-3">
+                {(isLoadingProducts || isSavingProduct || productLoadError) && (
+                  <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
+                      ? 'border-amber-200 bg-amber-50 text-amber-700'
+                      : 'border-gray-200 bg-white text-gray-500'
+                    }`}>
+                    {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
+                  </div>
+                )}
+                <ProductTable
+                  data={resolvedProducts}
+                  onEdit={openModal}
+                  onView={openViewModal}
+                  onDelete={handleDeleteProduct}
+                  onPublish={handlePublishClick}
+                  publishingProductId={publishingProductId}
+                  currentPage={productPage}
+                  totalPages={productTotalPages}
+                  totalItems={productTotal}
+                  itemsPerPage={productLimit}
+                  onPageChange={setProductPage}
+                  isLoading={isLoadingProducts}
+                />
+              </div>
+            )}
+            {activeTab === 'vendors' && (
+              <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+            )}
+            {activeTab === 'orders' && (
+              <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+            )}
+          </>
         )}
 
         <ActionModal
@@ -900,6 +1261,19 @@ export default function AdminPage() {
           isLoadingCategories={isLoadingCategories}
           currentUserId={currentUserId}
           onSave={handleSaveProduct}
+        />
+
+        <ViewProductModal
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+          product={viewingItem}
+        />
+
+        <CategoriesModal
+          isOpen={isCategoriesModalOpen}
+          onClose={() => {
+            setIsCategoriesModalOpen(false);
+          }}
         />
 
         <ImageUploadModal

@@ -496,7 +496,13 @@
 }
 
 .pd-tabs-content {
-  padding: 32px 24px;
+  padding: 36px 32px;
+}
+
+@media (max-width: 640px) {
+  .pd-tabs-content {
+    padding: 24px 16px;
+  }
 }
 
 .pd-tab-pane {
@@ -505,7 +511,50 @@
   font-size: 15px;
 }
 
-.pd-tab-pane p {
+/* Description block styling — purple vertical bar with overlay */
+.pd-desc-block {
+  padding: 16px 20px;
+  border-left: 4px solid #c800ff;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.pd-desc-block--primary {
+  background: linear-gradient(105deg, rgba(200, 0, 255, 0.07) 0%, rgba(200, 0, 255, 0.02) 100%);
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pd-desc-block--secondary {
+  background: linear-gradient(105deg, rgba(200, 0, 255, 0.04) 0%, rgba(200, 0, 255, 0.01) 100%);
+  color: #374151;
+  font-size: 15px;
+  border-left-color: #a855f7;
+  margin-bottom: 0;
+}
+
+.pd-desc-block:hover {
+  transform: translateX(5px);
+  box-shadow: -4px 0 0 0 #c800ff, 2px 0 16px rgba(200, 0, 255, 0.08);
+}
+
+.pd-desc-block--primary:hover {
+  background: linear-gradient(105deg, rgba(200, 0, 255, 0.11) 0%, rgba(200, 0, 255, 0.04) 100%);
+  border-left-color: #b500e6;
+}
+
+.pd-desc-block--secondary:hover {
+  background: linear-gradient(105deg, rgba(200, 0, 255, 0.08) 0%, rgba(200, 0, 255, 0.03) 100%);
+  border-left-color: #c800ff;
+}
+
+/* Legacy .pd-tab-pane p fallback (for any other rendered paragraphs) */
+.pd-tab-pane > p {
   margin-bottom: 18px;
   font-weight: 500;
   color: #374151;
@@ -519,7 +568,7 @@
   transition: all 0.3s ease;
 }
 
-.pd-tab-pane p:hover {
+.pd-tab-pane > p:hover {
   background: linear-gradient(135deg,
       rgba(152, 29, 135, 0.08) 0%,
       rgba(152, 29, 135, 0.04) 100%);
@@ -527,13 +576,7 @@
   border-left-color: #b500e6;
 }
 
-.pd-tab-pane p:first-child {
-  font-weight: 600;
-  font-size: 16px;
-  color: #1f2937;
-}
-
-.pd-tab-pane p:last-child {
+.pd-tab-pane > p:last-child {
   margin-bottom: 0;
 }
 

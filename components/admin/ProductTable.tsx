@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Edit3, Trash2, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Edit3, Trash2, ArrowUpDown, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -8,14 +8,19 @@ interface Product {
   stock: number;
   image: string;
   category?: string;
-  status?: 'draft' | 'active' | 'inactive' | 'out_of_stock' | 'discontinued';
+  subCategory?: string;
+  status?: 'draft' | 'active' | 'published' | 'inactive' | 'out_of_stock' | 'discontinued';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface ProductTableProps {
   data: Product[];
   onEdit: (item: Product) => void;
   onDelete: (id: string) => void;
+  onView?: (item: Product) => void;
   onPublish?: (id: string) => void;
+  publishingProductId?: string | null;
   searchQuery?: string;
   currentPage?: number;
   totalPages?: number;
@@ -25,11 +30,34 @@ interface ProductTableProps {
   isLoading?: boolean;
 }
 
+const getStatusBadge = (status?: Product['status']) => {
+  if (!status) return null;
+
+  const isPublished = status === 'active' || status === 'published';
+
+  if (isPublished) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Published
+      </span>
+    );
+  }
+
+  return (
+    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase">
+      {status.replaceAll('_', ' ')}
+    </span>
+  );
+};
+
 export default function ProductTable({
   data,
   onEdit,
   onDelete,
+  onView,
   onPublish,
+  publishingProductId,
   searchQuery = '',
   currentPage: serverPage,
   totalPages: serverTotalPages,
@@ -39,7 +67,7 @@ export default function ProductTable({
   isLoading = false,
 }: ProductTableProps) {
   const [localPage, setLocalPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<string>('createdAt-desc');
   const isServerPaginated = Boolean(onPageChange);
   const currentPage = serverPage || localPage;
 
@@ -55,13 +83,28 @@ export default function ProductTable({
       );
     }
 
-    // Sort by Price as an example
+    // Sort options
+    const [field, direction] = sortBy.split('-');
     result.sort((a, b) => {
-      return sortOrder === 'asc' ? a.price - b.price : b.price - a.price;
+      let comparison = 0;
+      if (field === 'price') {
+        comparison = a.price - b.price;
+      } else if (field === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (field === 'createdAt') {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        comparison = dateA - dateB;
+      } else if (field === 'updatedAt') {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        comparison = dateA - dateB;
+      }
+      return direction === 'asc' ? comparison : -comparison;
     });
 
     return result;
-  }, [data, searchQuery, sortOrder]);
+  }, [data, searchQuery, sortBy]);
 
   const totalPages =
     serverTotalPages || Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
@@ -78,10 +121,6 @@ export default function ProductTable({
     (currentPage - 1) * itemsPerPage + paginatedData.length,
     displayTotal
   );
-
-  const handleSortToggle = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-  };
 
   React.useEffect(() => {
     if (isServerPaginated) {
@@ -103,41 +142,83 @@ export default function ProductTable({
     setLocalPage(nextPage);
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return 'N/A';
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
       {/* Desktop Action Bar */}
-      <div className="hidden md:flex justify-end items-center p-4 border-b bg-white">
-        <button 
-          onClick={handleSortToggle}
-          className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-500 flex items-center gap-2 text-sm font-medium"
-        >
-          <ArrowUpDown size={16} />
-          Sort by Price
-        </button>
+      <div className="hidden md:flex justify-between items-center p-4 border-b bg-white">
+        <h2 className="text-lg font-bold text-slate-800">Products</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-semibold">Sort By</span>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-gray-50 border border-gray-200 text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff]"
+          >
+            <option value="createdAt-desc">Newest Created</option>
+            <option value="createdAt-asc">Oldest Created</option>
+            <option value="updatedAt-desc">Recent Updated</option>
+            <option value="updatedAt-asc">Oldest Updated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
       </div>
 
       {/* Mobile Action Bar */}
-      <div className="md:hidden flex justify-between items-center p-4 border-b bg-gray-50/50">
-        <h2 className="text-lg font-bold text-slate-800">Products</h2>
-        <button onClick={handleSortToggle} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg bg-white border">
-          <ArrowUpDown size={18} />
-        </button>
+      <div className="md:hidden flex flex-col gap-2 p-4 border-b bg-gray-50/50">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold text-slate-800">Products</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-semibold shrink-0">Sort By</span>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full bg-white border text-sm font-medium text-slate-700 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
+          >
+            <option value="createdAt-desc">Newest Created</option>
+            <option value="createdAt-asc">Oldest Created</option>
+            <option value="updatedAt-desc">Recent Updated</option>
+            <option value="updatedAt-asc">Oldest Updated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
       </div>
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead className="bg-gray-50/50 border-b">
             <tr>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Product</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Price</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Stock</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Created At</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Last Updated</th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.length > 0 ? paginatedData.map((p) => (
-              <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50/50 transition">
+              <tr key={p.id} onClick={() => onView?.(p)} className="border-b last:border-0 hover:bg-gray-50/50 transition cursor-pointer">
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border p-1 shrink-0 relative">
                     {p.image ? (
@@ -148,26 +229,56 @@ export default function ProductTable({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-slate-700 text-sm truncate max-w-[200px]">{p.name}</span>
-                    {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mt-0.5 uppercase">{p.status.replaceAll('_', ' ')}</span>}
+                    <div className="flex items-center gap-2 mt-0.5 w-fit">
+                      {getStatusBadge(p.status)}
+                      {(p.category || p.subCategory) && (
+                        <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                          {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-slate-700">NGN {p.price.toLocaleString()}</td>
                 <td className="p-4 text-center">
-                  <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{p.stock} In Stock</span>
+                  <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap">{p.stock} In Stock</span>
+                </td>
+                <td className="p-4 text-center text-xs font-medium text-slate-500">
+                  {formatDate(p.createdAt)}
+                </td>
+                <td className="p-4 text-center text-xs font-medium text-slate-500">
+                  {formatDate(p.updatedAt)}
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
                     {p.status === 'draft' && onPublish && (
-                      <button onClick={() => onPublish(p.id)} className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-lg transition shadow">Publish</button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
+                        disabled={publishingProductId === p.id}
+                        className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
+                      >
+                        {publishingProductId === p.id ? (
+                          <>
+                            <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            Publishing…
+                          </>
+                        ) : 'Publish'}
+                      </button>
                     )}
-                    <button onClick={() => onEdit(p)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
-                    <button onClick={() => onDelete(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
+                    {onView && (
+                      <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="p-2 hover:bg-emerald-50 text-emerald-500 rounded-lg transition"><Eye size={18}/></button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
+                    <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
                   </div>
                 </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500 font-medium">No products found.</td>
+                <td colSpan={6} className="p-8 text-center text-gray-500 font-medium">No products found.</td>
               </tr>
             )}
           </tbody>
@@ -177,7 +288,7 @@ export default function ProductTable({
       {/* Mobile Card View */}
       <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
         {paginatedData.length > 0 ? paginatedData.map((p) => (
-          <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
+          <div key={p.id} onClick={() => onView?.(p)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 cursor-pointer hover:border-fuchsia-200 transition">
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden border p-2 shrink-0">
                 {p.image ? (
@@ -189,24 +300,52 @@ export default function ProductTable({
               <div className="flex-1 min-w-0 pt-1">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">{p.name}</h3>
-                  {p.status && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded shrink-0 uppercase">{p.status.replaceAll('_', ' ')}</span>}
+                  {getStatusBadge(p.status)}
                 </div>
+                {(p.category || p.subCategory) && (
+                  <div className="mt-1">
+                    <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                      {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
+                    </span>
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
+                </div>
+                <div className="mt-2 space-y-0.5 border-t pt-2 border-gray-100 text-[10px] text-gray-400 font-medium">
+                  <div>Created: {formatDate(p.createdAt)}</div>
+                  <div>Updated: {formatDate(p.updatedAt)}</div>
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 border-t border-gray-50 pt-3 mt-1">
               {p.status === 'draft' && onPublish && (
-                <button onClick={() => onPublish(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] rounded-xl transition text-xs font-bold shadow">
-                  Publish
+                <button
+                  onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
+                  disabled={publishingProductId === p.id}
+                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 rounded-xl transition text-xs font-bold shadow"
+                >
+                  {publishingProductId === p.id ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Publishing…
+                    </>
+                  ) : 'Publish'}
                 </button>
               )}
-              <button onClick={() => onEdit(p)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-xs font-bold">
+              {onView && (
+                <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition text-xs font-bold">
+                  <Eye size={16}/> View
+                </button>
+              )}
+              <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-xs font-bold">
                 <Edit3 size={16}/> Edit
               </button>
-              <button onClick={() => onDelete(p.id)} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition text-xs font-bold">
+              <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition text-xs font-bold">
                 <Trash2 size={16}/> Delete
               </button>
             </div>
@@ -261,4 +400,3 @@ export default function ProductTable({
     </div>
   );
 }
-

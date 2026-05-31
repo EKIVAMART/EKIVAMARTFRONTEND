@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'i.pravatar.cc' },
+      { protocol: 'https', hostname: 'example.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
   /* config options here */
