@@ -1,18 +1,19 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAppSelector } from '@/lib/hooks';
+import type { RootState } from '@/lib/store';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: any) => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
 export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
-  const authUser = useAppSelector((state) => state.auth.user);
+  const authUser = useAppSelector((state: RootState) => state.auth.user);
 
   return (
     <>
@@ -44,11 +45,42 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           )}
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <SidebarLink icon={<LayoutDashboard size={20} />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <SidebarLink icon={<Package size={20} />} label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
-          <SidebarLink icon={<ShoppingCart size={20} />} label="Orders" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
-          <SidebarLink icon={<Users size={20} />} label="Vendor Settings" active={activeTab === 'vendors'} onClick={() => setActiveTab('vendors')} />
-          <SidebarLink icon={<Settings size={20} />} label="Settings" active={false} onClick={() => {}} />
+          <SidebarLink 
+            icon={<LayoutDashboard size={20} />} 
+            label="Dashboard" 
+            active={activeTab === 'dashboard'} 
+            onClick={() => setActiveTab('dashboard')} 
+          />
+          <SidebarLink 
+            icon={<Package size={20} />} 
+            label="Products" 
+            active={activeTab === 'products'} 
+            onClick={() => setActiveTab('products')} 
+          />
+          <SidebarLink 
+            icon={<ShoppingCart size={20} />} 
+            label="Orders" 
+            active={activeTab === 'orders'} 
+            onClick={() => setActiveTab('orders')} 
+          />
+          <SidebarLink 
+            icon={<Users size={20} />} 
+            label="Vendor Settings" 
+            active={activeTab === 'vendors'} 
+            onClick={() => setActiveTab('vendors')} 
+          />
+          <SidebarLink 
+            icon={<UserCog size={20} />} 
+            label="Admins" 
+            active={activeTab === 'admins'} 
+            onClick={() => setActiveTab('admins')} 
+          />
+          <SidebarLink 
+            icon={<Settings size={20} />} 
+            label="Settings" 
+            active={false} 
+            onClick={() => {}} 
+          />
         </nav>
         <div className="p-6 border-t mt-auto">
           <div className="flex items-center gap-3">

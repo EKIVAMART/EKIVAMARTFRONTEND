@@ -21,8 +21,8 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isVendorRegistration = pathname === '';
-  const isAdminRoute = pathname?.startsWith('/admin');
-  const hideNavigation = isVendorRegistration || isAdminRoute;
+  const isSuperAdminRoute = pathname?.startsWith('/super-admin');
+  const hideNavigation = isVendorRegistration || isSuperAdminRoute;
 
   return (
     <>
