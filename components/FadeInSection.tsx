@@ -2,7 +2,7 @@
 
 import { motion, HTMLMotionProps } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 
 const animations = {
   fade: { initial: { opacity: 0 }, animate: { opacity: 1 } },
@@ -21,6 +21,7 @@ interface FadeInSectionProps extends Omit<HTMLMotionProps<"div">, "initial" | "a
   type?: AnimationType;
   threshold?: number;
   duration?: number;
+  resetKey?: string | number; // Optional key to force re-triggering animation
 }
 
 const FadeInSection = forwardRef<HTMLDivElement, FadeInSectionProps>(({
@@ -30,19 +31,28 @@ const FadeInSection = forwardRef<HTMLDivElement, FadeInSectionProps>(({
   threshold = 0.15,
   duration = 0.7,
   className = "",
+  resetKey,
   ...props
 }, ref) => {
-  const { ref: inViewRef, inView } = useInView({
+  const { ref: inViewRef, inView, entry } = useInView({
     triggerOnce: true,
     threshold,
   });
 
   const animation = animations[type];
 
+  // Force re-trigger when resetKey changes
+  useEffect(() => {
+    if (resetKey && entry) {
+      const observer = new IntersectionObserver(() => {}, { threshold });
+      observer.observe(entry.target);
+      return () => observer.disconnect();
+    }
+  }, [resetKey, entry, threshold]);
+
   return (
     <motion.div
       ref={(node) => {
-        // Merge refs
         if (typeof ref === "function") ref(node);
         else if (ref) ref.current = node;
         inViewRef(node);

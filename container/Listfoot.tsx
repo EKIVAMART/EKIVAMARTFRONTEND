@@ -18,7 +18,6 @@ const footerLinks = [
       'Terms & Conditions',
       'Contact Us',
       'Support Center',
-      'Admin',
     ],
   },
   {
@@ -106,7 +105,7 @@ const Listfoot = () => {
             </Link>
 
             <p className="text-gray-500 text-sm max-w-sm">
-              Awesome grocery store website template
+              
             </p>
 
             <ul className="space-y-3">
@@ -138,7 +137,6 @@ const Listfoot = () => {
                   const isPrivacy = link === 'Privacy Policy';
                   const isSupport = link === 'Support Center';
                   const isContact = link === 'Contact Us';
-                  const isAdmin = link === 'Admin';
                   const isMarketing = link === 'Marketing Solutions & Analytics';
                   const href = isAbout
                     ? '/about-us'
@@ -150,11 +148,9 @@ const Listfoot = () => {
                           ? '/support'
                           : isContact
                             ? '/contact-us'
-                            : isAdmin
-                              ? '/admin/login'
-                              : isMarketing
-                                ? '/marketing-solutions-analytics'
-                                : '';
+                            : isMarketing
+                              ? '/marketing-solutions-analytics'
+                              : '';
 
                   return (
                     <li

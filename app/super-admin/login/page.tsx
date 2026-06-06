@@ -7,9 +7,9 @@ import { authApi, ApiError } from '@/lib/api';
 import { setCredentials } from '@/lib/features/auth/authSlice';
 import { useAppDispatch } from '@/lib/hooks';
 
-const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'];
+const SUPER_ADMIN_ROLES = ['SUPER_ADMIN', 'super_admin'];
 
-export default function AdminLoginPage() {
+export default function SuperAdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -52,11 +52,11 @@ export default function AdminLoginPage() {
 
       const role: string = profile?.role ?? payload?.role ?? '';
 
-      // Role check — only admin / super_admin can access the panel
-      if (!ADMIN_ROLES.includes(role)) {
+      // Role check — only super_admin can access the panel
+      if (!SUPER_ADMIN_ROLES.includes(role)) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        setError('Access denied. This portal is restricted to administrators only.');
+        setError('Access denied. This portal is restricted to Super Admins only.');
         return;
       }
 
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
         refreshToken,
       }));
 
-      router.push('/admin/dashboard');
+      router.push('/super-admin/dashboard');
 
     } catch (err) {
       const apiError = err as ApiError;
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Admin Portal Access</h1>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Super Admin Portal Access</h1>
           <p className="text-slate-500 text-sm mt-2 font-medium">Verify your credentials to continue</p>
         </div>
 

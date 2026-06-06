@@ -1,4 +1,4 @@
-import Slider from '../components/Slider';
+import HeroCarousel from '@/components/HeroCarousel';
 import ProductsSection from '../components/ProductsSection';
 import SpecialCategories from '../components/SpecialCategories';
 import FeaturedProducts from '../components/FeaturedProducts';
@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main className="w-full flex flex-col mb-16 lg:mb-24">
       {/* Slider + Categories sit flush together */}
-      <Slider />
+      <HeroCarousel />
       <FeaturedCategories />
 
       {/* Remaining sections with normal spacing */}

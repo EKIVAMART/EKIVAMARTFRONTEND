@@ -1,21 +1,24 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import Sidebar from '@/components/admin/Sidebar';
-import DashboardView from '@/components/admin/DashboardView';
+import Sidebar from '@/components/super-admin/Sidebar';
+import DashboardView from '@/components/super-admin/DashboardView';
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
   ProductImage,
   categoryIncludesWeightAndDimensions,
-} from '@/components/admin/ActionModal';
-import CategoriesModal from '@/components/admin/CategoriesModal';
-import ImageUploadModal from '@/components/admin/ImageUploadModal';
-import ViewProductModal from '@/components/admin/ViewProductModal';
-import ProductTable from '@/components/admin/ProductTable';
-import VendorTable from '@/components/admin/VendorTable';
-import OrderTable from '@/components/admin/OrderTable';
-import OrderDetailsModal from '@/components/admin/OrderDetailsModal';
+} from '@/components/super-admin/ActionModal';
+import CategoriesModal from '@/components/super-admin/CategoriesModal';
+import ImageUploadModal from '@/components/super-admin/ImageUploadModal';
+import ViewProductModal from '@/components/super-admin/ViewProductModal';
+import ProductTable from '@/components/super-admin/ProductTable';
+import VendorTable from '@/components/super-admin/VendorTable';
+import OrderTable from '@/components/super-admin/OrderTable';
+import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
+import AdminTable, { AdminUser } from '@/components/super-admin/AdminTable';
+import InviteAdminModal from '@/components/super-admin/InviteAdminModal';
+import ViewAdminModal from '@/components/super-admin/ViewAdminModal';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -31,6 +34,7 @@ import {
   uploadImages,
 } from '@/lib/api';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
+import type { RootState } from '@/lib/store';
 import { setUser } from '@/lib/features/auth/authSlice';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -308,7 +312,7 @@ const getProductImagesFull = (images: ProductRecord['images']): ProductImage[] =
     .map((image, idx) => {
       if (typeof image === 'string') return { url: image, order: idx };
       return {
-        key: image.url || '', // use url as key fallback
+        key: image.url || '',
         url: image.url || '',
         order: image.order ?? idx,
         isPrimary: image.isPrimary,
@@ -442,7 +446,6 @@ const buildProductPayload = (
     customMetadata.weightUnit = (formData as any).weightUnit || 'kg';
   }
 
-  // Ensure origin is completely removed from metadata
   delete customMetadata.origin;
 
   if (formData.colours.length > 0) {
@@ -524,7 +527,6 @@ const buildProductPayload = (
   const discount = clampPercentage(formData.discount);
   if (discount !== undefined) payload.discount = discount;
 
-  // Only include weight and dimensions if whitelisted category, added to metadata
   if (includesWeightAndDimensions) {
     const weight = getOptionalNumber(formData.weight);
     if (weight !== undefined) customMetadata.weight = weight;
@@ -544,11 +546,11 @@ const buildProductPayload = (
 };
 
 export default function AdminPage() {
-  const authUser = useAppSelector((state) => state.auth.user);
+  const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -575,6 +577,15 @@ export default function AdminPage() {
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
+  const SUPER_ADMIN_ROLES = ['SUPER_ADMIN', 'super_admin'];
+  const hasSuperAdminRole = authUser && SUPER_ADMIN_ROLES.includes(authUser.role);
+
+  // Admin States
+  const [isInviteAdminModalOpen, setIsInviteAdminModalOpen] = useState(false);
+  const [isViewAdminModalOpen, setIsViewAdminModalOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
+  const [isInvitingAdmin, setIsInvitingAdmin] = useState(false);
+
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
   const [vendors, setVendors] = useState<AdminVendor[]>([
@@ -598,6 +609,98 @@ export default function AdminPage() {
     { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
   ]);
 
+  // Admin Users Mock Data
+  const [admins, setAdmins] = useState<AdminUser[]>([
+    {
+      id: '1',
+      firstName: 'John',
+      lastName: 'Smith',
+      email: 'john.smith@example.com',
+      phone: '+234 801 234 5678',
+      status: 'active',
+      role: 'sub_admin',
+      invitedAt: '2026-05-15T10:30:00Z',
+      activatedAt: '2026-05-16T09:15:00Z',
+      lastUpdated: '2026-05-20T14:22:00Z',
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    },
+    {
+      id: '2',
+      firstName: 'Sarah',
+      lastName: 'Johnson',
+      email: 'sarah.j@example.com',
+      phone: '+234 802 345 6789',
+      status: 'pending',
+      role: 'sub_admin',
+      invitedAt: '2026-05-18T11:45:00Z',
+      lastUpdated: '2026-05-18T11:45:00Z',
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    },
+    {
+      id: '3',
+      firstName: 'Michael',
+      lastName: 'Wilson',
+      email: 'mike.wilson@example.com',
+      phone: '+234 803 456 7890',
+      status: 'pending',
+      role: 'sub_admin',
+      invitedAt: '2026-05-19T09:20:00Z',
+      lastUpdated: '2026-05-19T09:20:00Z',
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    },
+    {
+      id: '4',
+      firstName: 'David',
+      lastName: 'Brown',
+      email: 'david.brown@example.com',
+      phone: '+234 804 567 8901',
+      status: 'deactivated',
+      role: 'sub_admin',
+      invitedAt: '2026-05-10T14:00:00Z',
+      activatedAt: '2026-05-11T10:30:00Z',
+      lastUpdated: '2026-05-17T08:45:00Z',
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    },
+    {
+      id: '5',
+      firstName: 'Emily',
+      lastName: 'Davis',
+      email: 'emily.davis@example.com',
+      phone: '+234 805 678 9012',
+      status: 'blocked',
+      role: 'sub_admin',
+      invitedAt: '2026-05-12T13:15:00Z',
+      activatedAt: '2026-05-13T11:00:00Z',
+      lastUpdated: '2026-05-21T16:30:00Z',
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    },
+  ]);
+
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
     setIsModalOpen(true);
@@ -614,13 +717,11 @@ export default function AdminPage() {
       let resolvedSubCategory = p.subCategory || '';
 
       if (p.categoryId) {
-        // First check if this categoryId is a known subcategory in our map
         const subEntry = subcategoryMap.get(p.categoryId);
         if (subEntry) {
           resolvedCategory = subEntry.categoryName;
           resolvedSubCategory = subEntry.subCategoryName;
         } else {
-          // Check if categoryId is a top-level category
           const parentCat = categories.find((c) => c.id === p.categoryId);
           if (parentCat) {
             resolvedCategory = parentCat.name;
@@ -674,7 +775,7 @@ export default function AdminPage() {
               firstName: profileData?.firstName || profileData?.user?.firstName || '',
               lastName: profileData?.lastName || profileData?.user?.lastName || '',
               profilePicture: profileData?.avatar || profileData?.profilePicture || undefined,
-              role: profileData?.role || profileData?.user?.role || '', // Strict role check, no admin fallback
+              role: profileData?.role || profileData?.user?.role || '',
               isEmailVerified: profileData?.isEmailVerified ?? true,
             })
           );
@@ -698,6 +799,8 @@ export default function AdminPage() {
   }, [authUser?.id, dispatch]);
 
   useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole) return;
+
     let isMounted = true;
 
     const fetchCategories = async () => {
@@ -718,7 +821,6 @@ export default function AdminPage() {
         if (isMounted) {
           setCategories(fetchedCategories);
 
-          // Also fetch subcategories for each category and build a lookup map
           const map = new Map<string, { categoryName: string; subCategoryName: string }>();
           try {
             await Promise.all(
@@ -760,7 +862,7 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isCheckingAuth, hasSuperAdminRole]);
 
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
@@ -797,6 +899,8 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole) return;
+
     let isMounted = true;
 
     const loadProducts = async () => {
@@ -843,9 +947,11 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
+  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
 
   useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole) return;
+
     let isMounted = true;
     if (filterCategoryId === 'all') {
       setFilterSubcategories([]);
@@ -871,7 +977,7 @@ export default function AdminPage() {
     };
     void fetchSubs();
     return () => { isMounted = false; };
-  }, [filterCategoryId]);
+  }, [isCheckingAuth, hasSuperAdminRole, filterCategoryId]);
 
   const handleSaveProduct = async (formData: ProductFormData) => {
     if (activeTab !== 'products') return;
@@ -1007,15 +1113,123 @@ export default function AdminPage() {
     }
   };
 
-  const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'];
-  const hasAdminRole = authUser && ADMIN_ROLES.includes(authUser.role);
+  // Admin Handlers
+  const handleInviteAdmin = async (firstName: string, lastName: string, email: string, phone: string) => {
+    setIsInvitingAdmin(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const newAdmin: AdminUser = {
+      id: Date.now().toString(),
+      firstName,
+      lastName,
+      email,
+      phone,
+      status: 'pending',
+      role: 'sub_admin',
+      invitedAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      permissions: {
+        manageProducts: true,
+        manageOrders: true,
+        manageVendors: true,
+        viewAnalytics: true,
+      }
+    };
+    
+    setAdmins(prev => [newAdmin, ...prev]);
+    setIsInvitingAdmin(false);
+    setIsInviteAdminModalOpen(false);
+    toast.success(`Invitation sent to ${firstName} ${lastName}! They will receive an email with next steps.`);
+  };
+
+  const handleDeactivateAdmin = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    if (admin?.status !== 'active') return;
+    
+    setAdmins(prev => prev.map(s => 
+      s.id === id 
+        ? { ...s, status: 'deactivated', lastUpdated: new Date().toISOString() }
+        : s
+    ));
+    toast.success(`${admin.firstName} ${admin.lastName} has been deactivated.`);
+  };
+
+  const handleActivateAdmin = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    if (admin?.status !== 'deactivated') return;
+    
+    toast.loading('Sending reactivation invitation...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setAdmins(prev => prev.map(s => 
+      s.id === id 
+        ? { ...s, status: 'pending', activatedAt: undefined, lastUpdated: new Date().toISOString() }
+        : s
+    ));
+    toast.dismiss();
+    toast.success(`Reactivation invitation sent to ${admin.firstName} ${admin.lastName}!`);
+  };
+
+  const handleBlockAdmin = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    if (admin?.status !== 'active') return;
+    
+    setAdmins(prev => prev.map(s => 
+      s.id === id 
+        ? { ...s, status: 'blocked', lastUpdated: new Date().toISOString() }
+        : s
+    ));
+    toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
+  };
+
+  const handleUnblockAdmin = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    if (admin?.status !== 'blocked') return;
+    
+    setAdmins(prev => prev.map(s => 
+      s.id === id 
+        ? { ...s, status: 'active', lastUpdated: new Date().toISOString() }
+        : s
+    ));
+    toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
+  };
+
+  const handleDeleteAdmin = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
+    if (!confirmDelete) return;
+    
+    setAdmins(prev => prev.map(s => 
+      s.id === id 
+        ? { ...s, status: 'deleted', lastUpdated: new Date().toISOString() }
+        : s
+    ));
+    toast.success(`${admin?.firstName} ${admin?.lastName} has been deleted.`);
+  };
+
+  const handleResendInvite = async (id: string) => {
+    const admin = admins.find(s => s.id === id);
+    if (admin?.status !== 'pending') return;
+    
+    toast.loading('Resending invitation...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast.dismiss();
+    toast.success(`Invitation resent to ${admin.firstName} ${admin.lastName} (${admin.email})`);
+  };
+
+  const handleViewAdmin = (admin: AdminUser) => {
+    setSelectedAdmin(admin);
+    setIsViewAdminModalOpen(true);
+  };
+
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
 
-  // Trigger redirect for unauthenticated users
   useEffect(() => {
     if (!isCheckingAuth && !hasToken && !authUser) {
       toast.error('Session expired. Please log in again.');
-      router.push('/admin/login');
+      router.push('/super-admin/login');
     }
   }, [isCheckingAuth, hasToken, authUser, router]);
 
@@ -1030,11 +1244,9 @@ export default function AdminPage() {
     );
   }
 
-  // 1. Session expired / No token / No user
   if (!hasToken && !authUser) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        {/* Background decorations */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
         
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
@@ -1050,7 +1262,7 @@ export default function AdminPage() {
             Your login session has expired or you are not authorized to view this page. Please log in again to continue.
           </p>
           <button
-            onClick={() => router.push('/admin/login')}
+            onClick={() => router.push('/super-admin/login')}
             className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
           >
             Go to Login
@@ -1060,11 +1272,9 @@ export default function AdminPage() {
     );
   }
 
-  // 2. Logged in, but unauthorized role
-  if (authUser && !hasAdminRole) {
+  if (authUser && !hasSuperAdminRole) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        {/* Background decorations */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
         
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
@@ -1077,7 +1287,7 @@ export default function AdminPage() {
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Unauthorized Access</h2>
           <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
-            You do not have administrative privileges to access this dashboard. This portal is restricted to authorized admins only.
+            You do not have Super Admin privileges to access this dashboard. This portal is restricted to Super Admins only.
           </p>
           <button
             onClick={() => router.push('/')}
@@ -1143,6 +1353,44 @@ export default function AdminPage() {
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
         {activeTab === 'dashboard' ? (
           <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : activeTab === 'admins' ? (
+          <>
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">Admin Management</h2>
+                <p className="text-sm text-gray-500 font-medium">Invite and manage team members with limited admin access</p>
+              </div>
+              <button
+                onClick={() => setIsInviteAdminModalOpen(true)}
+                className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+              >
+                <Plus size={18} /> Invite Admin
+              </button>
+            </header>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-fuchsia-400 focus-within:ring-2 focus-within:ring-fuchsia-200 transition-all">
+              <Search size={18} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search admins by name, email, or phone..."
+                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <AdminTable
+              data={admins}
+              searchQuery={searchQuery}
+              onViewDetails={handleViewAdmin}
+              onDeactivate={handleDeactivateAdmin}
+              onActivate={handleActivateAdmin}
+              onBlock={handleBlockAdmin}
+              onUnblock={handleUnblockAdmin}
+              onDelete={handleDeleteAdmin}
+              onResendInvite={handleResendInvite}
+            />
+          </>
         ) : (
           <>
             <header className="flex justify-between items-center mb-8">
@@ -1287,6 +1535,22 @@ export default function AdminPage() {
           isOpen={isModalOpen && activeTab === 'orders'}
           onClose={() => setIsModalOpen(false)}
           order={editingItem}
+        />
+
+        <InviteAdminModal
+          isOpen={isInviteAdminModalOpen}
+          onClose={() => setIsInviteAdminModalOpen(false)}
+          onInvite={handleInviteAdmin}
+          isInviting={isInvitingAdmin}
+        />
+
+        <ViewAdminModal
+          isOpen={isViewAdminModalOpen}
+          onClose={() => {
+            setIsViewAdminModalOpen(false);
+            setSelectedAdmin(null);
+          }}
+          admin={selectedAdmin}
         />
       </main>
     </div>
