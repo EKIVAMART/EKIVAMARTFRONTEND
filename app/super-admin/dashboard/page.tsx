@@ -19,6 +19,8 @@ import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
 import AdminTable, { AdminUser } from '@/components/super-admin/AdminTable';
 import InviteAdminModal from '@/components/super-admin/InviteAdminModal';
 import ViewAdminModal from '@/components/super-admin/ViewAdminModal';
+import UserTable, { AppUser } from '@/components/super-admin/UserTable';
+import ViewUserModal from '@/components/super-admin/ViewUserModal';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -482,7 +484,7 @@ const buildProductPayload = (
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
   if (formData.tags.length) payload.tags = formData.tags;
-  
+
   if (formData.images?.length) {
     payload.images = formData.images.map((img, index) => {
       if (typeof img === 'string') {
@@ -550,7 +552,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -577,7 +579,7 @@ export default function AdminPage() {
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
-  const SUPER_ADMIN_ROLES = ['SUPER_ADMIN', 'super_admin'];
+  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
   const hasSuperAdminRole = authUser && SUPER_ADMIN_ROLES.includes(authUser.role);
 
   // Admin States
@@ -585,6 +587,20 @@ export default function AdminPage() {
   const [isViewAdminModalOpen, setIsViewAdminModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [isInvitingAdmin, setIsInvitingAdmin] = useState(false);
+
+  // User States
+  const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
+  const [users, setUsers] = useState<AppUser[]>([
+    { id: 'u1', email: 'alice.johnson@gmail.com', firstName: 'Alice', lastName: 'Johnson', fullName: 'Alice Johnson', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 415 555 0101', lastLoginAt: '2026-06-05T14:22:00Z', createdAt: '2026-01-10T08:00:00Z', updatedAt: '2026-06-05T14:22:00Z', status: 'active', isAuthenticated: true },
+    { id: 'u2', email: 'bob.smith@hotmail.com', firstName: 'Bob', lastName: 'Smith', fullName: 'Bob Smith', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-02-20T10:30:00Z', updatedAt: '2026-02-20T10:30:00Z', status: 'active', isAuthenticated: false },
+    { id: 'u3', email: 'carol.white@example.com', firstName: 'Carol', lastName: 'White', fullName: 'Carol White', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+1 212 555 0202', lastLoginAt: '2026-06-01T09:10:00Z', createdAt: '2026-03-05T15:00:00Z', updatedAt: '2026-06-01T09:10:00Z', status: 'active', isAuthenticated: true },
+    { id: 'u4', email: 'david.lee@yahoo.com', firstName: 'David', lastName: 'Lee', fullName: 'David Lee', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 310 555 0303', lastLoginAt: '2026-05-28T20:00:00Z', createdAt: '2026-01-25T12:00:00Z', updatedAt: '2026-05-28T20:00:00Z', status: 'blocked', isAuthenticated: true },
+    { id: 'u5', email: 'emma.brown@example.com', firstName: 'Emma', lastName: 'Brown', fullName: 'Emma Brown', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-04-12T07:45:00Z', updatedAt: '2026-04-12T07:45:00Z', status: 'active', isAuthenticated: false },
+    { id: 'u6', email: 'frank.miller@example.com', firstName: 'Frank', lastName: 'Miller', fullName: 'Frank Miller', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+44 20 555 0404', lastLoginAt: '2026-05-30T11:30:00Z', createdAt: '2025-11-15T09:00:00Z', updatedAt: '2026-05-30T11:30:00Z', status: 'active', isAuthenticated: true },
+    { id: 'u7', email: 'grace.kim@example.com', firstName: 'Grace', lastName: 'Kim', fullName: 'Grace Kim', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+82 2 555 0505', lastLoginAt: '2026-06-04T16:45:00Z', createdAt: '2026-02-01T14:20:00Z', updatedAt: '2026-06-04T16:45:00Z', status: 'active', isAuthenticated: true },
+    { id: 'u8', email: 'henry.davis@example.com', firstName: 'Henry', lastName: 'Davis', fullName: 'Henry Davis', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: '2026-03-20T08:00:00Z', createdAt: '2025-12-01T10:00:00Z', updatedAt: '2026-03-20T08:00:00Z', status: 'deleted', isAuthenticated: true },
+  ]);
 
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
@@ -1116,40 +1132,79 @@ export default function AdminPage() {
   // Admin Handlers
   const handleInviteAdmin = async (firstName: string, lastName: string, email: string, phone: string) => {
     setIsInvitingAdmin(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newAdmin: AdminUser = {
-      id: Date.now().toString(),
-      firstName,
-      lastName,
-      email,
-      phone,
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
+
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email,
+        phoneNumber: phone,
+        firstName,
+        lastName,
+      });
+
+      if (response?.success) {
+        const isPromoted = response.data?.promoted;
+        const isInvited = response.data?.invited;
+
+        if (isPromoted) {
+          toast.success(`User promoted to admin.`);
+          const newAdmin: AdminUser = {
+            id: Date.now().toString(),
+            firstName,
+            lastName,
+            email,
+            phone,
+            status: 'active',
+            role: 'sub_admin',
+            invitedAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString(),
+            permissions: {
+              manageProducts: true,
+              manageOrders: true,
+              manageVendors: true,
+              viewAnalytics: true,
+            }
+          };
+          setAdmins(prev => [newAdmin, ...prev]);
+        } else if (isInvited) {
+          toast.success(`Invitation sent. The link expires in 1 hour.`);
+          const newAdmin: AdminUser = {
+            id: Date.now().toString(),
+            firstName,
+            lastName,
+            email,
+            phone,
+            status: 'pending',
+            role: 'sub_admin',
+            invitedAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString(),
+            permissions: {
+              manageProducts: true,
+              manageOrders: true,
+              manageVendors: true,
+              viewAnalytics: true,
+            }
+          };
+          setAdmins(prev => [newAdmin, ...prev]);
+        } else {
+          toast.success(`Admin invitation processed successfully.`);
+        }
+        setIsInviteAdminModalOpen(false);
+      } else {
+        toast.error(response?.message || 'Failed to process admin invitation.');
       }
-    };
-    
-    setAdmins(prev => [newAdmin, ...prev]);
-    setIsInvitingAdmin(false);
-    setIsInviteAdminModalOpen(false);
-    toast.success(`Invitation sent to ${firstName} ${lastName}! They will receive an email with next steps.`);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to process admin invitation.');
+    } finally {
+      setIsInvitingAdmin(false);
+    }
   };
 
   const handleDeactivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (admin?.status !== 'active') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
+
+    setAdmins(prev => prev.map(s =>
+      s.id === id
         ? { ...s, status: 'deactivated', lastUpdated: new Date().toISOString() }
         : s
     ));
@@ -1159,12 +1214,12 @@ export default function AdminPage() {
   const handleActivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (admin?.status !== 'deactivated') return;
-    
+
     toast.loading('Sending reactivation invitation...');
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
+
+    setAdmins(prev => prev.map(s =>
+      s.id === id
         ? { ...s, status: 'pending', activatedAt: undefined, lastUpdated: new Date().toISOString() }
         : s
     ));
@@ -1175,9 +1230,9 @@ export default function AdminPage() {
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (admin?.status !== 'active') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
+
+    setAdmins(prev => prev.map(s =>
+      s.id === id
         ? { ...s, status: 'blocked', lastUpdated: new Date().toISOString() }
         : s
     ));
@@ -1187,9 +1242,9 @@ export default function AdminPage() {
   const handleUnblockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (admin?.status !== 'blocked') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
+
+    setAdmins(prev => prev.map(s =>
+      s.id === id
         ? { ...s, status: 'active', lastUpdated: new Date().toISOString() }
         : s
     ));
@@ -1200,9 +1255,9 @@ export default function AdminPage() {
     const admin = admins.find(s => s.id === id);
     const confirmDelete = window.confirm(`Are you sure you want to delete ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
     if (!confirmDelete) return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
+
+    setAdmins(prev => prev.map(s =>
+      s.id === id
         ? { ...s, status: 'deleted', lastUpdated: new Date().toISOString() }
         : s
     ));
@@ -1212,7 +1267,7 @@ export default function AdminPage() {
   const handleResendInvite = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (admin?.status !== 'pending') return;
-    
+
     toast.loading('Resending invitation...');
     await new Promise(resolve => setTimeout(resolve, 1000));
     toast.dismiss();
@@ -1222,6 +1277,32 @@ export default function AdminPage() {
   const handleViewAdmin = (admin: AdminUser) => {
     setSelectedAdmin(admin);
     setIsViewAdminModalOpen(true);
+  };
+
+  // User Handlers
+  const handleViewUser = (user: AppUser) => {
+    setSelectedUser(user);
+    setIsViewUserModalOpen(true);
+  };
+
+  const handleBlockUser = (id: string) => {
+    const user = users.find(u => u.id === id);
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked', updatedAt: new Date().toISOString() } : u));
+    toast.success(`${user?.firstName} ${user?.lastName} has been blocked.`);
+  };
+
+  const handleUnblockUser = (id: string) => {
+    const user = users.find(u => u.id === id);
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active', updatedAt: new Date().toISOString() } : u));
+    toast.success(`${user?.firstName} ${user?.lastName} has been unblocked.`);
+  };
+
+  const handleDeleteUser = (id: string) => {
+    const user = users.find(u => u.id === id);
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`);
+    if (!confirmDelete) return;
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'deleted', updatedAt: new Date().toISOString() } : u));
+    toast.success(`${user?.firstName} ${user?.lastName}'s account has been deleted.`);
   };
 
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
@@ -1248,7 +1329,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
-        
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
@@ -1276,7 +1357,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
-        
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
@@ -1308,7 +1389,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-1.5 shrink-0">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.jpg" alt="Faflora" width={100} height={28} className="object-contain" />
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
+            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Super Admin</span>
           </Link>
         </div>
         <div className="flex items-center gap-4">
@@ -1353,6 +1434,35 @@ export default function AdminPage() {
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
         {activeTab === 'dashboard' ? (
           <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : activeTab === 'users' ? (
+          <>
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">User Management</h2>
+                <p className="text-sm text-gray-500 font-medium">View and manage all registered platform users</p>
+              </div>
+            </header>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-fuchsia-400 focus-within:ring-2 focus-within:ring-fuchsia-200 transition-all">
+              <Search size={18} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search users by name, email, or phone..."
+                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <UserTable
+              data={users}
+              searchQuery={searchQuery}
+              onView={handleViewUser}
+              onBlock={handleBlockUser}
+              onUnblock={handleUnblockUser}
+              onDelete={handleDeleteUser}
+            />
+          </>
         ) : activeTab === 'admins' ? (
           <>
             <header className="flex justify-between items-center mb-8">
@@ -1469,8 +1579,8 @@ export default function AdminPage() {
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
                   <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
-                      ? 'border-amber-200 bg-amber-50 text-amber-700'
-                      : 'border-gray-200 bg-white text-gray-500'
+                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    : 'border-gray-200 bg-white text-gray-500'
                     }`}>
                     {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
                   </div>
@@ -1551,6 +1661,18 @@ export default function AdminPage() {
             setSelectedAdmin(null);
           }}
           admin={selectedAdmin}
+        />
+
+        <ViewUserModal
+          isOpen={isViewUserModalOpen}
+          onClose={() => {
+            setIsViewUserModalOpen(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
+          onBlock={handleBlockUser}
+          onUnblock={handleUnblockUser}
+          onDelete={handleDeleteUser}
         />
       </main>
     </div>

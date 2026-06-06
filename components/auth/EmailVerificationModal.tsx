@@ -9,6 +9,13 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { OTPInput } from './OTPInput';
 
+import { z } from 'zod';
+
+const verificationSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  otpCode: z.string().min(6, 'Invalid verification token').max(64, 'Invalid verification token'),
+});
+
 interface EmailVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -71,13 +78,20 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
     setError('');
 
     try {
-      await authApi.verifyEmailOTP({ email, otp });
+      const payload = { email, otpCode: otp };
+      verificationSchema.parse(payload);
+
+      await authApi.verifyEmailOTP(payload);
       toast.success('Email verified successfully! 🎉');
       onVerified();
       setOtp('');
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Invalid verification code';
+      let errorMessage = 'Invalid verification code';
+      if (err instanceof z.ZodError) {
+        errorMessage = err.errors[0]?.message || errorMessage;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
       setError(errorMessage);
       toast.error(errorMessage);
       setOtp(''); // Clear OTP on error

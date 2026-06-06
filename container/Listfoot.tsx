@@ -138,6 +138,7 @@ const Listfoot = () => {
                   const isSupport = link === 'Support Center';
                   const isContact = link === 'Contact Us';
                   const isMarketing = link === 'Marketing Solutions & Analytics';
+                  const isFaq = link.trim().toLowerCase() === 'faq';
                   const href = isAbout
                     ? '/about-us'
                     : isTerms
@@ -150,7 +151,9 @@ const Listfoot = () => {
                             ? '/contact-us'
                             : isMarketing
                               ? '/marketing-solutions-analytics'
-                              : '';
+                              : isFaq
+                                ? '/faq'
+                                : '';
 
                   return (
                     <li

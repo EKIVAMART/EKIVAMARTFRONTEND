@@ -71,7 +71,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
-      toast.success('Reset link sent to your email! 📧');
+      toast.success('Invitation sent. The link expires in 15 minutes.');
       onSuccess(data.email);
     } catch (error: unknown) {
       if (isApiError(error) && error.statusCode === 429) {

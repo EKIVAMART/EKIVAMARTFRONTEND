@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ShieldCheck, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@/lib/api';
+import Link from 'next/link';
 import { setCredentials } from '@/lib/features/auth/authSlice';
 import { useAppDispatch } from '@/lib/hooks';
 
-const SUPER_ADMIN_ROLES = ['SUPER_ADMIN', 'super_admin'];
+const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
 
 export default function SuperAdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -52,7 +54,7 @@ export default function SuperAdminLoginPage() {
 
       const role: string = profile?.role ?? payload?.role ?? '';
 
-      // Role check — only super_admin can access the panel
+      // Role check — only super-admin can access the panel
       if (!SUPER_ADMIN_ROLES.includes(role)) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -146,14 +148,22 @@ export default function SuperAdminLoginPage() {
                 <Lock size={18} className="text-slate-400" />
               </div>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#c800ff] focus:ring-4 focus:ring-[#c800ff]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
@@ -171,6 +181,13 @@ export default function SuperAdminLoginPage() {
               </>
             )}
           </button>
+
+          <div className="mt-8 pt-6 border-t border-slate-100">
+          <p className="text-center text-slate-600 text-sm">
+            Admin? <Link href="/admin/login" className="font-bold text-[#c800ff] hover:text-[#b500e6] transition-colors">Access Admin Portal</Link>
+          </p>
+        </div>
+
         </form>
       </div>
 

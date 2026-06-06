@@ -17,8 +17,12 @@ interface DashboardStats {
   revenueChange: number;
   ordersChange: number;
   productsChange: number;
+  usersChange: number;
   pendingOrders: number;
   activeVendors: number;
+  totalUsers: number;
+  activeUsers: number;
+  blockedUsers: number;
   timeframeLabel: string;
 }
 
@@ -78,7 +82,11 @@ const StatCard = ({ title, value, change, icon: Icon, trend = 'up', suffix = '',
       {typeof value === 'number' ? `₦${value.toLocaleString()}` : value}{suffix}
     </h3>
     <p className="text-sm text-gray-500 font-medium mt-1">{title}</p>
-    {subtext && <p className="text-xs text-gray-400 mt-2">{subtext}</p>}
+    {subtext && (
+      <div className="text-xs text-gray-400 mt-2">
+        {subtext}
+      </div>
+    )}
   </motion.div>
 );
 
@@ -99,8 +107,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         revenueChange: 4.5,
         ordersChange: 1.8,
         productsChange: 0.2,
+        usersChange: 1.2,
         pendingOrders: 5,
         activeVendors: 156,
+        totalUsers: 3842,
+        activeUsers: 3671,
+        blockedUsers: 24,
         timeframeLabel: 'today',
       };
     }
@@ -113,8 +125,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         revenueChange: 18.2,
         ordersChange: 14.5,
         productsChange: 5.4,
+        usersChange: 8.5,
         pendingOrders: 23,
         activeVendors: 156,
+        totalUsers: 3842,
+        activeUsers: 3671,
+        blockedUsers: 24,
         timeframeLabel: 'this month',
       };
     }
@@ -127,8 +143,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
       revenueChange: 12,
       ordersChange: 8,
       productsChange: 5,
+      usersChange: 3.2,
       pendingOrders: 23,
       activeVendors: 156,
+      totalUsers: 3842,
+      activeUsers: 3671,
+      blockedUsers: 24,
       timeframeLabel: 'this week',
     };
   }, [timeframe]);
@@ -305,7 +325,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
       </motion.div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
         <StatCard 
           title="Total Revenue" 
           value={stats.totalRevenue} 
@@ -339,6 +359,24 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
           trend="up"
           suffix=""
           subtext={`${stats.activeVendors} active vendors`}
+        />
+        <StatCard 
+          title="Total Users" 
+          value={stats.totalUsers} 
+          change={stats.usersChange} 
+          icon={Users} 
+          trend="up"
+          suffix=""
+          subtext={
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                Active: {stats.activeUsers}
+              </span>
+              <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                Blocked: {stats.blockedUsers}
+              </span>
+            </div>
+          }
         />
       </div>
 
@@ -415,7 +453,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
           </motion.div>
         </div>
 
-        {/* ROW 1 RIGHT: Sales Distribution Donut Chart (ENLARGED) */}
+        {/* ROW 1 RIGHT: Sales Distribution Donut Chart */}
         <div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

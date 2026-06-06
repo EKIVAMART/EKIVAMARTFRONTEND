@@ -247,8 +247,8 @@ const HeroCarousel = () => {
                   <span className="pb-1">{current.mainTextBefore}</span>
                   <TypingText 
                     texts={current.changingWords}
-                    typingSpeed={105}
-                    deleteSpeed={65}
+                    typingSpeed={85}
+                    deleteSpeed={45}
                     delayBetween={2000}
                     className="font-black pb-1 pr-2 md:pb-2 md:pr-2"
                     colorClass="bg-gradient-to-r from-[#f0a8ff] to-[#c800ff] via-[#d946ef] bg-clip-text text-transparent"

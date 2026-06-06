@@ -487,7 +487,6 @@ const Subnavbar = (): JSX.Element => {
               onSuccess={(email) => {
                 setResetEmail(email);
                 setIsForgotPasswordModalOpen(false);
-                setIsOTPVerificationModalOpen(true);
               }}
             />
             <OTPVerificationModal

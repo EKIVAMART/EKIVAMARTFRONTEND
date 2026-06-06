@@ -51,6 +51,17 @@ const CategoriesGrid = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Callback ref to scroll active category into view inside the scrollable sidebar
+  const activeRef = React.useCallback((node: HTMLAnchorElement | null) => {
+    if (node !== null) {
+      node.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     const fetchCats = async () => {
@@ -123,6 +134,7 @@ const CategoriesGrid = () => {
             return (
               <Link
                 key={category.id}
+                ref={isSelected ? activeRef : undefined}
                 href={`/categories/${category.slug}${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`}
                 className={`flex items-center gap-3 p-2 rounded-xl transition-all duration-300 border text-gray-800 ${
                   isSelected 

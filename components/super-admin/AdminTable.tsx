@@ -63,6 +63,18 @@ const statusStyles = {
 
 const allStatuses = ['All', 'pending', 'active', 'deactivated', 'blocked', 'deleted'];
 
+/** Tooltip wrapper for desktop — matches ProductTable/UserTable styling */
+const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="relative group/tip">
+    {children}
+    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50 transition-all">
+      {label}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
+    </div>
+  </div>
+);
+
 export default function AdminTable({ 
   data, 
   searchQuery = '', 
@@ -254,78 +266,85 @@ export default function AdminTable({
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-1">
                     {/* View Button */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onViewDetails?.(admin); }}
-                      className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
-                      title="View Details"
-                    >
-                      <Eye size={16} />
-                    </button>
+                    <Tooltip label="View Details">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onViewDetails?.(admin); }}
+                        className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    </Tooltip>
 
                     {/* Resend Invite - Only for pending */}
                     {admin.status === 'pending' && onResendInvite && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onResendInvite(admin.id); }}
-                        className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                        title="Resend Invite"
-                      >
-                        <Mail size={16} />
-                      </button>
+                      <Tooltip label="Resend Invite">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onResendInvite(admin.id); }}
+                          className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                        >
+                          <Mail size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Deactivate - Only for active */}
                     {admin.status === 'active' && onDeactivate && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onDeactivate(admin.id); }}
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
-                        title="Deactivate"
-                      >
-                        <PowerOff size={16} />
-                      </button>
+                      <Tooltip label="Deactivate">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDeactivate(admin.id); }}
+                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
+                        >
+                          <PowerOff size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Block - Only for active */}
                     {admin.status === 'active' && onBlock && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onBlock(admin.id); }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        title="Block Account"
-                      >
-                        <Ban size={16} />
-                      </button>
+                      <Tooltip label="Block Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onBlock(admin.id); }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Ban size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Unblock - Only for blocked */}
                     {admin.status === 'blocked' && onUnblock && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onUnblock(admin.id); }}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        title="Unblock Account"
-                      >
-                        <CheckCircle size={16} />
-                      </button>
+                      <Tooltip label="Unblock Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onUnblock(admin.id); }}
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Activate (Resend Invite) - Only for deactivated */}
                     {admin.status === 'deactivated' && onActivate && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onActivate(admin.id); }}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        title="Activate & Resend Invite"
-                      >
-                        <Power size={16} />
-                      </button>
+                      <Tooltip label="Activate Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onActivate(admin.id); }}
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                        >
+                          <Power size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Delete - Not for already deleted */}
                     {admin.status !== 'deleted' && onDelete && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(admin.id); }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        title="Delete Permanently"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <Tooltip label="Delete Permanently">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDelete(admin.id); }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </Tooltip>
                     )}
                   </div>
                 </td>

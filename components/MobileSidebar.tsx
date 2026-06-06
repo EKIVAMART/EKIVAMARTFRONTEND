@@ -48,6 +48,8 @@ import {
   Briefcase,
   Bolt,
   Package,
+  Store,
+  GlassWater,
 } from 'lucide-react';
 import { categoryApi } from '@/lib/api';
 
@@ -70,8 +72,9 @@ const categoryIconMap: Record<string, any> = {
   'home & kitchen': CookingPot,
   'home decor': Lamp,
   'furniture': Sofa,
-  'groceries & food': ShoppingBasket,
   'groceries': ShoppingBasket,
+  'local market': Store,
+  'drinks': GlassWater,
   'beauty & cosmetics': Sparkles,
   'beauty': Sparkles,
   'hair care & extensions': Scissors,

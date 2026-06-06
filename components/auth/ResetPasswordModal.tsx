@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { PasswordStrength } from '@/components/auth/PasswordStrength';
 
+import { authApi } from '@/lib/api';
+
 const resetPasswordSchema = z.object({
   password: z
     .string()
@@ -28,10 +30,10 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 interface ResetPasswordModalProps {
   isOpen: boolean;
-  email: string;
+  email?: string;
   otp: string;
   onClose: () => void;
-  onBack: () => void;
+  onBack?: () => void;
   onSuccess: () => void;
 }
 
@@ -60,16 +62,17 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      // Simulation delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // await authApi.resetPassword({ email, otp, newPassword: data.password });
+      if (authApi.resetPassword) {
+        await authApi.resetPassword({ otpCode: otp, newPassword: data.password });
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
       
       toast.success('Password reset successfully! 🎉');
       reset();
       onSuccess();
-    } catch (error) {
-      toast.error('Failed to reset password. Please try again.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to reset password. Please try again.');
     }
   };
 
@@ -84,13 +87,15 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
       onClose={handleClose}
       size="md"
       footer={
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center gap-1.5 w-full text-sm font-semibold text-gray-600 hover:text-purple-600 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to verification
-        </button>
+        onBack ? (
+          <button
+            onClick={onBack}
+            className="flex items-center justify-center gap-1.5 w-full text-sm font-semibold text-gray-600 hover:text-purple-600 transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Back to verification
+          </button>
+        ) : undefined
       }
     >
       <div className="flex flex-col items-center text-center mb-6 pt-2">

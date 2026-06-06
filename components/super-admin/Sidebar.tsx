@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import type { RootState } from '@/lib/store';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -34,7 +34,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             <Link href="/" className="flex items-center gap-2">
               <Image src="/logo.jpg" alt="Faflora" width={110} height={30} className="object-contain" />
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
-                Admin
+                Super Admin
               </span>
             </Link>
           </div>
@@ -76,6 +76,12 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             onClick={() => setActiveTab('admins')} 
           />
           <SidebarLink 
+            icon={<UserCircle size={20} />} 
+            label="Users" 
+            active={activeTab === 'users'} 
+            onClick={() => setActiveTab('users')} 
+          />
+          <SidebarLink 
             icon={<Settings size={20} />} 
             label="Settings" 
             active={false} 
@@ -89,7 +95,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             </div>
             <div>
               <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'super-admin' ? 'Super Admin' : 'Admin'}</p>
             </div>
           </div>
         </div>
