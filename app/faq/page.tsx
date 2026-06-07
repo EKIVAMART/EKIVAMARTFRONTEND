@@ -248,12 +248,12 @@ export default function FAQPage() {
             {/* Gradient title */}
             <FadeInSection type="fadeUp" delay={0.2}>
               <h1
-                className="text-5xl md:text-6xl lg:text-[5.5rem] font-black leading-[0.95] tracking-tight"
+                className="lg:-skew-x-8 -skew-x-6 text-5xl md:text-6xl lg:text-[5.5rem] font-black leading-[0.95] tracking-tight"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
                 {/* Line 1 */}
                 <span
-                  className="block"
+                  className="block pb-2"
                   style={{
                     background: 'linear-gradient(100deg, #7b00c0 0%, #c800ff 45%, #ff40d0 100%)',
                     WebkitBackgroundClip: 'text',
@@ -265,7 +265,7 @@ export default function FAQPage() {
                 </span>
                 {/* Line 2 */}
                 <span
-                  className="block"
+                  className="block pb-2"
                   style={{
                     background: 'linear-gradient(100deg, #c800ff 0%, #912cad 50%, #6b0f6b 100%)',
                     WebkitBackgroundClip: 'text',
@@ -277,7 +277,7 @@ export default function FAQPage() {
                 </span>
                 {/* Line 3 */}
                 <span
-                  className="block"
+                  className="block pb-2"
                   style={{
                     background: 'linear-gradient(100deg, #912cad 0%, #c800ff 60%, #ff69e0 100%)',
                     WebkitBackgroundClip: 'text',
@@ -305,7 +305,7 @@ export default function FAQPage() {
             {/* Search */}
             <FadeInSection type="fadeUp" delay={0.5}>
               <div className="mt-9 relative max-w-md group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#c800ff] transition-colors">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#c800ff] transition-colors z-10">
                   <Search size={18} />
                 </div>
                 <input

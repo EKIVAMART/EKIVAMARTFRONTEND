@@ -33,6 +33,22 @@ interface UserTableProps {
   onBlock?: (id: string) => void;
   onUnblock?: (id: string) => void;
   onDelete?: (id: string) => void;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
+  isLoading?: boolean;
+  sortBy?: string;
+  onSortByChange?: (sort: string) => void;
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
+  authFilter?: string;
+  onAuthFilterChange?: (auth: string) => void;
+  dateFrom?: string;
+  onDateFromChange?: (date: string) => void;
+  dateTo?: string;
+  onDateToChange?: (date: string) => void;
 }
 
 const allStatuses = ['All', 'active', 'blocked', 'deleted'];
@@ -115,21 +131,65 @@ export default function UserTable({
   onBlock,
   onUnblock,
   onDelete,
+  currentPage: serverPage,
+  totalPages: serverTotalPages,
+  totalItems,
+  itemsPerPage = 10,
+  onPageChange,
+  isLoading = false,
+  sortBy: serverSortBy,
+  onSortByChange,
+  statusFilter: serverStatusFilter,
+  onStatusFilterChange,
+  authFilter: serverAuthFilter,
+  onAuthFilterChange,
+  dateFrom: serverDateFrom,
+  onDateFromChange,
+  dateTo: serverDateTo,
+  onDateToChange,
 }: UserTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [authFilter, setAuthFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('createdAt-desc');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [localPage, setLocalPage] = useState(1);
+  const [localStatusFilter, setLocalStatusFilter] = useState('All');
+  const [localAuthFilter, setLocalAuthFilter] = useState('All');
+  const [localSortBy, setLocalSortBy] = useState('createdAt-desc');
+  const [localDateFrom, setLocalDateFrom] = useState('');
+  const [localDateTo, setLocalDateTo] = useState('');
 
-  const itemsPerPage = 10;
+  const isServerPaginated = Boolean(onPageChange);
+  
+  const currentPage = serverPage !== undefined ? serverPage : localPage;
+  const statusFilter = serverStatusFilter !== undefined ? serverStatusFilter : localStatusFilter;
+  const authFilter = serverAuthFilter !== undefined ? serverAuthFilter : localAuthFilter;
+  const sortBy = serverSortBy !== undefined ? serverSortBy : localSortBy;
+  const dateFrom = serverDateFrom !== undefined ? serverDateFrom : localDateFrom;
+  const dateTo = serverDateTo !== undefined ? serverDateTo : localDateTo;
+
+  const setStatusFilter = (val: string) => {
+    if (onStatusFilterChange) onStatusFilterChange(val);
+    else setLocalStatusFilter(val);
+  };
+  const setAuthFilter = (val: string) => {
+    if (onAuthFilterChange) onAuthFilterChange(val);
+    else setLocalAuthFilter(val);
+  };
+  const setSortBy = (val: string) => {
+    if (onSortByChange) onSortByChange(val);
+    else setLocalSortBy(val);
+  };
+  const setDateFrom = (val: string) => {
+    if (onDateFromChange) onDateFromChange(val);
+    else setLocalDateFrom(val);
+  };
+  const setDateTo = (val: string) => {
+    if (onDateToChange) onDateToChange(val);
+    else setLocalDateTo(val);
+  };
 
   const filteredAndSortedData = useMemo(() => {
     let result = [...data];
 
     // Search
-    if (searchQuery) {
+    if (!isServerPaginated && searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
         (u) =>
@@ -164,33 +224,58 @@ export default function UserTable({
     }
 
     // Sort
-    const [field, dir] = sortBy.split('-');
-    result.sort((a, b) => {
-      let cmp = 0;
-      if (field === 'name') {
-        cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-      } else if (field === 'createdAt') {
-        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      } else if (field === 'lastLoginAt') {
-        const aTime = a.lastLoginAt ? new Date(a.lastLoginAt).getTime() : 0;
-        const bTime = b.lastLoginAt ? new Date(b.lastLoginAt).getTime() : 0;
-        cmp = aTime - bTime;
-      }
-      return dir === 'asc' ? cmp : -cmp;
-    });
+    if (!isServerPaginated) {
+      const [field, dir] = sortBy.split('-');
+      result.sort((a, b) => {
+        let cmp = 0;
+        if (field === 'name') {
+          cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        } else if (field === 'createdAt') {
+          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        } else if (field === 'lastLoginAt') {
+          const aTime = a.lastLoginAt ? new Date(a.lastLoginAt).getTime() : 0;
+          const bTime = b.lastLoginAt ? new Date(b.lastLoginAt).getTime() : 0;
+          cmp = aTime - bTime;
+        }
+        return dir === 'asc' ? cmp : -cmp;
+      });
+    }
 
     return result;
-  }, [data, searchQuery, statusFilter, authFilter, sortBy, dateFrom, dateTo]);
+  }, [data, searchQuery, statusFilter, authFilter, sortBy, dateFrom, dateTo, isServerPaginated]);
 
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
-  const paginatedData = filteredAndSortedData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const totalPages =
+    serverTotalPages || Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
+
+  const paginatedData = isServerPaginated
+    ? filteredAndSortedData
+    : filteredAndSortedData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
+
+  const displayTotal = totalItems ?? filteredAndSortedData.length;
+  const showingFrom =
+    displayTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const showingTo = Math.min(
+    (currentPage - 1) * itemsPerPage + paginatedData.length,
+    displayTotal
   );
 
+  const goToPage = (page: number) => {
+    const nextPage = Math.min(totalPages, Math.max(1, page));
+    if (isServerPaginated) {
+      onPageChange?.(nextPage);
+    } else {
+      setLocalPage(nextPage);
+    }
+  };
+
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter, authFilter, sortBy, dateFrom, dateTo]);
+    if (!isServerPaginated) {
+      setLocalPage(1);
+    }
+  }, [isServerPaginated, searchQuery, statusFilter, authFilter, sortBy, dateFrom, dateTo]);
 
   const StatusBadge = ({ status }: { status: string }) => {
     const s = statusStyles[status] || statusStyles.active;
@@ -563,29 +648,40 @@ export default function UserTable({
       </div>
 
       {/* ── Pagination ── */}
-      {(filteredAndSortedData.length > itemsPerPage || currentPage > 1) && (
+      {(totalPages > 1 || currentPage > 1) && (
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
           <span className="text-sm text-gray-500 font-medium hidden sm:block">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-            {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)} of{' '}
-            {filteredAndSortedData.length} users
+            Showing {showingFrom} to {showingTo} of {displayTotal} users
           </span>
           <div className="flex items-center gap-1 mx-auto sm:mx-0">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1 || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronLeft size={18} />
             </button>
-            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-              // Show pages around current page
-              const page = totalPages <= 7 ? i + 1 : Math.max(1, Math.min(currentPage - 3, totalPages - 6)) + i;
-              if (page > totalPages) return null;
-              return (
+            {(() => {
+              const pages: number[] = [];
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - 2);
+              let end = Math.min(totalPages, currentPage + 2);
+
+              if (start === 1) {
+                end = Math.min(totalPages, maxVisible);
+              } else if (end === totalPages) {
+                start = Math.max(1, totalPages - maxVisible + 1);
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map(page => (
                 <button
                   key={page}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => goToPage(page)}
+                  disabled={isLoading}
                   className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
                     currentPage === page
                       ? 'bg-gray-100 text-slate-800 font-bold'
@@ -594,11 +690,11 @@ export default function UserTable({
                 >
                   {page}
                 </button>
-              );
-            })}
+              ));
+            })()}
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronRight size={18} />

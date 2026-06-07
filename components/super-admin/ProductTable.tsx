@@ -392,20 +392,37 @@ export default function ProductTable({
               <ChevronLeft size={18} />
             </button>
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button 
-                key={page}
-                onClick={() => goToPage(page)}
-                disabled={isLoading}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                  currentPage === page 
-                    ? 'bg-gray-100 text-slate-800 font-bold' 
-                    : 'hover:bg-gray-50 text-gray-500'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {(() => {
+              const pages: number[] = [];
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - 2);
+              let end = Math.min(totalPages, currentPage + 2);
+
+              if (start === 1) {
+                end = Math.min(totalPages, maxVisible);
+              } else if (end === totalPages) {
+                start = Math.max(1, totalPages - maxVisible + 1);
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map(page => (
+                <button 
+                  key={page}
+                  onClick={() => goToPage(page)}
+                  disabled={isLoading}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
+                    currentPage === page 
+                      ? 'bg-gray-100 text-slate-800 font-bold' 
+                      : 'hover:bg-gray-50 text-gray-500'
+                  }`}
+                >
+                  {page}
+                </button>
+              ));
+            })()}
 
             <button 
               onClick={() => goToPage(currentPage + 1)}

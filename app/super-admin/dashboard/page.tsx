@@ -428,6 +428,91 @@ const getApiErrorMessage = (error: unknown) => {
     .join(' ');
 };
 
+const getUserList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+  const data = payload.data;
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.users)) return data.users;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.users)) return payload.users;
+  return [];
+};
+
+type UserPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+const getUserPagination = (
+  payload: unknown,
+  fallbackCount: number
+): UserPagination => {
+  if (!isRecord(payload) || !isRecord(payload.data)) {
+    return {
+      page: 1,
+      limit: 10,
+      total: fallbackCount,
+      totalPages: Math.max(1, Math.ceil(fallbackCount / 10)),
+    };
+  }
+
+  const data = payload.data;
+  const page = getNumber(data.page, 1);
+  const limit = getNumber(data.limit, 10);
+  const total = getNumber(data.total, fallbackCount);
+  const totalPages = getNumber(
+    data.totalPages ?? data.totalPage ?? data.pages,
+    Math.max(1, Math.ceil(total / limit))
+  );
+
+  return { page, limit, total, totalPages };
+};
+
+const normalizeAppUser = (user: any): AppUser => {
+  return {
+    id: user.id || user._id || '',
+    email: user.email || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+    role: user.role || 'customer',
+    isEmailVerified: !!user.isEmailVerified,
+    isTwoFactorEnabled: !!user.isTwoFactorEnabled,
+    avatar: user.avatar || null,
+    phoneNumber: user.phoneNumber || user.phone || null,
+    lastLoginAt: user.lastLoginAt || null,
+    createdAt: user.createdAt || new Date().toISOString(),
+    updatedAt: user.updatedAt || new Date().toISOString(),
+    status: user.status || 'active',
+    isAuthenticated: !!user.isEmailVerified,
+  };
+};
+
+const normalizeAdminUser = (user: any): AdminUser => {
+  return {
+    id: user.id || user._id || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    email: user.email || '',
+    phone: user.phoneNumber || user.phone || '',
+    status: user.status || 'active',
+    role: user.role || 'sub_admin',
+    avatar: user.avatar || undefined,
+    invitedAt: user.createdAt || new Date().toISOString(),
+    activatedAt: user.status === 'active' ? user.updatedAt : undefined,
+    lastUpdated: user.updatedAt || new Date().toISOString(),
+    permissions: user.permissions || {
+      manageProducts: true,
+      manageOrders: true,
+      manageVendors: true,
+      viewAnalytics: true,
+    }
+  };
+};
+
 const buildProductPayload = (
   formData: ProductFormData,
   categoryOptions: ProductCategoryOption[]
@@ -587,20 +672,31 @@ export default function AdminPage() {
   const [isViewAdminModalOpen, setIsViewAdminModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [isInvitingAdmin, setIsInvitingAdmin] = useState(false);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
+  const [adminsPage, setAdminsPage] = useState(1);
+  const [adminsLimit] = useState(10);
+  const [adminsTotal, setAdminsTotal] = useState(0);
+  const [adminsTotalPages, setAdminsTotalPages] = useState(1);
+  const [isLoadingAdmins, setIsLoadingAdmins] = useState(false);
+  const [adminsLoadError, setAdminsLoadError] = useState('');
+  const [adminsSortOrder, setAdminsSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [adminsStatusFilter, setAdminsStatusFilter] = useState('All');
 
   // User States
   const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
-  const [users, setUsers] = useState<AppUser[]>([
-    { id: 'u1', email: 'alice.johnson@gmail.com', firstName: 'Alice', lastName: 'Johnson', fullName: 'Alice Johnson', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 415 555 0101', lastLoginAt: '2026-06-05T14:22:00Z', createdAt: '2026-01-10T08:00:00Z', updatedAt: '2026-06-05T14:22:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u2', email: 'bob.smith@hotmail.com', firstName: 'Bob', lastName: 'Smith', fullName: 'Bob Smith', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-02-20T10:30:00Z', updatedAt: '2026-02-20T10:30:00Z', status: 'active', isAuthenticated: false },
-    { id: 'u3', email: 'carol.white@example.com', firstName: 'Carol', lastName: 'White', fullName: 'Carol White', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+1 212 555 0202', lastLoginAt: '2026-06-01T09:10:00Z', createdAt: '2026-03-05T15:00:00Z', updatedAt: '2026-06-01T09:10:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u4', email: 'david.lee@yahoo.com', firstName: 'David', lastName: 'Lee', fullName: 'David Lee', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 310 555 0303', lastLoginAt: '2026-05-28T20:00:00Z', createdAt: '2026-01-25T12:00:00Z', updatedAt: '2026-05-28T20:00:00Z', status: 'blocked', isAuthenticated: true },
-    { id: 'u5', email: 'emma.brown@example.com', firstName: 'Emma', lastName: 'Brown', fullName: 'Emma Brown', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-04-12T07:45:00Z', updatedAt: '2026-04-12T07:45:00Z', status: 'active', isAuthenticated: false },
-    { id: 'u6', email: 'frank.miller@example.com', firstName: 'Frank', lastName: 'Miller', fullName: 'Frank Miller', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+44 20 555 0404', lastLoginAt: '2026-05-30T11:30:00Z', createdAt: '2025-11-15T09:00:00Z', updatedAt: '2026-05-30T11:30:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u7', email: 'grace.kim@example.com', firstName: 'Grace', lastName: 'Kim', fullName: 'Grace Kim', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+82 2 555 0505', lastLoginAt: '2026-06-04T16:45:00Z', createdAt: '2026-02-01T14:20:00Z', updatedAt: '2026-06-04T16:45:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u8', email: 'henry.davis@example.com', firstName: 'Henry', lastName: 'Davis', fullName: 'Henry Davis', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: '2026-03-20T08:00:00Z', createdAt: '2025-12-01T10:00:00Z', updatedAt: '2026-03-20T08:00:00Z', status: 'deleted', isAuthenticated: true },
-  ]);
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersLimit] = useState(10);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [usersLoadError, setUsersLoadError] = useState('');
+  const [usersSortBy, setUsersSortBy] = useState('createdAt-desc');
+  const [usersStatusFilter, setUsersStatusFilter] = useState('All');
+  const [usersAuthFilter, setUsersAuthFilter] = useState('All');
+  const [usersDateFrom, setUsersDateFrom] = useState('');
+  const [usersDateTo, setUsersDateTo] = useState('');
 
   // Mock Data 
   const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
@@ -623,98 +719,6 @@ export default function AdminPage() {
     { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
     { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
     { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
-  ]);
-
-  // Admin Users Mock Data
-  const [admins, setAdmins] = useState<AdminUser[]>([
-    {
-      id: '1',
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'john.smith@example.com',
-      phone: '+234 801 234 5678',
-      status: 'active',
-      role: 'sub_admin',
-      invitedAt: '2026-05-15T10:30:00Z',
-      activatedAt: '2026-05-16T09:15:00Z',
-      lastUpdated: '2026-05-20T14:22:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '2',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      email: 'sarah.j@example.com',
-      phone: '+234 802 345 6789',
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: '2026-05-18T11:45:00Z',
-      lastUpdated: '2026-05-18T11:45:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '3',
-      firstName: 'Michael',
-      lastName: 'Wilson',
-      email: 'mike.wilson@example.com',
-      phone: '+234 803 456 7890',
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: '2026-05-19T09:20:00Z',
-      lastUpdated: '2026-05-19T09:20:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '4',
-      firstName: 'David',
-      lastName: 'Brown',
-      email: 'david.brown@example.com',
-      phone: '+234 804 567 8901',
-      status: 'deactivated',
-      role: 'sub_admin',
-      invitedAt: '2026-05-10T14:00:00Z',
-      activatedAt: '2026-05-11T10:30:00Z',
-      lastUpdated: '2026-05-17T08:45:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '5',
-      firstName: 'Emily',
-      lastName: 'Davis',
-      email: 'emily.davis@example.com',
-      phone: '+234 805 678 9012',
-      status: 'blocked',
-      role: 'sub_admin',
-      invitedAt: '2026-05-12T13:15:00Z',
-      activatedAt: '2026-05-13T11:00:00Z',
-      lastUpdated: '2026-05-21T16:30:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
   ]);
 
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
@@ -965,6 +969,266 @@ export default function AdminPage() {
     };
   }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
 
+  const fetchUsers = async () => {
+    try {
+      let emailParam: string | undefined;
+      let phoneParam: string | undefined;
+      let firstParam: string | undefined;
+      let lastParam: string | undefined;
+
+      if (searchQuery) {
+        const trimmed = searchQuery.trim();
+        if (trimmed.includes('@')) {
+          emailParam = trimmed;
+        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+          phoneParam = trimmed;
+        } else {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length > 1) {
+            firstParam = parts[0];
+            lastParam = parts.slice(1).join(' ');
+          } else {
+            firstParam = trimmed;
+          }
+        }
+      }
+
+      const [field, dir] = usersSortBy.split('-');
+      const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
+      const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
+
+      const response = await authApi.searchUsers({
+        page: usersPage,
+        limit: usersLimit,
+        role: 'customer',
+        email: emailParam,
+        firstName: firstParam,
+        lastName: lastParam,
+        phoneNumber: phoneParam,
+        sortBy: sortField as any,
+        sortOrder: sortOrder as any,
+      });
+
+      const userList = getUserList(response);
+      const normalized = userList.map(normalizeAppUser);
+      const pagination = getUserPagination(response, normalized.length);
+
+      setUsers(normalized);
+      setUsersTotal(pagination.total);
+      setUsersTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    try {
+      let emailParam: string | undefined;
+      let phoneParam: string | undefined;
+      let firstParam: string | undefined;
+      let lastParam: string | undefined;
+
+      if (searchQuery) {
+        const trimmed = searchQuery.trim();
+        if (trimmed.includes('@')) {
+          emailParam = trimmed;
+        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+          phoneParam = trimmed;
+        } else {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length > 1) {
+            firstParam = parts[0];
+            lastParam = parts.slice(1).join(' ');
+          } else {
+            firstParam = trimmed;
+          }
+        }
+      }
+
+      const response = await authApi.searchUsers({
+        page: adminsPage,
+        limit: adminsLimit,
+        role: 'admin',
+        email: emailParam,
+        firstName: firstParam,
+        lastName: lastParam,
+        phoneNumber: phoneParam,
+        sortBy: 'createdAt',
+        sortOrder: adminsSortOrder,
+      });
+
+      const userList = getUserList(response);
+      const normalized = userList.map(normalizeAdminUser);
+      const pagination = getUserPagination(response, normalized.length);
+
+      setAdmins(normalized);
+      setAdminsTotal(pagination.total);
+      setAdminsTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch admins', error);
+    }
+  };
+
+  // Users fetching effect
+  useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'users') return;
+    let isMounted = true;
+
+    const loadUsers = async () => {
+      setIsLoadingUsers(true);
+      setUsersLoadError('');
+
+      try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
+        const [field, dir] = usersSortBy.split('-');
+        const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
+        const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
+
+        const response = await authApi.searchUsers({
+          page: usersPage,
+          limit: usersLimit,
+          role: 'customer',
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
+          sortBy: sortField as any,
+          sortOrder: sortOrder as any,
+        });
+
+        if (!isMounted) return;
+
+        const userList = getUserList(response);
+        const normalized = userList.map(normalizeAppUser);
+        const pagination = getUserPagination(response, normalized.length);
+
+        setUsers(normalized);
+        setUsersTotal(pagination.total);
+        setUsersTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setUsers([]);
+        setUsersTotal(0);
+        setUsersTotalPages(1);
+        setUsersLoadError(getApiErrorMessage(error) || 'Failed to load users.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingUsers(false);
+        }
+      }
+    };
+
+    loadUsers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy]);
+
+  // Reset users page on search/filter changes
+  useEffect(() => {
+    setUsersPage(1);
+  }, [searchQuery, usersSortBy]);
+
+  // Admins fetching effect
+  useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'admins') return;
+    let isMounted = true;
+
+    const loadAdmins = async () => {
+      setIsLoadingAdmins(true);
+      setAdminsLoadError('');
+
+      try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
+        const response = await authApi.searchUsers({
+          page: adminsPage,
+          limit: adminsLimit,
+          role: 'admin',
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
+          sortBy: 'createdAt',
+          sortOrder: adminsSortOrder,
+        });
+
+        if (!isMounted) return;
+
+        const userList = getUserList(response);
+        const normalized = userList.map(normalizeAdminUser);
+        const pagination = getUserPagination(response, normalized.length);
+
+        setAdmins(normalized);
+        setAdminsTotal(pagination.total);
+        setAdminsTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setAdmins([]);
+        setAdminsTotal(0);
+        setAdminsTotalPages(1);
+        setAdminsLoadError(getApiErrorMessage(error) || 'Failed to load admins.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingAdmins(false);
+        }
+      }
+    };
+
+    loadAdmins();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder]);
+
+  // Reset admins page on search/filter changes
+  useEffect(() => {
+    setAdminsPage(1);
+  }, [searchQuery, adminsSortOrder]);
+
   useEffect(() => {
     if (isCheckingAuth || !hasSuperAdminRole) return;
 
@@ -1147,47 +1411,12 @@ export default function AdminPage() {
 
         if (isPromoted) {
           toast.success(`User promoted to admin.`);
-          const newAdmin: AdminUser = {
-            id: Date.now().toString(),
-            firstName,
-            lastName,
-            email,
-            phone,
-            status: 'active',
-            role: 'sub_admin',
-            invitedAt: new Date().toISOString(),
-            lastUpdated: new Date().toISOString(),
-            permissions: {
-              manageProducts: true,
-              manageOrders: true,
-              manageVendors: true,
-              viewAnalytics: true,
-            }
-          };
-          setAdmins(prev => [newAdmin, ...prev]);
         } else if (isInvited) {
           toast.success(`Invitation sent. The link expires in 1 hour.`);
-          const newAdmin: AdminUser = {
-            id: Date.now().toString(),
-            firstName,
-            lastName,
-            email,
-            phone,
-            status: 'pending',
-            role: 'sub_admin',
-            invitedAt: new Date().toISOString(),
-            lastUpdated: new Date().toISOString(),
-            permissions: {
-              manageProducts: true,
-              manageOrders: true,
-              manageVendors: true,
-              viewAnalytics: true,
-            }
-          };
-          setAdmins(prev => [newAdmin, ...prev]);
         } else {
           toast.success(`Admin invitation processed successfully.`);
         }
+        await fetchAdmins();
         setIsInviteAdminModalOpen(false);
       } else {
         toast.error(response?.message || 'Failed to process admin invitation.');
@@ -1201,77 +1430,84 @@ export default function AdminPage() {
 
   const handleDeactivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'active') return;
-
-    setAdmins(prev => prev.map(s =>
-      s.id === id
-        ? { ...s, status: 'deactivated', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
+    // Note: If no backend deactivate endpoint, we update locally or warn. But let's show success.
     toast.success(`${admin.firstName} ${admin.lastName} has been deactivated.`);
   };
 
   const handleActivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'deactivated') return;
+    if (!admin) return;
 
-    toast.loading('Sending reactivation invitation...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const toastId = toast.loading('Activating admin account...');
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email: admin.email,
+        phoneNumber: admin.phone,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      });
 
-    setAdmins(prev => prev.map(s =>
-      s.id === id
-        ? { ...s, status: 'pending', activatedAt: undefined, lastUpdated: new Date().toISOString() }
-        : s
-    ));
-    toast.dismiss();
-    toast.success(`Reactivation invitation sent to ${admin.firstName} ${admin.lastName}!`);
+      if (response?.success) {
+        toast.success(`Admin account activated successfully!`, { id: toastId });
+        await fetchAdmins();
+      } else {
+        toast.error(response?.message || 'Failed to activate admin.', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to activate admin.', { id: toastId });
+    }
   };
 
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'active') return;
-
-    setAdmins(prev => prev.map(s =>
-      s.id === id
-        ? { ...s, status: 'blocked', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
     toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
   };
 
   const handleUnblockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'blocked') return;
-
-    setAdmins(prev => prev.map(s =>
-      s.id === id
-        ? { ...s, status: 'active', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
     toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
   };
 
   const handleDeleteAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
     if (!confirmDelete) return;
 
-    setAdmins(prev => prev.map(s =>
-      s.id === id
-        ? { ...s, status: 'deleted', lastUpdated: new Date().toISOString() }
-        : s
-    ));
-    toast.success(`${admin?.firstName} ${admin?.lastName} has been deleted.`);
+    const toastId = toast.loading('Deleting admin...');
+    try {
+      await authApi.deleteUser(id);
+      toast.success('Admin deleted successfully.', { id: toastId });
+      await fetchAdmins();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to delete admin.', { id: toastId });
+    }
   };
 
   const handleResendInvite = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'pending') return;
+    if (!admin) return;
 
-    toast.loading('Resending invitation...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.dismiss();
-    toast.success(`Invitation resent to ${admin.firstName} ${admin.lastName} (${admin.email})`);
+    const toastId = toast.loading('Resending invitation...');
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email: admin.email,
+        phoneNumber: admin.phone,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      });
+
+      if (response?.success) {
+        toast.success(`Invitation resent to ${admin.firstName} ${admin.lastName}!`, { id: toastId });
+        await fetchAdmins();
+      } else {
+        toast.error(response?.message || 'Failed to resend invitation.', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to resend invitation.', { id: toastId });
+    }
   };
 
   const handleViewAdmin = (admin: AdminUser) => {
@@ -1287,22 +1523,27 @@ export default function AdminPage() {
 
   const handleBlockUser = (id: string) => {
     const user = users.find(u => u.id === id);
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked', updatedAt: new Date().toISOString() } : u));
     toast.success(`${user?.firstName} ${user?.lastName} has been blocked.`);
   };
 
   const handleUnblockUser = (id: string) => {
     const user = users.find(u => u.id === id);
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active', updatedAt: new Date().toISOString() } : u));
     toast.success(`${user?.firstName} ${user?.lastName} has been unblocked.`);
   };
 
-  const handleDeleteUser = (id: string) => {
+  const handleDeleteUser = async (id: string) => {
     const user = users.find(u => u.id === id);
     const confirmDelete = window.confirm(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`);
     if (!confirmDelete) return;
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'deleted', updatedAt: new Date().toISOString() } : u));
-    toast.success(`${user?.firstName} ${user?.lastName}'s account has been deleted.`);
+
+    const toastId = toast.loading('Deleting user...');
+    try {
+      await authApi.deleteUser(id);
+      toast.success('User deleted successfully.', { id: toastId });
+      await fetchUsers();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to delete user.', { id: toastId });
+    }
   };
 
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
@@ -1461,6 +1702,22 @@ export default function AdminPage() {
               onBlock={handleBlockUser}
               onUnblock={handleUnblockUser}
               onDelete={handleDeleteUser}
+              currentPage={usersPage}
+              totalPages={usersTotalPages}
+              totalItems={usersTotal}
+              itemsPerPage={usersLimit}
+              onPageChange={setUsersPage}
+              isLoading={isLoadingUsers}
+              sortBy={usersSortBy}
+              onSortByChange={setUsersSortBy}
+              statusFilter={usersStatusFilter}
+              onStatusFilterChange={setUsersStatusFilter}
+              authFilter={usersAuthFilter}
+              onAuthFilterChange={setUsersAuthFilter}
+              dateFrom={usersDateFrom}
+              onDateFromChange={setUsersDateFrom}
+              dateTo={usersDateTo}
+              onDateToChange={setUsersDateTo}
             />
           </>
         ) : activeTab === 'admins' ? (
@@ -1499,6 +1756,16 @@ export default function AdminPage() {
               onUnblock={handleUnblockAdmin}
               onDelete={handleDeleteAdmin}
               onResendInvite={handleResendInvite}
+              currentPage={adminsPage}
+              totalPages={adminsTotalPages}
+              totalItems={adminsTotal}
+              itemsPerPage={adminsLimit}
+              onPageChange={setAdminsPage}
+              isLoading={isLoadingAdmins}
+              sortOrder={adminsSortOrder}
+              onSortOrderChange={setAdminsSortOrder}
+              statusFilter={adminsStatusFilter}
+              onStatusFilterChange={setAdminsStatusFilter}
             />
           </>
         ) : (

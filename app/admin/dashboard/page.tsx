@@ -139,19 +139,9 @@ type CategoryRecord = {
 
 const PRODUCT_PAGE_LIMIT = 20;
 
-const fallbackProducts: AdminProduct[] = [
-  {
-    id: '1',
-    name: 'Lenovo Ideapad Slim 3',
-    price: 45000,
-    category: 'Electronics',
-    stock: 12,
-    image: '/laptop.jpg',
-  },
-];
-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value && typeof value === 'object');
+
 
 const getProductList = (payload: unknown): unknown[] => {
   if (!isRecord(payload)) return [];
@@ -425,6 +415,73 @@ const getApiErrorMessage = (error: unknown) => {
     .join(' ');
 };
 
+const getUserList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+  const data = payload.data;
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.users)) return data.users;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.users)) return payload.users;
+  return [];
+};
+
+type UserPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+const getUserPagination = (
+  payload: unknown,
+  fallbackCount: number
+): UserPagination => {
+  if (!isRecord(payload) || !isRecord(payload.data)) {
+    return {
+      page: 1,
+      limit: 10,
+      total: fallbackCount,
+      totalPages: Math.max(1, Math.ceil(fallbackCount / 10)),
+    };
+  }
+  const data = payload.data;
+  const getN = (v: unknown, fb: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : fb;
+  };
+  const limit = getN(data.limit, 10);
+  const total = getN(data.total, fallbackCount);
+  return {
+    page: getN(data.page, 1),
+    limit,
+    total,
+    totalPages: getN(
+      (data as any).totalPages ?? (data as any).totalPage ?? (data as any).pages,
+      Math.max(1, Math.ceil(total / limit))
+    ),
+  };
+};
+
+const normalizeAppUser = (user: any): import('@/components/super-admin/UserTable').AppUser => ({
+  id: user.id || user._id || '',
+  email: user.email || '',
+  firstName: user.firstName || '',
+  lastName: user.lastName || '',
+  fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+  role: user.role || 'customer',
+  isEmailVerified: !!user.isEmailVerified,
+  isTwoFactorEnabled: !!user.isTwoFactorEnabled,
+  avatar: user.avatar || null,
+  phoneNumber: user.phoneNumber || user.phone || null,
+  lastLoginAt: user.lastLoginAt || null,
+  createdAt: user.createdAt || new Date().toISOString(),
+  updatedAt: user.updatedAt || new Date().toISOString(),
+  status: user.status || 'active',
+  isAuthenticated: !!user.isEmailVerified,
+});
+
+
 const buildProductPayload = (
   formData: ProductFormData,
   categoryOptions: ProductCategoryOption[]
@@ -564,7 +621,7 @@ export default function AdminPage() {
   const [productLoadError, setProductLoadError] = useState('');
   const [productPage, setProductPage] = useState(1);
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
-  const [productTotal, setProductTotal] = useState(fallbackProducts.length);
+  const [productTotal, setProductTotal] = useState(0);
   const [productTotalPages, setProductTotalPages] = useState(1);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [publishingProductId, setPublishingProductId] = useState<string | null>(null);
@@ -606,16 +663,18 @@ export default function AdminPage() {
   // User States
   const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
-  const [users, setUsers] = useState<AppUser[]>([
-    { id: 'u1', email: 'alice.johnson@gmail.com', firstName: 'Alice', lastName: 'Johnson', fullName: 'Alice Johnson', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 415 555 0101', lastLoginAt: '2026-06-05T14:22:00Z', createdAt: '2026-01-10T08:00:00Z', updatedAt: '2026-06-05T14:22:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u2', email: 'bob.smith@hotmail.com', firstName: 'Bob', lastName: 'Smith', fullName: 'Bob Smith', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-02-20T10:30:00Z', updatedAt: '2026-02-20T10:30:00Z', status: 'active', isAuthenticated: false },
-    { id: 'u3', email: 'carol.white@example.com', firstName: 'Carol', lastName: 'White', fullName: 'Carol White', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+1 212 555 0202', lastLoginAt: '2026-06-01T09:10:00Z', createdAt: '2026-03-05T15:00:00Z', updatedAt: '2026-06-01T09:10:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u4', email: 'david.lee@yahoo.com', firstName: 'David', lastName: 'Lee', fullName: 'David Lee', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+1 310 555 0303', lastLoginAt: '2026-05-28T20:00:00Z', createdAt: '2026-01-25T12:00:00Z', updatedAt: '2026-05-28T20:00:00Z', status: 'blocked', isAuthenticated: true },
-    { id: 'u5', email: 'emma.brown@example.com', firstName: 'Emma', lastName: 'Brown', fullName: 'Emma Brown', role: 'user', isEmailVerified: false, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: null, createdAt: '2026-04-12T07:45:00Z', updatedAt: '2026-04-12T07:45:00Z', status: 'active', isAuthenticated: false },
-    { id: 'u6', email: 'frank.miller@example.com', firstName: 'Frank', lastName: 'Miller', fullName: 'Frank Miller', role: 'user', isEmailVerified: true, isTwoFactorEnabled: true, avatar: null, phoneNumber: '+44 20 555 0404', lastLoginAt: '2026-05-30T11:30:00Z', createdAt: '2025-11-15T09:00:00Z', updatedAt: '2026-05-30T11:30:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u7', email: 'grace.kim@example.com', firstName: 'Grace', lastName: 'Kim', fullName: 'Grace Kim', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: '+82 2 555 0505', lastLoginAt: '2026-06-04T16:45:00Z', createdAt: '2026-02-01T14:20:00Z', updatedAt: '2026-06-04T16:45:00Z', status: 'active', isAuthenticated: true },
-    { id: 'u8', email: 'henry.davis@example.com', firstName: 'Henry', lastName: 'Davis', fullName: 'Henry Davis', role: 'user', isEmailVerified: true, isTwoFactorEnabled: false, avatar: null, phoneNumber: null, lastLoginAt: '2026-03-20T08:00:00Z', createdAt: '2025-12-01T10:00:00Z', updatedAt: '2026-03-20T08:00:00Z', status: 'deleted', isAuthenticated: true },
-  ]);
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersLimit] = useState(10);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [usersLoadError, setUsersLoadError] = useState('');
+  const [usersSortBy, setUsersSortBy] = useState('createdAt-desc');
+  const [usersStatusFilter, setUsersStatusFilter] = useState('All');
+  const [usersAuthFilter, setUsersAuthFilter] = useState('All');
+  const [usersDateFrom, setUsersDateFrom] = useState('');
+  const [usersDateTo, setUsersDateTo] = useState('');
 
   const handleViewUser = (user: AppUser) => {
     setSelectedUser(user);
@@ -623,18 +682,27 @@ export default function AdminPage() {
   };
 
   const handleBlockUser = (id: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'blocked' } : u));
+    // Local optimistic update — no block API yet
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' } : u));
     toast.success('User blocked successfully');
   };
 
   const handleUnblockUser = (id: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'active' } : u));
+    // Local optimistic update — no unblock API yet
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active' } : u));
     toast.success('User unblocked successfully');
   };
 
-  const handleDeleteUser = (id: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'deleted' } : u));
-    toast.success('User deleted successfully');
+  const handleDeleteUser = async (id: string) => {
+    try {
+      await authApi.deleteUser(id);
+      setUsers(prev => prev.filter(u => u.id !== id));
+      setUsersTotal(prev => Math.max(0, prev - 1));
+      toast.success('User deleted successfully');
+    } catch (error) {
+      const msg = getApiErrorMessage(error) || 'Could not delete user. Please try again.';
+      toast.error(msg);
+    }
   };
 
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
@@ -823,11 +891,12 @@ export default function AdminPage() {
       setProductTotal(pagination.total);
       setProductTotalPages(pagination.totalPages);
     } catch (error) {
-      setProducts(fallbackProducts);
-      setProductTotal(fallbackProducts.length);
+      // Show error — never fall back to dummy data
+      setProducts([]);
+      setProductTotal(0);
       setProductTotalPages(1);
       setProductLoadError(
-        getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+        getApiErrorMessage(error) || 'Could not load products. Please try again.'
       );
     } finally {
       setIsLoadingProducts(false);
@@ -865,11 +934,12 @@ export default function AdminPage() {
         setProductTotalPages(pagination.totalPages);
       } catch (error) {
         if (!isMounted) return;
-        setProducts(fallbackProducts);
-        setProductTotal(fallbackProducts.length);
+        // Show error — never fall back to dummy data
+        setProducts([]);
+        setProductTotal(0);
         setProductTotalPages(1);
         setProductLoadError(
-          getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+          getApiErrorMessage(error) || 'Could not load products. Please try again.'
         );
       } finally {
         if (isMounted) {
@@ -885,6 +955,85 @@ export default function AdminPage() {
     };
   }, [isCheckingAuth, hasAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
 
+  // Users fetching effect — triggered when users tab is active
+  useEffect(() => {
+    if (isCheckingAuth || !hasAdminRole || activeTab !== 'users') return;
+    let isMounted = true;
+
+    const loadUsers = async () => {
+      setIsLoadingUsers(true);
+      setUsersLoadError('');
+
+      try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
+        const [field, dir] = usersSortBy.split('-');
+        const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
+        const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
+
+        const response = await authApi.searchUsers({
+          page: usersPage,
+          limit: usersLimit,
+          role: 'customer',
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
+          sortBy: sortField as any,
+          sortOrder: sortOrder as any,
+        });
+
+        if (!isMounted) return;
+
+        const userList = getUserList(response);
+        const normalized = userList.map(normalizeAppUser);
+        const pagination = getUserPagination(response, normalized.length);
+
+        setUsers(normalized);
+        setUsersTotal(pagination.total);
+        setUsersTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setUsers([]);
+        setUsersTotal(0);
+        setUsersTotalPages(1);
+        setUsersLoadError(getApiErrorMessage(error) || 'Failed to load users.');
+      } finally {
+        if (isMounted) setIsLoadingUsers(false);
+      }
+    };
+
+    loadUsers();
+    return () => { isMounted = false; };
+  }, [isCheckingAuth, hasAdminRole, activeTab, usersPage, searchQuery, usersSortBy]);
+
+  // Reset users page when search or sort changes
+  useEffect(() => {
+    setUsersPage(1);
+  }, [searchQuery, usersSortBy]);
+
+
+  // Subcategory filter loader
   useEffect(() => {
     if (isCheckingAuth || !hasAdminRole) return;
 
@@ -914,6 +1063,7 @@ export default function AdminPage() {
     void fetchSubs();
     return () => { isMounted = false; };
   }, [isCheckingAuth, hasAdminRole, filterCategoryId]);
+
 
   const handleSaveProduct = async (formData: ProductFormData) => {
     if (activeTab !== 'products') return;
@@ -1072,25 +1222,25 @@ export default function AdminPage() {
   if (!hasToken && !authUser) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-amber-400 to-red-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
         
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
-            <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
-              <svg className="w-12 h-12 text-red-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+              <svg className="w-12 h-12 text-amber-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Session Expired</h2>
           <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
-            Your login session has expired or you are not authorized to view this page. Please log in again to continue.
+            Your login session has expired. Please sign in again to continue managing the dashboard.
           </p>
           <button
             onClick={() => router.push('/admin/login')}
             className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
           >
-            Go to Login
+            Sign In Again
           </button>
         </div>
       </div>
@@ -1194,17 +1344,38 @@ export default function AdminPage() {
                 placeholder="Search users by name, email, or phone..."
                 className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setUsersPage(1); }}
               />
             </div>
 
+            {usersLoadError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 mb-4">
+                {usersLoadError}
+              </div>
+            )}
+
             <UserTable
               data={users}
-              searchQuery={searchQuery}
               onView={handleViewUser}
               onBlock={handleBlockUser}
               onUnblock={handleUnblockUser}
               onDelete={handleDeleteUser}
+              currentPage={usersPage}
+              totalPages={usersTotalPages}
+              totalItems={usersTotal}
+              itemsPerPage={usersLimit}
+              onPageChange={setUsersPage}
+              isLoading={isLoadingUsers}
+              sortBy={usersSortBy}
+              onSortByChange={(s) => { setUsersSortBy(s); setUsersPage(1); }}
+              statusFilter={usersStatusFilter}
+              onStatusFilterChange={(s) => { setUsersStatusFilter(s); setUsersPage(1); }}
+              authFilter={usersAuthFilter}
+              onAuthFilterChange={(a) => { setUsersAuthFilter(a); setUsersPage(1); }}
+              dateFrom={usersDateFrom}
+              onDateFromChange={setUsersDateFrom}
+              dateTo={usersDateTo}
+              onDateToChange={setUsersDateTo}
             />
           </>
         ) : (

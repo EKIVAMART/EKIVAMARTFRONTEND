@@ -25,9 +25,9 @@ import {
 } from 'lucide-react';
 
 const Divider = () => (
-  <div className="flex items-center gap-3 my-16">
+  <div className="flex items-center gap-3 my-24">
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-    <div className="w-1.5 h-1.5 rounded-full bg-[#c740b0]" />
+    <div className="w-1.5 h-1.5 rounded-full bg-[#a84f9a]" />
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
   </div>
 );
@@ -231,27 +231,39 @@ export default function MarketingSolutionsAnalyticsPage() {
     >
       {/* ══ HERO ══ */}
       <section className="relative min-h-[82vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
-        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#c740b0] opacity-20 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#3d0060] opacity-30 blur-[100px] pointer-events-none" />
-        <div className="absolute top-[30%] right-[15%] w-[28vw] h-[28vw] rounded-full bg-[#ff69e0] opacity-10 blur-[80px] pointer-events-none" />
+        {/* Rich purple background — slightly brighter, closer to brand primary button gradient */}
+        <div className="absolute inset-0 bg-[#350834]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#350834] via-[#1f0321] to-[#0d000e]" />
+        {/* Ambient glow orbs */}
+        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#7d1870] opacity-[0.25] blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#56154e] opacity-[0.30] blur-[110px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[5%] w-[30vw] h-[30vw] rounded-full bg-[#a84f9a] opacity-[0.12] blur-[90px] pointer-events-none" />
+        <div className="absolute top-[40%] right-[20%] w-[22vw] h-[22vw] rounded-full bg-[#d8acd1] opacity-[0.10] blur-[70px] pointer-events-none" />
 
-        <div className="absolute top-10 right-10 w-56 h-56 rounded-full border border-white/10 pointer-events-none" />
-        <div className="absolute top-16 right-16 w-40 h-40 rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute top-10 right-10 w-56 h-56 rounded-full border border-white/8 pointer-events-none" />
+        <div className="absolute top-16 right-16 w-40 h-40 rounded-full border border-white/8 pointer-events-none" />
         <div className="absolute bottom-10 left-6 w-72 h-72 rounded-full border border-white/5 pointer-events-none" />
-
+        {/* Fine diagonal grid */}
         <div
-          className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          className="absolute inset-0 opacity-[0.035] pointer-events-none"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 40px)',
+              'repeating-linear-gradient(135deg, #a84f9a 0px, #a84f9a 1px, transparent 1px, transparent 48px)',
+          }}
+        />
+        {/* Dot matrix overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.025] pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #a84f9a 1px, transparent 1px)',
+            backgroundSize: '36px 36px',
           }}
         />
 
-        <div className="absolute top-24 right-[8%] hidden lg:flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-semibold px-4 py-2 rounded-full border border-white/20 select-none">
+        <div className="absolute top-24 right-[8%] hidden lg:flex items-center gap-2 bg-white/8 backdrop-blur-sm text-white/75 text-xs font-semibold px-4 py-2 rounded-full border border-white/15 select-none">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Data-Driven Growth
         </div>
-        <div className="absolute top-40 right-[12%] hidden lg:flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-semibold px-4 py-2 rounded-full border border-white/20 select-none">
+        <div className="absolute top-40 right-[12%] hidden lg:flex items-center gap-2 bg-white/8 backdrop-blur-sm text-white/75 text-xs font-semibold px-4 py-2 rounded-full border border-white/15 select-none">
           <BarChart3 size={11} /> Real-Time Insights
         </div>
 
@@ -265,19 +277,52 @@ export default function MarketingSolutionsAnalyticsPage() {
 
             <FadeInSection type="fadeUp" delay={0.2}>
               <h1
-                className="text-white font-black uppercase leading-[0.92] tracking-tight lg:-skew-x-8 -skew-x-6 text-5xl md:text-7xl lg:text-[5.5rem] drop-shadow-[0_4px_32px_rgba(199,64,176,0.4)]"
-                style={{ fontFamily: "'Georgia', serif", textShadow: '0 2px 40px rgba(199,64,176,0.35)' }}
+                className="font-black uppercase leading-[1.1] tracking-tight lg:-skew-x-8 -skew-x-6 text-5xl md:text-7xl lg:text-[5.5rem]"
+                style={{ fontFamily: "'Georgia', serif" }}
               >
-                <TypingText text="Marketing" delay={300} typingSpeed={60} />
+                {/* "Marketing" — bright white with strong glow */}
+                <span
+                  className="inline-block"
+                  style={{
+                    color: '#ffffff',
+                    textShadow: '0 0 60px rgba(168,79,154,0.4), 0 2px 20px rgba(168,79,154,0.2)',
+                    filter: 'drop-shadow(0 0 24px rgba(168,79,154,0.35))',
+                  }}
+                >
+                  <TypingText text="Marketing" delay={300} typingSpeed={60} />
+                </span>
                 <br />
-                <span className="text-[#ff9eed]">
+                {/* "Solutions" — soft lavender/purple gradient */}
+                <span
+                  className="inline-block mr-4"
+                  style={{
+                    background: 'linear-gradient(90deg, #f4e9f2 0%, #d8acd1 45%, #c07db5 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    filter: 'drop-shadow(0 0 18px rgba(216,172,209,0.4))',
+                  }}
+                >
                   <TypingText text="Solutions" delay={900} typingSpeed={60} />
                 </span>
-                <span className="text-white/70">
-                  <TypingText text=" &" delay={1400} typingSpeed={60} />
+                <span
+                  className="inline-block mr-4"
+                  style={{ color: 'rgba(255,255,255,0.55)', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))' }}
+                >
+                  <TypingText text="&" delay={1400} typingSpeed={60} />
                 </span>
                 <br />
-                <span className="text-[#ff69e0]">
+                {/* "Analytics" — warm amber-gold, creating maximum contrast against the cool plum background */}
+                <span
+                  className="inline-block"
+                  style={{
+                    background: 'linear-gradient(90deg, #ffd54f 0%, #ffab40 35%, #ff7043 65%, #ff5252 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    filter: 'drop-shadow(0 0 22px rgba(255,112,67,0.5))',
+                  }}
+                >
                   <TypingText text="Analytics" delay={1600} typingSpeed={60} />
                 </span>
               </h1>
@@ -285,9 +330,9 @@ export default function MarketingSolutionsAnalyticsPage() {
 
             <FadeInSection type="fadeUp" delay={0.5}>
               <div className="mt-7 flex items-center gap-3">
-                <div className="h-[3px] w-16 rounded-full bg-[#ff69e0]" />
-                <div className="h-[3px] w-8 rounded-full bg-white/30" />
-                <div className="h-[3px] w-4 rounded-full bg-white/15" />
+                <div className="h-[3px] w-16 rounded-full" style={{ background: 'linear-gradient(90deg, #a84f9a, #ff7043)' }} />
+                <div className="h-[3px] w-8 rounded-full bg-white/25" />
+                <div className="h-[3px] w-4 rounded-full bg-white/12" />
               </div>
             </FadeInSection>
 
@@ -327,7 +372,7 @@ export default function MarketingSolutionsAnalyticsPage() {
 
       {/* ══ STATS RIBBON ══ */}
       <FadeInSection type="fade" delay={0.1}>
-        <div className="bg-gradient-to-r from-[#2d0029] via-[#6b0f6b] to-[#c800ff] py-6 px-6 md:px-12">
+        <div className="py-6 px-6 md:px-12" style={{ background: 'linear-gradient(135deg, #120010 0%, #1a0016 40%, #2b0129 70%, #120010 100%)' }}>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               { value: '3.2×', label: 'Avg. ROI Increase' },
@@ -357,7 +402,7 @@ export default function MarketingSolutionsAnalyticsPage() {
 
           <FadeInSection type="fadeUp" delay={0.15}>
             <div className="relative rounded-3xl overflow-hidden border border-[#e8b8e4] shadow-md bg-white mb-12">
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#c800ff] via-[#c740b0] to-[#c800ff]" />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#a84f9a] via-[#c740b0] to-[#a84f9a]" />
               <div className="px-8 md:px-12 py-8 md:py-10 pl-10 md:pl-14">
                 <p className="text-xs font-black uppercase tracking-[4px] text-[#c740b0] mb-3">Overview</p>
                 <p className="text-gray-700 text-base md:text-[17px] leading-relaxed">
@@ -561,9 +606,10 @@ export default function MarketingSolutionsAnalyticsPage() {
         {/* ── CTA BANNER ── */}
         <FadeInSection type="zoom" delay={0.1}>
           <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#c800ff]" />
-            <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#c740b0] opacity-20 blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#ff69e0] opacity-10 blur-[60px] pointer-events-none" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #a84f9a 0%, #7d1870 50%, #35082e 100%)' }} />
+            <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#7d1870] opacity-20 blur-[80px] pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#56154e] opacity-[0.10] blur-[60px] pointer-events-none" />
+            <div className="absolute top-[30%] left-[40%] w-48 h-48 rounded-full bg-[#a84f9a] opacity-[0.10] blur-[60px] pointer-events-none" />
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"
               style={{
@@ -581,9 +627,9 @@ export default function MarketingSolutionsAnalyticsPage() {
                   style={{ fontFamily: "'Georgia', serif" }}
                 >
                   Ready to scale<br />
-                  <span className="text-[#ff9eed]">your business?</span>
+                  <span className="text-[#f0c8ec]">your business?</span>
                 </h3>
-                <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-md">
+                <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-md">
                   Join thousands of Nigerian vendors already using Faflora&rsquo;s marketing and analytics tools to grow revenue, optimise operations, and build lasting customer relationships.
                 </p>
               </div>
