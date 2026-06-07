@@ -637,8 +637,8 @@ export default function AdminPage() {
   const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
   const hasAdminRole = authUser && (ADMIN_ROLES.includes(authUser.role) || SUPER_ADMIN_ROLES.includes(authUser.role));
 
-  // Mock Data 
-  const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
+  // Initialize products as empty array (will be populated from API)
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);

@@ -142,17 +142,6 @@ type CategoryRecord = {
 
 const PRODUCT_PAGE_LIMIT = 20;
 
-const fallbackProducts: AdminProduct[] = [
-  {
-    id: '1',
-    name: 'Lenovo Ideapad Slim 3',
-    price: 45000,
-    category: 'Electronics',
-    stock: 12,
-    image: '/laptop.jpg',
-  },
-];
-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value && typeof value === 'object');
 
@@ -652,7 +641,7 @@ export default function AdminPage() {
   const [productLoadError, setProductLoadError] = useState('');
   const [productPage, setProductPage] = useState(1);
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
-  const [productTotal, setProductTotal] = useState(fallbackProducts.length);
+  const [productTotal, setProductTotal] = useState(0);
   const [productTotalPages, setProductTotalPages] = useState(1);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [publishingProductId, setPublishingProductId] = useState<string | null>(null);
@@ -698,8 +687,8 @@ export default function AdminPage() {
   const [usersDateFrom, setUsersDateFrom] = useState('');
   const [usersDateTo, setUsersDateTo] = useState('');
 
-  // Mock Data 
-  const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
+  // Initialize products as empty array (will be populated from API)
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
@@ -907,11 +896,11 @@ export default function AdminPage() {
       setProductTotal(pagination.total);
       setProductTotalPages(pagination.totalPages);
     } catch (error) {
-      setProducts(fallbackProducts);
-      setProductTotal(fallbackProducts.length);
+      setProducts([]);
+      setProductTotal(0);
       setProductTotalPages(1);
       setProductLoadError(
-        getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+        getApiErrorMessage(error) || 'Could not load products. Please try again.'
       );
     } finally {
       setIsLoadingProducts(false);
@@ -949,11 +938,11 @@ export default function AdminPage() {
         setProductTotalPages(pagination.totalPages);
       } catch (error) {
         if (!isMounted) return;
-        setProducts(fallbackProducts);
-        setProductTotal(fallbackProducts.length);
+        setProducts([]);
+        setProductTotal(0);
         setProductTotalPages(1);
         setProductLoadError(
-          getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+          getApiErrorMessage(error) || 'Could not load products. Please try again.'
         );
       } finally {
         if (isMounted) {
