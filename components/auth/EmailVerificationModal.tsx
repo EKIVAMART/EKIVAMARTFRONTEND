@@ -88,7 +88,8 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
     } catch (err: unknown) {
       let errorMessage = 'Invalid verification code';
       if (err instanceof z.ZodError) {
-        errorMessage = err.errors[0]?.message || errorMessage;
+        // Use 'issues' instead of 'errors' for Zod v3+
+        errorMessage = err.issues[0]?.message || errorMessage;
       } else if (err instanceof Error) {
         errorMessage = err.message;
       }
@@ -117,8 +118,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       setExpiresIn(600); // Reset expiration to 10 minutes
       setOtp('');
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to resend code';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to resend code';
       toast.error(errorMessage);
     } finally {
       setResendLoading(false);
