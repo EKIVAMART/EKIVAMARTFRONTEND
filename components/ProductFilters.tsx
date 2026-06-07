@@ -91,7 +91,7 @@ const ProductFilters = ({
             <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gray-200 rounded-lg pointer-events-none"></div>
             {/* Active track */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 h-2 bg-blue-500 rounded-lg pointer-events-none"
+              className="absolute top-1/2 -translate-y-1/2 h-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg pointer-events-none"
               style={{
                 left: `${minPercentage}%`,
                 right: `${100 - maxPercentage}%`,
@@ -131,11 +131,11 @@ const ProductFilters = ({
           <div className="flex justify-between text-[11px] text-gray-600 pt-2">
             <span>
               From:{' '}
-              <span className="text-blue-500 font-semibold">₦ {minPrice}</span>
+              <span className="text-[#c800ff] font-semibold">₦ {minPrice}</span>
             </span>
             <span>
               To:{' '}
-              <span className="text-blue-500 font-semibold">₦ {maxPrice}</span>
+              <span className="text-[#c800ff] font-semibold">₦ {maxPrice}</span>
             </span>
           </div>
         </div>
@@ -168,6 +168,43 @@ const ProductFilters = ({
           ))}
         </div>
       </div>
+
+      <style>{`
+        .slider {
+          -webkit-appearance: none;
+          appearance: none;
+          outline: none;
+          background: transparent;
+          padding: 0;
+          margin: 0;
+        }
+        .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #c800ff, #912cad) !important;
+          cursor: pointer;
+          box-shadow: 0 1px 4px rgba(200, 0, 255, 0.4);
+          border: 2px solid #fff;
+          margin-top: -5px;
+        }
+        .slider::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #c800ff, #912cad) !important;
+          cursor: pointer;
+          box-shadow: 0 1px 4px rgba(200, 0, 255, 0.4);
+          border: 2px solid #fff;
+        }
+        .slider::-webkit-slider-thumb:hover,
+        .slider::-moz-range-thumb:hover {
+          background: linear-gradient(135deg, #d845ff, #a23cd6) !important;
+          box-shadow: 0 2px 6px rgba(200, 0, 255, 0.6);
+        }
+      `}</style>
     </div>
   );
 };

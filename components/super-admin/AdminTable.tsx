@@ -31,6 +31,16 @@ interface AdminTableProps {
   onUnblock?: (id: string) => void;
   onDelete?: (id: string) => void;
   onResendInvite?: (id: string) => void;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
+  isLoading?: boolean;
+  sortOrder?: 'asc' | 'desc';
+  onSortOrderChange?: (order: 'asc' | 'desc') => void;
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
 }
 
 const statusStyles = {
@@ -63,6 +73,18 @@ const statusStyles = {
 
 const allStatuses = ['All', 'pending', 'active', 'deactivated', 'blocked', 'deleted'];
 
+/** Tooltip wrapper for desktop — matches ProductTable/UserTable styling */
+const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="relative group/tip">
+    {children}
+    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50 transition-all">
+      {label}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
+    </div>
+  </div>
+);
+
 export default function AdminTable({ 
   data, 
   searchQuery = '', 
@@ -72,19 +94,46 @@ export default function AdminTable({
   onBlock,
   onUnblock,
   onDelete,
-  onResendInvite
+  onResendInvite,
+  currentPage: serverPage,
+  totalPages: serverTotalPages,
+  totalItems,
+  itemsPerPage = 10,
+  onPageChange,
+  isLoading = false,
+  sortOrder: serverSortOrder,
+  onSortOrderChange,
+  statusFilter: serverStatusFilter,
+  onStatusFilterChange,
 }: AdminTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [localPage, setLocalPage] = useState(1);
+  const [localSortOrder, setLocalSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [localStatusFilter, setLocalStatusFilter] = useState<string>('All');
   
-  const itemsPerPage = 10;
+  const isServerPaginated = Boolean(onPageChange);
+
+  const currentPage = serverPage !== undefined ? serverPage : localPage;
+  const sortOrder = serverSortOrder !== undefined ? serverSortOrder : localSortOrder;
+  const statusFilter = serverStatusFilter !== undefined ? serverStatusFilter : localStatusFilter;
+
+  const setStatusFilter = (val: string) => {
+    if (onStatusFilterChange) onStatusFilterChange(val);
+    else setLocalStatusFilter(val);
+  };
+  const setSortOrder = (val: 'asc' | 'desc') => {
+    if (onSortByChangeWrapper) onSortByChangeWrapper(val);
+    else setLocalSortOrder(val);
+  };
+
+  const onSortByChangeWrapper = (val: 'asc' | 'desc') => {
+    onSortOrderChange?.(val);
+  };
 
   const filteredAndSortedData = useMemo(() => {
     let result = [...data];
 
     // Search filter
-    if (searchQuery) {
+    if (!isServerPaginated && searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(admin => 
         admin.firstName?.toLowerCase().includes(query) ||
@@ -101,25 +150,54 @@ export default function AdminTable({
     }
 
     // Sort by invited date (newest first)
-    result.sort((a, b) => {
-      const dateA = new Date(a.invitedAt).getTime();
-      const dateB = new Date(b.invitedAt).getTime();
-      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
-    });
+    if (!isServerPaginated) {
+      result.sort((a, b) => {
+        const dateA = new Date(a.invitedAt).getTime();
+        const dateB = new Date(b.invitedAt).getTime();
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      });
+    }
 
     return result;
-  }, [data, searchQuery, statusFilter, sortOrder]);
+  }, [data, searchQuery, statusFilter, sortOrder, isServerPaginated]);
 
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
-  const paginatedData = filteredAndSortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages =
+    serverTotalPages || Math.ceil(filteredAndSortedData.length / itemsPerPage) || 1;
+
+  const paginatedData = isServerPaginated
+    ? filteredAndSortedData
+    : filteredAndSortedData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
+
+  const displayTotal = totalItems ?? filteredAndSortedData.length;
+  const showingFrom =
+    displayTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const showingTo = Math.min(
+    (currentPage - 1) * itemsPerPage + paginatedData.length,
+    displayTotal
+  );
+
+  const goToPage = (page: number) => {
+    const nextPage = Math.min(totalPages, Math.max(1, page));
+    if (isServerPaginated) {
+      onPageChange?.(nextPage);
+    } else {
+      setLocalPage(nextPage);
+    }
+  };
 
   const handleSortToggle = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    const nextOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortOrder(nextOrder);
   };
 
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
+    if (!isServerPaginated) {
+      setLocalPage(1);
+    }
+  }, [isServerPaginated, searchQuery, statusFilter]);
 
   const formatDate = (dateStr: string) => {
     try {
@@ -254,78 +332,85 @@ export default function AdminTable({
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-1">
                     {/* View Button */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onViewDetails?.(admin); }}
-                      className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
-                      title="View Details"
-                    >
-                      <Eye size={16} />
-                    </button>
+                    <Tooltip label="View Details">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onViewDetails?.(admin); }}
+                        className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    </Tooltip>
 
                     {/* Resend Invite - Only for pending */}
                     {admin.status === 'pending' && onResendInvite && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onResendInvite(admin.id); }}
-                        className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                        title="Resend Invite"
-                      >
-                        <Mail size={16} />
-                      </button>
+                      <Tooltip label="Resend Invite">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onResendInvite(admin.id); }}
+                          className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                        >
+                          <Mail size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Deactivate - Only for active */}
                     {admin.status === 'active' && onDeactivate && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onDeactivate(admin.id); }}
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
-                        title="Deactivate"
-                      >
-                        <PowerOff size={16} />
-                      </button>
+                      <Tooltip label="Deactivate">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDeactivate(admin.id); }}
+                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
+                        >
+                          <PowerOff size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Block - Only for active */}
                     {admin.status === 'active' && onBlock && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onBlock(admin.id); }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        title="Block Account"
-                      >
-                        <Ban size={16} />
-                      </button>
+                      <Tooltip label="Block Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onBlock(admin.id); }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Ban size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Unblock - Only for blocked */}
                     {admin.status === 'blocked' && onUnblock && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onUnblock(admin.id); }}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        title="Unblock Account"
-                      >
-                        <CheckCircle size={16} />
-                      </button>
+                      <Tooltip label="Unblock Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onUnblock(admin.id); }}
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Activate (Resend Invite) - Only for deactivated */}
                     {admin.status === 'deactivated' && onActivate && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onActivate(admin.id); }}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        title="Activate & Resend Invite"
-                      >
-                        <Power size={16} />
-                      </button>
+                      <Tooltip label="Activate Account">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onActivate(admin.id); }}
+                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                        >
+                          <Power size={16} />
+                        </button>
+                      </Tooltip>
                     )}
 
                     {/* Delete - Not for already deleted */}
                     {admin.status !== 'deleted' && onDelete && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(admin.id); }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        title="Delete Permanently"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <Tooltip label="Delete Permanently">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDelete(admin.id); }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </Tooltip>
                     )}
                   </div>
                 </td>
@@ -435,37 +520,55 @@ export default function AdminTable({
       </div>
 
       {/* Pagination Footer */}
-      {totalPages > 1 && (
+      {(totalPages > 1 || currentPage > 1) && (
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
           <span className="text-sm text-gray-500 font-medium hidden sm:block">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} entries
+            Showing {showingFrom} to {showingTo} of {displayTotal} entries
           </span>
           <div className="flex items-center gap-1 mx-auto sm:mx-0">
             <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1 || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronLeft size={18} />
             </button>
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button 
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                  currentPage === page 
-                    ? 'bg-gray-100 text-slate-800 font-bold' 
-                    : 'hover:bg-gray-50 text-gray-500'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {(() => {
+              const pages: number[] = [];
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - 2);
+              let end = Math.min(totalPages, currentPage + 2);
+
+              if (start === 1) {
+                end = Math.min(totalPages, maxVisible);
+              } else if (end === totalPages) {
+                start = Math.max(1, totalPages - maxVisible + 1);
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map(page => (
+                <button 
+                  key={page}
+                  onClick={() => goToPage(page)}
+                  disabled={isLoading}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
+                    currentPage === page 
+                      ? 'bg-gray-100 text-slate-800 font-bold' 
+                      : 'hover:bg-gray-50 text-gray-500'
+                  }`}
+                >
+                  {page}
+                </button>
+              ));
+            })()}
 
             <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronRight size={18} />

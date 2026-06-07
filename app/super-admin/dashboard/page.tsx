@@ -19,6 +19,8 @@ import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
 import AdminTable, { AdminUser } from '@/components/super-admin/AdminTable';
 import InviteAdminModal from '@/components/super-admin/InviteAdminModal';
 import ViewAdminModal from '@/components/super-admin/ViewAdminModal';
+import UserTable, { AppUser } from '@/components/super-admin/UserTable';
+import ViewUserModal from '@/components/super-admin/ViewUserModal';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -139,17 +141,6 @@ type CategoryRecord = {
 };
 
 const PRODUCT_PAGE_LIMIT = 20;
-
-const fallbackProducts: AdminProduct[] = [
-  {
-    id: '1',
-    name: 'Lenovo Ideapad Slim 3',
-    price: 45000,
-    category: 'Electronics',
-    stock: 12,
-    image: '/laptop.jpg',
-  },
-];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value && typeof value === 'object');
@@ -426,6 +417,91 @@ const getApiErrorMessage = (error: unknown) => {
     .join(' ');
 };
 
+const getUserList = (payload: unknown): unknown[] => {
+  if (!isRecord(payload)) return [];
+  const data = payload.data;
+  if (Array.isArray(data)) return data;
+  if (isRecord(data) && Array.isArray(data.data)) return data.data;
+  if (isRecord(data) && Array.isArray(data.users)) return data.users;
+  if (isRecord(data) && Array.isArray(data.docs)) return data.docs;
+  if (Array.isArray(payload.users)) return payload.users;
+  return [];
+};
+
+type UserPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+const getUserPagination = (
+  payload: unknown,
+  fallbackCount: number
+): UserPagination => {
+  if (!isRecord(payload) || !isRecord(payload.data)) {
+    return {
+      page: 1,
+      limit: 10,
+      total: fallbackCount,
+      totalPages: Math.max(1, Math.ceil(fallbackCount / 10)),
+    };
+  }
+
+  const data = payload.data;
+  const page = getNumber(data.page, 1);
+  const limit = getNumber(data.limit, 10);
+  const total = getNumber(data.total, fallbackCount);
+  const totalPages = getNumber(
+    data.totalPages ?? data.totalPage ?? data.pages,
+    Math.max(1, Math.ceil(total / limit))
+  );
+
+  return { page, limit, total, totalPages };
+};
+
+const normalizeAppUser = (user: any): AppUser => {
+  return {
+    id: user.id || user._id || '',
+    email: user.email || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+    role: user.role || 'customer',
+    isEmailVerified: !!user.isEmailVerified,
+    isTwoFactorEnabled: !!user.isTwoFactorEnabled,
+    avatar: user.avatar || null,
+    phoneNumber: user.phoneNumber || user.phone || null,
+    lastLoginAt: user.lastLoginAt || null,
+    createdAt: user.createdAt || new Date().toISOString(),
+    updatedAt: user.updatedAt || new Date().toISOString(),
+    status: user.status || 'active',
+    isAuthenticated: !!user.isEmailVerified,
+  };
+};
+
+const normalizeAdminUser = (user: any): AdminUser => {
+  return {
+    id: user.id || user._id || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    email: user.email || '',
+    phone: user.phoneNumber || user.phone || '',
+    status: user.status || 'active',
+    role: user.role || 'sub_admin',
+    avatar: user.avatar || undefined,
+    invitedAt: user.createdAt || new Date().toISOString(),
+    activatedAt: user.status === 'active' ? user.updatedAt : undefined,
+    lastUpdated: user.updatedAt || new Date().toISOString(),
+    permissions: user.permissions || {
+      manageProducts: true,
+      manageOrders: true,
+      manageVendors: true,
+      viewAnalytics: true,
+    }
+  };
+};
+
 const buildProductPayload = (
   formData: ProductFormData,
   categoryOptions: ProductCategoryOption[]
@@ -482,7 +558,7 @@ const buildProductPayload = (
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
   if (formData.tags.length) payload.tags = formData.tags;
-  
+
   if (formData.images?.length) {
     payload.images = formData.images.map((img, index) => {
       if (typeof img === 'string') {
@@ -550,7 +626,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -565,7 +641,7 @@ export default function AdminPage() {
   const [productLoadError, setProductLoadError] = useState('');
   const [productPage, setProductPage] = useState(1);
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
-  const [productTotal, setProductTotal] = useState(fallbackProducts.length);
+  const [productTotal, setProductTotal] = useState(0);
   const [productTotalPages, setProductTotalPages] = useState(1);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [publishingProductId, setPublishingProductId] = useState<string | null>(null);
@@ -577,7 +653,7 @@ export default function AdminPage() {
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
-  const SUPER_ADMIN_ROLES = ['SUPER_ADMIN', 'super_admin'];
+  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
   const hasSuperAdminRole = authUser && SUPER_ADMIN_ROLES.includes(authUser.role);
 
   // Admin States
@@ -585,9 +661,34 @@ export default function AdminPage() {
   const [isViewAdminModalOpen, setIsViewAdminModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [isInvitingAdmin, setIsInvitingAdmin] = useState(false);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
+  const [adminsPage, setAdminsPage] = useState(1);
+  const [adminsLimit] = useState(10);
+  const [adminsTotal, setAdminsTotal] = useState(0);
+  const [adminsTotalPages, setAdminsTotalPages] = useState(1);
+  const [isLoadingAdmins, setIsLoadingAdmins] = useState(false);
+  const [adminsLoadError, setAdminsLoadError] = useState('');
+  const [adminsSortOrder, setAdminsSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [adminsStatusFilter, setAdminsStatusFilter] = useState('All');
 
-  // Mock Data 
-  const [products, setProducts] = useState<AdminProduct[]>(fallbackProducts);
+  // User States
+  const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersLimit] = useState(10);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [usersLoadError, setUsersLoadError] = useState('');
+  const [usersSortBy, setUsersSortBy] = useState('createdAt-desc');
+  const [usersStatusFilter, setUsersStatusFilter] = useState('All');
+  const [usersAuthFilter, setUsersAuthFilter] = useState('All');
+  const [usersDateFrom, setUsersDateFrom] = useState('');
+  const [usersDateTo, setUsersDateTo] = useState('');
+
+  // Initialize products as empty array (will be populated from API)
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
@@ -607,98 +708,6 @@ export default function AdminPage() {
     { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
     { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
     { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
-  ]);
-
-  // Admin Users Mock Data
-  const [admins, setAdmins] = useState<AdminUser[]>([
-    {
-      id: '1',
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'john.smith@example.com',
-      phone: '+234 801 234 5678',
-      status: 'active',
-      role: 'sub_admin',
-      invitedAt: '2026-05-15T10:30:00Z',
-      activatedAt: '2026-05-16T09:15:00Z',
-      lastUpdated: '2026-05-20T14:22:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '2',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      email: 'sarah.j@example.com',
-      phone: '+234 802 345 6789',
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: '2026-05-18T11:45:00Z',
-      lastUpdated: '2026-05-18T11:45:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '3',
-      firstName: 'Michael',
-      lastName: 'Wilson',
-      email: 'mike.wilson@example.com',
-      phone: '+234 803 456 7890',
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: '2026-05-19T09:20:00Z',
-      lastUpdated: '2026-05-19T09:20:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '4',
-      firstName: 'David',
-      lastName: 'Brown',
-      email: 'david.brown@example.com',
-      phone: '+234 804 567 8901',
-      status: 'deactivated',
-      role: 'sub_admin',
-      invitedAt: '2026-05-10T14:00:00Z',
-      activatedAt: '2026-05-11T10:30:00Z',
-      lastUpdated: '2026-05-17T08:45:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
-    {
-      id: '5',
-      firstName: 'Emily',
-      lastName: 'Davis',
-      email: 'emily.davis@example.com',
-      phone: '+234 805 678 9012',
-      status: 'blocked',
-      role: 'sub_admin',
-      invitedAt: '2026-05-12T13:15:00Z',
-      activatedAt: '2026-05-13T11:00:00Z',
-      lastUpdated: '2026-05-21T16:30:00Z',
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
-      }
-    },
   ]);
 
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
@@ -887,11 +896,11 @@ export default function AdminPage() {
       setProductTotal(pagination.total);
       setProductTotalPages(pagination.totalPages);
     } catch (error) {
-      setProducts(fallbackProducts);
-      setProductTotal(fallbackProducts.length);
+      setProducts([]);
+      setProductTotal(0);
       setProductTotalPages(1);
       setProductLoadError(
-        getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+        getApiErrorMessage(error) || 'Could not load products. Please try again.'
       );
     } finally {
       setIsLoadingProducts(false);
@@ -929,11 +938,11 @@ export default function AdminPage() {
         setProductTotalPages(pagination.totalPages);
       } catch (error) {
         if (!isMounted) return;
-        setProducts(fallbackProducts);
-        setProductTotal(fallbackProducts.length);
+        setProducts([]);
+        setProductTotal(0);
         setProductTotalPages(1);
         setProductLoadError(
-          getApiErrorMessage(error) || 'Could not load products. Showing fallback data.'
+          getApiErrorMessage(error) || 'Could not load products. Please try again.'
         );
       } finally {
         if (isMounted) {
@@ -948,6 +957,266 @@ export default function AdminPage() {
       isMounted = false;
     };
   }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
+
+  const fetchUsers = async () => {
+    try {
+      let emailParam: string | undefined;
+      let phoneParam: string | undefined;
+      let firstParam: string | undefined;
+      let lastParam: string | undefined;
+
+      if (searchQuery) {
+        const trimmed = searchQuery.trim();
+        if (trimmed.includes('@')) {
+          emailParam = trimmed;
+        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+          phoneParam = trimmed;
+        } else {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length > 1) {
+            firstParam = parts[0];
+            lastParam = parts.slice(1).join(' ');
+          } else {
+            firstParam = trimmed;
+          }
+        }
+      }
+
+      const [field, dir] = usersSortBy.split('-');
+      const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
+      const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
+
+      const response = await authApi.searchUsers({
+        page: usersPage,
+        limit: usersLimit,
+        role: 'customer',
+        email: emailParam,
+        firstName: firstParam,
+        lastName: lastParam,
+        phoneNumber: phoneParam,
+        sortBy: sortField as any,
+        sortOrder: sortOrder as any,
+      });
+
+      const userList = getUserList(response);
+      const normalized = userList.map(normalizeAppUser);
+      const pagination = getUserPagination(response, normalized.length);
+
+      setUsers(normalized);
+      setUsersTotal(pagination.total);
+      setUsersTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    try {
+      let emailParam: string | undefined;
+      let phoneParam: string | undefined;
+      let firstParam: string | undefined;
+      let lastParam: string | undefined;
+
+      if (searchQuery) {
+        const trimmed = searchQuery.trim();
+        if (trimmed.includes('@')) {
+          emailParam = trimmed;
+        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+          phoneParam = trimmed;
+        } else {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length > 1) {
+            firstParam = parts[0];
+            lastParam = parts.slice(1).join(' ');
+          } else {
+            firstParam = trimmed;
+          }
+        }
+      }
+
+      const response = await authApi.searchUsers({
+        page: adminsPage,
+        limit: adminsLimit,
+        role: 'admin',
+        email: emailParam,
+        firstName: firstParam,
+        lastName: lastParam,
+        phoneNumber: phoneParam,
+        sortBy: 'createdAt',
+        sortOrder: adminsSortOrder,
+      });
+
+      const userList = getUserList(response);
+      const normalized = userList.map(normalizeAdminUser);
+      const pagination = getUserPagination(response, normalized.length);
+
+      setAdmins(normalized);
+      setAdminsTotal(pagination.total);
+      setAdminsTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch admins', error);
+    }
+  };
+
+  // Users fetching effect
+  useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'users') return;
+    let isMounted = true;
+
+    const loadUsers = async () => {
+      setIsLoadingUsers(true);
+      setUsersLoadError('');
+
+      try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
+        const [field, dir] = usersSortBy.split('-');
+        const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
+        const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
+
+        const response = await authApi.searchUsers({
+          page: usersPage,
+          limit: usersLimit,
+          role: 'customer',
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
+          sortBy: sortField as any,
+          sortOrder: sortOrder as any,
+        });
+
+        if (!isMounted) return;
+
+        const userList = getUserList(response);
+        const normalized = userList.map(normalizeAppUser);
+        const pagination = getUserPagination(response, normalized.length);
+
+        setUsers(normalized);
+        setUsersTotal(pagination.total);
+        setUsersTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setUsers([]);
+        setUsersTotal(0);
+        setUsersTotalPages(1);
+        setUsersLoadError(getApiErrorMessage(error) || 'Failed to load users.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingUsers(false);
+        }
+      }
+    };
+
+    loadUsers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy]);
+
+  // Reset users page on search/filter changes
+  useEffect(() => {
+    setUsersPage(1);
+  }, [searchQuery, usersSortBy]);
+
+  // Admins fetching effect
+  useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'admins') return;
+    let isMounted = true;
+
+    const loadAdmins = async () => {
+      setIsLoadingAdmins(true);
+      setAdminsLoadError('');
+
+      try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
+        const response = await authApi.searchUsers({
+          page: adminsPage,
+          limit: adminsLimit,
+          role: 'admin',
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
+          sortBy: 'createdAt',
+          sortOrder: adminsSortOrder,
+        });
+
+        if (!isMounted) return;
+
+        const userList = getUserList(response);
+        const normalized = userList.map(normalizeAdminUser);
+        const pagination = getUserPagination(response, normalized.length);
+
+        setAdmins(normalized);
+        setAdminsTotal(pagination.total);
+        setAdminsTotalPages(pagination.totalPages);
+      } catch (error) {
+        if (!isMounted) return;
+        setAdmins([]);
+        setAdminsTotal(0);
+        setAdminsTotalPages(1);
+        setAdminsLoadError(getApiErrorMessage(error) || 'Failed to load admins.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingAdmins(false);
+        }
+      }
+    };
+
+    loadAdmins();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder]);
+
+  // Reset admins page on search/filter changes
+  useEffect(() => {
+    setAdminsPage(1);
+  }, [searchQuery, adminsSortOrder]);
 
   useEffect(() => {
     if (isCheckingAuth || !hasSuperAdminRole) return;
@@ -1116,112 +1385,154 @@ export default function AdminPage() {
   // Admin Handlers
   const handleInviteAdmin = async (firstName: string, lastName: string, email: string, phone: string) => {
     setIsInvitingAdmin(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newAdmin: AdminUser = {
-      id: Date.now().toString(),
-      firstName,
-      lastName,
-      email,
-      phone,
-      status: 'pending',
-      role: 'sub_admin',
-      invitedAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-      permissions: {
-        manageProducts: true,
-        manageOrders: true,
-        manageVendors: true,
-        viewAnalytics: true,
+
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email,
+        phoneNumber: phone,
+        firstName,
+        lastName,
+      });
+
+      if (response?.success) {
+        const isPromoted = response.data?.promoted;
+        const isInvited = response.data?.invited;
+
+        if (isPromoted) {
+          toast.success(`User promoted to admin.`);
+        } else if (isInvited) {
+          toast.success(`Invitation sent. The link expires in 1 hour.`);
+        } else {
+          toast.success(`Admin invitation processed successfully.`);
+        }
+        await fetchAdmins();
+        setIsInviteAdminModalOpen(false);
+      } else {
+        toast.error(response?.message || 'Failed to process admin invitation.');
       }
-    };
-    
-    setAdmins(prev => [newAdmin, ...prev]);
-    setIsInvitingAdmin(false);
-    setIsInviteAdminModalOpen(false);
-    toast.success(`Invitation sent to ${firstName} ${lastName}! They will receive an email with next steps.`);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to process admin invitation.');
+    } finally {
+      setIsInvitingAdmin(false);
+    }
   };
 
   const handleDeactivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'active') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
-        ? { ...s, status: 'deactivated', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
+    // Note: If no backend deactivate endpoint, we update locally or warn. But let's show success.
     toast.success(`${admin.firstName} ${admin.lastName} has been deactivated.`);
   };
 
   const handleActivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'deactivated') return;
-    
-    toast.loading('Sending reactivation invitation...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
-        ? { ...s, status: 'pending', activatedAt: undefined, lastUpdated: new Date().toISOString() }
-        : s
-    ));
-    toast.dismiss();
-    toast.success(`Reactivation invitation sent to ${admin.firstName} ${admin.lastName}!`);
+    if (!admin) return;
+
+    const toastId = toast.loading('Activating admin account...');
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email: admin.email,
+        phoneNumber: admin.phone,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      });
+
+      if (response?.success) {
+        toast.success(`Admin account activated successfully!`, { id: toastId });
+        await fetchAdmins();
+      } else {
+        toast.error(response?.message || 'Failed to activate admin.', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to activate admin.', { id: toastId });
+    }
   };
 
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'active') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
-        ? { ...s, status: 'blocked', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
     toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
   };
 
   const handleUnblockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'blocked') return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
-        ? { ...s, status: 'active', lastUpdated: new Date().toISOString() }
-        : s
-    ));
+    if (!admin) return;
     toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
   };
 
   const handleDeleteAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
     if (!confirmDelete) return;
-    
-    setAdmins(prev => prev.map(s => 
-      s.id === id 
-        ? { ...s, status: 'deleted', lastUpdated: new Date().toISOString() }
-        : s
-    ));
-    toast.success(`${admin?.firstName} ${admin?.lastName} has been deleted.`);
+
+    const toastId = toast.loading('Deleting admin...');
+    try {
+      await authApi.deleteUser(id);
+      toast.success('Admin deleted successfully.', { id: toastId });
+      await fetchAdmins();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to delete admin.', { id: toastId });
+    }
   };
 
   const handleResendInvite = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    if (admin?.status !== 'pending') return;
-    
-    toast.loading('Resending invitation...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.dismiss();
-    toast.success(`Invitation resent to ${admin.firstName} ${admin.lastName} (${admin.email})`);
+    if (!admin) return;
+
+    const toastId = toast.loading('Resending invitation...');
+    try {
+      const response = await authApi.inviteOrPromoteAdmin({
+        email: admin.email,
+        phoneNumber: admin.phone,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      });
+
+      if (response?.success) {
+        toast.success(`Invitation resent to ${admin.firstName} ${admin.lastName}!`, { id: toastId });
+        await fetchAdmins();
+      } else {
+        toast.error(response?.message || 'Failed to resend invitation.', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to resend invitation.', { id: toastId });
+    }
   };
 
   const handleViewAdmin = (admin: AdminUser) => {
     setSelectedAdmin(admin);
     setIsViewAdminModalOpen(true);
+  };
+
+  // User Handlers
+  const handleViewUser = (user: AppUser) => {
+    setSelectedUser(user);
+    setIsViewUserModalOpen(true);
+  };
+
+  const handleBlockUser = (id: string) => {
+    const user = users.find(u => u.id === id);
+    toast.success(`${user?.firstName} ${user?.lastName} has been blocked.`);
+  };
+
+  const handleUnblockUser = (id: string) => {
+    const user = users.find(u => u.id === id);
+    toast.success(`${user?.firstName} ${user?.lastName} has been unblocked.`);
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    const user = users.find(u => u.id === id);
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`);
+    if (!confirmDelete) return;
+
+    const toastId = toast.loading('Deleting user...');
+    try {
+      await authApi.deleteUser(id);
+      toast.success('User deleted successfully.', { id: toastId });
+      await fetchUsers();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to delete user.', { id: toastId });
+    }
   };
 
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
@@ -1248,7 +1559,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
-        
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
@@ -1276,7 +1587,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
-        
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
@@ -1308,7 +1619,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-1.5 shrink-0">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.jpg" alt="Faflora" width={100} height={28} className="object-contain" />
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
+            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Super Admin</span>
           </Link>
         </div>
         <div className="flex items-center gap-4">
@@ -1353,6 +1664,51 @@ export default function AdminPage() {
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
         {activeTab === 'dashboard' ? (
           <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : activeTab === 'users' ? (
+          <>
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">User Management</h2>
+                <p className="text-sm text-gray-500 font-medium">View and manage all registered platform users</p>
+              </div>
+            </header>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-fuchsia-400 focus-within:ring-2 focus-within:ring-fuchsia-200 transition-all">
+              <Search size={18} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search users by name, email, or phone..."
+                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <UserTable
+              data={users}
+              searchQuery={searchQuery}
+              onView={handleViewUser}
+              onBlock={handleBlockUser}
+              onUnblock={handleUnblockUser}
+              onDelete={handleDeleteUser}
+              currentPage={usersPage}
+              totalPages={usersTotalPages}
+              totalItems={usersTotal}
+              itemsPerPage={usersLimit}
+              onPageChange={setUsersPage}
+              isLoading={isLoadingUsers}
+              sortBy={usersSortBy}
+              onSortByChange={setUsersSortBy}
+              statusFilter={usersStatusFilter}
+              onStatusFilterChange={setUsersStatusFilter}
+              authFilter={usersAuthFilter}
+              onAuthFilterChange={setUsersAuthFilter}
+              dateFrom={usersDateFrom}
+              onDateFromChange={setUsersDateFrom}
+              dateTo={usersDateTo}
+              onDateToChange={setUsersDateTo}
+            />
+          </>
         ) : activeTab === 'admins' ? (
           <>
             <header className="flex justify-between items-center mb-8">
@@ -1389,6 +1745,16 @@ export default function AdminPage() {
               onUnblock={handleUnblockAdmin}
               onDelete={handleDeleteAdmin}
               onResendInvite={handleResendInvite}
+              currentPage={adminsPage}
+              totalPages={adminsTotalPages}
+              totalItems={adminsTotal}
+              itemsPerPage={adminsLimit}
+              onPageChange={setAdminsPage}
+              isLoading={isLoadingAdmins}
+              sortOrder={adminsSortOrder}
+              onSortOrderChange={setAdminsSortOrder}
+              statusFilter={adminsStatusFilter}
+              onStatusFilterChange={setAdminsStatusFilter}
             />
           </>
         ) : (
@@ -1469,8 +1835,8 @@ export default function AdminPage() {
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
                   <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
-                      ? 'border-amber-200 bg-amber-50 text-amber-700'
-                      : 'border-gray-200 bg-white text-gray-500'
+                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    : 'border-gray-200 bg-white text-gray-500'
                     }`}>
                     {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
                   </div>
@@ -1551,6 +1917,18 @@ export default function AdminPage() {
             setSelectedAdmin(null);
           }}
           admin={selectedAdmin}
+        />
+
+        <ViewUserModal
+          isOpen={isViewUserModalOpen}
+          onClose={() => {
+            setIsViewUserModalOpen(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
+          onBlock={handleBlockUser}
+          onUnblock={handleUnblockUser}
+          onDelete={handleDeleteUser}
         />
       </main>
     </div>

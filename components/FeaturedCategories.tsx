@@ -20,9 +20,12 @@ const categoryAssetMap: Record<string, any> = {
   'bags': bags,
   'footwear': footwear,
   'groceries': groceries,
+  'groceries and food': groceries,
   'beauty': beauty,
   'wellness': wellness,
   'jewellery': jewellery,
+  'local market': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23fef3c7"/><text y=".9em" font-size="60" x="50%" text-anchor="middle" dominant-baseline="middle" dy="0.1em">🛒</text></svg>',
+  'drinks': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23dbeafe"/><text y=".9em" font-size="60" x="50%" text-anchor="middle" dominant-baseline="middle" dy="0.1em">🥤</text></svg>',
 };
 
 const bgClasses = [

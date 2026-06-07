@@ -51,6 +51,18 @@ const getStatusBadge = (status?: Product['status']) => {
   );
 };
 
+/** Tooltip wrapper for desktop */
+const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="relative group/tip">
+    {children}
+    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50 transition-all">
+      {label}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
+    </div>
+  </div>
+);
+
 export default function ProductTable({
   data,
   onEdit,
@@ -250,29 +262,37 @@ export default function ProductTable({
                   {formatDate(p.updatedAt)}
                 </td>
                 <td className="p-4 text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-1">
                     {p.status === 'draft' && onPublish && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
-                        disabled={publishingProductId === p.id}
-                        className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
-                      >
-                        {publishingProductId === p.id ? (
-                          <>
-                            <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            Publishing…
-                          </>
-                        ) : 'Publish'}
-                      </button>
+                      <Tooltip label="Publish Product">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
+                          disabled={publishingProductId === p.id}
+                          className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
+                        >
+                          {publishingProductId === p.id ? (
+                            <>
+                              <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                              </svg>
+                              Publishing…
+                            </>
+                          ) : 'Publish'}
+                        </button>
+                      </Tooltip>
                     )}
                     {onView && (
-                      <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="p-2 hover:bg-emerald-50 text-emerald-500 rounded-lg transition"><Eye size={18}/></button>
+                      <Tooltip label="View Details">
+                        <button onClick={(e) => { e.stopPropagation(); onView(p); }} className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"><Eye size={16}/></button>
+                      </Tooltip>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={18}/></button>
-                    <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={18}/></button>
+                    <Tooltip label="Edit Product">
+                      <button onClick={(e) => { e.stopPropagation(); onEdit(p); }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition"><Edit3 size={16}/></button>
+                    </Tooltip>
+                    <Tooltip label="Delete Product">
+                      <button onClick={(e) => { e.stopPropagation(); onDelete(p.id); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={16}/></button>
+                    </Tooltip>
                   </div>
                 </td>
               </tr>
@@ -372,20 +392,37 @@ export default function ProductTable({
               <ChevronLeft size={18} />
             </button>
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button 
-                key={page}
-                onClick={() => goToPage(page)}
-                disabled={isLoading}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                  currentPage === page 
-                    ? 'bg-gray-100 text-slate-800 font-bold' 
-                    : 'hover:bg-gray-50 text-gray-500'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {(() => {
+              const pages: number[] = [];
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - 2);
+              let end = Math.min(totalPages, currentPage + 2);
+
+              if (start === 1) {
+                end = Math.min(totalPages, maxVisible);
+              } else if (end === totalPages) {
+                start = Math.max(1, totalPages - maxVisible + 1);
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map(page => (
+                <button 
+                  key={page}
+                  onClick={() => goToPage(page)}
+                  disabled={isLoading}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
+                    currentPage === page 
+                      ? 'bg-gray-100 text-slate-800 font-bold' 
+                      : 'hover:bg-gray-50 text-gray-500'
+                  }`}
+                >
+                  {page}
+                </button>
+              ));
+            })()}
 
             <button 
               onClick={() => goToPage(currentPage + 1)}

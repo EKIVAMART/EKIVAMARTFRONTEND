@@ -406,11 +406,11 @@ export const authApi = {
   },
 
   // OTP Verification Endpoints
-  async verifyEmailOTP(data: { email: string; otp: string }) {
+  async verifyEmailOTP(data: { email: string; otpCode: string }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
         '/auth/verify-email-otp',
-        data
+        { email: data.email, otpCode: data.otpCode }
       );
       return response.data;
     } catch (error) {
@@ -418,11 +418,11 @@ export const authApi = {
     }
   },
 
-  async resetPassword(data: { token: string; newPassword: string }) {
+  async resetPassword(data: { otpCode: string; newPassword: string }) {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
         '/auth/reset-password',
-        data
+        { otpCode: data.otpCode, newPassword: data.newPassword }
       );
       return response.data;
     } catch (error) {
@@ -448,6 +448,74 @@ export const authApi = {
 
   async facebookLogin() {
     redirectToAuthProvider('/auth/facebook');
+  },
+
+  async inviteOrPromoteAdmin(data: {
+    email: string;
+    phoneNumber: string;
+    firstName: string;
+    lastName: string;
+  }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/admin/invitations',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async completeAdminInvitation(data: {
+    token: string;
+    password: string;
+  }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/auth/admin/invitations/complete',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async searchUsers(params: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    role?: 'customer' | 'vendor' | 'admin' | 'super-admin';
+    page?: number;
+    limit?: number;
+    sortBy?: 'createdAt' | 'updatedAt';
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/auth/users?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteUser(id: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 };
 

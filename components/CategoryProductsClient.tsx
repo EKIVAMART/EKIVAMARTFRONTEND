@@ -82,39 +82,55 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
               <div className="mt-6">
                 <h4 className="font-semibold text-gray-500 mb-3">Filter by price</h4>
                 <div className="p-3 bg-white rounded-lg border border-gray-100">
-                  <div className="text-sm text-gray-600 mb-2">From: <span className="text-[#c800ff] font-semibold">{currency} {minValue}</span></div>
-                  <div className="text-sm text-gray-600 mb-4">To: <span className="text-[#c800ff] font-semibold">{currency} {maxValue}</span></div>
-  
-                  <div className="space-y-2">
-                    <input
-                      aria-label="Minimum price"
-                      type="range"
-                      min={globalMin}
-                      max={globalMax}
-                      value={minValue}
-                      onChange={(e) => handleMinChange(Number(e.target.value))}
-                      className="w-full"
+                  <div className="text-sm text-gray-600 mb-1">From: <span className="text-[#c800ff] font-semibold">{currency} {minValue}</span></div>
+                  <div className="text-sm text-gray-600 mb-3">To: <span className="text-[#c800ff] font-semibold">{currency} {maxValue}</span></div>
+
+                  {/* Dual range slider with purple gradient track */}
+                  <div className="relative py-4">
+                    {/* Background track */}
+                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gray-200 rounded-lg pointer-events-none" />
+                    {/* Active gradient track */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 h-2 rounded-lg pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(to right, #c800ff, #912cad)',
+                        left: globalMax > globalMin ? `${((minValue - globalMin) / (globalMax - globalMin)) * 100}%` : '0%',
+                        right: globalMax > globalMin ? `${100 - ((maxValue - globalMin) / (globalMax - globalMin)) * 100}%` : '0%',
+                      }}
                     />
-  
-                    <input
-                      aria-label="Maximum price"
-                      type="range"
-                      min={globalMin}
-                      max={globalMax}
-                      value={maxValue}
-                      onChange={(e) => handleMaxChange(Number(e.target.value))}
-                      className="w-full"
-                    />
-  
-                    <div className="flex items-center gap-2 mt-3">
-                      <button
-                        className="px-3 py-2 rounded-md bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-sm"
-                        onClick={() => { setMinValue(globalMin); setMaxValue(globalMax); }}
-                      >
-                        Reset
-                      </button>
-                      <div className="text-sm text-gray-500">Showing <span className="text-[#c800ff] font-semibold">{filtered.length}</span></div>
+                    <div className="relative w-full h-2">
+                      <input
+                        aria-label="Minimum price"
+                        type="range"
+                        min={globalMin}
+                        max={globalMax}
+                        value={minValue}
+                        onChange={(e) => handleMinChange(Number(e.target.value))}
+                        className="absolute w-full h-2 top-0 appearance-none cursor-pointer pointer-events-auto cat-slider"
+                        style={{ zIndex: minValue > (globalMin + globalMax) / 2 ? 1 : 0 }}
+                      />
+                      <input
+                        aria-label="Maximum price"
+                        type="range"
+                        min={globalMin}
+                        max={globalMax}
+                        value={maxValue}
+                        onChange={(e) => handleMaxChange(Number(e.target.value))}
+                        className="absolute w-full h-2 top-0 appearance-none cursor-pointer pointer-events-auto cat-slider"
+                        style={{ zIndex: maxValue < (globalMin + globalMax) / 2 ? 0 : 1 }}
+                      />
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-1">
+                    <button
+                      className="px-3 py-2 rounded-md text-white text-sm font-medium"
+                      style={{ background: 'linear-gradient(to right, #c800ff, #912cad)' }}
+                      onClick={() => { setMinValue(globalMin); setMaxValue(globalMax); }}
+                    >
+                      Reset
+                    </button>
+                    <div className="text-sm text-gray-500">Showing <span className="text-[#c800ff] font-semibold">{filtered.length}</span></div>
                   </div>
                 </div>
               </div>
@@ -159,6 +175,29 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
         @media (min-width: 768px) {
           :global(.pc-card) { max-width: 100%; }
         }
+        .cat-slider { background: transparent; }
+        .cat-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #c800ff, #912cad);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 1px 4px rgba(200,0,255,0.4);
+        }
+        .cat-slider::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #c800ff, #912cad);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 1px 4px rgba(200,0,255,0.4);
+        }
+        .cat-slider::-webkit-slider-runnable-track { background: transparent; }
+        .cat-slider::-moz-range-track { background: transparent; }
       `}</style>
     </div>
   );

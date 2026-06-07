@@ -67,6 +67,7 @@ export default function ProductsSection() {
   const [subcategoryIdMap, setSubcategoryIdMap] = useState<Record<string, string>>({});
 
   // 8 Specific popular product chips requested by the user
+  // 9 Specific popular product chips requested by the user
   const CATEGORY_TABS = [
     'Smartphones',
     'Sneakers',
@@ -74,8 +75,9 @@ export default function ProductsSection() {
     'Skincare',
     'Laptops',
     'T-Shirts',
-    'Fragrances',
-    'Rice'
+    'Local Market',
+    'Drinks',
+    'Fragrances'
   ];
 
   const findMatchingSubcategory = (chip: string, allSubcategories: any[]) => {
@@ -133,10 +135,15 @@ export default function ProductsSection() {
         const nameNorm = sub.name.toLowerCase();
         return nameNorm.includes('perfume') || nameNorm.includes('fragrance') || nameNorm.includes('scent') || nameNorm.includes('beauty');
       });
-    } else if (chipNorm === 'rice') {
+    } else if (chipNorm === 'localmarket') {
       matched = allSubcategories.find(sub => {
         const nameNorm = sub.name.toLowerCase();
-        return nameNorm.includes('rice') || nameNorm.includes('grocery') || nameNorm.includes('groceries') || nameNorm.includes('grain');
+        return nameNorm.includes('market') || nameNorm.includes('local');
+      });
+    } else if (chipNorm === 'drinks') {
+      matched = allSubcategories.find(sub => {
+        const nameNorm = sub.name.toLowerCase();
+        return nameNorm.includes('drink') || nameNorm.includes('beverage') || nameNorm.includes('soda') || nameNorm.includes('juice') || nameNorm.includes('water');
       });
     }
 
@@ -169,6 +176,15 @@ export default function ProductsSection() {
         const parents = publishedData.filter((item: any) => !item.parentId);
 
         const allSubs: any[] = [];
+        
+        // Push parent categories to search space
+        parents.forEach((parent: any) => {
+          allSubs.push({
+            id: String(parent.id || parent._id || parent.categoryId || parent.uuid),
+            name: parent.name || 'Unknown',
+          });
+        });
+
         await Promise.all(
           parents.map(async (parent: any) => {
             const parentId = String(parent.id || parent._id || parent.categoryId || parent.uuid);
@@ -303,8 +319,11 @@ export default function ProductsSection() {
     if (chipNorm === 'fragrances') {
       return nameNorm.includes('perfume') || nameNorm.includes('fragrance') || nameNorm.includes('cologne') || nameNorm.includes('scent') || nameNorm.includes('spray');
     }
-    if (chipNorm === 'rice') {
-      return nameNorm.includes('rice') || nameNorm.includes('grain');
+    if (chipNorm === 'local market' || chipNorm === 'localmarket') {
+      return nameNorm.includes('market') || nameNorm.includes('local') || prodCat?.toLowerCase().includes('market');
+    }
+    if (chipNorm === 'drinks') {
+      return nameNorm.includes('drink') || nameNorm.includes('beverage') || nameNorm.includes('juice') || nameNorm.includes('soda') || nameNorm.includes('wine') || prodCat?.toLowerCase().includes('drink');
     }
 
     return false;
