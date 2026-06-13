@@ -12,7 +12,7 @@ type SimpleProduct = {
   category?: string;
   rating?: number;
   store?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
 };
 
 type Props = {
@@ -41,8 +41,11 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
   const filtered = useMemo(() => {
     return initialProducts.filter((p) => {
       const matchesPrice = p.price >= minValue && p.price <= maxValue;
+      const productLoc = typeof p.location === 'object' && p.location
+        ? p.location.state || p.location.town || 'Lagos'
+        : (p.location || 'Lagos');
       const matchesLocation = selectedLocation === 'All' || 
-                             p.location?.toLowerCase() === selectedLocation.toLowerCase();
+                             productLoc.toLowerCase() === selectedLocation.toLowerCase();
       return matchesPrice && matchesLocation;
     });
   }, [initialProducts, minValue, maxValue, selectedLocation]);

@@ -18,6 +18,7 @@ import OrderTable from '@/components/super-admin/OrderTable';
 import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
 import UserTable, { AppUser } from '@/components/super-admin/UserTable';
 import ViewUserModal from '@/components/super-admin/ViewUserModal';
+import WaitlistView from '@/components/admin/WaitlistView';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -53,6 +54,12 @@ type AdminProduct = Partial<ProductFormData> & {
   size?: string;
   subCategoryId?: string;
   subCategory?: string;
+  origin?: string;
+  location?: {
+    town: string;
+    state: string;
+    lga: string;
+  };
   createdAt?: string;
   updatedAt?: string;
 };
@@ -115,6 +122,8 @@ type ProductRecord = {
   metadata?: Record<string, unknown>;
   discount?: number;
   discountPercentage?: number;
+  origin?: string;
+  location?: { town?: string; state?: string; lga?: string };
   createdAt?: string | Date;
   updatedAt?: string | Date;
 };
@@ -341,6 +350,21 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
       ? ((metadata as { sizes: string[] }).sizes)
       : [];
 
+  // Extract origin — prefer top-level field, fall back to metadata
+  const origin = typeof record.origin === 'string' && record.origin
+    ? record.origin
+    : String((metadata as { origin?: unknown }).origin || 'Nigeria');
+
+  // Extract location — prefer top-level field, fall back to empty
+  let location: { town: string; state: string; lga: string } = { town: '', state: '', lga: '' };
+  if (record.location && typeof record.location === 'object') {
+    location = {
+      town: String(record.location.town || ''),
+      state: String(record.location.state || ''),
+      lga: String(record.location.lga || ''),
+    };
+  }
+
   return {
     id: String(id),
     vendorId: record.vendorId || '',
@@ -381,7 +405,8 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     currency: 'NGN',
     subCategoryId: record.subCategoryId || '',
     subCategory: getCategoryName(record.subCategory),
-    origin: String((metadata as { origin?: unknown }).origin || 'Nigeria'),
+    origin,
+    location,
     returnConditions: String((metadata as { returnConditions?: unknown }).returnConditions || ''),
     warrantyDetails: String((metadata as { warrantyDetails?: unknown }).warrantyDetails || ''),
     createdAt: record.createdAt ? new Date(record.createdAt).toISOString() : new Date().toISOString(),
@@ -531,7 +556,12 @@ const buildProductPayload = (
     compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
     stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
-    origin: formData.origin,
+    origin: formData.origin || 'Nigeria',
+    location: {
+      town: formData.location?.town || '',
+      state: formData.location?.state || '',
+      lga: formData.location?.lga || '',
+    },
   };
 
   if (formData.brand) payload.brand = formData.brand;
@@ -606,7 +636,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'users'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -681,16 +711,30 @@ export default function AdminPage() {
     setIsViewUserModalOpen(true);
   };
 
-  const handleBlockUser = (id: string) => {
-    // Local optimistic update — no block API yet
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' } : u));
-    toast.success('User blocked successfully');
+  const handleBlockUser = async (id: string) => {
+    // Optimistic update
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' as const } : u));
+    try {
+      await authApi.blockUser(id);
+      toast.success('User blocked successfully');
+    } catch (error) {
+      // Revert on failure
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active' as const } : u));
+      toast.error(getApiErrorMessage(error) || 'Could not block user. Please try again.');
+    }
   };
 
-  const handleUnblockUser = (id: string) => {
-    // Local optimistic update — no unblock API yet
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active' } : u));
-    toast.success('User unblocked successfully');
+  const handleUnblockUser = async (id: string) => {
+    // Optimistic update
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'active' as const } : u));
+    try {
+      await authApi.unblockUser(id);
+      toast.success('User unblocked successfully');
+    } catch (error) {
+      // Revert on failure
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' as const } : u));
+      toast.error(getApiErrorMessage(error) || 'Could not unblock user. Please try again.');
+    }
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -1328,6 +1372,8 @@ export default function AdminPage() {
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
         {activeTab === 'dashboard' ? (
           <AdminDashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+        ) : activeTab === 'waitlist' ? (
+          <WaitlistView />
         ) : activeTab === 'users' ? (
           <>
             <header className="flex justify-between items-center mb-8">

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import type { RootState } from '@/lib/store';
 
 interface AdminSidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -74,6 +74,12 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             label="Users" 
             active={activeTab === 'users'} 
             onClick={() => setActiveTab('users')} 
+          />
+          <SidebarLink 
+            icon={<Clock size={20} />} 
+            label="Waitlist" 
+            active={activeTab === 'waitlist'} 
+            onClick={() => setActiveTab('waitlist')} 
           />
           <SidebarLink 
             icon={<Settings size={20} />} 

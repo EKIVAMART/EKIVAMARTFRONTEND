@@ -32,7 +32,7 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[] | number;
   stock: number;
 }
@@ -48,16 +48,18 @@ const FeaturedProducts = () => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
+  // Set mounted state
   useEffect(() => {
     setMounted(true);
-    let isMounted = true;
-    const fetchFeatured = async () => {
-      try {
-        const res = await productApi.getAllProducts({
-          status: 'active',
-          limit: 100,
-        });
+  }, []);
 
+  // Fetch products from backend
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPublishedProducts = async () => {
+      setLoading(true);
+      try {
+        const res = await productApi.getAllProducts({ status: 'active', limit: 100 });
         let list: Product[] = [];
         if (res?.data && Array.isArray(res.data)) {
           list = res.data;
@@ -72,11 +74,11 @@ const FeaturedProducts = () => {
           setLoading(false);
         }
       } catch (err) {
-        console.error('Failed to fetch featured products:', err);
+        console.error('Failed to fetch home page products:', err);
         if (isMounted) setLoading(false);
       }
     };
-    void fetchFeatured();
+    void fetchPublishedProducts();
     return () => {
       isMounted = false;
     };
@@ -91,8 +93,11 @@ const FeaturedProducts = () => {
   // Get 10 random products from backend products, filtered by location if selected
   const featuredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
-      return selectedLocation === 'All' || 
-             product.location?.toLowerCase() === selectedLocation.toLowerCase();
+      if (selectedLocation === 'All') return true;
+      const productLoc = typeof product.location === 'object' && product.location
+        ? product.location.state || product.location.town || 'Lagos'
+        : (product.location || 'Lagos');
+      return productLoc.toLowerCase() === selectedLocation.toLowerCase();
     });
     // Return at most 10 random products, but avoid shuffling during SSR to prevent hydration errors
     if (!mounted) return filtered.slice(0, 10);

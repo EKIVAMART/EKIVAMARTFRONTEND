@@ -511,12 +511,30 @@ export const authApi = {
 
   async deleteUser(id: string) {
     try {
-      const response = await axiosInstance.delete<ApiResponse<any>>(`/users/${id}`);
+      const response = await axiosInstance.delete<ApiResponse<any>>(`/auth/users/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
     }
-  }
+  },
+
+  async blockUser(id: string) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/auth/users/${id}/block`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async unblockUser(id: string) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/auth/users/${id}/unblock`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 // ─── Product API ──────────────────────────────────────────────────────────────
@@ -556,26 +574,29 @@ export interface ProductSearchParams {
   inStock?: boolean;
   tags?: string | string[];
   searchQuery?: string;
+  town?: string;      // Filter by town/city
+  state?: string;     // Filter by state
+  lga?: string;       // Filter by LGA
   page?: number;
   limit?: number;
   sortBy?:
-    | 'id'
-    | 'name'
-    | 'description'
-    | 'sku'
-    | 'price'
-    | 'priceAmount'
-    | 'stock'
-    | 'stockQuantity'
-    | 'status'
-    | 'condition'
-    | 'brand'
-    | 'discount'
-    | 'returnWindow'
-    | 'returnShipping'
-    | 'warrantyPeriod'
-    | 'createdAt'
-    | 'updatedAt';
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'sku'
+  | 'price'
+  | 'priceAmount'
+  | 'stock'
+  | 'stockQuantity'
+  | 'status'
+  | 'condition'
+  | 'brand'
+  | 'discount'
+  | 'returnWindow'
+  | 'returnShipping'
+  | 'warrantyPeriod'
+  | 'createdAt'
+  | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -590,6 +611,11 @@ export interface CreateProductDto {
   preview: string;
   description: string;
   origin: string;
+  location: {
+    town: string;   // REQUIRED
+    state: string;  // REQUIRED
+    lga: string;    // REQUIRED (Local Government Area)
+  };
   brand?: string;
   returnWindow?: ReturnWindow;
   returnShipping?: ReturnShipping;
@@ -815,4 +841,114 @@ export const categoryApi = {
       handleApiError(error);
     }
   },
+};
+
+// ─── Waitlist API ─────────────────────────────────────────────────────────────
+
+export interface WaitlistStats {
+  total: number;
+  active: number;
+  unsubscribed: number;
+  bounced: number;
+  todaySignups: number;
+  weekSignups: number;
+  customers: number;
+  vendors: number;
 }
+
+export interface WaitlistSubscriber {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  phoneNumber: string;
+  role: 'customer' | 'vendor';
+  interestTags: string[];
+  status: 'active' | 'unsubscribed' | 'bounced';
+  referralSource: string;
+  createdAt: string;
+}
+
+export interface LaunchConfig {
+  launchDate: string;
+  title: string;
+  subtitle: string;
+  isLaunched: boolean;
+  updatedAt: string;
+}
+
+export interface UpdateLaunchConfigDto {
+  launchDate: string;
+  title?: string;
+  subtitle?: string;
+  sendBroadcast?: boolean;
+  broadcastReason?: string;
+}
+
+export interface SendBroadcastDto {
+  subject: string;
+  bodyText: string;
+  previewText?: string;
+  role?: 'customer' | 'vendor';
+}
+
+export const waitlistApi = {
+  async getStats(): Promise<ApiResponse<WaitlistStats>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<WaitlistStats>>('/waitlist/stats');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getSubscribers(params: {
+    status?: string;
+    role?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<ApiResponse<{ subscribers: WaitlistSubscriber[]; total: number }>> {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<{ subscribers: WaitlistSubscriber[]; total: number }>>(
+        `/waitlist/subscribers?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getLaunchConfig(): Promise<ApiResponse<LaunchConfig>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<LaunchConfig>>('/waitlist/launch-config');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateLaunchConfig(data: UpdateLaunchConfigDto): Promise<ApiResponse<LaunchConfig>> {
+    try {
+      const response = await axiosInstance.put<ApiResponse<LaunchConfig>>('/waitlist/launch-config', data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async sendBroadcast(data: SendBroadcastDto): Promise<ApiResponse<{ sent: number }>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<{ sent: number }>>('/waitlist/broadcast', data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};

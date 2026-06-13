@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft, MapPin } from 'lucide-react';
 import { useAppDispatch, useWishlist } from '@/lib/hooks';
 import { addToCart } from '@/lib/features/cart/cartSlice';
 import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
@@ -37,7 +37,7 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[];
   stock: number | { quantity: number };
   sku?: string;
@@ -215,6 +215,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     ? (product.stock as any).quantity ?? 0
     : (product.stock ?? 0);
 
+  const locationStr = typeof product.location === 'object' && product.location !== null
+    ? [product.location.town, product.location.lga, product.location.state].filter(Boolean).join(', ')
+    : (product.location || '');
+
   // Derive available sizes from metadata; hide selector when none
   const sizes: string[] = (() => {
     const raw = product.metadata?.sizes || product.metadata?.size || product.metadata?.availableSizes;
@@ -391,6 +395,13 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 <div>
                   <span className="text-gray-400 block font-medium uppercase tracking-wider mb-0.5 text-[10px] sm:text-xs">Origin</span>
                   <span className="font-bold text-gray-800 text-sm sm:text-base">{product.origin}</span>
+                </div>
+              )}
+              {locationStr && (
+                <div className="col-span-2 border-t border-gray-200/50 pt-2.5 mt-1 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-[#c800ff] shrink-0" />
+                  <span className="text-gray-400 font-bold uppercase tracking-wider text-[10px] sm:text-xs">Location:</span>
+                  <span className="font-bold text-gray-800 text-xs sm:text-sm">{locationStr}</span>
                 </div>
               )}
             </div>

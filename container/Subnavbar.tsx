@@ -78,12 +78,14 @@ const LocationSelector = (): JSX.Element => {
     setSearchQuery('');
 
     const params = new URLSearchParams(window.location.search);
-    if (state === 'All') {
+    if (state === 'All' || state === 'Location') {
       params.delete('location');
     } else {
       params.set('location', state);
     }
-    router.push(`?${params.toString()}`, { scroll: false });
+    const pathname = window.location.pathname;
+    const targetPath = pathname.startsWith('/categories/') ? pathname : '/categories/shop';
+    router.push(`${targetPath}?${params.toString()}`);
   };
 
   const filteredStates = nigerianStates.filter((state) =>
