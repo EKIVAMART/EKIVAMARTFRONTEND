@@ -56,7 +56,12 @@ export interface ProductFormData {
   dimensions: ProductDimensions;
   tags: string[];
   metadata: Record<string, any>;
-  origin: string;
+  origin: string;        // Country of manufacture
+  location: {            // Shipping location (ALL REQUIRED)
+    town: string;
+    state: string;
+    lga: string;
+  };
   returnWindow: string;
   whoPaysReturnShipping: string;
   returnConditions: string;
@@ -331,6 +336,7 @@ export default function ActionModal({
     tags: [],
     metadata: {},
     origin: 'Nigeria',
+    location: { town: '', state: '', lga: '' },
     returnWindow: 'Use Store Default',
     whoPaysReturnShipping: 'Use Store Default',
     returnConditions: '',
@@ -420,6 +426,15 @@ export default function ActionModal({
     setSaveErrors([]);
     setHasUnsavedChanges(true);
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const updateLocation = (field: 'town' | 'state' | 'lga', value: string) => {
+    setSaveErrors([]);
+    setHasUnsavedChanges(true);
+    setFormData(prev => ({
+      ...prev,
+      location: { ...prev.location, [field]: value }
+    }));
   };
 
   const clampDiscount = (val: string) => {
@@ -709,6 +724,56 @@ export default function ActionModal({
         </div>
       </div>
 
+      {/* Origin & Location Section in Quick Add */}
+      <div className="bg-teal-50/40 rounded-2xl p-5 border border-teal-100">
+        <h4 className="font-bold text-teal-800 mb-4 text-sm flex items-center gap-2">
+          <span className="w-2 h-2 bg-teal-500 rounded-full inline-block" />
+          Origin &amp; Location <span className="text-[#c800ff] text-xs ml-1">(All Required)</span>
+        </h4>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Country of Origin <span className="text-[#c800ff] ml-1">*</span></label>
+            <input
+              type="text"
+              value={formData.origin || ''}
+              onChange={e => updateField('origin', e.target.value)}
+              placeholder="e.g. Nigeria, China, USA"
+              className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+              required
+            />
+          </div>
+          <div className="border-t border-teal-100 pt-4">
+            <label className="text-xs font-bold text-gray-600 mb-3 block">Shipping Location <span className="text-[#c800ff] ml-1">*</span></label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <input
+                type="text"
+                value={formData.location?.town || ''}
+                onChange={e => updateLocation('town', e.target.value)}
+                placeholder="Town / City *"
+                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                required
+              />
+              <input
+                type="text"
+                value={formData.location?.state || ''}
+                onChange={e => updateLocation('state', e.target.value)}
+                placeholder="State *"
+                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                required
+              />
+              <input
+                type="text"
+                value={formData.location?.lga || ''}
+                onChange={e => updateLocation('lga', e.target.value)}
+                placeholder="LGA (Local Government Area) *"
+                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end gap-3 pt-4 border-t">
         <button
           type="button"
@@ -954,6 +1019,7 @@ export default function ActionModal({
           tags: editingItem.tags || [],
           metadata: editingItem.metadata || {},
           origin: editingItem.origin || 'Nigeria',
+          location: (editingItem as any).location || { town: '', state: '', lga: '' },
           returnWindow: editingItem.returnWindow || 'Use Store Default',
           whoPaysReturnShipping: editingItem.whoPaysReturnShipping || 'Use Store Default',
           returnConditions: editingItem.returnConditions || '',
@@ -1026,6 +1092,7 @@ export default function ActionModal({
           tags: [],
           metadata: {},
           origin: 'Nigeria',
+          location: { town: '', state: '', lga: '' },
           returnWindow: 'Use Store Default',
           whoPaysReturnShipping: 'Use Store Default',
           returnConditions: '',
@@ -1086,6 +1153,11 @@ export default function ActionModal({
     if (step === 1) {
       if (!formData.name.trim()) errors.push('Product name is required.');
       if (!formData.categoryId) errors.push('Product category is required.');
+      // Origin & Location validation - ALL REQUIRED
+      if (!formData.origin?.trim()) errors.push('Country of origin is required.');
+      if (!formData.location?.town?.trim()) errors.push('Town/City is required.');
+      if (!formData.location?.state?.trim()) errors.push('State is required.');
+      if (!formData.location?.lga?.trim()) errors.push('LGA (Local Government Area) is required.');
     } else if (step === 2) {
       if (!formData.compareAtPrice || formData.compareAtPrice <= 0) errors.push('Original price is required.');
       if (formData.stock === undefined || formData.stock < 0) errors.push('Stock is required.');
@@ -1514,6 +1586,83 @@ export default function ActionModal({
                           Example: <span className="font-bold text-gray-500">GADG-IPHONE-256GB</span> or <span className="font-bold text-gray-500">FASH-TSHIRT-BLACK-M</span>.
                           You can auto-generate it, type your own, or leave it blank if unsure.
                         </p>
+                      </div>
+
+                      {/* Origin & Location Section - ALL FIELDS REQUIRED */}
+                      <div className="bg-purple-50/40 rounded-2xl p-5 border border-purple-100">
+                        <h4 className="font-bold text-purple-800 mb-4 text-sm flex items-center gap-2">
+                          <span className="w-2 h-2 bg-[#c800ff] rounded-full inline-block" />
+                          Origin &amp; Location <span className="text-[#c800ff] text-xs ml-1">(All Fields Required)</span>
+                        </h4>
+
+                        {/* Country of Origin */}
+                        <div className="mb-5">
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">
+                            Country of Origin <span className="text-[#c800ff] ml-1">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.origin || ''}
+                            onChange={e => updateField('origin', e.target.value)}
+                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                            required
+                            placeholder="e.g. Nigeria, China, USA"
+                          />
+                          <p className="text-[11px] text-gray-400 font-medium mt-1.5">
+                            Where the product is manufactured or sourced from
+                          </p>
+                        </div>
+
+                        {/* Shipping Location */}
+                        <div className="border-t border-purple-100 pt-4">
+                          <label className="text-xs font-bold text-gray-600 mb-3 block">
+                            Shipping Location <span className="text-[#c800ff] ml-1">*</span>
+                          </label>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+                            <div>
+                              <label className="text-xs font-bold text-gray-500 mb-1 block">
+                                Town / City <span className="text-[#c800ff] ml-1">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.location?.town || ''}
+                                onChange={e => updateLocation('town', e.target.value)}
+                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                required
+                                placeholder="e.g. Victoria Island"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-bold text-gray-500 mb-1 block">
+                                State <span className="text-[#c800ff] ml-1">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.location?.state || ''}
+                                onChange={e => updateLocation('state', e.target.value)}
+                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                required
+                                placeholder="e.g. Lagos"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-bold text-gray-500 mb-1 block">
+                                LGA (Local Government Area) <span className="text-[#c800ff] ml-1">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.location?.lga || ''}
+                                onChange={e => updateLocation('lga', e.target.value)}
+                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                required
+                                placeholder="e.g. Eti-Osa"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-gray-400 font-medium mt-2">
+                            Where the product is physically located for shipping/delivery
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}

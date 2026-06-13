@@ -262,7 +262,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     } else {
       params.set('location', location);
     }
-    router.push(`?${params.toString()}`, { scroll: false });
+    const pathname = window.location.pathname;
+    const targetPath = pathname.startsWith('/categories/') ? pathname : '/categories/shop';
+    router.push(`${targetPath}?${params.toString()}`);
   };
 
   // Filter locations based on search

@@ -35,7 +35,7 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[] | number;
 }
 
@@ -230,6 +230,7 @@ export default function CategoryPage() {
       setProductsLoading(true);
       try {
         const searchQuery = searchParams.get('search') || undefined;
+        const locationQuery = searchParams.get('location') || undefined;
         const fetchParams: any = {
           status: 'active',
           limit: 100,
@@ -240,6 +241,9 @@ export default function CategoryPage() {
         }
         if (searchQuery) {
           fetchParams.searchQuery = searchQuery;
+        }
+        if (locationQuery && locationQuery !== 'All' && locationQuery !== 'Location') {
+          fetchParams.state = locationQuery;
         }
 
         const res = await productApi.getAllProducts(fetchParams);
@@ -318,8 +322,9 @@ export default function CategoryPage() {
     return Number.isNaN(max) ? 100000 : max;
   }, [products]);
 
-  // Apply price and rating in-memory filters
+  // Apply price, rating, and location in-memory filters
   const filteredProducts = useMemo(() => {
+    const locationQuery = searchParams.get('location') || 'All';
     return products.filter((p) => {
       const price = getProductPrice(p);
       if (price < minPrice || price > maxPrice) return false;
@@ -328,9 +333,23 @@ export default function CategoryPage() {
         const ratingVal = calculateAverageRating(p.rating);
         if (ratingVal < selectedRating) return false;
       }
+
+      // Robust location matching
+      const productLoc = typeof p.location === 'object' && p.location
+        ? p.location.state || p.location.town || 'Lagos'
+        : (p.location || 'Lagos');
+      
+      const locLower = productLoc.toLowerCase();
+      const queryLower = locationQuery.toLowerCase();
+      const matchesLocation = locationQuery === 'All' || locationQuery === 'Location' ||
+                             locLower === queryLower ||
+                             locLower.includes(queryLower) ||
+                             queryLower.includes(locLower);
+      if (!matchesLocation) return false;
+
       return true;
     });
-  }, [products, minPrice, maxPrice, selectedRating]);
+  }, [products, minPrice, maxPrice, selectedRating, searchParams]);
 
   // Change chip category filter
   const selectSubcategory = (subSlug: string | null) => {
@@ -353,9 +372,19 @@ export default function CategoryPage() {
   }
 
   const searchQuery = searchParams.get('search');
-  const categoryName = searchQuery 
-    ? `Search Results for "${searchQuery}"` 
-    : activeCategory?.name || (slug === 'shop' || slug === 'all' ? 'All Products' : slug.charAt(0).toUpperCase() + slug.slice(1));
+  const locationQuery = searchParams.get('location');
+  const categoryName = (() => {
+    if (searchQuery && locationQuery && locationQuery !== 'All' && locationQuery !== 'Location') {
+      return `Search Results for "${searchQuery}" in ${locationQuery}`;
+    }
+    if (searchQuery) {
+      return `Search Results for "${searchQuery}"`;
+    }
+    if (locationQuery && locationQuery !== 'All' && locationQuery !== 'Location') {
+      return `Search Results for products in "${locationQuery}"`;
+    }
+    return activeCategory?.name || (slug === 'shop' || slug === 'all' ? 'All Products' : slug.charAt(0).toUpperCase() + slug.slice(1));
+  })();
 
   // Normalization for matching slugs
   const getSlug = (name: string) => 

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import type { RootState } from '@/lib/store';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -80,6 +80,12 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             label="Users" 
             active={activeTab === 'users'} 
             onClick={() => setActiveTab('users')} 
+          />
+          <SidebarLink 
+            icon={<Clock size={20} />} 
+            label="Waitlist" 
+            active={activeTab === 'waitlist'} 
+            onClick={() => setActiveTab('waitlist')} 
           />
           <SidebarLink 
             icon={<Settings size={20} />} 

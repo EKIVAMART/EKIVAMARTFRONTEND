@@ -208,8 +208,8 @@ export default function InviteAdminModal({
                 )}
               </div>
 
-              <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                <p className="text-xs text-amber-700 font-medium leading-relaxed">
+              <div className="bg-fuchsia-50 rounded-xl p-4 border border-fuchsia-100">
+                <p className="text-xs text-fuchsia-700 font-medium leading-relaxed">
                   <span className="font-bold">Note:</span> The invited admin will receive an email with instructions to set up their account. They will have full access to all admin features by default.
                 </p>
               </div>

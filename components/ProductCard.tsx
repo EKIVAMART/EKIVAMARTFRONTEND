@@ -16,7 +16,7 @@ type ProductCardProps = {
   originalPrice?: number | { amount: number; currency?: string };
   currency?: string;
   href?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
 };
 
 export default function ProductCard({
@@ -32,6 +32,9 @@ export default function ProductCard({
   href = '#',
   location = 'Lagos',
 }: ProductCardProps) {
+  const locationStr = typeof location === 'object' && location !== null
+    ? [location.town, location.lga, location.state].filter(Boolean).join(', ') || 'Lagos'
+    : (location || 'Lagos');
   const dispatch = useAppDispatch();
   const wishlistItems = useWishlist();
   const isWishlisted = wishlistItems.includes(id);
@@ -109,7 +112,7 @@ export default function ProductCard({
           
           <div className="pc-location">
             <MapPin size={12} className="pc-location-icon" />
-            <span>{location}</span>
+            <span>{locationStr}</span>
           </div>
         </div>
 

@@ -29,7 +29,7 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
-  location?: string;
+  location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[] | number;
   stock: number;
 }
@@ -249,6 +249,9 @@ export default function ProductsSection() {
         if (activeSubcategoryId) {
           params.categoryId = activeSubcategoryId;
         }
+        if (selectedLocation && selectedLocation !== 'All' && selectedLocation !== 'Location') {
+          params.state = selectedLocation;
+        }
 
         const res = await productApi.getAllProducts(params);
 
@@ -274,7 +277,7 @@ export default function ProductsSection() {
     return () => {
       isMounted = false;
     };
-  }, [activeCategory, subcategoryIdMap]);
+  }, [activeCategory, subcategoryIdMap, selectedLocation]);
 
 
 
@@ -374,8 +377,16 @@ export default function ProductsSection() {
     const activeSubcategoryId = subcategoryIdMap[activeCategory];
     const filtered = products.filter((product) => {
       const matchesCategory = activeSubcategoryId ? true : filterByChip(product, activeCategory);
-      const matchesLocation = selectedLocation === 'All' || 
-                             product.location?.toLowerCase() === selectedLocation.toLowerCase();
+      const productLoc = typeof product.location === 'object' && product.location
+        ? product.location.state || product.location.town || 'Lagos'
+        : (product.location || 'Lagos');
+
+      const locLower = productLoc.toLowerCase();
+      const queryLower = selectedLocation.toLowerCase();
+      const matchesLocation = selectedLocation === 'All' || selectedLocation === 'Location' ||
+                             locLower === queryLower ||
+                             locLower.includes(queryLower) ||
+                             queryLower.includes(locLower);
       return matchesCategory && matchesLocation;
     });
     // Return at most 10 random products from the category, but avoid shuffling during SSR to prevent hydration errors

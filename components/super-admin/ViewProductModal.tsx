@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box, MapPin } from 'lucide-react';
 import { ProductImage } from './ActionModal';
 
 const parseMarkdownToHtml = (markdown: string): string => {
@@ -64,6 +64,10 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
 
   const weightVal = Number(product.weight ?? product.metadata?.weight ?? 0);
   const weightUnitVal = product.weightUnit ?? product.metadata?.weightUnit ?? 'kg';
+
+  const locationStr = product.location && typeof product.location === 'object'
+    ? [product.location.town, product.location.lga, product.location.state].filter(Boolean).join(', ')
+    : (product.location || '');
 
   const compulsoryInfo = [
     { label: 'Final Price', value: `NGN ${Number(product.price).toLocaleString()}` },
@@ -239,6 +243,12 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                     <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
                       <Package size={16} className="text-slate-400" />
                       <span className="text-xs font-bold text-slate-600">Origin: <span className="text-slate-800">{product.origin}</span></span>
+                    </div>
+                  )}
+                  {locationStr && (
+                    <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                      <MapPin size={16} className="text-slate-400" />
+                      <span className="text-xs font-bold text-slate-600">Location: <span className="text-slate-800">{locationStr}</span></span>
                     </div>
                   )}
                   {weightVal > 0 && (

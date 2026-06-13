@@ -161,7 +161,7 @@ export default function ViewUserModal({
             <div className={`-mt-8 mx-6 rounded-2xl p-4 shadow-md z-10 shrink-0 ${
               isAuthenticated
                 ? 'bg-emerald-500'
-                : 'bg-amber-400'
+                : 'bg-slate-500'
             }`}>
               <div className="flex items-center gap-3">
                 {isAuthenticated

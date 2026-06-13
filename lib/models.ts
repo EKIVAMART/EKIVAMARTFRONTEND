@@ -199,6 +199,14 @@ class MongoDBModels {
   async stores() {
     return this.getCollection<IStore>('stores');
   }
+
+  async waitlistSubscribers() {
+    return this.getCollection<any>('waitlist_subscribers');
+  }
+
+  async launchConfig() {
+    return this.getCollection<any>('launch_config');
+  }
 }
 
 export const db = new MongoDBModels();
