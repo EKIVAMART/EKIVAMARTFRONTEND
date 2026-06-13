@@ -574,7 +574,12 @@ const buildProductPayload = (
     compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
     stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
-    origin: formData.origin,
+    origin: formData.origin || 'Nigeria',
+    location: {
+      town: formData.location?.town || '',
+      state: formData.location?.state || '',
+      lga: formData.location?.lga || '',
+    },
   };
 
   if (formData.brand) payload.brand = formData.brand;

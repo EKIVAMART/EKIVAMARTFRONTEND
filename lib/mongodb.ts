@@ -2,10 +2,6 @@ import { MongoClient, Db } from 'mongodb';
 
 const MONGODB_URI = process.env.DATABASE_URL;
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the DATABASE_URL environment variable');
-}
-
 interface Global {
   mongodb?: {
     conn: MongoClient | null;
@@ -19,6 +15,10 @@ const cached = global.mongodb || { conn: null, promise: null };
 global.mongodb = cached;
 
 export async function connectToDatabase() {
+  if (!MONGODB_URI) {
+    throw new Error('Please define the DATABASE_URL environment variable');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -28,7 +28,7 @@ export async function connectToDatabase() {
       maxPoolSize: 10,
     };
 
-    cached.promise = MongoClient.connect(MONGODB_URI!, opts);
+    cached.promise = MongoClient.connect(MONGODB_URI, opts);
   }
 
   try {
