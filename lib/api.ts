@@ -952,3 +952,71 @@ export const waitlistApi = {
     }
   },
 };
+
+// ─── Wishlist API ─────────────────────────────────────────────────────────────
+
+export interface WishlistCheckResponseDto {
+  productId: string;
+  isSaved: boolean;
+}
+
+export interface WishlistCountResponseDto {
+  count: number;
+}
+
+export const wishlistApi = {
+  async getWishlist() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/wishlist');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getWishlistCount() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<WishlistCountResponseDto>>('/wishlist/count');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async saveWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<WishlistCheckResponseDto>>('/wishlist/items', { productId });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async removeWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/wishlist/items/${productId}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async checkWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<WishlistCheckResponseDto>>(`/wishlist/items/${productId}/check`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async clearWishlist() {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>('/wishlist');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+

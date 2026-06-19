@@ -4,10 +4,11 @@ import React, { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft, MapPin } from 'lucide-react';
-import { useAppDispatch, useWishlist } from '@/lib/hooks';
+import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
 import { addToCart } from '@/lib/features/cart/cartSlice';
-import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
-import { productApi, categoryApi } from '@/lib/api';
+import { addWishlistItem, removeWishlistItem, fetchWishlistCount, setWishlistItemStatus } from '@/lib/features/wishlist/wishlistSlice';
+import { productApi, categoryApi, wishlistApi } from '@/lib/api';
+import toast from 'react-hot-toast';
 import './product-details.css';
 
 interface Rating {
@@ -56,8 +57,32 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
   const { id } = use(params);
   const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useWishlist();
   const isWishlisted = wishlistItems.includes(id);
+
+  // Fetch wishlist count on mount so the header badge is always in sync
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlistCount());
+    }
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const checkStatus = async () => {
+        try {
+          const res = await wishlistApi.checkWishlistItem(id);
+          if (res?.success && res.data) {
+            dispatch(setWishlistItemStatus({ productId: id, isSaved: !!res.data.isSaved }));
+          }
+        } catch (err) {
+          console.error('Failed to check product wishlist status:', err);
+        }
+      };
+      void checkStatus();
+    }
+  }, [id, isAuthenticated, dispatch]);
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -487,7 +512,17 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
               <button
                 className={`pd-btn-wishlist ${isWishlisted ? 'active' : ''}`}
-                onClick={() => dispatch(toggleWishlist(product.id))}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast.error('Please log in to manage your wishlist');
+                    return;
+                  }
+                  if (isWishlisted) {
+                    dispatch(removeWishlistItem(product.id));
+                  } else {
+                    dispatch(addWishlistItem(product.id));
+                  }
+                }}
                 aria-label="Add to wishlist"
               >
                 <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />

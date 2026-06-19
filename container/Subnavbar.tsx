@@ -7,7 +7,10 @@ import { FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCartCount, useWishlist, useAppSelector } from '@/lib/hooks';
+import { useCartCount, useWishlist, useAppSelector, useAppDispatch } from '@/lib/hooks';
+import { fetchWishlistCount } from '@/lib/features/wishlist/wishlistSlice';
+import { authApi } from '@/lib/api';
+import { setUser } from '@/lib/features/auth/authSlice';
 import MobileSidebar from '@/components/MobileSidebar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
@@ -196,12 +199,11 @@ const LocationSelector = (): JSX.Element => {
 
 const Subnavbar = (): JSX.Element => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const cartCount = useCartCount();
-  const wishlistItems = useWishlist();
-
-  const wishlistCount = wishlistItems.length;
+  const wishlistCount = useAppSelector(state => state.wishlist.count);
 
   const [mainSearchQuery, setMainSearchQuery] = useState('');
   const handleSearch = (query: string) => {
@@ -213,6 +215,44 @@ const Subnavbar = (): JSX.Element => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted && isAuthenticated) {
+      dispatch(fetchWishlistCount());
+    }
+  }, [mounted, isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (mounted && isAuthenticated && !user) {
+      const fetchUserProfile = async () => {
+        try {
+          const res = await authApi.getProfile();
+          if (res?.success && res.data) {
+            dispatch(setUser(res.data));
+          }
+        } catch (err) {
+          console.error('Failed to fetch user profile:', err);
+        }
+      };
+      void fetchUserProfile();
+    }
+  }, [mounted, isAuthenticated, user, dispatch]);
+
+  useEffect(() => {
+    if (!mounted || !isAuthenticated) return;
+
+    const handleFocus = () => {
+      dispatch(fetchWishlistCount());
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, [mounted, isAuthenticated, dispatch]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);

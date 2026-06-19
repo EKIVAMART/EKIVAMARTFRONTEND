@@ -77,9 +77,19 @@ export interface CartState {
   cartItems: Record<string, number>
 }
 
-export interface WishlistState {
-  items: string[] // Store product IDs
+export interface HydratedWishlistItem {
+  id: string;
+  addedAt: string;
+  product: any;
 }
+
+export interface WishlistState {
+  items: string[]; // Store product IDs
+  hydratedItems: HydratedWishlistItem[];
+  count: number;
+  loading: boolean;
+}
+
 
 export interface ProductState {
   list: Product[]

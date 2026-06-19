@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { assets } from '@/assets/assets';
 import ProductCard from './ProductCard';
 import { productApi } from '@/lib/api';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
 
 interface Rating {
   id: string;
@@ -43,6 +45,15 @@ const FeaturedProducts = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlist());
+    }
+  }, [isAuthenticated, dispatch]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);

@@ -892,12 +892,12 @@
   }
 
   .pd-actions-section {
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
   }
 
   .pd-btn-add-to-cart {
-    min-width: 100%;
+    min-width: 50%;
   }
 
   .pd-btn-wishlist {
