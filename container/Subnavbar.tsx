@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartCount, useWishlist, useAppSelector, useAppDispatch } from '@/lib/hooks';
 import { fetchWishlistCount } from '@/lib/features/wishlist/wishlistSlice';
+import { fetchCartCount, fetchCart } from '@/lib/features/cart/cartSlice';
 import { authApi } from '@/lib/api';
 import { setUser } from '@/lib/features/auth/authSlice';
 import MobileSidebar from '@/components/MobileSidebar';
@@ -219,6 +220,8 @@ const Subnavbar = (): JSX.Element => {
   useEffect(() => {
     if (mounted && isAuthenticated) {
       dispatch(fetchWishlistCount());
+      dispatch(fetchCartCount());
+      dispatch(fetchCart());
     }
   }, [mounted, isAuthenticated, dispatch]);
 
@@ -243,6 +246,8 @@ const Subnavbar = (): JSX.Element => {
 
     const handleFocus = () => {
       dispatch(fetchWishlistCount());
+      dispatch(fetchCartCount());
+      dispatch(fetchCart());
     };
 
     window.addEventListener('focus', handleFocus);

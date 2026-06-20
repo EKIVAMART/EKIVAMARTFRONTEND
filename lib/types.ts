@@ -73,8 +73,26 @@ export interface Address {
 
 // Redux State Types
 export interface CartState {
-  total: number
-  cartItems: Record<string, number>
+  activeItems: any[]
+  savedItems: any[]
+  activeProductIds: string[]
+  savedProductIds: string[]
+  activeCount: number
+  savedCount: number
+  total: number // totalCount
+  summary: {
+    subtotal: number
+    shipping: number
+    tax: number
+    total: number
+    currency: string;
+  } | null
+  loading: boolean
+  noteModal: {
+    isOpen: boolean
+    productId: string | null
+    quantity: number
+  }
 }
 
 export interface HydratedWishlistItem {

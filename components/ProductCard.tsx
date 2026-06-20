@@ -1,9 +1,10 @@
 'use client';
 import Image, { StaticImageData } from 'next/image';
+import Link from 'next/link';
 import { Heart, ShoppingCart, MapPin, Plus } from 'lucide-react';
 import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
 import { addWishlistItem, removeWishlistItem } from '@/lib/features/wishlist/wishlistSlice';
-import { addToCart } from '@/lib/features/cart/cartSlice';
+import { openNoteModal } from '@/lib/features/cart/cartSlice';
 import toast from 'react-hot-toast';
 
 type ProductCardProps = {
@@ -42,6 +43,12 @@ export default function ProductCard({
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useWishlist();
   const isWishlisted = wishlistItems.includes(id);
+
+  const activeProductIds = useAppSelector((state) => state.cart.activeProductIds);
+  const savedProductIds = useAppSelector((state) => state.cart.savedProductIds);
+  const isActiveInCart = activeProductIds.includes(id);
+  const isSavedInCart = savedProductIds.includes(id);
+
   const fullStars = Math.floor(rating);
   const halfStar = rating - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
@@ -145,14 +152,18 @@ export default function ProductCard({
           
           <button 
             className="pc-add-cart-btn"
+            disabled={isActiveInCart || isSavedInCart}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              dispatch(addToCart({ productId: id }));
+              if (isActiveInCart || isSavedInCart) return;
+              dispatch(openNoteModal({ productId: id, quantity: 1 }));
             }}
           >
             <Plus size={16} />
-            <span>Add</span>
+            <span>
+              {isActiveInCart ? 'Added' : isSavedInCart ? 'Saved' : 'Add'}
+            </span>
           </button>
         </div>
       </div>
@@ -313,6 +324,15 @@ export default function ProductCard({
           color: white;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(152, 29, 135, 0.2);
+        }
+
+        .pc-add-cart-btn:disabled {
+          background: #f3f4f6;
+          color: #9ca3af;
+          border-color: #e5e7eb;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
         }
 
         .pc-add-cart-btn:active {

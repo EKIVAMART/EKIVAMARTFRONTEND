@@ -7,7 +7,7 @@ import { ChevronLeft, Search, Share, UserPlus, Calendar, Heart, MapPin, CheckCir
 import { productDummyData, dummyStoreData } from '@/assets/assets';
 import './vendor-details.css';
 import { useAppDispatch } from '@/lib/hooks';
-import { addToCart } from '@/lib/features/cart/cartSlice';
+import { openNoteModal } from '@/lib/features/cart/cartSlice';
 
 interface VendorPageProps {
   params: Promise<{ id: string }>;
@@ -167,7 +167,7 @@ export default function VendorPage({ params }: VendorPageProps) {
                       </div>
                       <button 
                         className="vp-add-to-cart-btn"
-                        onClick={() => dispatch(addToCart({ productId: product.id }))}
+                        onClick={() => dispatch(openNoteModal({ productId: product.id, quantity: 1 }))}
                       >
                         Add to cart
                       </button>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Trash2, Star, ChevronRight, ShoppingCart } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist, removeWishlistItem, clearWishlistApi } from '@/lib/features/wishlist/wishlistSlice';
-import { addToCart } from '@/lib/features/cart/cartSlice';
+import { openNoteModal } from '@/lib/features/cart/cartSlice';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,8 @@ export default function WishlistPage() {
   const hydratedItems = useAppSelector((state) => state.wishlist.hydratedItems);
   const loading = useAppSelector((state) => state.wishlist.loading);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const activeProductIds = useAppSelector((state) => state.cart.activeProductIds);
+  const savedProductIds = useAppSelector((state) => state.cart.savedProductIds);
   const router = useRouter();
 
   const [showClearModal, setShowClearModal] = useState(false);
@@ -62,9 +64,8 @@ export default function WishlistPage() {
     dispatch(removeWishlistItem(id));
   };
 
-  const handleAddToCart = (id: string, name: string) => {
-    dispatch(addToCart({ productId: id }));
-    toast.success(`${name} added to cart`);
+  const handleAddToCart = (id: string) => {
+    dispatch(openNoteModal({ productId: id, quantity: 1 }));
   };
 
   const handleClearWishlist = () => {
@@ -249,13 +250,24 @@ export default function WishlistPage() {
 
                       {/* Cart Action */}
                       <div className="col-span-2 md:col-span-1 mt-2 md:mt-0 text-center flex justify-center">
-                        <button
-                          onClick={() => handleAddToCart(product.id, product.name)}
-                          className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-4 py-2 rounded-xl font-semibold hover:from-[#b500e6] hover:to-[#802699] transition text-sm w-full md:w-auto flex items-center justify-center gap-2 shadow-sm"
-                        >
-                          <ShoppingCart size={16} />
-                          Add to Cart
-                        </button>
+                        {(() => {
+                          const isActiveInCart = activeProductIds.includes(product.id);
+                          const isSavedInCart = savedProductIds.includes(product.id);
+                          return (
+                            <button
+                              disabled={isActiveInCart || isSavedInCart}
+                              onClick={() => handleAddToCart(product.id)}
+                              className={`px-4 py-2 rounded-xl font-semibold transition text-sm w-full md:w-auto flex items-center justify-center gap-2 shadow-sm ${
+                                isActiveInCart || isSavedInCart
+                                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                                  : 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699]'
+                              }`}
+                            >
+                              <ShoppingCart size={16} />
+                              {isActiveInCart ? 'Added' : isSavedInCart ? 'Saved' : 'Add to Cart'}
+                            </button>
+                          );
+                        })()}
                       </div>
 
                       {/* Remove */}

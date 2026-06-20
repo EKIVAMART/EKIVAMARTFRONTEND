@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { Toast } from '@/components/ui/Toast';
+import CartNoteModal from './CartNoteModal';
 
 import { ResetPasswordModalTrigger } from '@/components/auth/ResetPasswordModalTrigger';
 
@@ -39,6 +40,7 @@ export default function LayoutWrapper({
       </Suspense>
       {!hideNavigation && <Footer />}
       <Toast />
+      <CartNoteModal />
       <Suspense fallback={null}>
         <ResetPasswordModalTrigger />
       </Suspense>
