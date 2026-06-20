@@ -17,7 +17,7 @@ export type {
 } from './types'
 
 // Re-export actions
-export { addToCart, removeFromCart, clearCart, deleteItemFromCart } from './features/cart/cartSlice'
+export { openNoteModal, closeNoteModal, clearCartLocally, fetchCart, fetchCartCount, fetchCartSummary, addItemToCartApi, updateCartItemQuantityApi, removeCartItemApi, selectCartItemApi, selectAllCartItemsApi, saveCartItemForLaterApi, moveSavedCartItemToCartApi, clearCartApi } from './features/cart/cartSlice'
 export { setProduct, clearProduct } from './features/product/productSlice'
 export { addAddress } from './features/address/addressSlice'
 export { addRating } from './features/rating/ratingSlice'

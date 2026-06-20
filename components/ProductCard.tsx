@@ -1,14 +1,17 @@
 'use client';
 import Image, { StaticImageData } from 'next/image';
+import Link from 'next/link';
 import { Heart, ShoppingCart, MapPin, Plus } from 'lucide-react';
-import { useAppDispatch, useWishlist } from '@/lib/hooks';
-import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
-import { addToCart } from '@/lib/features/cart/cartSlice';
+import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
+import { addWishlistItem, removeWishlistItem } from '@/lib/features/wishlist/wishlistSlice';
+import { openNoteModal } from '@/lib/features/cart/cartSlice';
+import toast from 'react-hot-toast';
 
 type ProductCardProps = {
   id: string;
   image?: string | StaticImageData;
   category?: string;
+  subcategory?: string;
   title: string;
   rating?: number;
   author?: string;
@@ -22,7 +25,8 @@ type ProductCardProps = {
 export default function ProductCard({
   id,
   image = '/placeholder.png',
-  category = 'Fashion',
+  category,
+  subcategory,
   title,
   rating = 4.2,
   author = 'Tazo',
@@ -36,8 +40,15 @@ export default function ProductCard({
     ? [location.town, location.lga, location.state].filter(Boolean).join(', ') || 'Lagos'
     : (location || 'Lagos');
   const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useWishlist();
   const isWishlisted = wishlistItems.includes(id);
+
+  const activeProductIds = useAppSelector((state) => state.cart.activeProductIds);
+  const savedProductIds = useAppSelector((state) => state.cart.savedProductIds);
+  const isActiveInCart = activeProductIds.includes(id);
+  const isSavedInCart = savedProductIds.includes(id);
+
   const fullStars = Math.floor(rating);
   const halfStar = rating - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
@@ -65,7 +76,11 @@ export default function ProductCard({
       </div>
 
       <div className="pc-body">
-        <div className="pc-category">{category}</div>
+        {(category || subcategory) && (
+          <div className="pc-category">
+            {category}{subcategory ? ` › ${subcategory}` : ''}
+          </div>
+        )}
 
         <h3 className="pc-title" title={title}>
           {title}
@@ -137,14 +152,18 @@ export default function ProductCard({
           
           <button 
             className="pc-add-cart-btn"
+            disabled={isActiveInCart || isSavedInCart}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              dispatch(addToCart({ productId: id }));
+              if (isActiveInCart || isSavedInCart) return;
+              dispatch(openNoteModal({ productId: id, quantity: 1 }));
             }}
           >
             <Plus size={16} />
-            <span>Add</span>
+            <span>
+              {isActiveInCart ? 'Added' : isSavedInCart ? 'Saved' : 'Add'}
+            </span>
           </button>
         </div>
       </div>
@@ -154,7 +173,15 @@ export default function ProductCard({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          dispatch(toggleWishlist(id));
+          if (!isAuthenticated) {
+            toast.error('Please log in to manage your wishlist');
+            return;
+          }
+          if (isWishlisted) {
+            dispatch(removeWishlistItem(id));
+          } else {
+            dispatch(addWishlistItem(id));
+          }
         }}
         aria-label="Add to wishlist"
       >
@@ -299,6 +326,15 @@ export default function ProductCard({
           box-shadow: 0 4px 12px rgba(152, 29, 135, 0.2);
         }
 
+        .pc-add-cart-btn:disabled {
+          background: #f3f4f6;
+          color: #9ca3af;
+          border-color: #e5e7eb;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
         .pc-add-cart-btn:active {
           transform: translateY(0);
         }
@@ -367,10 +403,11 @@ export default function ProductCard({
         /* Rating */
         .pc-rating-row {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
           gap: 8px;
           margin: 6px 0;
+          flex-wrap: wrap;
         }
 
         .pc-stars-container {
@@ -387,7 +424,7 @@ export default function ProductCard({
 
         .pc-location {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 3px;
           font-size: 11px;
           color: #6b7280;
@@ -395,10 +432,10 @@ export default function ProductCard({
           padding: 2px 6px;
           border-radius: 4px;
           font-weight: 500;
-          max-width: 100px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          flex-wrap: wrap;
+          word-break: break-word;
+          flex-shrink: 1;
+          min-width: 0;
         }
 
         .pc-location-icon {
@@ -536,6 +573,7 @@ export default function ProductCard({
           .pc-location {
             font-size: 10px;
             padding: 2px 4px;
+            word-break: break-word;
           }
 
           .pc-add-cart-btn {

@@ -4,10 +4,11 @@ import React, { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft, MapPin } from 'lucide-react';
-import { useAppDispatch, useWishlist } from '@/lib/hooks';
-import { addToCart } from '@/lib/features/cart/cartSlice';
-import { toggleWishlist } from '@/lib/features/wishlist/wishlistSlice';
-import { productApi, categoryApi } from '@/lib/api';
+import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
+import { openNoteModal } from '@/lib/features/cart/cartSlice';
+import { addWishlistItem, removeWishlistItem, fetchWishlistCount, setWishlistItemStatus } from '@/lib/features/wishlist/wishlistSlice';
+import { productApi, categoryApi, wishlistApi, cartApi } from '@/lib/api';
+import toast from 'react-hot-toast';
 import './product-details.css';
 
 interface Rating {
@@ -56,8 +57,55 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
   const { id } = use(params);
   const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useWishlist();
   const isWishlisted = wishlistItems.includes(id);
+
+  // Fetch wishlist count on mount so the header badge is always in sync
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlistCount());
+    }
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const checkStatus = async () => {
+        try {
+          const res = await wishlistApi.checkWishlistItem(id);
+          if (res?.success && res.data) {
+            dispatch(setWishlistItemStatus({ productId: id, isSaved: !!res.data.isSaved }));
+          }
+        } catch (err) {
+          console.error('Failed to check product wishlist status:', err);
+        }
+      };
+      void checkStatus();
+    }
+  }, [id, isAuthenticated, dispatch]);
+
+  const [cartStatus, setCartStatus] = useState<'active' | 'saved_for_later' | 'not_in_cart'>('not_in_cart');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const checkCartStatus = async () => {
+        try {
+          const res = await cartApi.checkCartItem(id);
+          if (res?.success && res.data) {
+            setCartStatus(res.data.status);
+          }
+        } catch (err) {
+          console.error('Failed to check product cart status:', err);
+        }
+      };
+      void checkCartStatus();
+    }
+  }, [id, isAuthenticated]);
+
+  const activeProductIds = useAppSelector((state) => state.cart.activeProductIds);
+  const savedProductIds = useAppSelector((state) => state.cart.savedProductIds);
+  const isActiveInCart = activeProductIds.includes(id) || cartStatus === 'active';
+  const isSavedInCart = savedProductIds.includes(id) || cartStatus === 'saved_for_later';
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -449,7 +497,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               );
             })()}
 
-            {/* Actions */}
             <div className="pd-actions-section">
               <div className="pd-quantity-selector">
                 <button
@@ -477,17 +524,32 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
 
               <button
-                className="pd-btn-primary pd-btn-add-to-cart"
-                onClick={() => dispatch(addToCart({ productId: product.id }))}
-                disabled={stockQty <= 0}
+                className={`pd-btn-primary pd-btn-add-to-cart ${(isActiveInCart || isSavedInCart) ? 'pd-btn-readonly' : ''}`}
+                onClick={() => {
+                  if (isActiveInCart || isSavedInCart) return;
+                  dispatch(openNoteModal({ productId: product.id, quantity }));
+                }}
+                disabled={stockQty <= 0 || isActiveInCart || isSavedInCart}
               >
                 <ShoppingCart className="pd-cart-icon" />
-                <span>Add to Cart</span>
+                <span>
+                  {isActiveInCart ? 'Added to Cart' : isSavedInCart ? 'Saved' : 'Add to Cart'}
+                </span>
               </button>
 
               <button
                 className={`pd-btn-wishlist ${isWishlisted ? 'active' : ''}`}
-                onClick={() => dispatch(toggleWishlist(product.id))}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast.error('Please log in to manage your wishlist');
+                    return;
+                  }
+                  if (isWishlisted) {
+                    dispatch(removeWishlistItem(product.id));
+                  } else {
+                    dispatch(addWishlistItem(product.id));
+                  }
+                }}
                 aria-label="Add to wishlist"
               >
                 <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />

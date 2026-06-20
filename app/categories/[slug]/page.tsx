@@ -8,6 +8,8 @@ import CategoriesGrid from '@/components/CategoriesGrid';
 import ProductFilters from '@/components/ProductFilters';
 import CategoryPromoBanner from '@/components/CategoryPromoBanner';
 import { categoryApi, productApi } from '@/lib/api';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
 import { ChevronLeft, ChevronRight, Package, Sparkles } from 'lucide-react';
 
 interface Rating {
@@ -43,6 +45,15 @@ export default function CategoryPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlist());
+    }
+  }, [isAuthenticated, dispatch]);
   
   const slug = String(params?.slug || '').toLowerCase();
   const subcategoryQuery = searchParams.get('subcategory');

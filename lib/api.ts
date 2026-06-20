@@ -952,3 +952,285 @@ export const waitlistApi = {
     }
   },
 };
+
+// ─── Wishlist API ─────────────────────────────────────────────────────────────
+
+export interface WishlistCheckResponseDto {
+  productId: string;
+  isSaved: boolean;
+}
+
+export interface WishlistCountResponseDto {
+  count: number;
+}
+
+export const wishlistApi = {
+  async getWishlist() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/wishlist');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getWishlistCount() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<WishlistCountResponseDto>>('/wishlist/count');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async saveWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<WishlistCheckResponseDto>>('/wishlist/items', { productId });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async removeWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/wishlist/items/${productId}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async checkWishlistItem(productId: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<WishlistCheckResponseDto>>(`/wishlist/items/${productId}/check`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async clearWishlist() {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>('/wishlist');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+};
+
+// ─── Cart API ─────────────────────────────────────────────────────────────────
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+  isSelected: boolean;
+  isSavedForLater: boolean;
+  notes?: string;
+  product?: {
+    id: string;
+    name: string;
+    price: number;
+    currency?: string;
+    stock: number;
+    isAvailable: boolean;
+    imageUrl?: string;
+  };
+}
+
+export interface CartData {
+  userId: string;
+  activeItems: CartItem[];
+  savedItems: CartItem[];
+  activeCount: number;
+  savedCount: number;
+}
+
+export interface CartCountResponse {
+  activeCount: number;
+  savedCount: number;
+  totalCount: number;
+}
+
+export interface CartSummaryResponse {
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  currency: string;
+}
+
+export interface CartValidationResponse {
+  isValid: boolean;
+  errors: Array<{
+    productId: string;
+    productName: string;
+    errorType: 'unavailable' | 'insufficient_stock' | 'not_found';
+    requestedQuantity: number;
+    availableStock: number;
+    message: string;
+  }>;
+}
+
+export interface CartItemCheckResponse {
+  productId: string;
+  inCart: boolean;
+  status: 'active' | 'saved_for_later' | 'not_in_cart';
+  isActive: boolean;
+  isSavedForLater: boolean;
+  isSelected?: boolean;
+  quantity?: number;
+  notes?: string;
+}
+
+export const cartApi = {
+  async getCart(): Promise<ApiResponse<CartData>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<CartData>>('/cart');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getCartCount(): Promise<ApiResponse<CartCountResponse>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<CartCountResponse>>('/cart/count');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getCartSummary(): Promise<ApiResponse<CartSummaryResponse>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<CartSummaryResponse>>('/cart/summary');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async validateCart(): Promise<ApiResponse<CartValidationResponse>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<CartValidationResponse>>('/cart/validate');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async addItemToCart(productId: string, quantity: number, notes?: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<null>>('/cart/items', {
+        productId,
+        quantity,
+        notes,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async updateItemQuantity(productId: string, quantity: number): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<null>>(`/cart/items/${productId}/quantity`, {
+        quantity,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async removeItemFromCart(productId: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/cart/items/${productId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async selectOrUnselectItem(productId: string, isSelected: boolean): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<null>>(`/cart/items/${productId}/select`, {
+        isSelected,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async selectOrUnselectAllItems(isSelected: boolean): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<null>>('/cart/items/select-all', {
+        isSelected,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async saveItemForLater(productId: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<null>>(`/cart/items/${productId}/save-for-later`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async moveSavedItemBackToCart(productId: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<null>>(`/cart/items/${productId}/move-to-cart`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async clearCart(clearAll: boolean = false): Promise<ApiResponse<null>> {
+    try {
+      const config: any = { url: '/cart', method: 'DELETE', data: { clearAll } };
+      const response = await axiosInstance.request<ApiResponse<null>>(config);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async checkout(shippingAddress: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phoneNumber: string;
+  }, notes?: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/cart/checkout', {
+        shippingAddress,
+        notes,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async checkCartItem(productId: string): Promise<ApiResponse<CartItemCheckResponse>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<CartItemCheckResponse>>(`/cart/items/${productId}/check`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+};

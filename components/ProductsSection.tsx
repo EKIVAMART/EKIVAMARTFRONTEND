@@ -3,6 +3,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from './ProductCard';
 import { productApi, categoryApi } from '@/lib/api';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
 import { Package, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Rating {
@@ -59,6 +61,15 @@ export default function ProductsSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlist());
+    }
+  }, [isAuthenticated, dispatch]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);

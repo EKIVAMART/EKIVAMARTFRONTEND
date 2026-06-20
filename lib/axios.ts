@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 
-import { store } from '@/lib/store';
 import { setCredentials, logout, setTokens } from '@/lib/features/auth/authSlice';
+
+let storeInstance: any = null;
+
+export const injectStore = (s: any) => {
+  storeInstance = s;
+};
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -30,8 +35,8 @@ axiosInstance.interceptors.request.use(
       }
 
       // Fallback: read from the module-level store singleton
-      if (!token) {
-        const state = store.getState();
+      if (!token && storeInstance) {
+        const state = storeInstance.getState();
         token = state?.auth?.accessToken ?? null;
       }
 
@@ -113,15 +118,17 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const state = store.getState();
+      const state = storeInstance?.getState();
       const refreshToken =
-        state.auth.refreshToken ||
+        state?.auth?.refreshToken ||
         (typeof window !== 'undefined'
           ? localStorage.getItem('refreshToken')
           : null);
 
       if (!refreshToken) {
-        store.dispatch(logout());
+        if (storeInstance) {
+          storeInstance.dispatch(logout());
+        }
         return Promise.reject(error);
       }
 
@@ -137,12 +144,14 @@ axiosInstance.interceptors.response.use(
         const { accessToken, refreshToken: newRefreshToken } = tokenData.data;
 
         // Update tokens in store
-        store.dispatch(
-          setTokens({
-            accessToken,
-            refreshToken: newRefreshToken,
-          })
-        );
+        if (storeInstance) {
+          storeInstance.dispatch(
+            setTokens({
+              accessToken,
+              refreshToken: newRefreshToken,
+            })
+          );
+        }
 
         // Update authorization header
         if (originalRequest.headers) {
@@ -155,7 +164,9 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        store.dispatch(logout());
+        if (storeInstance) {
+          storeInstance.dispatch(logout());
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

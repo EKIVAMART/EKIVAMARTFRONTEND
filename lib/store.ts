@@ -5,6 +5,7 @@ import wishlistReducer from './features/wishlist/wishlistSlice';
 import productReducer from './features/product/productSlice';
 import addressReducer from './features/address/addressSlice';
 import ratingReducer from './features/rating/ratingSlice';
+import { injectStore } from './axios';
 
 export const makeStore = () => {
   return configureStore({
@@ -21,6 +22,7 @@ export const makeStore = () => {
 
 // Create and export a store instance for server-side usage
 export const store = makeStore();
+injectStore(store);
 
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore['getState']>;
