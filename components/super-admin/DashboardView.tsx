@@ -213,7 +213,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
   const categoryBreakdown = useMemo(() => {
     if (timeframe === 'daily') {
       return [
-        { name: 'Fashion', value: 50, color: '#c800ff', percentage: '50%', amount: 225000 },
+        { name: 'Fashion', value: 50, color: '#9d4ae3', percentage: '50%', amount: 225000 },
         { name: 'Electronics', value: 25, color: '#3b82f6', percentage: '25%', amount: 112500 },
         { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 67500 },
         { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 45000 },
@@ -221,7 +221,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     }
     if (timeframe === 'monthly') {
       return [
-        { name: 'Fashion', value: 40, color: '#c800ff', percentage: '40%', amount: 5940000 },
+        { name: 'Fashion', value: 40, color: '#9d4ae3', percentage: '40%', amount: 5940000 },
         { name: 'Electronics', value: 35, color: '#3b82f6', percentage: '35%', amount: 5197500 },
         { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 2227500 },
         { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 1485000 },
@@ -229,7 +229,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     }
     // weekly
     return [
-      { name: 'Fashion', value: 45, color: '#c800ff', percentage: '45%', amount: 1462500 },
+      { name: 'Fashion', value: 45, color: '#9d4ae3', percentage: '45%', amount: 1462500 },
       { name: 'Electronics', value: 30, color: '#3b82f6', percentage: '30%', amount: 975000 },
       { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 487500 },
       { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 325000 },

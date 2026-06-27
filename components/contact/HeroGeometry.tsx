@@ -35,7 +35,7 @@ export default function HeroGeometry() {
             </radialGradient>
             <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#ff69e0" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#c740b0" stopOpacity="0" />
+              <stop offset="100%" stopColor="#8236be" stopOpacity="0" />
             </radialGradient>
           </defs>
           {/* Spokes */}

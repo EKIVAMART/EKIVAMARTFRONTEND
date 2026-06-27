@@ -122,7 +122,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
           className="relative bg-white w-full max-w-6xl rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 max-h-full flex flex-col"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-6 sm:px-8 py-5 text-white flex items-center justify-between shrink-0">
+          <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-6 sm:px-8 py-5 text-white flex items-center justify-between shrink-0">
             <div>
               <h2 className="text-xl sm:text-2xl font-black tracking-tight">{product.name}</h2>
               <div className="flex items-center gap-3 mt-1.5">
@@ -190,7 +190,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                             key={idx}
                             onClick={() => setSelectedImageIndex(idx)}
                             className={`w-14 h-14 rounded-xl overflow-hidden border-2 transition-all bg-white ${
-                              selectedImageIndex === idx ? 'border-[#c800ff] shadow-md scale-110' : 'border-transparent hover:border-slate-300 opacity-60 hover:opacity-100'
+                              selectedImageIndex === idx ? 'border-[#9d4ae3] shadow-md scale-110' : 'border-transparent hover:border-slate-300 opacity-60 hover:opacity-100'
                             }`}
                           >
                             <img src={url} className="w-full h-full object-cover" alt="" />
@@ -303,7 +303,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                   <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
                     <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
                       <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <Info size={16} className="text-[#c800ff]" />
+                        <Info size={16} className="text-[#9d4ae3]" />
                         Additional Info
                       </h3>
                     </div>

@@ -102,7 +102,7 @@ export default function WishlistPage() {
     return (
       <div className="min-h-[60vh] bg-white flex flex-col items-center justify-center p-6 text-center">
         <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-4">
-          <ShoppingCart size={30} className="text-[#c800ff]" />
+          <ShoppingCart size={30} className="text-[#9d4ae3]" />
         </div>
         <h2 className="text-xl font-bold text-slate-800 mb-2">Access Your Wishlist</h2>
         <p className="text-gray-500 max-w-sm mb-6">
@@ -110,7 +110,7 @@ export default function WishlistPage() {
         </p>
         <Link
           href="/"
-          className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-2.5 rounded-xl font-bold hover:from-[#b500e6] hover:to-[#802699] transition shadow-md"
+          className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-2.5 rounded-xl font-bold hover:from-[#8236be] hover:to-[#692a99] transition shadow-md"
         >
           Return to Shop
         </Link>
@@ -134,7 +134,7 @@ export default function WishlistPage() {
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-gray-50/50">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
-          <Link href="/" className="text-[#c800ff] font-medium hover:underline">
+          <Link href="/" className="text-[#9d4ae3] font-medium hover:underline">
             Home
           </Link>
           <ChevronRight size={14} className="text-gray-400" />
@@ -149,7 +149,7 @@ export default function WishlistPage() {
             <h1 className="text-3xl font-bold text-slate-800 mb-1">My List</h1>
             <p className="text-gray-500 font-medium">
               There are{' '}
-              <span className="text-[#c800ff] font-bold">
+              <span className="text-[#9d4ae3] font-bold">
                 {hydratedItems.length}
               </span>{' '}
               products in your Wishlist
@@ -209,7 +209,7 @@ export default function WishlistPage() {
                         </Link>
                         <div>
                           <Link href={`/products/${product.id}`}>
-                            <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-[#c800ff] cursor-pointer">
+                            <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-2 hover:text-[#9d4ae3] cursor-pointer">
                               {product.name}
                             </h3>
                           </Link>
@@ -260,7 +260,7 @@ export default function WishlistPage() {
                               className={`px-4 py-2 rounded-xl font-semibold transition text-sm w-full md:w-auto flex items-center justify-center gap-2 shadow-sm ${
                                 isActiveInCart || isSavedInCart
                                   ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                                  : 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699]'
+                                  : 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white hover:from-[#8236be] hover:to-[#692a99]'
                               }`}
                             >
                               <ShoppingCart size={16} />
@@ -290,7 +290,7 @@ export default function WishlistPage() {
             <p className="text-gray-500 mb-6">Your wishlist is empty — start saving items you love!</p>
             <Link
               href="/"
-              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-8 py-3 rounded-xl font-bold hover:from-[#b500e6] hover:to-[#802699] transition shadow-lg"
+              className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-8 py-3 rounded-xl font-bold hover:from-[#8236be] hover:to-[#692a99] transition shadow-lg"
             >
               Explore Products
             </Link>

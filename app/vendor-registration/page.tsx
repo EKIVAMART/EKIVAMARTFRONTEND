@@ -1,57 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Stepper from '@/components/vendor-registration/Stepper';
-import Step1Category from '@/components/vendor-registration/Step1Category';
-import Step2CompanyInfo from '@/components/vendor-registration/Step2CompanyInfo';
-import Step3ContactDetails from '@/components/vendor-registration/Step3ContactDetails';
-import Step4Documents from '@/components/vendor-registration/Step4Documents';
-import Step5Declaration from '@/components/vendor-registration/Step5Declaration';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function VendorRegistrationPage() {
-  const [step, setStep] = useState(1);
+export default function VendorRegistrationRedirect() {
+  const router = useRouter();
 
-  const nextStep = () => setStep((s) => Math.min(s + 1, 5));
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
-
-  const renderStep = () => {
-    switch (step) {
-      case 1: return <Step1Category onNext={nextStep} />;
-      case 2: return <Step2CompanyInfo onNext={nextStep} onPrev={prevStep} />;
-      case 3: return <Step3ContactDetails onNext={nextStep} onPrev={prevStep} />;
-      case 4: return <Step4Documents onNext={nextStep} onPrev={prevStep} />;
-      case 5: return <Step5Declaration onPrev={prevStep} />;
-      default: return <Step1Category onNext={nextStep} />;
-    }
-  };
+  useEffect(() => {
+    router.replace('/become-a-vendor');
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-20 font-sans pt-20">
-      {/* Brand Logo */}
-      {/* <div className="flex justify-center py-8">
-        <div className="text-center">
-          <div className="text-[#c800ff] flex justify-center mb-1">
-             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
-          </div>
-          <h1 className="text-2xl font-black tracking-tighter text-[#c800ff]">Faflora</h1>
-        </div>
-      </div> */}
-
-      <div className="max-w-4xl mx-auto px-4">
-        <Stepper currentStep={step} />
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            {renderStep()}
-          </motion.div>
-        </AnimatePresence>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
+      <div className="text-center space-y-4">
+        <div className="w-10 h-10 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin mx-auto" />
+        <p className="text-slate-500 text-sm font-semibold">Redirecting to Become a Vendor portal...</p>
       </div>
     </div>
   );

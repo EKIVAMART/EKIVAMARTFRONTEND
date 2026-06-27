@@ -78,9 +78,9 @@ export const ProfileTab: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Success Message */}
         {success && (
-          <div className="flex items-center gap-3 p-4 bg-[#fcedf9] border border-[#fcedf9] rounded-xl">
-            <CheckCircle2 className="w-5 h-5 text-[#c800ff]" />
-            <p className="text-sm font-medium text-[#b500e6]">
+          <div className="flex items-center gap-3 p-4 bg-[#f3ecfc] border border-[#f3ecfc] rounded-xl">
+            <CheckCircle2 className="w-5 h-5 text-[#9d4ae3]" />
+            <p className="text-sm font-medium text-[#8236be]">
               Profile updated successfully!
             </p>
           </div>
@@ -141,7 +141,7 @@ export const ProfileTab: React.FC = () => {
               className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
             />
             {user?.isEmailVerified && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fcedf9] text-[#b500e6] text-xs font-medium rounded-full">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f3ecfc] text-[#8236be] text-xs font-medium rounded-full">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Verified
               </span>

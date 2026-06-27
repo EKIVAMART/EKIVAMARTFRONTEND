@@ -202,17 +202,17 @@ export default function ProductCard({
           will-change: transform, box-shadow;
           position: relative;
           height: 100%;
-          border: 1px solid rgba(152, 29, 135, 0.1);
+          border: 1px solid rgba(157, 74, 227, 0.1);
         }
 
         .pc-card:hover {
           transform: translateY(-12px);
-          box-shadow: 0 20px 40px rgba(152, 29, 135, 0.15);
-          border-color: rgba(152, 29, 135, 0.3);
+          box-shadow: 0 20px 40px rgba(157, 74, 227, 0.15);
+          border-color: rgba(157, 74, 227, 0.3);
         }
 
         .pc-image-wrap {
-          background: linear-gradient(135deg, #f8fafb 0%, #fcedf9 100%);
+          background: linear-gradient(135deg, #f8fafb 0%, #f3ecfc 100%);
           height: 240px;
           display: flex;
           align-items: center;
@@ -248,7 +248,7 @@ export default function ProductCard({
           position: absolute;
           top: 12px;
           right: 12px;
-          background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
+          background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
           color: white;
           border-radius: 12px;
           padding: 8px 12px;
@@ -259,7 +259,7 @@ export default function ProductCard({
           gap: 2px;
           font-weight: 700;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.3);
+          box-shadow: 0 4px 12px rgba(157, 74, 227, 0.3);
           min-width: 52px;
         }
 
@@ -282,19 +282,19 @@ export default function ProductCard({
           height: 40px;
           border-radius: 50%;
           background: white;
-          border: 2px solid #c800ff;
-          color: #c800ff;
+          border: 2px solid #9d4ae3;
+          color: #9d4ae3;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s ease;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.15);
+          box-shadow: 0 4px 12px rgba(157, 74, 227, 0.15);
         }
 
         .pc-wishlist-btn:hover {
-          background: #c800ff;
+          background: #9d4ae3;
           color: white;
           transform: scale(1.1);
         }
@@ -307,8 +307,8 @@ export default function ProductCard({
           display: flex;
           align-items: center;
           gap: 4px;
-          background: #fcedf9;
-          color: #c800ff;
+          background: #f3ecfc;
+          color: #9d4ae3;
           border: none;
           padding: 6px 14px;
           border-radius: 8px;
@@ -316,14 +316,14 @@ export default function ProductCard({
           font-size: 14px;
           cursor: pointer;
           transition: all 0.3s ease;
-          border: 1px solid #fcedf9;
+          border: 1px solid #f3ecfc;
         }
 
         .pc-add-cart-btn:hover {
-          background: #c800ff;
+          background: #9d4ae3;
           color: white;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(152, 29, 135, 0.2);
+          box-shadow: 0 4px 12px rgba(157, 74, 227, 0.2);
         }
 
         .pc-add-cart-btn:disabled {
@@ -345,7 +345,7 @@ export default function ProductCard({
           bottom: 0;
           left: 0;
           right: 0;
-          background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
+          background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
           color: white;
           padding: 12px;
           display: flex;
@@ -376,7 +376,7 @@ export default function ProductCard({
 
         .pc-category {
           font-size: 11px;
-          color: #c800ff;
+          color: #9d4ae3;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.6px;
@@ -397,7 +397,7 @@ export default function ProductCard({
         }
 
         .pc-card:hover .pc-title {
-          color: #c800ff;
+          color: #9d4ae3;
         }
 
         /* Rating */
@@ -439,7 +439,7 @@ export default function ProductCard({
         }
 
         .pc-location-icon {
-          color: #c800ff;
+          color: #9d4ae3;
           flex-shrink: 0;
         }
 
@@ -481,13 +481,13 @@ export default function ProductCard({
         }
 
         .pc-author {
-          color: #c800ff;
+          color: #9d4ae3;
           font-weight: 700;
           transition: all 0.3s ease;
         }
 
         .pc-card:hover .pc-author {
-          color: #b500e6;
+          color: #8236be;
         }
 
         /* Price Row */
@@ -510,7 +510,7 @@ export default function ProductCard({
         .pc-current {
           font-size: 18px;
           font-weight: 800;
-          color: #c800ff;
+          color: #9d4ae3;
           letter-spacing: -0.3px;
         }
 

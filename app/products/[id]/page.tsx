@@ -371,7 +371,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         <div className="pd-details-section">
           <div className="pd-info">
             {/* Category tag */}
-            <span className="text-xs font-bold text-[#c800ff] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#9d4ae3] uppercase tracking-wider">
               {categoryName}
             </span>
             
@@ -447,7 +447,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               )}
               {locationStr && (
                 <div className="col-span-2 border-t border-gray-200/50 pt-2.5 mt-1 flex items-center gap-1.5">
-                  <MapPin size={14} className="text-[#c800ff] shrink-0" />
+                  <MapPin size={14} className="text-[#9d4ae3] shrink-0" />
                   <span className="text-gray-400 font-bold uppercase tracking-wider text-[10px] sm:text-xs">Location:</span>
                   <span className="font-bold text-gray-800 text-xs sm:text-sm">{locationStr}</span>
                 </div>
@@ -795,7 +795,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                     {(() => {
                       const relPriceVal = typeof related.price === 'object' && related.price !== null ? (related.price as any).amount : (related.price ?? 0);
                       return (
-                        <p className="pd-related-price mt-auto text-[#c800ff] font-extrabold text-base">
+                        <p className="pd-related-price mt-auto text-[#9d4ae3] font-extrabold text-base">
                           ₦ {relPriceVal.toLocaleString()}
                         </p>
                       );

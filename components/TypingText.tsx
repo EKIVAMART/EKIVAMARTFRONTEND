@@ -24,7 +24,7 @@ const TypingText = ({
   deleteSpeed = 50,
   delayBetween = 1800,
   className = "",
-  colorClass = "text-[#c800ff]",
+  colorClass = "text-[#9d4ae3]",
   onCycleComplete,
   disableCursorOnMobile = true,
   keepCursorFlashing = false,

@@ -385,7 +385,7 @@ export default function WaitlistView() {
           
           <button
             onClick={() => setIsBroadcastModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white font-bold rounded-2xl active:scale-98 transition shadow-lg shadow-fuchsia-100 flex-1 sm:flex-none text-center justify-center"
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white font-bold rounded-2xl active:scale-98 transition shadow-lg shadow-fuchsia-100 flex-1 sm:flex-none text-center justify-center"
           >
             <Send size={17} />
             Send Email Broadcast
@@ -435,7 +435,7 @@ export default function WaitlistView() {
                 placeholder="Search subscribers by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-2xl text-sm bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-2xl text-sm bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
               />
               {searchQuery && (
                 <button
@@ -453,7 +453,7 @@ export default function WaitlistView() {
               <select
                 value={statusFilter}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
               >
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
@@ -468,7 +468,7 @@ export default function WaitlistView() {
               <select
                 value={roleFilter}
                 onChange={(e) => handleRoleChange(e.target.value)}
-                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
               >
                 <option value="All">All Roles</option>
                 <option value="Customer">Customer</option>
@@ -492,7 +492,7 @@ export default function WaitlistView() {
         <div className="overflow-x-auto">
           {isLoadingSubscribers ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <Loader2 size={32} className="animate-spin text-[#c800ff]" />
+              <Loader2 size={32} className="animate-spin text-[#9d4ae3]" />
               <p className="text-sm font-semibold text-slate-500">Loading subscriber records...</p>
             </div>
           ) : filteredSubscribers.length === 0 ? (
@@ -605,7 +605,7 @@ export default function WaitlistView() {
                         onClick={() => handlePageChange(page)}
                         className={`w-8 h-8 rounded-xl font-bold text-sm transition flex items-center justify-center ${
                           currentPage === page
-                            ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white shadow-sm'
+                            ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-sm'
                             : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
@@ -660,7 +660,7 @@ export default function WaitlistView() {
                   value={launchForm.launchDate}
                   onChange={(e) => setLaunchForm({ ...launchForm, launchDate: e.target.value })}
                   min={new Date().toISOString().substring(0, 16)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
                 />
               </div>
 
@@ -678,7 +678,7 @@ export default function WaitlistView() {
                   value={launchForm.title}
                   onChange={(e) => setLaunchForm({ ...launchForm, title: e.target.value.substring(0, 300) })}
                   maxLength={255}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
                 />
               </div>
 
@@ -696,7 +696,7 @@ export default function WaitlistView() {
                   onChange={(e) => setLaunchForm({ ...launchForm, subtitle: e.target.value.substring(0, 600) })}
                   maxLength={500}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition resize-none"
                 />
               </div>
 
@@ -715,7 +715,7 @@ export default function WaitlistView() {
                     onChange={(e) => setLaunchForm({ ...launchForm, sendBroadcast: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#c800ff]" />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9d4ae3]" />
                 </label>
               </div>
 
@@ -737,7 +737,7 @@ export default function WaitlistView() {
                     onChange={(e) => setLaunchForm({ ...launchForm, broadcastReason: e.target.value.substring(0, 1100) })}
                     maxLength={1000}
                     rows={4}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition resize-none"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition resize-none"
                   />
                   <p className="text-xs text-slate-400 flex items-center gap-1 font-semibold">
                     <Info size={12} /> Explain why the date shifted; this will be embedded directly in the email broadcast.
@@ -752,7 +752,7 @@ export default function WaitlistView() {
                   <h4 className="text-lg font-black text-slate-800 tracking-tight leading-none">{launchForm.title || 'Something Amazing is Coming'}</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">{launchForm.subtitle || "Nigeria's Premier Multi-Vendor Marketplace"}</p>
                   <div className="inline-flex gap-2 justify-center pt-2">
-                    <span className="bg-[#c800ff]/10 text-[#c800ff] px-3 py-1 rounded-full text-xs font-black">
+                    <span className="bg-[#9d4ae3]/10 text-[#9d4ae3] px-3 py-1 rounded-full text-xs font-black">
                       {launchForm.launchDate ? formatDate(new Date(launchForm.launchDate).toISOString()) : 'Set a Date'}
                     </span>
                   </div>
@@ -773,7 +773,7 @@ export default function WaitlistView() {
               <button
                 type="button"
                 onClick={handleLaunchSubmit}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100"
               >
                 Save Launch Config
               </button>
@@ -824,7 +824,7 @@ export default function WaitlistView() {
                     value={broadcastForm.subject}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value.substring(0, 300) })}
                     maxLength={255}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
                   />
                 </div>
 
@@ -842,7 +842,7 @@ export default function WaitlistView() {
                     value={broadcastForm.previewText}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, previewText: e.target.value.substring(0, 300) })}
                     maxLength={255}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
                   />
                   <p className="text-[10px] font-semibold text-slate-400">Short text displayed next to subject line in standard inbox views.</p>
                 </div>
@@ -853,7 +853,7 @@ export default function WaitlistView() {
                   <select
                     value={broadcastForm.role}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, role: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition cursor-pointer"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition cursor-pointer"
                   >
                     <option value="All">All Active Subscribers</option>
                     <option value="Customer">Customers Only</option>
@@ -864,7 +864,7 @@ export default function WaitlistView() {
                   <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600 text-xs font-bold w-fit">
                     <Users size={14} className="text-slate-500" />
                     Target Audience:
-                    <span className="text-[#c800ff] font-extrabold">{broadcastRecipientCount} active subscribers</span>
+                    <span className="text-[#9d4ae3] font-extrabold">{broadcastRecipientCount} active subscribers</span>
                   </div>
                 </div>
 
@@ -877,7 +877,7 @@ export default function WaitlistView() {
                     value={broadcastForm.bodyText}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, bodyText: e.target.value })}
                     rows={6}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#c800ff] transition resize-none font-mono"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition resize-none font-mono"
                   />
                 </div>
 
@@ -893,7 +893,7 @@ export default function WaitlistView() {
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[350px]">
                   
                   {/* Faflora Email Brand Header */}
-                  <div className="bg-[#c800ff] p-4 text-center">
+                  <div className="bg-[#9d4ae3] p-4 text-center">
                     <h4 className="text-white text-base font-black tracking-widest leading-none">FAFLORA</h4>
                     <span className="text-[9px] text-fuchsia-100 tracking-wider font-semibold uppercase mt-1 inline-block">Nigeria's Flowers & Marketplace</span>
                   </div>
@@ -919,7 +919,7 @@ export default function WaitlistView() {
                     <p>
                       You are receiving this email because you signed up on our waitlist. 
                     </p>
-                    <a href="#" className="text-[#c800ff] font-extrabold hover:underline block mt-1">
+                    <a href="#" className="text-[#9d4ae3] font-extrabold hover:underline block mt-1">
                       Unsubscribe from this list
                     </a>
                   </div>
@@ -941,7 +941,7 @@ export default function WaitlistView() {
               <button
                 type="button"
                 onClick={handleBroadcastSubmit}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100"
               >
                 Send Broadcast
               </button>
@@ -956,7 +956,7 @@ export default function WaitlistView() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsLaunchConfirmOpen(false)} />
           <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-full bg-fuchsia-100 flex items-center justify-center mx-auto mb-4 text-[#c800ff]">
+            <div className="w-12 h-12 rounded-full bg-fuchsia-100 flex items-center justify-center mx-auto mb-4 text-[#9d4ae3]">
               <Settings size={22} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Save Launch Configuration?</h4>
@@ -979,7 +979,7 @@ export default function WaitlistView() {
               </button>
               <button
                 onClick={confirmLaunchSave}
-                className="flex-1 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-bold rounded-xl hover:opacity-90 transition text-sm flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-xl hover:opacity-90 transition text-sm flex items-center justify-center gap-1.5"
                 disabled={isSavingLaunch}
               >
                 {isSavingLaunch ? (

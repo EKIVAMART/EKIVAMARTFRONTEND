@@ -35,7 +35,7 @@ export default function HeroSubscribe() {
             />
 
             {/* Button */}
-            <button className="shrink-0 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white transition-all hover:from-[#b500e6] hover:to-[#802699] hover:shadow-lg hover:shadow-purple-400/30 active:scale-95">
+            <button className="shrink-0 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white transition-all hover:from-[#8236be] hover:to-[#692a99] hover:shadow-lg hover:shadow-purple-400/30 active:scale-95">
               Subscribe
             </button>
           </div>

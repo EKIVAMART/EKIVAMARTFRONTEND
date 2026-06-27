@@ -285,8 +285,8 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
               <div
                 className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all ${
                   imagePreview
-                    ? 'border-[#c800ff]/30 bg-fuchsia-50/50'
-                    : 'border-gray-200 hover:border-[#c800ff]/50 hover:bg-fuchsia-50/20'
+                    ? 'border-[#9d4ae3]/30 bg-fuchsia-50/50'
+                    : 'border-gray-200 hover:border-[#9d4ae3]/50 hover:bg-fuchsia-50/20'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -302,7 +302,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                           e.stopPropagation();
                           fileInputRef.current?.click();
                         }}
-                        className="text-xs font-bold text-[#912cad] hover:text-[#c800ff] px-3 py-1 border border-[#c800ff]/30 rounded-lg hover:bg-fuchsia-50 transition"
+                        className="text-xs font-bold text-[#8236be] hover:text-[#9d4ae3] px-3 py-1 border border-[#9d4ae3]/30 rounded-lg hover:bg-fuchsia-50 transition"
                       >
                         Click to change image
                       </button>
@@ -326,7 +326,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
                       <Upload size={24} />
                     </div>
-                    <p className="text-sm font-bold text-[#912cad]">Click to upload image</p>
+                    <p className="text-sm font-bold text-[#8236be]">Click to upload image</p>
                     <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF or WebP (Max 10MB)</p>
                   </div>
                 )}
@@ -350,7 +350,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition bg-white text-slate-800"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition bg-white text-slate-800"
                 placeholder="e.g., Electronics, Fashion"
                 required
               />
@@ -365,7 +365,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                 id="catDesc"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition bg-white text-slate-800 min-h-[100px]"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition bg-white text-slate-800 min-h-[100px]"
                 placeholder="Brief description of the category..."
                 required
               />
@@ -389,7 +389,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             type="submit"
             form="categoryForm"
             disabled={isLoading || isPublishing}
-            className="flex-1 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white font-bold rounded-xl transition flex items-center justify-center shadow-lg shadow-fuchsia-100 disabled:opacity-70"
+            className="flex-1 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white font-bold rounded-xl transition flex items-center justify-center shadow-lg shadow-fuchsia-100 disabled:opacity-70"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -73,7 +73,7 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                     <li key={c}>
                       <a
                         href={`/categories/${slugC}`}
-                        className={`block w-full px-3 py-3 rounded-lg transition text-sm ${isActive ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                        className={`block w-full px-3 py-3 rounded-lg transition text-sm ${isActive ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white' : 'text-gray-700 hover:bg-gray-50'}`}
                       >
                         <span className="capitalize">{c}</span>
                       </a>
@@ -85,8 +85,8 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
               <div className="mt-6">
                 <h4 className="font-semibold text-gray-500 mb-3">Filter by price</h4>
                 <div className="p-3 bg-white rounded-lg border border-gray-100">
-                  <div className="text-sm text-gray-600 mb-1">From: <span className="text-[#c800ff] font-semibold">{currency} {minValue}</span></div>
-                  <div className="text-sm text-gray-600 mb-3">To: <span className="text-[#c800ff] font-semibold">{currency} {maxValue}</span></div>
+                  <div className="text-sm text-gray-600 mb-1">From: <span className="text-[#9d4ae3] font-semibold">{currency} {minValue}</span></div>
+                  <div className="text-sm text-gray-600 mb-3">To: <span className="text-[#9d4ae3] font-semibold">{currency} {maxValue}</span></div>
 
                   {/* Dual range slider with purple gradient track */}
                   <div className="relative py-4">
@@ -96,7 +96,7 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                     <div
                       className="absolute top-1/2 -translate-y-1/2 h-2 rounded-lg pointer-events-none"
                       style={{
-                        background: 'linear-gradient(to right, #c800ff, #912cad)',
+                        background: 'linear-gradient(to right, #9d4ae3, #8236be)',
                         left: globalMax > globalMin ? `${((minValue - globalMin) / (globalMax - globalMin)) * 100}%` : '0%',
                         right: globalMax > globalMin ? `${100 - ((maxValue - globalMin) / (globalMax - globalMin)) * 100}%` : '0%',
                       }}
@@ -128,12 +128,12 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                   <div className="flex items-center gap-2 mt-1">
                     <button
                       className="px-3 py-2 rounded-md text-white text-sm font-medium"
-                      style={{ background: 'linear-gradient(to right, #c800ff, #912cad)' }}
+                      style={{ background: 'linear-gradient(to right, #9d4ae3, #8236be)' }}
                       onClick={() => { setMinValue(globalMin); setMaxValue(globalMax); }}
                     >
                       Reset
                     </button>
-                    <div className="text-sm text-gray-500">Showing <span className="text-[#c800ff] font-semibold">{filtered.length}</span></div>
+                    <div className="text-sm text-gray-500">Showing <span className="text-[#9d4ae3] font-semibold">{filtered.length}</span></div>
                   </div>
                 </div>
               </div>
@@ -142,10 +142,10 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
   
           <section className="md:col-span-3">
             <div className="flex items-center justify-between mb-4">
-              <div className="text-sm text-gray-600">We found <span className="text-[#c800ff] font-semibold">{filtered.length}</span> items for you!</div>
+              <div className="text-sm text-gray-600">We found <span className="text-[#9d4ae3] font-semibold">{filtered.length}</span> items for you!</div>
               <div className="flex items-center gap-3">
-                <button className="text-sm text-gray-600 hover:text-[#c800ff]">Filters</button>
-                <button className="text-sm text-gray-600 hover:text-[#c800ff]">Sort</button>
+                <button className="text-sm text-gray-600 hover:text-[#9d4ae3]">Filters</button>
+                <button className="text-sm text-gray-600 hover:text-[#9d4ae3]">Sort</button>
               </div>
             </div>
   
@@ -185,19 +185,19 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #c800ff, #912cad);
+          background: linear-gradient(135deg, #9d4ae3, #8236be);
           cursor: pointer;
           border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(200,0,255,0.4);
+          box-shadow: 0 1px 4px rgba(157,74,227,0.4);
         }
         .cat-slider::-moz-range-thumb {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #c800ff, #912cad);
+          background: linear-gradient(135deg, #9d4ae3, #8236be);
           cursor: pointer;
           border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(200,0,255,0.4);
+          box-shadow: 0 1px 4px rgba(157,74,227,0.4);
         }
         .cat-slider::-webkit-slider-runnable-track { background: transparent; }
         .cat-slider::-moz-range-track { background: transparent; }

@@ -83,7 +83,7 @@ const CategoryCard = ({ category }: { category: any }) => {
         )}
       </div>
       {/* Text label — scales with the image on hover, and shows in full without truncation */}
-      <p className="mt-2 text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#c800ff] group-hover:scale-110 group-hover:mt-4 transition-all duration-300 whitespace-nowrap max-w-[96px] sm:max-w-[120px] truncate origin-top group-hover:whitespace-normal group-hover:max-w-[160px] group-hover:overflow-visible group-hover:text-clip">
+      <p className="mt-2 text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#9d4ae3] group-hover:scale-110 group-hover:mt-4 transition-all duration-300 whitespace-nowrap max-w-[96px] sm:max-w-[120px] truncate origin-top group-hover:whitespace-normal group-hover:max-w-[160px] group-hover:overflow-visible group-hover:text-clip">
         {category.name}
       </p>
     </Link>
@@ -284,7 +284,7 @@ const FeaturedCategories = () => {
       {/* Position Indicator */}
       <div className="w-28 h-1.5 bg-purple-200/60 rounded-full mx-auto mt-4 relative overflow-hidden">
         <div
-          className="absolute top-0 bottom-0 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full transition-none"
+          className="absolute top-0 bottom-0 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-full transition-none"
           style={{
             width: '25%',
             left: `${scrollProgress * 75}%`,

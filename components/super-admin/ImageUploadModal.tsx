@@ -138,7 +138,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
             className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-8 py-6 text-white flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
                 <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
@@ -150,7 +150,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
 
             <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><ImageIcon size={22} /></div>
+                <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><ImageIcon size={22} /></div>
                 <div>
                   <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
                   <p className="text-xs text-gray-500">
@@ -168,11 +168,11 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-3xl p-12 flex flex-col items-center cursor-pointer transition-all select-none ${
                   isDraggingOver
-                    ? 'border-[#c800ff] bg-[#f5e6ff] scale-[1.01]'
-                    : 'border-[#fcedf9] bg-[#F8FDFF] hover:bg-[#F0F9FA] hover:border-[#e4aeff]'
+                    ? 'border-[#9d4ae3] bg-[#f5e6ff] scale-[1.01]'
+                    : 'border-[#f3ecfc] bg-[#F8FDFF] hover:bg-[#F0F9FA] hover:border-[#e4aeff]'
                 }`}
               >
-                <div className={`text-white p-4 rounded-2xl mb-4 transition-all ${isDraggingOver ? 'bg-[#c800ff] scale-110' : 'bg-gradient-to-r from-[#c800ff] to-[#912cad]'}`}>
+                <div className={`text-white p-4 rounded-2xl mb-4 transition-all ${isDraggingOver ? 'bg-[#9d4ae3] scale-110' : 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be]'}`}>
                   <Upload size={36} />
                 </div>
                 <p className="font-bold text-gray-700">
@@ -189,7 +189,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
                       <div className="relative group rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm aspect-square bg-gray-50 flex items-center justify-center">
                         <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
                         {i === 0 && existingImagesCount === 0 && (
-                          <div className="absolute top-2 left-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[10px] font-bold px-2 py-1 rounded-md shadow">
+                          <div className="absolute top-2 left-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-[10px] font-bold px-2 py-1 rounded-md shadow">
                             COVER
                           </div>
                         )}
@@ -207,7 +207,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
                           newAlts[i] = e.target.value;
                           setAlts(newAlts);
                         }}
-                        className="w-full text-xs p-2 border rounded-lg outline-none focus:border-[#912cad]" 
+                        className="w-full text-xs p-2 border rounded-lg outline-none focus:border-[#8236be]" 
                       />
                     </div>
                   ))}
@@ -229,7 +229,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
                 onClick={handleComplete} 
                 className={`flex items-center gap-2 px-10 py-3 rounded-2xl font-bold transition shadow-lg ${
                   imagePreviews.length > 0 
-                    ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white' 
+                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white' 
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
                 disabled={imagePreviews.length === 0 || alts.some(alt => !alt.trim())}

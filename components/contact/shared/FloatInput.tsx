@@ -23,15 +23,15 @@ const FloatInput = React.forwardRef<HTMLInputElement, FloatInputProps>(
             error
               ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-300'
               : focused
-              ? 'border-[#c800ff] shadow-[0_0_0_3px_rgba(152,29,135,0.08)]'
-              : 'border-[#e8b8e4] hover:border-[#c740b0]/50'
+              ? 'border-[#9d4ae3] shadow-[0_0_0_3px_rgba(152,29,135,0.08)]'
+              : 'border-[#e8b8e4] hover:border-[#8236be]/50'
           } ${className}`}
           style={{ fontFamily: "'Palatino Linotype', Georgia, serif" }}
         />
         <label
           className={`absolute left-4 transition-all duration-200 pointer-events-none font-medium ${
             lifted
-              ? 'top-2 text-[10px] uppercase tracking-[2px] text-[#c740b0]'
+              ? 'top-2 text-[10px] uppercase tracking-[2px] text-[#8236be]'
               : 'top-4 text-[14px] text-gray-400'
           }`}
         >

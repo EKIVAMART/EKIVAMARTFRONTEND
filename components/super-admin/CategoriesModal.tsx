@@ -64,7 +64,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
       </div>
 
       {/* Status ribbon */}
-      <div className={`h-1.5 w-full ${isDraft ? 'bg-gradient-to-r from-amber-400 to-yellow-300' : 'bg-gradient-to-r from-[#c800ff] to-[#912cad]'}`} />
+      <div className={`h-1.5 w-full ${isDraft ? 'bg-gradient-to-r from-amber-400 to-yellow-300' : 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be]'}`} />
 
       {/* Body */}
       <div className="p-5 pt-8 flex flex-col items-center text-center flex-1">
@@ -73,7 +73,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           className={`w-20 h-20 rounded-full overflow-hidden mb-4 ring-4 relative flex items-center justify-center text-white text-3xl font-black uppercase flex-shrink-0 ${
             isDraft
               ? 'bg-gradient-to-br from-amber-400 to-yellow-300 ring-amber-50'
-              : 'bg-gradient-to-br from-[#c800ff] to-[#912cad] ring-fuchsia-50'
+              : 'bg-gradient-to-br from-[#9d4ae3] to-[#8236be] ring-fuchsia-50'
           }`}
         >
           {category.image ? (
@@ -109,7 +109,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
             return (
               <>
                 {publishedCount > 0 && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#912cad] border border-fuchsia-100 animate-in fade-in duration-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#8236be] border border-fuchsia-100 animate-in fade-in duration-200">
                     <Layers size={10} />
                     {publishedCount} {publishedCount === 1 ? 'Subcategory' : 'Subcategories'}
                   </span>
@@ -139,7 +139,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           <div className="flex flex-col gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); onPublish(category); }}
-              className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
+              className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
             >
               <Upload size={13} />
               Publish Category
@@ -163,7 +163,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); onSubcategories(category); }}
-              className="flex-1 bg-white border border-fuchsia-200 text-[#912cad] hover:bg-fuchsia-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+              className="flex-1 bg-white border border-fuchsia-200 text-[#8236be] hover:bg-fuchsia-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
               title="Manage Subcategories"
             >
               <Layers size={13} /> Subcategories
@@ -347,7 +347,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           <div className="flex items-center gap-3">
             <button
               onClick={() => { setEditingCategory(null); setIsFormOpen(true); }}
-              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap text-sm"
+              className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap text-sm"
             >
               <Plus size={17} /> New Category
             </button>
@@ -366,7 +366,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search categories by name or description…"
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 text-slate-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 text-slate-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition"
             />
             {searchQuery && (
               <button
@@ -398,7 +398,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           {isLoading ? (
             <div className="flex items-center justify-center py-24">
               <div className="flex flex-col items-center gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c800ff]" />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9d4ae3]" />
                 <p className="text-sm text-gray-500 font-medium">Loading categories…</p>
               </div>
             </div>
@@ -413,11 +413,11 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
               {/* ── Published Section ── */}
               <section>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c800ff] to-[#912cad] flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 size={16} className="text-white" />
                   </div>
                   <h3 className="font-black text-slate-700 text-base tracking-tight">Published Categories</h3>
-                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-100 text-[#912cad]">
+                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-100 text-[#8236be]">
                     {published.length}
                   </span>
                 </div>

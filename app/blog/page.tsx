@@ -100,7 +100,7 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
 const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
   <FadeInSection type="fadeUp" delay={0.1 + index * 0.07}>
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <div className="flex flex-col h-full bg-white border border-[#e8e4f0] rounded-3xl overflow-hidden hover:border-[#a84f9a] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+      <div className="flex flex-col h-full bg-white border border-[#e8e4f0] rounded-3xl overflow-hidden hover:border-[#ad74e8] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
         {/* Color block top */}
         <div className={`relative h-44 bg-gradient-to-br ${post.gradient} overflow-hidden flex-shrink-0`}>
           <div
@@ -128,9 +128,9 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
 
         {/* Text */}
         <div className="flex flex-col flex-1 p-6">
-          <span className="text-[10px] font-black uppercase tracking-[4px] text-[#a84f9a] mb-2">{post.category}</span>
+          <span className="text-[10px] font-black uppercase tracking-[4px] text-[#ad74e8] mb-2">{post.category}</span>
           <h3
-            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#a84f9a] transition-colors leading-snug mb-3 flex-1"
+            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-3 flex-1"
             style={{ fontFamily: "'Georgia', serif" }}
           >
             {post.title}
@@ -138,7 +138,7 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
           <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-4">{post.excerpt}</p>
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             <span className="text-xs text-gray-400 font-medium">{post.date}</span>
-            <span className="inline-flex items-center gap-1 text-[#c740b0] text-sm font-bold group-hover:gap-2 transition-all">
+            <span className="inline-flex items-center gap-1 text-[#8236be] text-sm font-bold group-hover:gap-2 transition-all">
               Read <ChevronRight size={14} />
             </span>
           </div>
@@ -170,13 +170,13 @@ export default function BlogPage() {
         {/* Ambient glow orbs */}
         <div className="absolute top-[-10%] left-[-8%] w-[50vw] h-[50vw] rounded-full bg-[#8b0d7a] opacity-[0.22] blur-[130px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-[#5c0060] opacity-[0.28] blur-[110px] pointer-events-none" />
-        <div className="absolute top-[10%] right-[5%] w-[28vw] h-[28vw] rounded-full bg-[#a84f9a] opacity-[0.10] blur-[90px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[5%] w-[28vw] h-[28vw] rounded-full bg-[#ad74e8] opacity-[0.10] blur-[90px] pointer-events-none" />
         <div className="absolute top-[45%] right-[25%] w-[20vw] h-[20vw] rounded-full bg-[#ff69e0] opacity-[0.08] blur-[70px] pointer-events-none" />
         {/* Grid */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, #a84f9a 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #ad74e8 1px, transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -184,7 +184,7 @@ export default function BlogPage() {
           className="absolute inset-0 opacity-[0.025] pointer-events-none"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(135deg, #a84f9a 0px, #a84f9a 1px, transparent 1px, transparent 48px)',
+              'repeating-linear-gradient(135deg, #ad74e8 0px, #ad74e8 1px, transparent 1px, transparent 48px)',
           }}
         />
         {/* Floating badges */}
@@ -313,8 +313,8 @@ export default function BlogPage() {
                 onClick={() => setActiveCategory(cat)}
                 className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
                   activeCategory === cat
-                    ? 'bg-gradient-to-r from-[#a84f9a] to-[#7d1870] text-white shadow-lg shadow-purple-100'
-                    : 'bg-white border border-[#e8e4f0] text-gray-600 hover:border-[#a84f9a] hover:text-[#a84f9a]'
+                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-lg shadow-purple-100'
+                    : 'bg-white border border-[#e8e4f0] text-gray-600 hover:border-[#ad74e8] hover:text-[#ad74e8]'
                 }`}
               >
                 {categoryIcons[cat]}
@@ -329,7 +329,7 @@ export default function BlogPage() {
           <FadeInSection type="fadeUp" delay={0.1}>
             <div className="text-center py-20">
               <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center mx-auto mb-4">
-                <BookOpen size={28} className="text-[#a84f9a]" />
+                <BookOpen size={28} className="text-[#ad74e8]" />
               </div>
               <h3
                 className="text-xl font-extrabold text-[#1a0018] mb-2"
@@ -351,7 +351,7 @@ export default function BlogPage() {
         {/* ─── DIVIDER ─── */}
         <div className="flex items-center gap-3 my-16">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-          <div className="w-1.5 h-1.5 rounded-full bg-[#c740b0]" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#8236be]" />
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
         </div>
 
@@ -399,7 +399,7 @@ export default function BlogPage() {
         {/* ─── NEWSLETTER ─── */}
         <FadeInSection type="fadeUp" delay={0.1}>
           <div className="mt-12 rounded-3xl border border-[#e8b8e4] bg-white p-8 md:p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#c800ff] to-[#7c3aed] flex items-center justify-center text-white mx-auto mb-5 shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#7c3aed] flex items-center justify-center text-white mx-auto mb-5 shadow-md">
               <Sparkles size={22} />
             </div>
             <h3
@@ -415,9 +415,9 @@ export default function BlogPage() {
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className="flex-1 px-5 py-3.5 rounded-xl border border-[#e8b8e4] text-sm font-medium outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition"
+                className="flex-1 px-5 py-3.5 rounded-xl border border-[#e8b8e4] text-sm font-medium outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition"
               />
-              <button className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#c800ff] to-[#7c3aed] hover:from-[#b500e6] hover:to-[#6d31d4] text-white font-bold text-sm transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap">
+              <button className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#9d4ae3] to-[#7c3aed] hover:from-[#8236be] hover:to-[#6d31d4] text-white font-bold text-sm transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap">
                 Subscribe
               </button>
             </div>

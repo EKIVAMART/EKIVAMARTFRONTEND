@@ -265,8 +265,8 @@ export const posts: BlogPost[] = [
       'From AI-powered recommendations to faster checkout flows — here\'s everything that launched on Faflora this quarter.',
     readTime: '4 min read',
     date: 'May 25, 2026',
-    gradient: 'from-[#c800ff] via-[#6a0dad] to-[#1a0016]',
-    accentColor: '#c800ff',
+    gradient: 'from-[#9d4ae3] via-[#6a0dad] to-[#1a0016]',
+    accentColor: '#9d4ae3',
     author: {
       name: 'Kofi Mensah',
       role: 'VP of Product',

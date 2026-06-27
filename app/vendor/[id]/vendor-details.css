@@ -96,8 +96,8 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  color: #c800ff;
+  background: linear-gradient(135deg, #f3ecfc 0%, #e8dbf8 100%);
+  color: #9d4ae3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,19 +195,19 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #c800ff 0%, #b500e6 100%);
+  background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
   color: white;
   padding: 0.75rem 2.5rem;
   border-radius: 0.75rem;
   font-weight: 700;
   font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(152, 29, 135, 0.25);
+  box-shadow: 0 4px 12px rgba(157, 74, 227, 0.25);
   transition: all 0.2s;
 }
 
 .vp-follow-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(152, 29, 135, 0.35);
+  box-shadow: 0 6px 16px rgba(157, 74, 227, 0.35);
 }
 
 .vp-joined-date {
@@ -395,7 +395,7 @@
 
 .vp-add-to-cart-btn {
   width: 100%;
-  background-color: #c800ff;
+  background-color: #9d4ae3;
   color: white;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -579,9 +579,9 @@
 }
 
 .vp-review-add-btn:hover {
-  background-color: #f1f5f9;
-  color: #c800ff;
-  border-color: #c800ff;
+  background-color: #f3ecfc;
+  color: #9d4ae3;
+  border-color: #9d4ae3;
 }
 
 /* Categories Tab */
@@ -607,19 +607,19 @@
 
 .vp-category-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(152, 29, 135, 0.08);
-  border-color: #fbcfe8;
+  box-shadow: 0 10px 25px rgba(157, 74, 227, 0.08);
+  border-color: #e8dbf8;
 }
 
 .vp-category-icon-wrapper {
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  background: linear-gradient(135deg, #f3ecfc 0%, #e8dbf8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #c800ff;
+  color: #9d4ae3;
 }
 
 .vp-category-info h3 {

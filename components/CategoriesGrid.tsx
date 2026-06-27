@@ -34,7 +34,7 @@ const bgClasses = [
   'bg-purple-50',
   'bg-teal-50',
   'bg-violet-50',
-  'bg-[#fcedf9]',
+  'bg-[#f3ecfc]',
   'bg-green-50',
   'bg-yellow-50',
   'bg-red-50',
@@ -138,8 +138,8 @@ const CategoriesGrid = () => {
                 href={`/categories/${category.slug}${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`}
                 className={`flex items-center gap-3 p-2 rounded-xl transition-all duration-300 border text-gray-800 ${
                   isSelected 
-                    ? 'border-[#c800ff] bg-gradient-to-r from-[#fcedf9] to-[#f5eeff] shadow-sm font-bold scale-[1.02]' 
-                    : 'bg-white border-gray-100 hover:border-[#fcedf9] hover:bg-[#fcedf9]/25 hover:shadow-sm'
+                    ? 'border-[#9d4ae3] bg-gradient-to-r from-[#f3ecfc] to-[#f5eeff] shadow-sm font-bold scale-[1.02]' 
+                    : 'bg-white border-gray-100 hover:border-[#f3ecfc] hover:bg-[#f3ecfc]/25 hover:shadow-sm'
                 }`}
               >
                 <div
@@ -166,7 +166,7 @@ const CategoriesGrid = () => {
                   )}
                 </div>
 
-                <p className={`text-xs font-semibold transition-colors ${isSelected ? 'text-[#c800ff]' : 'text-gray-700 hover:text-[#c800ff]'}`}>
+                <p className={`text-xs font-semibold transition-colors ${isSelected ? 'text-[#9d4ae3]' : 'text-gray-700 hover:text-[#9d4ae3]'}`}>
                   {category.name}
                 </p>
               </Link>

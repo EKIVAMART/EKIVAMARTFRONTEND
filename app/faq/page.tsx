@@ -88,7 +88,7 @@ const faqCategories: FAQCategory[] = [
     faqs: [
       {
         q: 'How do I register as a vendor on Faflora?',
-        a: 'To start selling, click "Sell on Faflora" or visit the "/vendor-registration" page. Fill out your brand name, store details, and payout bank information. Our vendor success team will review your application and approve your store within 48 hours.'
+        a: 'To start selling, click "Become a Vendor" or visit the "/become-a-vendor" page. Fill out your brand name, store details, and payout bank information. Our vendor success team will review your application and approve your store within 48 hours.'
       },
       {
         q: 'What are the fees for selling on Faflora?',
@@ -108,22 +108,22 @@ const featureCards = [
     icon: ShieldCheck,
     title: 'Secure Platform',
     desc: 'Transactions are fully encrypted. Your payments are processed using PCI-DSS compliance standards.',
-    accentFrom: '#c800ff',
-    accentTo: '#912cad',
+    accentFrom: '#9d4ae3',
+    accentTo: '#8236be',
   },
   {
     icon: RefreshCcw,
     title: 'E-Commerce Protections',
     desc: 'Refunds are automatically issued for cancelled orders under our secure buyer-protection terms.',
-    accentFrom: '#912cad',
+    accentFrom: '#8236be',
     accentTo: '#6b0f6b',
   },
   {
     icon: Globe,
     title: '24/7 Knowledge Base',
     desc: 'Browse topics online anywhere, anytime, to find detailed self-help instructions and guides.',
-    accentFrom: '#c740b0',
-    accentTo: '#c800ff',
+    accentFrom: '#8236be',
+    accentTo: '#9d4ae3',
   },
 ];
 
@@ -178,30 +178,30 @@ export default function FAQPage() {
             <circle cx="480" cy="180" r="190" stroke="#e8b8e4" strokeWidth="0.8" />
             <circle cx="480" cy="180" r="140" stroke="#f0c8ec" strokeWidth="0.6" />
             <circle cx="480" cy="180" r="90" stroke="#e4a8e0" strokeWidth="0.5" />
-            <circle cx="480" cy="180" r="44" stroke="#c800ff" strokeWidth="0.5" opacity="0.3" />
+            <circle cx="480" cy="180" r="44" stroke="#9d4ae3" strokeWidth="0.5" opacity="0.3" />
 
             {/* Focal dot */}
-            <circle cx="480" cy="180" r="6" fill="#c800ff" opacity="0.7" />
-            <circle cx="480" cy="180" r="12" fill="#c800ff" opacity="0.12" />
+            <circle cx="480" cy="180" r="6" fill="#9d4ae3" opacity="0.7" />
+            <circle cx="480" cy="180" r="12" fill="#9d4ae3" opacity="0.12" />
 
             {/* Crosshair fine lines */}
-            <line x1="430" y1="180" x2="530" y2="180" stroke="#c800ff" strokeWidth="0.9" opacity="0.25" />
-            <line x1="480" y1="130" x2="480" y2="230" stroke="#c800ff" strokeWidth="0.9" opacity="0.25" />
+            <line x1="430" y1="180" x2="530" y2="180" stroke="#9d4ae3" strokeWidth="0.9" opacity="0.25" />
+            <line x1="480" y1="130" x2="480" y2="230" stroke="#9d4ae3" strokeWidth="0.9" opacity="0.25" />
 
             {/* Floating accent circles */}
             <circle cx="310" cy="370" r="9" fill="#fdf3fc" />
-            <circle cx="310" cy="370" r="18" stroke="#c740b0" strokeWidth="1" opacity="0.4" />
-            <circle cx="180" cy="120" r="5" fill="#c800ff" opacity="0.3" />
-            <circle cx="560" cy="420" r="7" fill="#912cad" opacity="0.2" />
+            <circle cx="310" cy="370" r="18" stroke="#8236be" strokeWidth="1" opacity="0.4" />
+            <circle cx="180" cy="120" r="5" fill="#9d4ae3" opacity="0.3" />
+            <circle cx="560" cy="420" r="7" fill="#8236be" opacity="0.2" />
 
             {/* Small decorative diamond */}
-            <rect x="200" y="300" width="20" height="20" rx="3" stroke="#c800ff" strokeWidth="0.8" opacity="0.3" transform="rotate(45 210 310)" />
+            <rect x="200" y="300" width="20" height="20" rx="3" stroke="#9d4ae3" strokeWidth="0.8" opacity="0.3" transform="rotate(45 210 310)" />
 
             {/* Gradient defs */}
             <defs>
               <linearGradient id="heroRing1" x1="240" y1="0" x2="720" y2="360">
-                <stop offset="0%" stopColor="#c800ff" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#912cad" stopOpacity="0.2" />
+                <stop offset="0%" stopColor="#9d4ae3" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#8236be" stopOpacity="0.2" />
               </linearGradient>
             </defs>
           </svg>
@@ -221,14 +221,14 @@ export default function FAQPage() {
         </div>
 
         {/* ── Radial glow orbs ── */}
-        <div className="absolute top-[-80px] right-[-80px] w-[420px] h-[420px] rounded-full bg-[#c800ff]/8 blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-[-60px] left-[-60px] w-[300px] h-[300px] rounded-full bg-[#912cad]/6 blur-[80px] pointer-events-none" />
+        <div className="absolute top-[-80px] right-[-80px] w-[420px] h-[420px] rounded-full bg-[#9d4ae3]/8 blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-[-60px] left-[-60px] w-[300px] h-[300px] rounded-full bg-[#8236be]/6 blur-[80px] pointer-events-none" />
 
         {/* ── Fine dot matrix ── */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.03]"
           style={{
-            backgroundImage: 'radial-gradient(circle, #912cad 1.2px, transparent 1.2px)',
+            backgroundImage: 'radial-gradient(circle, #8236be 1.2px, transparent 1.2px)',
             backgroundSize: '22px 22px',
           }}
         />
@@ -239,7 +239,7 @@ export default function FAQPage() {
 
             {/* Badge */}
             <FadeInSection type="fadeDown" delay={0.1}>
-              <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-[#e0a8da] text-[#b000e0] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-[#d8c1f4] text-[#b000e0] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8 shadow-sm">
                 <HelpCircle size={11} />
                 Faflora · Knowledge Hub
               </div>
@@ -255,7 +255,7 @@ export default function FAQPage() {
                 <span
                   className="block pb-2"
                   style={{
-                    background: 'linear-gradient(100deg, #7b00c0 0%, #c800ff 45%, #ff40d0 100%)',
+                    background: 'linear-gradient(100deg, #7b00c0 0%, #9d4ae3 45%, #ff40d0 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -267,7 +267,7 @@ export default function FAQPage() {
                 <span
                   className="block pb-2"
                   style={{
-                    background: 'linear-gradient(100deg, #c800ff 0%, #912cad 50%, #6b0f6b 100%)',
+                    background: 'linear-gradient(100deg, #9d4ae3 0%, #8236be 50%, #6b0f6b 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -279,7 +279,7 @@ export default function FAQPage() {
                 <span
                   className="block pb-2"
                   style={{
-                    background: 'linear-gradient(100deg, #912cad 0%, #c800ff 60%, #ff69e0 100%)',
+                    background: 'linear-gradient(100deg, #8236be 0%, #9d4ae3 60%, #ff69e0 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -293,7 +293,7 @@ export default function FAQPage() {
             {/* Divider rule */}
             <FadeInSection type="fadeUp" delay={0.4}>
               <div className="mt-7 flex items-center gap-3">
-                <div className="h-[3px] w-16 rounded-full" style={{ background: 'linear-gradient(90deg, #c800ff, #912cad)' }} />
+                <div className="h-[3px] w-16 rounded-full" style={{ background: 'linear-gradient(90deg, #9d4ae3, #8236be)' }} />
                 <div className="h-[3px] w-8 rounded-full bg-[#e8b8e4]" />
                 <div className="h-[3px] w-4 rounded-full bg-[#f0c8ec]" />
               </div>
@@ -305,7 +305,7 @@ export default function FAQPage() {
             {/* Search */}
             <FadeInSection type="fadeUp" delay={0.5}>
               <div className="mt-9 relative max-w-md group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#c800ff] transition-colors z-10">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#9d4ae3] transition-colors z-10">
                   <Search size={18} />
                 </div>
                 <input
@@ -316,7 +316,7 @@ export default function FAQPage() {
                     setSearchQuery(e.target.value);
                     setExpandedIndex(null);
                   }}
-                  className="w-full pl-12 pr-6 py-4 rounded-2xl border border-[#e0a8da] bg-white/80 backdrop-blur-sm text-slate-800 placeholder-gray-400 shadow-sm focus:shadow-md focus:border-[#c800ff] focus:ring-4 focus:ring-purple-100 outline-none transition-all font-medium text-sm"
+                  className="w-full pl-12 pr-6 py-4 rounded-2xl border border-[#d8c1f4] bg-white/80 backdrop-blur-sm text-slate-800 placeholder-gray-400 shadow-sm focus:shadow-md focus:border-[#9d4ae3] focus:ring-4 focus:ring-purple-100 outline-none transition-all font-medium text-sm"
                 />
                 {searchQuery && (
                   <button
@@ -340,7 +340,7 @@ export default function FAQPage() {
           <FadeInSection type="fadeUp" delay={0.1}>
             <div className="bg-white rounded-3xl p-8 border border-[#e8b8e4] shadow-xl">
               <h3 className="text-xl font-extrabold text-[#1a0018] mb-6 flex items-center gap-2">
-                <Sparkles size={18} className="text-[#c800ff]" />
+                <Sparkles size={18} className="text-[#9d4ae3]" />
                 Search Results ({filteredResults.length})
               </h3>
 
@@ -349,9 +349,9 @@ export default function FAQPage() {
                   {filteredResults.map((faq, idx) => (
                     <div
                       key={idx}
-                      className="p-5 rounded-2xl bg-[#fdf8ff] border border-[#f0c8ec]/60 transition hover:border-[#c800ff] hover:bg-white"
+                      className="p-5 rounded-2xl bg-[#fdf8ff] border border-[#f0c8ec]/60 transition hover:border-[#9d4ae3] hover:bg-white"
                     >
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#c740b0] bg-purple-50 px-2.5 py-1 rounded-full mb-2 inline-block">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#8236be] bg-purple-50 px-2.5 py-1 rounded-full mb-2 inline-block">
                         {faq.category}
                       </span>
                       <h4 className="text-base font-extrabold text-[#1a0018]">{faq.q}</h4>
@@ -373,7 +373,7 @@ export default function FAQPage() {
 
             {/* Category Sidebar */}
             <div className="lg:col-span-4 space-y-3">
-              <span className="block text-[10px] font-black uppercase tracking-[3px] text-[#c740b0] mb-4 pl-1">
+              <span className="block text-[10px] font-black uppercase tracking-[3px] text-[#8236be] mb-4 pl-1">
                 FAQ Categories
               </span>
               <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-3 lg:pb-0 scrollbar-none">
@@ -390,15 +390,15 @@ export default function FAQPage() {
                       className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-bold text-sm transition-all whitespace-nowrap lg:whitespace-normal w-fit lg:w-full border ${
                         isActive
                           ? 'text-white border-transparent shadow-lg shadow-purple-500/20 scale-[1.02]'
-                          : 'bg-white border-gray-100 text-slate-700 hover:bg-[#fcedf9]/25 hover:border-[#fcedf9]'
+                          : 'bg-white border-gray-100 text-slate-700 hover:bg-[#f3ecfc]/25 hover:border-[#f3ecfc]'
                       }`}
                       style={
                         isActive
-                          ? { background: 'linear-gradient(135deg, #c800ff 0%, #912cad 100%)' }
+                          ? { background: 'linear-gradient(135deg, #9d4ae3 0%, #8236be 100%)' }
                           : {}
                       }
                     >
-                      <Icon size={16} className={isActive ? 'text-white' : 'text-[#c800ff]'} />
+                      <Icon size={16} className={isActive ? 'text-white' : 'text-[#9d4ae3]'} />
                       <span>{cat.name}</span>
                     </button>
                   );
@@ -416,7 +416,7 @@ export default function FAQPage() {
                       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
                         <div
                           className="w-9 h-9 rounded-xl flex items-center justify-center text-white flex-shrink-0"
-                          style={{ background: 'linear-gradient(135deg, #c800ff 0%, #912cad 100%)' }}
+                          style={{ background: 'linear-gradient(135deg, #9d4ae3 0%, #8236be 100%)' }}
                         >
                           <activeCategory.icon size={15} />
                         </div>
@@ -431,7 +431,7 @@ export default function FAQPage() {
                               key={index}
                               className={`border rounded-2xl overflow-hidden transition-all duration-300 ${
                                 isExpanded
-                                  ? 'border-[#c800ff] shadow-md shadow-purple-100'
+                                  ? 'border-[#9d4ae3] shadow-md shadow-purple-100'
                                   : 'border-gray-100 bg-white hover:border-purple-200 hover:shadow-sm'
                               }`}
                               style={
@@ -447,7 +447,7 @@ export default function FAQPage() {
                                 {/* ── Active question text turns purple ── */}
                                 <span
                                   className={`font-extrabold text-sm md:text-base pr-4 transition-colors duration-200 ${
-                                    isExpanded ? 'text-[#c800ff]' : 'text-[#1a0018] group-hover:text-[#912cad]'
+                                    isExpanded ? 'text-[#9d4ae3]' : 'text-[#1a0018] group-hover:text-[#8236be]'
                                   }`}
                                 >
                                   {faq.q}
@@ -455,7 +455,7 @@ export default function FAQPage() {
                                 <motion.span
                                   animate={{ rotate: isExpanded ? 180 : 0 }}
                                   transition={{ duration: 0.22 }}
-                                  className={`shrink-0 transition-colors ${isExpanded ? 'text-[#c800ff]' : 'text-gray-400'}`}
+                                  className={`shrink-0 transition-colors ${isExpanded ? 'text-[#9d4ae3]' : 'text-gray-400'}`}
                                 >
                                   <ChevronDown size={18} />
                                 </motion.span>
@@ -523,9 +523,9 @@ export default function FAQPage() {
           <FadeInSection type="zoom" delay={0.15}>
             <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
               {/* Deep gradient background */}
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #2d0029 0%, #6b0f6b 45%, #c800ff 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #2d0029 0%, #6b0f6b 45%, #9d4ae3 100%)' }} />
               {/* Glow orbs */}
-              <div className="absolute -top-20 -right-14 w-72 h-72 rounded-full bg-[#c740b0] opacity-20 blur-[80px] pointer-events-none" />
+              <div className="absolute -top-20 -right-14 w-72 h-72 rounded-full bg-[#8236be] opacity-20 blur-[80px] pointer-events-none" />
               <div className="absolute -bottom-14 -left-14 w-56 h-56 rounded-full bg-[#ff69e0] opacity-12 blur-[60px] pointer-events-none" />
               {/* Subtle ruled lines */}
               <div

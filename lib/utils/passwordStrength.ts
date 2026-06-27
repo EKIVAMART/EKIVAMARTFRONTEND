@@ -52,7 +52,7 @@ export function calculatePasswordStrength(password: string): PasswordStrength {
     return {
       score: 4,
       feedback,
-      color: 'bg-[#fcedf9]0',
+      color: 'bg-[#f3ecfc]0',
       label: 'Strong',
     };
   }

@@ -15,7 +15,7 @@ export default function HeroSection() {
 
       {/* Chromatic glow orbs */}
       <div className="absolute top-[-8%] left-[30%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px] rounded-full bg-[#8b0d7a] opacity-30 blur-[140px] pointer-events-none" />
-      <div className="absolute top-[8%] right-[-8%] w-[40vw] h-[40vw] max-w-[540px] max-h-[540px] rounded-full bg-[#c740b0] opacity-20 blur-[110px] pointer-events-none" />
+      <div className="absolute top-[8%] right-[-8%] w-[40vw] h-[40vw] max-w-[540px] max-h-[540px] rounded-full bg-[#8236be] opacity-20 blur-[110px] pointer-events-none" />
       <div className="absolute bottom-[10%] left-[-5%] w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] rounded-full bg-[#5c0060] opacity-25 blur-[90px] pointer-events-none" />
       <div className="absolute top-[18%] left-[48%] w-[22vw] h-[22vw] max-w-[280px] max-h-[280px] rounded-full bg-[#ff69e0] opacity-[0.12] blur-[60px] pointer-events-none" />
 
@@ -80,7 +80,7 @@ export default function HeroSection() {
           {/* Refined rule */}
           <FadeInSection type="fadeUp" delay={0.42}>
             <div className="mt-9 flex items-center gap-2">
-              <div className="h-[2px] w-16 rounded-full bg-gradient-to-r from-[#ff69e0] to-[#c740b0]" />
+              <div className="h-[2px] w-16 rounded-full bg-gradient-to-r from-[#ff69e0] to-[#8236be]" />
               <div className="h-[2px] w-8 rounded-full bg-white/20" />
               <div className="h-[2px] w-3 rounded-full bg-white/10" />
             </div>

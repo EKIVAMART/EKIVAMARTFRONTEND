@@ -116,7 +116,7 @@ const LocationSelector = (): JSX.Element => {
         className="flex items-center justify-between gap-4 px-4 py-2.5 cursor-pointer bg-white hover:bg-gray-50 transition-all rounded-md border border-gray-300 group"
       >
         <div className="flex items-center gap-1.5 w-full">
-          <FiMapPin className="text-[#c800ff] shrink-0" size={15} />
+          <FiMapPin className="text-[#9d4ae3] shrink-0" size={15} />
           <span className="font-medium text-gray-800 text-[15px] truncate">{selected}</span>
         </div>
         <FaAngleDown className="text-gray-600" size={15} />
@@ -157,7 +157,7 @@ const LocationSelector = (): JSX.Element => {
                   className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors duration-100 border-b border-gray-50 last:border-b-0"
                 >
                   <div className="flex items-center gap-2">
-                    {state === 'All' && <FiMapPin size={14} className="text-[#c800ff]" />}
+                    {state === 'All' && <FiMapPin size={14} className="text-[#9d4ae3]" />}
                     <span className="font-medium">{state}</span>
                   </div>
                 </div>
@@ -181,14 +181,14 @@ const LocationSelector = (): JSX.Element => {
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: #c800ff;
+          background-color: #9d4ae3;
           border-radius: 6px;
           border: 2px solid transparent;
           background-clip: content-box;
         }
 
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background-color: #b500e6;
+          background-color: #8236be;
           background-clip: content-box;
         }
       `}</style>
@@ -326,7 +326,7 @@ const Subnavbar = (): JSX.Element => {
             {/* Logo */}
             <div className="flex-1 flex justify-center">
               <Link href="/">
-                <Image src="/logo.jpg" alt="Faflora" width={120} height={32} className="object-contain" />
+                <Image src="/fa_logo_brand.png" alt="Faflora" width={120} height={32} className="object-contain" />
               </Link>
             </div>
 
@@ -336,12 +336,12 @@ const Subnavbar = (): JSX.Element => {
                   onClick={() => setIsLoginModalOpen(true)}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition group"
                 >
-                  <FiUser size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
+                  <FiUser size={20} className="text-gray-700 group-hover:text-[#9d4ae3]" />
                 </button>
               ) : (
                 <button
                   onClick={() => setIsProfileModalOpen(true)}
-                  className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-xs font-semibold"
+                  className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center text-xs font-semibold"
                 >
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
@@ -349,15 +349,15 @@ const Subnavbar = (): JSX.Element => {
               )}
 
               <Link href="/wishlist" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
-                <FiHeart size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
+                <FiHeart size={20} className="text-gray-700 group-hover:text-[#9d4ae3]" />
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
                   {wishlistCount}
                 </span>
               </Link>
 
               <Link href="/cart" className="p-1.5 hover:bg-gray-100 rounded-lg transition relative group">
-                <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#c800ff]" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
+                <FiShoppingCart size={20} className="text-gray-700 group-hover:text-[#9d4ae3]" />
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full font-bold">
                   {cartCount}
                 </span>
               </Link>
@@ -365,7 +365,7 @@ const Subnavbar = (): JSX.Element => {
           </div>
 
           {/* Search Bar - Mobile */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-transparent focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 focus-within:bg-white transition-all">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-transparent focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 focus-within:bg-white transition-all">
             <FiSearch size={18} className="text-gray-500 shrink-0" />
             <input
               type="text"
@@ -384,7 +384,7 @@ const Subnavbar = (): JSX.Element => {
                 aria-label="Clear search"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             )}
@@ -403,11 +403,11 @@ const Subnavbar = (): JSX.Element => {
             href="/"
             className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
           >
-            <Image src="/logo.jpg" alt="Faflora" width={160} height={45} className="object-contain" />
+            <Image src="/fa_logo_brand.png" alt="Faflora" width={160} height={45} className="object-contain" />
           </Link>
 
           {/* Search Bar - Takes up more space */}
-          <div className="flex w-full max-w-xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-[#c800ff]/50 focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition group">
+          <div className="flex w-full max-w-xl items-center bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:border-[#9d4ae3]/50 focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition group">
             <input
               type="text"
               placeholder="Search for items..."
@@ -425,15 +425,15 @@ const Subnavbar = (): JSX.Element => {
                 aria-label="Cancel search"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             )}
-            <button 
+            <button
               onClick={() => handleSearch(mainSearchQuery)}
               className="p-1 hover:bg-gray-100 rounded-lg transition"
             >
-              <FiSearch size={20} className="text-[#c800ff]" />
+              <FiSearch size={20} className="text-[#9d4ae3]" />
             </button>
           </div>
 
@@ -450,15 +450,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiHeart
-                  className="w-7 h-7 text-slate-700 group-hover:text-[#c800ff] transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#9d4ae3] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {wishlistCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-[#c800ff] transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#9d4ae3] transition-colors">
                 Wishlist
               </span>
             </Link>
@@ -469,15 +469,15 @@ const Subnavbar = (): JSX.Element => {
             >
               <div className="relative">
                 <FiShoppingCart
-                  className="w-7 h-7 text-slate-700 group-hover:text-[#c800ff] transition-colors"
+                  className="w-7 h-7 text-slate-700 group-hover:text-[#9d4ae3] transition-colors"
                   strokeWidth={1.5}
                 />
-                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               </div>
               {/* This is your specific line of code, now wrapped in a Link */}
-              <span className="text-sm font-medium text-slate-700 group-hover:text-[#c800ff] transition-colors">
+              <span className="text-sm font-medium text-slate-700 group-hover:text-[#9d4ae3] transition-colors">
                 Cart
               </span>
             </Link>
@@ -490,9 +490,9 @@ const Subnavbar = (): JSX.Element => {
               >
                 <FiUser
                   size={22}
-                  className="text-gray-700 group-hover:text-[#c800ff] transition"
+                  className="text-gray-700 group-hover:text-[#9d4ae3] transition"
                 />
-                <span className="text-sm text-gray-600 group-hover:text-[#c800ff] transition whitespace-nowrap hidden lg:block">
+                <span className="text-sm text-gray-600 group-hover:text-[#9d4ae3] transition whitespace-nowrap hidden lg:block">
                   Account
                 </span>
               </button>
@@ -501,7 +501,7 @@ const Subnavbar = (): JSX.Element => {
                 onClick={() => setIsProfileModalOpen(true)}
                 className="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white flex items-center justify-center text-sm font-semibold">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center text-sm font-semibold">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </div>
