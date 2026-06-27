@@ -406,15 +406,15 @@ export default function CategoryPage() {
       <div className="mx-auto w-[90%] max-w-7xl">
         
         {/* Banner Section */}
-        <div className="rounded-2xl bg-gradient-to-r from-[#fcedf9] via-[#f5eeff] to-[#fcedf9] p-6 sm:p-8 mb-6 shadow-md border border-[#e8d5f5]/30 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#c800ff]/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-[#912cad]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="rounded-2xl bg-gradient-to-r from-[#f3ecfc] via-[#f5eeff] to-[#f3ecfc] p-6 sm:p-8 mb-6 shadow-md border border-[#e8d5f5]/30 relative overflow-hidden">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-[#9d4ae3]/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-[#8236be]/5 rounded-full blur-3xl pointer-events-none" />
           
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#912cad] tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#8236be] tracking-tight mb-2">
             {categoryName}
           </h1>
           <div className="text-sm text-gray-600 flex items-center gap-2">
-            <Link href="/" className="hover:text-[#c800ff] font-medium transition-colors">
+            <Link href="/" className="hover:text-[#9d4ae3] font-medium transition-colors">
               Home
             </Link>
             <span className="text-gray-400">/</span>
@@ -431,7 +431,7 @@ export default function CategoryPage() {
         {subcategories.length > 0 && (
           <div className="flex items-center gap-2 mb-8 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative">
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollLeft ? 'text-[#c800ff] hover:bg-purple-50' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollLeft ? 'text-[#9d4ae3] hover:bg-purple-50' : 'text-gray-300'}`}
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
               aria-label="Scroll left"
@@ -450,8 +450,8 @@ export default function CategoryPage() {
                 onClick={() => selectSubcategory(null)}
                 className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${
                   !subcategoryQuery
-                    ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white border-transparent shadow-md shadow-purple-500/20'
-                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#c800ff] hover:text-[#c800ff]'
+                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
+                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
                 }`}
               >
                 All {categoryName}
@@ -467,8 +467,8 @@ export default function CategoryPage() {
                     onClick={() => selectSubcategory(subSlug)}
                     className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${
                       isSelected
-                        ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white border-transparent shadow-md shadow-purple-500/20'
-                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#c800ff] hover:text-[#c800ff]'
+                        ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
+                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
                     }`}
                   >
                     {sub.name}
@@ -478,7 +478,7 @@ export default function CategoryPage() {
             </div>
 
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollRight ? 'text-[#c800ff] hover:bg-purple-50' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollRight ? 'text-[#9d4ae3] hover:bg-purple-50' : 'text-gray-300'}`}
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
               aria-label="Scroll right"
@@ -526,7 +526,7 @@ export default function CategoryPage() {
             <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
               <div className="text-sm font-semibold text-gray-600">
                 We found{' '}
-                <span className="text-[#c800ff] text-base font-extrabold px-1">
+                <span className="text-[#9d4ae3] text-base font-extrabold px-1">
                   {productsLoading ? '...' : filteredProducts.length}
                 </span>{' '}
                 items matching your selection
@@ -574,7 +574,7 @@ export default function CategoryPage() {
               </div>
             ) : (
               <div className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center max-w-lg mx-auto mt-8">
-                <div className="inline-flex p-4 rounded-full bg-purple-50 text-[#c800ff] mb-4">
+                <div className="inline-flex p-4 rounded-full bg-purple-50 text-[#9d4ae3] mb-4">
                   <Package size={48} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">No Products Found</h3>

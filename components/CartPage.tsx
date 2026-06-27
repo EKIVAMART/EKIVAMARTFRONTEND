@@ -100,7 +100,7 @@ export default function CartPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center bg-white">
         <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-4">
-          <ShoppingBag size={30} className="text-[#c800ff]" />
+          <ShoppingBag size={30} className="text-[#9d4ae3]" />
         </div>
         <h2 className="text-xl font-bold text-slate-800 mb-2">Access Your Cart</h2>
         <p className="text-gray-500 max-w-sm mb-6">
@@ -108,7 +108,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/"
-          className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-2.5 rounded-xl font-bold hover:from-[#b500e6] hover:to-[#802699] transition shadow-md"
+          className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-2.5 rounded-xl font-bold hover:from-[#8236be] hover:to-[#692a99] transition shadow-md"
         >
           Return to Shop
         </Link>
@@ -304,7 +304,7 @@ export default function CartPage() {
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-white shadow-xs">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
-          <Link href="/" className="text-[#c800ff] font-semibold hover:underline">
+          <Link href="/" className="text-[#9d4ae3] font-semibold hover:underline">
             Home
           </Link>
           <ChevronRight size={14} className="text-gray-400" />
@@ -354,7 +354,7 @@ export default function CartPage() {
             }}
             className={`flex-1 md:flex-initial px-6 py-3 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'active'
-                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white shadow-md'
+                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md'
                 : 'text-gray-500 hover:text-slate-700 hover:bg-gray-50'
             }`}
           >
@@ -373,7 +373,7 @@ export default function CartPage() {
             onClick={() => setActiveTab('saved')}
             className={`flex-1 md:flex-initial px-6 py-3 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'saved'
-                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white shadow-md'
+                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md'
                 : 'text-gray-500 hover:text-slate-700 hover:bg-gray-50'
             }`}
           >
@@ -401,7 +401,7 @@ export default function CartPage() {
                   <p className="text-gray-400 text-sm mt-1 mb-6">Explore our special catalog and add products.</p>
                   <Link
                     href="/"
-                    className="inline-flex bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition"
+                    className="inline-flex bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition"
                   >
                     Go Shop
                   </Link>
@@ -469,12 +469,12 @@ export default function CartPage() {
                               </Link>
                               <div className="min-w-0 flex-1">
                                 <Link href={`/products/${item.productId}`}>
-                                  <h4 className="text-sm md:text-base font-bold text-slate-800 hover:text-[#c800ff] cursor-pointer whitespace-normal break-words leading-tight">
+                                  <h4 className="text-sm md:text-base font-bold text-slate-800 hover:text-[#9d4ae3] cursor-pointer whitespace-normal break-words leading-tight">
                                     {product.name}
                                   </h4>
                                 </Link>
                                 {item.notes && (
-                                  <div className="mt-1 bg-purple-50 text-[#c800ff] text-xs px-2.5 py-1 rounded-lg border border-purple-100 inline-flex items-center gap-1">
+                                  <div className="mt-1 bg-purple-50 text-[#9d4ae3] text-xs px-2.5 py-1 rounded-lg border border-purple-100 inline-flex items-center gap-1">
                                     <FileText size={12} />
                                     <span className="font-semibold italic">Note: {item.notes}</span>
                                   </div>
@@ -510,7 +510,7 @@ export default function CartPage() {
                                     onClick={() =>
                                       handleQuantityChange(item.productId, item.quantity, 1, product.stock)
                                     }
-                                    className="p-1 text-gray-400 hover:text-[#c800ff] transition-colors"
+                                    className="p-1 text-gray-400 hover:text-[#9d4ae3] transition-colors"
                                   >
                                     <Plus size={14} />
                                   </button>
@@ -524,7 +524,7 @@ export default function CartPage() {
                             {/* Subtotal */}
                             <div className="flex md:block justify-between items-center text-center">
                               <span className="md:hidden text-xs font-bold text-gray-400">Subtotal</span>
-                              <span className="font-extrabold text-[#c800ff]">
+                              <span className="font-extrabold text-[#9d4ae3]">
                                 ₦{(priceVal * item.quantity).toLocaleString()}
                               </span>
                             </div>
@@ -584,7 +584,7 @@ export default function CartPage() {
                       </div>
                       <div className="border-t border-dashed pt-4 flex justify-between items-center">
                         <span className="font-bold text-slate-800">Total Amount</span>
-                        <span className="text-2xl font-extrabold text-[#c800ff]">
+                        <span className="text-2xl font-extrabold text-[#9d4ae3]">
                           ₦{summary.total.toLocaleString()}
                         </span>
                       </div>
@@ -598,7 +598,7 @@ export default function CartPage() {
                   <button
                     onClick={handleProceedToCheckout}
                     disabled={selectedCount === 0 || isProcessing}
-                    className="w-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white font-bold py-4 rounded-xl mt-6 hover:from-[#b500e6] hover:to-[#802699] transition shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed group active:scale-95"
+                    className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold py-4 rounded-xl mt-6 hover:from-[#8236be] hover:to-[#692a99] transition shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed group active:scale-95"
                   >
                     <span>Proceed To Checkout</span>
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -619,7 +619,7 @@ export default function CartPage() {
                     <h3 className="text-xl font-bold text-slate-800">Shipping Details</h3>
                     <button
                       onClick={() => setIsCheckingOut(false)}
-                      className="text-xs font-bold text-[#c800ff] hover:underline"
+                      className="text-xs font-bold text-[#9d4ae3] hover:underline"
                     >
                       Back to Cart
                     </button>
@@ -634,7 +634,7 @@ export default function CartPage() {
                         value={shippingAddress.fullName}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
                         placeholder="Jane Doe"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
                     </div>
 
@@ -646,7 +646,7 @@ export default function CartPage() {
                         value={shippingAddress.phoneNumber}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, phoneNumber: e.target.value })}
                         placeholder="+2348012345678"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
                     </div>
 
@@ -658,7 +658,7 @@ export default function CartPage() {
                         value={shippingAddress.addressLine1}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
                         placeholder="123 Flower Street"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
                     </div>
 
@@ -669,7 +669,7 @@ export default function CartPage() {
                         value={shippingAddress.addressLine2}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
                         placeholder="Apartment 4B"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
                     </div>
 
@@ -682,7 +682,7 @@ export default function CartPage() {
                           value={shippingAddress.city}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                           placeholder="Lagos"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                         />
                       </div>
                       <div>
@@ -693,7 +693,7 @@ export default function CartPage() {
                           value={shippingAddress.state}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
                           placeholder="Lagos"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                         />
                       </div>
                     </div>
@@ -707,7 +707,7 @@ export default function CartPage() {
                           value={shippingAddress.postalCode}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
                           placeholder="100001"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                         />
                       </div>
                       <div>
@@ -730,7 +730,7 @@ export default function CartPage() {
                         value={checkoutNotes}
                         onChange={(e) => setCheckoutNotes(e.target.value)}
                         placeholder="Leave at reception"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c800ff] focus:ring-2 focus:ring-[#c800ff]/20 transition-all bg-slate-50/50"
+                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
                     </div>
 
@@ -738,7 +738,7 @@ export default function CartPage() {
                       <div className="border-t pt-4 mt-2">
                         <div className="flex justify-between items-center text-sm font-bold text-slate-800">
                           <span>Total due:</span>
-                          <span className="text-lg text-[#c800ff]">₦{summary.total.toLocaleString()}</span>
+                          <span className="text-lg text-[#9d4ae3]">₦{summary.total.toLocaleString()}</span>
                         </div>
                       </div>
                     )}
@@ -770,7 +770,7 @@ export default function CartPage() {
                 </p>
                 <button
                   onClick={() => setActiveTab('active')}
-                  className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition"
+                  className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition"
                 >
                   View Active Cart
                 </button>
@@ -814,7 +814,7 @@ export default function CartPage() {
                             </Link>
                             <div className="min-w-0 flex-1">
                               <Link href={`/products/${item.productId}`}>
-                                <h4 className="text-sm md:text-base font-bold text-slate-800 hover:text-[#c800ff] cursor-pointer whitespace-normal break-words leading-tight">
+                                <h4 className="text-sm md:text-base font-bold text-slate-800 hover:text-[#9d4ae3] cursor-pointer whitespace-normal break-words leading-tight">
                                   {product.name}
                                 </h4>
                               </Link>
@@ -836,7 +836,7 @@ export default function CartPage() {
                           <div className="flex md:block justify-center">
                             <button
                               onClick={() => handleMoveToCart(item.productId)}
-                              className="px-4 py-2 bg-purple-50 text-[#c800ff] hover:bg-purple-100 border border-purple-100 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 active:scale-95"
+                              className="px-4 py-2 bg-purple-50 text-[#9d4ae3] hover:bg-purple-100 border border-purple-100 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 active:scale-95"
                             >
                               <ShoppingBag size={14} />
                               Move to Cart

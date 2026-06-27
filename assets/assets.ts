@@ -1,4 +1,4 @@
-import gs_logo from './gs_logo.jpg';
+import gs_logo from '../public/fa_logo_brand.png';
 import happy_store from './happy_store.webp';
 import upload_area from './upload_area.svg';
 import hero_model_img from './hero_model_img.png';

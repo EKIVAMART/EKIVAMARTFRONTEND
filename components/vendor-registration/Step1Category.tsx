@@ -47,7 +47,7 @@ export default function Step1Category({ onNext }: { onNext: () => void }) {
   return (
     <FormWrapper onNext={onNext}>
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Layers size={20}/></div>
+        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><Layers size={20}/></div>
         <div>
           <h3 className="font-bold text-lg text-gray-800">Select Your Category</h3>
           <p className="text-xs text-gray-400">Choose the type of organization you represent</p>
@@ -58,14 +58,14 @@ export default function Step1Category({ onNext }: { onNext: () => void }) {
         {/* Navigation Buttons */}
         <button 
           onClick={() => scroll('left')}
-          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#c800ff] hover:scale-110 transition-transform hidden group-hover:flex"
+          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#9d4ae3] hover:scale-110 transition-transform hidden group-hover:flex"
         >
           <ChevronLeft size={20} />
         </button>
         
         <button 
           onClick={() => scroll('right')}
-          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#c800ff] hover:scale-110 transition-transform hidden group-hover:flex"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#9d4ae3] hover:scale-110 transition-transform hidden group-hover:flex"
         >
           <ChevronRight size={20} />
         </button>
@@ -81,12 +81,12 @@ export default function Step1Category({ onNext }: { onNext: () => void }) {
               onClick={() => setSelected(cat.id)}
               className={`flex flex-col items-center justify-center p-6 border rounded-2xl transition-all min-w-[140px] snap-start group ${
                 selected === cat.id 
-                  ? 'border-[#c800ff] bg-[#fcedf9] text-[#c800ff] shadow-md -translate-y-1' 
-                  : 'hover:border-[#c800ff] hover:bg-[#fcedf9] text-gray-500 hover:text-[#c800ff]'
+                  ? 'border-[#9d4ae3] bg-[#f3ecfc] text-[#9d4ae3] shadow-md -translate-y-1' 
+                  : 'hover:border-[#9d4ae3] hover:bg-[#f3ecfc] text-gray-500 hover:text-[#9d4ae3]'
               }`}
             >
               <div className="mb-3 transition-transform group-hover:scale-110">{cat.icon}</div>
-              <span className={`text-[10px] font-bold text-center leading-tight ${selected === cat.id ? 'text-[#c800ff]' : 'text-gray-700'}`}>
+              <span className={`text-[10px] font-bold text-center leading-tight ${selected === cat.id ? 'text-[#9d4ae3]' : 'text-gray-700'}`}>
                 {cat.name}
               </span>
             </button>
@@ -94,8 +94,8 @@ export default function Step1Category({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      <div className="bg-[#fcedf9] p-4 rounded-xl flex gap-3 items-center">
-        <Info size={18} className="text-[#c800ff] shrink-0" />
+      <div className="bg-[#f3ecfc] p-4 rounded-xl flex gap-3 items-center">
+        <Info size={18} className="text-[#9d4ae3] shrink-0" />
         <p className="text-xs text-black font-medium">
           Select the category that best describes your organization. This will determine your access level and features.
         </p>

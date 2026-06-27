@@ -14,15 +14,15 @@ import indBanner from '../assets/industries-banner.webp';
 
 // --- Shared Components ---
 const TealButton = ({ text }: { text: string }) => (
-  <button className="flex items-center gap-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-6 py-3 rounded-md font-bold hover:bg-[#366d64] transition-all group">
+  <button className="flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-3 rounded-md font-bold hover:bg-[#366d64] transition-all group">
     {text} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
   </button>
 );
 
 const SectionHeading = ({ sub, title }: { sub: string; title: string }) => (
   <div className="mb-6">
-    <span className="text-[#c800ff] font-bold uppercase tracking-widest text-sm">{sub}</span>
-    <h2 className="text-4xl font-extrabold text-[#c800ff] mt-2">{title}</h2>
+    <span className="text-[#9d4ae3] font-bold uppercase tracking-widest text-sm">{sub}</span>
+    <h2 className="text-4xl font-extrabold text-[#9d4ae3] mt-2">{title}</h2>
   </div>
 );
 
@@ -40,7 +40,7 @@ export default function AboutUs() {
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-20">
         <motion.h1 
-          className="text-5xl md:text-7xl font-extrabold text-[#c800ff] mb-4"
+          className="text-5xl md:text-7xl font-extrabold text-[#9d4ae3] mb-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
@@ -56,7 +56,7 @@ export default function AboutUs() {
              <Image src={indBanner} alt="Skyline Layout" className="w-full h-auto object-cover opacity-0 pointer-events-none" priority />
              {/* Custom colored mask */}
              <div 
-               className="absolute inset-0 bg-gradient-to-r from-[#c800ff] to-[#912cad]"
+               className="absolute inset-0 bg-gradient-to-r from-[#9d4ae3] to-[#8236be]"
                style={{
                  maskImage: `url(${indBanner.src})`,
                  WebkitMaskImage: `url(${indBanner.src})`,
@@ -93,29 +93,29 @@ export default function AboutUs() {
           <motion.div className="space-y-12" {...fadeInUp}>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#c800ff]">56+</h3>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">56+</h3>
                   <p className="text-gray-500 font-bold">Industries</p>
                 </div>
                 <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
-                   {[Building2, Briefcase, Factory, Landmark, Truck, Wrench, Stethoscope, Scissors, Plane, GraduationCap, HardHat, Store].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#c800ff]" /></div>)}
+                   {[Building2, Briefcase, Factory, Landmark, Truck, Wrench, Stethoscope, Scissors, Plane, GraduationCap, HardHat, Store].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#9d4ae3]" /></div>)}
                 </div>
              </div>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#c800ff]">11CR+</h3>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">11CR+</h3>
                   <p className="text-gray-500 font-bold">Products</p>
                 </div>
                 <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
-                   {[ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen, Coffee, Utensils, Package, Gift, Camera, Headphones].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#c800ff]" /></div>)}
+                   {[ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen, Coffee, Utensils, Package, Gift, Camera, Headphones].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#9d4ae3]" /></div>)}
                 </div>
              </div>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#c800ff]">1000+</h3>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">1000+</h3>
                   <p className="text-gray-500 font-bold">Cities</p>
                 </div>
                 <div className="flex-1 border-l pl-8">
-                   <MapPin className="text-[#c800ff] opacity-20" size={60} />
+                   <MapPin className="text-[#9d4ae3] opacity-20" size={60} />
                 </div>
              </div>
           </motion.div>

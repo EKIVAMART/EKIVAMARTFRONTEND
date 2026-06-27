@@ -21,7 +21,7 @@ export const MobileNavMenuItem = ({
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-all ${
-        isActive ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white' : 'text-gray-700 hover:bg-gray-100'
+        isActive ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white' : 'text-gray-700 hover:bg-gray-100'
       }`}
     >
       <div className="text-2xl mb-1">{icon}</div>
@@ -56,7 +56,7 @@ export const SubcategoryExpander = ({
           key={sub}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSubcategoryClick?.(sub)}
-          className="block w-full text-left px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#c800ff] hover:bg-white transition border-b last:border-b-0"
+          className="block w-full text-left px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#9d4ae3] hover:bg-white transition border-b last:border-b-0"
         >
           {sub}
         </motion.button>

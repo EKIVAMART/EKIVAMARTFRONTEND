@@ -39,7 +39,7 @@ const HeroCarousel = () => {
       mainTextBefore: "Sell",
       changingWords: ["effortlessly", "profitably", "confidently"],
       ctaText: "Centralized payments, powerful tools, and reach millions of buyers",
-      primaryButton: { text: "Become a Vendor — Start Selling", action: "link", link: "/vendor-registration" },
+      primaryButton: { text: "Become a Vendor — Start Selling", action: "link", link: "/become-a-vendor" },
       secondaryButton: { text: "Learn More", link: "/support/topics/becoming-a-vendor" }
     }
   ];
@@ -127,7 +127,7 @@ const HeroCarousel = () => {
     if (currentSlide === 0) {
       setIsSignupModalOpen(true);
     } else {
-      window.location.href = "/vendor-registration";
+      window.location.href = "/become-a-vendor";
     }
   };
 
@@ -200,9 +200,9 @@ const HeroCarousel = () => {
               resetKey={currentSlide}
             >
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-sm font-medium px-5 py-2 rounded-full mb-6">
-                <Sparkles size={14} className="text-[#c800ff]" />
+                <Sparkles size={14} className="text-[#9d4ae3]" />
                 <span>Faflora — Nigeria's Premier Marketplace</span>
-                <Shield size={12} className="text-[#c800ff]" />
+                <Shield size={12} className="text-[#9d4ae3]" />
               </div>
             </FadeInSection>
 
@@ -214,7 +214,7 @@ const HeroCarousel = () => {
               duration={0.7}
               resetKey={currentSlide}
             >
-              <p className="text-[#c800ff] font-bold uppercase tracking-[4px] text-sm mb-4">
+              <p className="text-[#9d4ae3] font-bold uppercase tracking-[4px] text-sm mb-4">
                 {current.subtitle}
               </p>
             </FadeInSection>
@@ -251,7 +251,7 @@ const HeroCarousel = () => {
                     deleteSpeed={45}
                     delayBetween={2000}
                     className="font-black pb-1 pr-2 md:pb-2 md:pr-2"
-                    colorClass="bg-gradient-to-r from-[#f0a8ff] to-[#c800ff] via-[#d946ef] bg-clip-text text-transparent"
+                    colorClass="bg-gradient-to-r from-[#f0a8ff] to-[#9d4ae3] via-[#d946ef] bg-clip-text text-transparent"
                     keepCursorFlashing={true}
                     onCycleComplete={() => {
                       if (!isTypingComplete) {
@@ -290,7 +290,7 @@ const HeroCarousel = () => {
                 {currentSlide === 0 ? (
                   <button
                     onClick={handlePrimaryClick}
-                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#c800ff] to-[#c740b0] hover:from-[#c740b0] hover:to-[#c800ff] text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#c800ff]/25 group cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#9d4ae3] text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#9d4ae3]/25 group cursor-pointer"
                   >
                     {current.primaryButton.text}
                     <ArrowRight className="w-4 h-4 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
@@ -298,7 +298,7 @@ const HeroCarousel = () => {
                 ) : (
                   <Link
                     href={current.primaryButton.link}
-                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#c800ff] to-[#c740b0] hover:from-[#c740b0] hover:to-[#c800ff] text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#c800ff]/25 group"
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#9d4ae3] text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#9d4ae3]/25 group"
                   >
                     {current.primaryButton.text}
                     <ArrowRight className="w-4 h-4 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
@@ -372,7 +372,7 @@ const HeroCarousel = () => {
               {currentSlide === idx && (
                 <motion.div
                   key={`progress-${progressKey}-${idx}`}
-                  className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#c800ff] via-[#d946ef] to-[#ff69e0]"
+                  className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#9d4ae3] via-[#d946ef] to-[#ff69e0]"
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ 

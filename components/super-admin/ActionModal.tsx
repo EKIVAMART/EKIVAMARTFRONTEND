@@ -249,11 +249,11 @@ const ChipSelector = ({
   return (
     <div className="space-y-2">
       <label className="text-xs font-bold text-gray-600 block">{label}</label>
-      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-2xl border bg-white focus-within:ring-2 focus-within:ring-[#c800ff]/20 focus-within:border-[#c800ff] transition-all">
+      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-2xl border bg-white focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 focus-within:border-[#9d4ae3] transition-all">
         {selectedValues.map((val, idx) => (
-          <span key={`${val}-${idx}`} className="bg-[#f0e1f7] text-[#912cad] text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
+          <span key={`${val}-${idx}`} className="bg-[#f0e1f7] text-[#8236be] text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
-            <button type="button" onClick={() => handleRemove(val)} className="text-[#912cad] hover:text-red-500 transition">
+            <button type="button" onClick={() => handleRemove(val)} className="text-[#8236be] hover:text-red-500 transition">
               <X size={13} strokeWidth={3} />
             </button>
           </span>
@@ -277,7 +277,7 @@ const ChipSelector = ({
               type="button"
               onClick={() => handleToggle(opt)}
               className={`text-xs px-2.5 py-1 rounded-lg border font-bold transition-all ${isSelected
-                ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white border-transparent shadow-sm'
+                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-sm'
                 : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                 }`}
             >
@@ -394,8 +394,8 @@ export default function ActionModal({
           100% { left: 150%; }
         }
         @keyframes quick-add-glow {
-          0%, 100% { box-shadow: 0 0 10px rgba(45, 212, 191, 0.4), 0 0 15px rgba(200, 0, 255, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(45, 212, 191, 0.7), 0 0 30px rgba(200, 0, 255, 0.4); }
+          0%, 100% { box-shadow: 0 0 10px rgba(45, 212, 191, 0.4), 0 0 15px rgba(157, 74, 227, 0.2); }
+          50% { box-shadow: 0 0 20px rgba(45, 212, 191, 0.7), 0 0 30px rgba(157, 74, 227, 0.4); }
         }
         .animate-quick-shine {
           animation: quick-add-shine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -582,7 +582,7 @@ export default function ActionModal({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#c800ff] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#9d4ae3] ml-1">*</span></label>
           <input
             type="text"
             value={formData.name}
@@ -593,7 +593,7 @@ export default function ActionModal({
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#9d4ae3] ml-1">*</span></label>
           <select
             value={selectedCategoryValue}
             onChange={e => {
@@ -615,7 +615,7 @@ export default function ActionModal({
           </select>
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#9d4ae3] ml-1">*</span></label>
           <select
             value={formData.subCategoryId}
             onChange={e => updateField('subCategoryId', e.target.value)}
@@ -642,7 +642,7 @@ export default function ActionModal({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
           <input
             type="number"
             value={formData.compareAtPrice || ''}
@@ -653,7 +653,7 @@ export default function ActionModal({
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#9d4ae3] ml-1">*</span></label>
           <input
             type="number"
             min="0"
@@ -668,7 +668,7 @@ export default function ActionModal({
       </div>
 
       <div>
-        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview / Short Summary <span className="text-[#c800ff] ml-1">*</span></label>
+        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview / Short Summary <span className="text-[#9d4ae3] ml-1">*</span></label>
         <textarea
           value={formData.preview}
           onChange={e => updateField('preview', e.target.value)}
@@ -680,7 +680,7 @@ export default function ActionModal({
       </div>
 
       <div>
-        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
+        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#9d4ae3] ml-1">*</span></label>
         <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
@@ -692,14 +692,14 @@ export default function ActionModal({
               <button
                 type="button"
                 onClick={() => setEditorMode('write')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
               >
                 Write
               </button>
               <button
                 type="button"
                 onClick={() => setEditorMode('preview')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
               >
                 Preview
               </button>
@@ -728,11 +728,11 @@ export default function ActionModal({
       <div className="bg-teal-50/40 rounded-2xl p-5 border border-teal-100">
         <h4 className="font-bold text-teal-800 mb-4 text-sm flex items-center gap-2">
           <span className="w-2 h-2 bg-teal-500 rounded-full inline-block" />
-          Origin &amp; Location <span className="text-[#c800ff] text-xs ml-1">(All Required)</span>
+          Origin &amp; Location <span className="text-[#9d4ae3] text-xs ml-1">(All Required)</span>
         </h4>
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Country of Origin <span className="text-[#c800ff] ml-1">*</span></label>
+            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Country of Origin <span className="text-[#9d4ae3] ml-1">*</span></label>
             <input
               type="text"
               value={formData.origin || ''}
@@ -743,7 +743,7 @@ export default function ActionModal({
             />
           </div>
           <div className="border-t border-teal-100 pt-4">
-            <label className="text-xs font-bold text-gray-600 mb-3 block">Shipping Location <span className="text-[#c800ff] ml-1">*</span></label>
+            <label className="text-xs font-bold text-gray-600 mb-3 block">Shipping Location <span className="text-[#9d4ae3] ml-1">*</span></label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
@@ -839,7 +839,7 @@ export default function ActionModal({
     if (normalized.includes('fashion') || normalized.includes('clothing') || normalized.includes('apparel')) {
       return (
         <div className="col-span-1 md:col-span-2 space-y-4 animate-in fade-in duration-200">
-          <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Fashion Specifications</h5>
+          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Fashion Specifications</h5>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Material / Fabric</label>
@@ -885,7 +885,7 @@ export default function ActionModal({
     if (normalized.includes('electronics') || normalized.includes('gadget') || normalized.includes('appliances')) {
       return (
         <div className="col-span-1 md:col-span-2 space-y-4 animate-in fade-in duration-200">
-          <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Technical Specifications</h5>
+          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Technical Specifications</h5>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Model Name / Number</label>
@@ -1339,7 +1339,7 @@ export default function ActionModal({
               )}
             </AnimatePresence>
 
-            <div className="bg-gradient-to-r from-[#c800ff] to-[#912cad] px-8 py-6 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-8 py-6 text-white flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold">{editingItem ? 'Edit Product' : 'Add New Product'}</h2>
                 <p className="text-sm opacity-90 mt-1">
@@ -1382,8 +1382,8 @@ export default function ActionModal({
                       ...(totalSteps === 4 ? [{ step: 4, title: 'Images', desc: 'Manage product gallery' }] : [])
                     ].map((s) => (
                       <div key={s.step} className="flex flex-col items-center flex-1 relative">
-                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#c800ff]' : 'bg-gray-200'}`} />}
-                        <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#c800ff] text-white shadow-md shadow-[#c800ff]/30 ring-4 ring-[#c800ff]/10' : currentStep > s.step ? 'bg-[#912cad] text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#9d4ae3]' : 'bg-gray-200'}`} />}
+                        <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#9d4ae3] text-white shadow-md shadow-[#9d4ae3]/30 ring-4 ring-[#9d4ae3]/10' : currentStep > s.step ? 'bg-[#8236be] text-white' : 'bg-gray-200 text-gray-500'}`}>
                           {currentStep > s.step ? <Check size={14} /> : s.step}
                         </div>
                         <div className="mt-2 text-center hidden md:block">
@@ -1399,14 +1399,14 @@ export default function ActionModal({
                   {currentStep === 1 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Layers size={22} /></div>
+                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><Layers size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
                           <p className="text-xs text-gray-500">Core product details</p>
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#c800ff] ml-1">*</span></label>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#9d4ae3] ml-1">*</span></label>
                         <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                       </div>
 
@@ -1414,7 +1414,7 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#c800ff] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#9d4ae3] ml-1">*</span></label>
                           <select
                             value={selectedCategoryValue}
                             onChange={e => {
@@ -1436,7 +1436,7 @@ export default function ActionModal({
                           </select>
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#c800ff] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#9d4ae3] ml-1">*</span></label>
                           <select
                             value={formData.subCategoryId}
                             onChange={e => updateField('subCategoryId', e.target.value)}
@@ -1462,12 +1462,12 @@ export default function ActionModal({
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#c800ff] ml-1">*</span></label>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#9d4ae3] ml-1">*</span></label>
                         <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#c800ff] ml-1">*</span></label>
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#9d4ae3] ml-1">*</span></label>
                         <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
                           {/* Editor Header Toolbar */}
                           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
@@ -1518,14 +1518,14 @@ export default function ActionModal({
                               <button
                                 type="button"
                                 onClick={() => setEditorMode('write')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
                               >
                                 Write
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setEditorMode('preview')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#912cad]' : 'text-gray-500 hover:text-gray-800'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
                               >
                                 Preview
                               </button>
@@ -1558,10 +1558,10 @@ export default function ActionModal({
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                          <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#c800ff] focus-within:ring-[#c800ff]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                          <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#9d4ae3] focus-within:ring-[#9d4ae3]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
-                              <span key={`tag-${t}-${idx}`} className="bg-[#e9d2e5] text-[#c800ff] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
-                                {t} <X size={12} className="cursor-pointer text-[#c800ff] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                              <span key={`tag-${t}-${idx}`} className="bg-[#e9d2e5] text-[#9d4ae3] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                                {t} <X size={12} className="cursor-pointer text-[#9d4ae3] hover:text-red-500 transition" onClick={() => removeTag(t)} />
                               </span>
                             ))}
                             <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
@@ -1576,7 +1576,7 @@ export default function ActionModal({
                           <button
                             type="button"
                             onClick={generateSKU}
-                            className="px-5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white text-xs font-bold rounded-2xl shadow-md transition"
+                            className="px-5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white text-xs font-bold rounded-2xl shadow-md transition"
                           >
                             Auto-Generate SKU
                           </button>
@@ -1591,14 +1591,14 @@ export default function ActionModal({
                       {/* Origin & Location Section - ALL FIELDS REQUIRED */}
                       <div className="bg-purple-50/40 rounded-2xl p-5 border border-purple-100">
                         <h4 className="font-bold text-purple-800 mb-4 text-sm flex items-center gap-2">
-                          <span className="w-2 h-2 bg-[#c800ff] rounded-full inline-block" />
-                          Origin &amp; Location <span className="text-[#c800ff] text-xs ml-1">(All Fields Required)</span>
+                          <span className="w-2 h-2 bg-[#9d4ae3] rounded-full inline-block" />
+                          Origin &amp; Location <span className="text-[#9d4ae3] text-xs ml-1">(All Fields Required)</span>
                         </h4>
 
                         {/* Country of Origin */}
                         <div className="mb-5">
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                            Country of Origin <span className="text-[#c800ff] ml-1">*</span>
+                            Country of Origin <span className="text-[#9d4ae3] ml-1">*</span>
                           </label>
                           <input
                             type="text"
@@ -1616,12 +1616,12 @@ export default function ActionModal({
                         {/* Shipping Location */}
                         <div className="border-t border-purple-100 pt-4">
                           <label className="text-xs font-bold text-gray-600 mb-3 block">
-                            Shipping Location <span className="text-[#c800ff] ml-1">*</span>
+                            Shipping Location <span className="text-[#9d4ae3] ml-1">*</span>
                           </label>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                Town / City <span className="text-[#c800ff] ml-1">*</span>
+                                Town / City <span className="text-[#9d4ae3] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1634,7 +1634,7 @@ export default function ActionModal({
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                State <span className="text-[#c800ff] ml-1">*</span>
+                                State <span className="text-[#9d4ae3] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1647,7 +1647,7 @@ export default function ActionModal({
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                LGA (Local Government Area) <span className="text-[#c800ff] ml-1">*</span>
+                                LGA (Local Government Area) <span className="text-[#9d4ae3] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1671,7 +1671,7 @@ export default function ActionModal({
                   {currentStep === 2 && (
                     <div className="space-y-8">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><DollarSign size={22} /></div>
+                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><DollarSign size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
                           <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
@@ -1680,7 +1680,7 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
                           <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
                         </div>
                         <div>
@@ -1691,8 +1691,8 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#c800ff] ml-1">*</span></label>
-                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#c800ff]" required />
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
+                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#9d4ae3]" required />
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
@@ -1702,12 +1702,12 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#c800ff] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#9d4ae3] ml-1">*</span></label>
                           <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
                         </div>
                         <div className="flex items-center pt-2 md:pt-8">
                           <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#c800ff] rounded border-gray-300 focus:ring-[#c800ff]" />
+                            <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#9d4ae3] rounded border-gray-300 focus:ring-[#9d4ae3]" />
                             <span className="font-bold text-gray-700 text-sm">In Stock</span>
                           </label>
                         </div>
@@ -1719,7 +1719,7 @@ export default function ActionModal({
                   {currentStep === 3 && (
                     <div className="space-y-8 animate-in fade-in duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white"><Info size={22} /></div>
+                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><Info size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
                           <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
@@ -1786,7 +1786,7 @@ export default function ActionModal({
                       </div>
 
                       {/* Dynamic Category Specifications + Custom Fields */}
-                      <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#c800ff]">
+                      <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#9d4ae3]">
                         <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
                           {selectedCategoryName || 'General'} Specifications
                         </h4>
@@ -1796,7 +1796,7 @@ export default function ActionModal({
                           {/* Unified weight & dimension inputs nested in specs based on category */}
                           {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
                             <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
-                              <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
+                              <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
@@ -1878,7 +1878,7 @@ export default function ActionModal({
 
                         {/* Custom Attributes Fields Grid — always at the bottom of specs */}
                         <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
-                          <h5 className="font-extrabold text-[#912cad] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
+                          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
                           {customFields.map((field, index) => (
                             <div key={index} className="flex flex-col sm:flex-row gap-3">
                               <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
@@ -1892,7 +1892,7 @@ export default function ActionModal({
                               </button>
                             </div>
                           ))}
-                          <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#c800ff] flex items-center gap-1.5 hover:underline mt-2">
+                          <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#9d4ae3] flex items-center gap-1.5 hover:underline mt-2">
                             <Plus size={15} /> Add Custom Field
                           </button>
                         </div>
@@ -1931,7 +1931,7 @@ export default function ActionModal({
                     <div className="space-y-6 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-lg text-white">
+                          <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white">
                             <ImageIcon size={22} />
                           </div>
                           <div>
@@ -1987,8 +1987,8 @@ export default function ActionModal({
                                     e.preventDefault();
                                     setDraggedIndex(null);
                                   }}
-                                  className={`flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border cursor-grab active:cursor-grabbing select-none hover:border-[#c800ff]/30 hover:shadow-md transition-all ${
-                                    draggedIndex === idx ? 'opacity-40 border-[#c800ff] scale-[0.98]' : 'border-gray-100'
+                                  className={`flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border cursor-grab active:cursor-grabbing select-none hover:border-[#9d4ae3]/30 hover:shadow-md transition-all ${
+                                    draggedIndex === idx ? 'opacity-40 border-[#9d4ae3] scale-[0.98]' : 'border-gray-100'
                                   }`}
                                   style={{ touchAction: 'none' }}
                                 >
@@ -1999,7 +1999,7 @@ export default function ActionModal({
                                   <div className="flex-1 pointer-events-none">
                                     <p className="font-bold text-sm">Image {idx + 1}</p>
                                     {alt && <p className="text-xs text-gray-500 mt-0.5">{alt}</p>}
-                                    {isPrimary && <span className="text-[10px] font-bold text-[#c800ff] bg-[#f0e1f7] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
+                                    {isPrimary && <span className="text-[10px] font-bold text-[#9d4ae3] bg-[#f0e1f7] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
                                   </div>
                                 </div>
                               );
@@ -2007,7 +2007,7 @@ export default function ActionModal({
                           </div>
                           <div className="flex justify-end gap-3 mt-6">
                             <button type="button" onClick={() => setIsReordering(false)} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-50">Cancel</button>
-                            <button type="button" onClick={handleSaveReorder} className="px-5 py-2.5 bg-[#c800ff] text-white rounded-xl font-bold text-sm hover:bg-[#b500e6]">Save New Order</button>
+                            <button type="button" onClick={handleSaveReorder} className="px-5 py-2.5 bg-[#9d4ae3] text-white rounded-xl font-bold text-sm hover:bg-[#8236be]">Save New Order</button>
                           </div>
                         </div>
                       ) : (
@@ -2044,7 +2044,7 @@ export default function ActionModal({
                             )}
 
                             {stagedImages && stagedImages.length > 0 && stagedImages[Math.min(selectedImageIndex, stagedImages.length - 1)]?.isPrimary && (
-                              <div className="absolute top-4 left-4 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
+                              <div className="absolute top-4 left-4 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
                                 <CheckCircle2 size={14} /> Cover Image
                               </div>
                             )}
@@ -2065,7 +2065,7 @@ export default function ActionModal({
                                   key={idx}
                                   type="button"
                                   onClick={() => { setSelectedImageIndex(idx); setEditingAltIndex(null); }}
-                                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === idx ? 'border-[#c800ff] shadow-md scale-110' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
+                                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === idx ? 'border-[#9d4ae3] shadow-md scale-110' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
                                 >
                                   <img src={url} className="w-full h-full object-cover" alt="" />
                                 </button>
@@ -2078,7 +2078,7 @@ export default function ActionModal({
                                   setReorderImages(stagedImages);
                                   setIsUploadModalOpen(true);
                                 }}
-                                className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#c800ff] text-gray-400 hover:text-[#c800ff] flex items-center justify-center transition-all bg-white"
+                                className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#9d4ae3] text-gray-400 hover:text-[#9d4ae3] flex items-center justify-center transition-all bg-white"
                               >
                                 <Plus size={24} />
                               </button>
@@ -2094,15 +2094,15 @@ export default function ActionModal({
 
                             return (
                               <div className="flex flex-wrap justify-center gap-3 w-full">
-                                <button type="button" onClick={() => replaceInputRef.current?.click()} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => replaceInputRef.current?.click()} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                   <UploadCloud size={16} /> Change Image
                                 </button>
                                 {!isPrimary && (
-                                  <button type="button" onClick={handleSetCoverImage} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                  <button type="button" onClick={handleSetCoverImage} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                     <Check size={16} /> Set as Cover
                                   </button>
                                 )}
-                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#c800ff] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
                                   <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
                                 </button>
                                 <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-bold flex items-center gap-2 transition">
@@ -2116,10 +2116,10 @@ export default function ActionModal({
                           {editingAltIndex !== null && (
                             <div className="mt-6 w-full max-w-md bg-white p-4 rounded-2xl shadow-sm border border-[#e4d3e0] animate-in fade-in zoom-in-95">
                               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text</label>
-                              <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-xl border focus:border-[#c800ff] outline-none text-sm mb-3" />
+                              <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-xl border focus:border-[#9d4ae3] outline-none text-sm mb-3" />
                               <div className="flex justify-end gap-2">
                                 <button type="button" onClick={() => setEditingAltIndex(null)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
-                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#c800ff] text-white rounded-lg hover:bg-[#b500e6]">Save Alt Text</button>
+                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#9d4ae3] text-white rounded-lg hover:bg-[#8236be]">Save Alt Text</button>
                               </div>
                             </div>
                           )}
@@ -2167,7 +2167,7 @@ export default function ActionModal({
 
                 <div className="flex flex-col items-end gap-1">
                   {(isSaving || isImageUploading || isImageActionLoading) && loadingMessage && (
-                    <span className="text-xs text-[#912cad] font-semibold animate-pulse text-right">{loadingMessage}</span>
+                    <span className="text-xs text-[#8236be] font-semibold animate-pulse text-right">{loadingMessage}</span>
                   )}
                   <div className="flex gap-3 md:gap-4">
                     {currentStep < totalSteps ? (
@@ -2175,7 +2175,7 @@ export default function ActionModal({
                         type="button"
                         onClick={nextStep}
                         disabled={isSaving || isImageActionLoading || isImageUploading}
-                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
+                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
                       >
                         Next <ChevronRight size={20} />
                       </button>
@@ -2184,7 +2184,7 @@ export default function ActionModal({
                         type="button"
                         onClick={handleSubmit}
                         disabled={isSaving || isImageActionLoading || isImageUploading}
-                        className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
+                        className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
                       >
                         {isSaving || isImageActionLoading || isImageUploading ? (
                           <>
@@ -2236,13 +2236,13 @@ export default function ActionModal({
                 value={imageToReplace.alt} 
                 onChange={(e) => setImageToReplace({ ...imageToReplace, alt: e.target.value })} 
                 placeholder="Describe the image for SEO" 
-                className="w-full p-3 rounded-xl border focus:border-[#c800ff] outline-none text-sm" 
+                className="w-full p-3 rounded-xl border focus:border-[#9d4ae3] outline-none text-sm" 
               />
             </div>
 
             <div className="flex gap-3">
               <button type="button" onClick={handleCancelReplace} disabled={isImageActionLoading} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
-              <button type="button" onClick={handleConfirmReplace} disabled={isImageActionLoading || !imageToReplace.alt.trim()} className="flex-1 py-3 bg-[#c800ff] hover:bg-[#b500e6] disabled:opacity-50 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2">
+              <button type="button" onClick={handleConfirmReplace} disabled={isImageActionLoading || !imageToReplace.alt.trim()} className="flex-1 py-3 bg-[#9d4ae3] hover:bg-[#8236be] disabled:opacity-50 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2">
                 {isImageActionLoading ? 'Saving...' : 'Save Image & Alt Text'}
               </button>
             </div>
@@ -2261,7 +2261,7 @@ export default function ActionModal({
             <div className="flex gap-3">
               <button type="button" onClick={closeModalAndReset} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Discard</button>
               <button type="button" onClick={() => setShowCancelConfirm(false)} className="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
-              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#c800ff] hover:bg-[#b500e6] disabled:opacity-60 text-white rounded-2xl font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
+              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#9d4ae3] hover:bg-[#8236be] disabled:opacity-60 text-white rounded-2xl font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>

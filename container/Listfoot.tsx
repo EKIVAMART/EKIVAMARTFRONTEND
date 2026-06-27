@@ -101,11 +101,11 @@ const Listfoot = () => {
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
             <Link href="/">
-              <Image src="/logo.jpg" alt="Faflora" width={160} height={45} className="object-contain" />
+              <Image src="/fa_logo_brand.png" alt="Faflora" width={160} height={45} className="object-contain" />
             </Link>
 
             <p className="text-gray-500 text-sm max-w-sm">
-              
+
             </p>
 
             <ul className="space-y-3">
@@ -116,7 +116,7 @@ const Listfoot = () => {
                     key={index}
                     className="flex items-start gap-3 text-sm text-gray-600"
                   >
-                    <Icon className="text-[#c800ff] mt-1" />
+                    <Icon className="text-[#9d4ae3] mt-1" />
                     <span>{item.text}</span>
                   </li>
                 );
@@ -161,7 +161,7 @@ const Listfoot = () => {
                   return (
                     <li
                       key={idx}
-                      className="text-sm text-gray-600 hover:text-[#c800ff] cursor-pointer transition"
+                      className="text-sm text-gray-600 hover:text-[#9d4ae3] cursor-pointer transition"
                     >
                       <Link href={href} className="block w-full">
                         {link}
@@ -192,7 +192,7 @@ const Listfoot = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] transition"
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white hover:from-[#8236be] hover:to-[#692a99] transition"
                   >
                     <Icon size={14} />
                   </a>

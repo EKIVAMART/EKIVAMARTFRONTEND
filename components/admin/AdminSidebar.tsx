@@ -32,7 +32,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
         <div className="p-6 border-b flex justify-between items-center">
           <div className="flex items-center gap-1.5 shrink-0">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.jpg" alt="Faflora" width={110} height={30} className="object-contain" />
+              <Image src="/fa_logo_brand.png" alt="Faflora" width={110} height={30} className="object-contain" />
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
                 Admin
               </span>
@@ -45,47 +45,47 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
           )}
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <SidebarLink 
-            icon={<LayoutDashboard size={20} />} 
-            label="Dashboard" 
-            active={activeTab === 'dashboard'} 
-            onClick={() => setActiveTab('dashboard')} 
+          <SidebarLink
+            icon={<LayoutDashboard size={20} />}
+            label="Dashboard"
+            active={activeTab === 'dashboard'}
+            onClick={() => setActiveTab('dashboard')}
           />
-          <SidebarLink 
-            icon={<Package size={20} />} 
-            label="Products" 
-            active={activeTab === 'products'} 
-            onClick={() => setActiveTab('products')} 
+          <SidebarLink
+            icon={<Package size={20} />}
+            label="Products"
+            active={activeTab === 'products'}
+            onClick={() => setActiveTab('products')}
           />
-          <SidebarLink 
-            icon={<ShoppingCart size={20} />} 
-            label="Orders" 
-            active={activeTab === 'orders'} 
-            onClick={() => setActiveTab('orders')} 
+          <SidebarLink
+            icon={<ShoppingCart size={20} />}
+            label="Orders"
+            active={activeTab === 'orders'}
+            onClick={() => setActiveTab('orders')}
           />
-          <SidebarLink 
-            icon={<Users size={20} />} 
-            label="Vendor Settings" 
-            active={activeTab === 'vendors'} 
-            onClick={() => setActiveTab('vendors')} 
+          <SidebarLink
+            icon={<Users size={20} />}
+            label="Vendor Settings"
+            active={activeTab === 'vendors'}
+            onClick={() => setActiveTab('vendors')}
           />
-          <SidebarLink 
-            icon={<UserCircle size={20} />} 
-            label="Users" 
-            active={activeTab === 'users'} 
-            onClick={() => setActiveTab('users')} 
+          <SidebarLink
+            icon={<UserCircle size={20} />}
+            label="Users"
+            active={activeTab === 'users'}
+            onClick={() => setActiveTab('users')}
           />
-          <SidebarLink 
-            icon={<Clock size={20} />} 
-            label="Waitlist" 
-            active={activeTab === 'waitlist'} 
-            onClick={() => setActiveTab('waitlist')} 
+          <SidebarLink
+            icon={<Clock size={20} />}
+            label="Waitlist"
+            active={activeTab === 'waitlist'}
+            onClick={() => setActiveTab('waitlist')}
           />
-          <SidebarLink 
-            icon={<Settings size={20} />} 
-            label="Settings" 
-            active={false} 
-            onClick={() => {}} 
+          <SidebarLink
+            icon={<Settings size={20} />}
+            label="Settings"
+            active={false}
+            onClick={() => { }}
           />
         </nav>
         <div className="p-6 border-t mt-auto">

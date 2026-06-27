@@ -568,7 +568,7 @@ const buildProductPayload = (
   if (formData.sku) payload.sku = formData.sku;
   if (formData.currency) payload.currency = formData.currency;
   if (formData.tags.length) payload.tags = formData.tags;
-  
+
   if (formData.images?.length) {
     payload.images = formData.images.map((img, index) => {
       if (typeof img === 'string') {
@@ -1256,7 +1256,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#c800ff]/20 border-t-[#c800ff] rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
           <p className="text-sm font-bold text-slate-600 animate-pulse">Verifying credentials...</p>
         </div>
       </div>
@@ -1267,7 +1267,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-amber-400 to-red-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
-        
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
@@ -1282,7 +1282,7 @@ export default function AdminPage() {
           </p>
           <button
             onClick={() => router.push('/admin/login')}
-            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+            className="w-full mt-8 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
           >
             Sign In Again
           </button>
@@ -1294,12 +1294,12 @@ export default function AdminPage() {
   if (authUser && !hasAdminRole) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#c800ff] to-[#912cad] rounded-full blur-[120px] opacity-15 pointer-events-none" />
-        
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-full blur-[120px] opacity-15 pointer-events-none" />
+
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
-              <svg className="w-12 h-12 text-[#c800ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-12 h-12 text-[#9d4ae3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -1310,7 +1310,7 @@ export default function AdminPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="w-full mt-8 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+            className="w-full mt-8 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
           >
             Go to Home
           </button>
@@ -1326,7 +1326,7 @@ export default function AdminPage() {
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.jpg" alt="Faflora" width={100} height={28} className="object-contain" />
+            <Image src="/fa_logo_brand.png" alt="Faflora" width={100} height={28} className="object-contain" />
             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
           </Link>
         </div>
@@ -1436,14 +1436,14 @@ export default function AdminPage() {
                   {activeTab === 'products' && (
                     <button
                       onClick={() => setIsCategoriesModalOpen(true)}
-                      className="bg-white text-[#912cad] border border-[#c800ff]/30 hover:border-[#c800ff] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                      className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
                     >
                       All Categories
                     </button>
                   )}
                   <button
                     onClick={() => openModal()}
-                    className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+                    className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
                   >
                     <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
                   </button>
@@ -1451,7 +1451,7 @@ export default function AdminPage() {
               )}
             </header>
 
-            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#c800ff] focus-within:ring-2 focus-within:ring-[#c800ff]/20 transition-all">
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -1473,7 +1473,7 @@ export default function AdminPage() {
                     setFilterCategoryId(e.target.value);
                     setProductPage(1);
                   }}
-                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1"
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((c) => (
@@ -1488,7 +1488,7 @@ export default function AdminPage() {
                     setProductPage(1);
                   }}
                   disabled={filterCategoryId === 'all'}
-                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
                 >
                   <option value="all">All Subcategories</option>
                   {filterSubcategories.map((c) => (
@@ -1502,8 +1502,8 @@ export default function AdminPage() {
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
                   <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
-                      ? 'border-amber-200 bg-amber-50 text-amber-700'
-                      : 'border-gray-200 bg-white text-gray-500'
+                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    : 'border-gray-200 bg-white text-gray-500'
                     }`}>
                     {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
                   </div>

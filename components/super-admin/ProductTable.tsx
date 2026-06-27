@@ -177,7 +177,7 @@ export default function ProductTable({
           <select 
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-gray-50 border border-gray-200 text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer focus:border-[#c800ff] focus:ring-1 focus:ring-[#c800ff]"
+            className="bg-gray-50 border border-gray-200 text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3]"
           >
             <option value="createdAt-desc">Newest Created</option>
             <option value="createdAt-asc">Oldest Created</option>
@@ -244,7 +244,7 @@ export default function ProductTable({
                     <div className="flex items-center gap-2 mt-0.5 w-fit">
                       {getStatusBadge(p.status)}
                       {(p.category || p.subCategory) && (
-                        <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-[#8236be] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
                           {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
                         </span>
                       )}
@@ -268,7 +268,7 @@ export default function ProductTable({
                         <button
                           onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
                           disabled={publishingProductId === p.id}
-                          className="px-3 py-1.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-70 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5"
                         >
                           {publishingProductId === p.id ? (
                             <>
@@ -324,13 +324,13 @@ export default function ProductTable({
                 </div>
                 {(p.category || p.subCategory) && (
                   <div className="mt-1">
-                    <span className="text-[10px] font-bold text-[#912cad] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-[#8236be] bg-[#f0e1f7] px-2 py-0.5 rounded uppercase tracking-wider">
                       {p.category} {p.subCategory ? `› ${p.subCategory}` : ''}
                     </span>
                   </div>
                 )}
                 <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                  <span className="text-sm font-black text-[#c800ff]">NGN {p.price.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#9d4ae3]">NGN {p.price.toLocaleString()}</span>
                   <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{p.stock} in stock</span>
                 </div>
                 <div className="mt-2 space-y-0.5 border-t pt-2 border-gray-100 text-[10px] text-gray-400 font-medium">
@@ -344,7 +344,7 @@ export default function ProductTable({
                 <button
                   onClick={(e) => { e.stopPropagation(); onPublish(p.id); }}
                   disabled={publishingProductId === p.id}
-                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white hover:from-[#b500e6] hover:to-[#802699] disabled:opacity-70 rounded-xl transition text-xs font-bold shadow"
+                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-70 rounded-xl transition text-xs font-bold shadow"
                 >
                   {publishingProductId === p.id ? (
                     <>

@@ -170,7 +170,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight">Subcategories</h2>
-            <p className="text-sm text-[#912cad] font-bold mt-1 bg-fuchsia-50 px-2 py-0.5 rounded inline-block">
+            <p className="text-sm text-[#8236be] font-bold mt-1 bg-fuchsia-50 px-2 py-0.5 rounded inline-block">
               {category.name}
             </p>
           </div>
@@ -193,13 +193,13 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
               value={newSubcategoryName}
               onChange={(e) => setNewSubcategoryName(e.target.value)}
               placeholder="New subcategory name..."
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20 focus:border-[#c800ff] transition"
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition"
               disabled={isAdding}
             />
             <button
               type="submit"
               disabled={isAdding || !newSubcategoryName.trim()}
-              className="bg-gradient-to-r from-[#c800ff] to-[#912cad] hover:from-[#b500e6] hover:to-[#802699] text-white px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-fuchsia-100"
+              className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-fuchsia-100"
             >
               {isAdding ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -212,7 +212,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
           {/* List */}
           {isLoading ? (
             <div className="flex items-center justify-center py-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c800ff]"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#9d4ae3]"></div>
             </div>
           ) : subcategories.length === 0 ? (
             <div className="text-center py-10 bg-white rounded-xl border border-gray-200 border-dashed">
@@ -229,13 +229,13 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         autoFocus
-                        className="flex-1 border border-[#c800ff]/30 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#c800ff]/20"
+                        className="flex-1 border border-[#9d4ae3]/30 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20"
                         onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
                       />
                       <button
                         onClick={saveEdit}
                         disabled={isSavingEdit || !editName.trim()}
-                        className="bg-[#c800ff] text-white p-2 rounded-lg hover:bg-[#b500e6] transition disabled:opacity-50"
+                        className="bg-[#9d4ae3] text-white p-2 rounded-lg hover:bg-[#8236be] transition disabled:opacity-50"
                       >
                         {isSavingEdit ? (
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

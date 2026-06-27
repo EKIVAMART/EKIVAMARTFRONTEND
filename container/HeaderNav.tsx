@@ -289,7 +289,7 @@ export default function Header() {
             onClick={() => setIsBrowseOpen(!isBrowseOpen)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-2 rounded-md bg-gradient-to-r from-[#c800ff] to-[#912cad] px-3 py-2 text-sm font-semibold text-white hover:from-[#b500e6] hover:to-[#802699] transition shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 rounded-md bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-3 py-2 text-sm font-semibold text-white hover:from-[#8236be] hover:to-[#692a99] transition shadow-md hover:shadow-lg"
           >
             <Grid size={15} />
             Browse All Categories
@@ -325,14 +325,14 @@ export default function Header() {
                       >
                         <Link
                           href={`/categories/${cat.slug}`}
-                          className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-[#fcedf9] hover:text-[#b500e6] transition"
+                          className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f3ecfc] hover:text-[#8236be] transition"
                           onClick={() => {
                             setIsBrowseOpen(false);
                             setHoveredCategoryInBrowse(null);
                           }}
                         >
                           <div className="flex items-center gap-3">
-                            <Icon size={16} className="text-[#c800ff] flex-shrink-0" />
+                            <Icon size={16} className="text-[#9d4ae3] flex-shrink-0" />
                             <span className="font-medium">{cat.name}</span>
                           </div>
                           {hasSubs && (
@@ -346,14 +346,14 @@ export default function Header() {
                             className="absolute left-full top-0 ml-1 w-52 rounded-md border bg-white shadow-xl py-2 z-[60]"
                             style={{ maxHeight: '280px', overflowY: 'auto', scrollbarWidth: 'thin' }}
                           >
-                            <p className="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#c800ff]/70 border-b border-gray-100 mb-1">
+                            <p className="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#9d4ae3]/70 border-b border-gray-100 mb-1">
                               {cat.name}
                             </p>
                             {cat.subcategories.map((sub: any) => (
                               <Link
                                 key={sub.id}
                                 href={`/categories/${cat.slug}?subcategory=${sub.slug}`}
-                                className="block px-4 py-2 text-sm text-gray-600 hover:bg-[#fcedf9] hover:text-[#b500e6] font-medium transition"
+                                className="block px-4 py-2 text-sm text-gray-600 hover:bg-[#f3ecfc] hover:text-[#8236be] font-medium transition"
                                 onClick={() => {
                                   setIsBrowseOpen(false);
                                   setHoveredCategoryInBrowse(null);
@@ -387,7 +387,7 @@ export default function Header() {
               <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                 <Link
                   href={link.href}
-                  className={`flex items-center gap-1 transition-colors hover:text-[#c800ff] ${hoveredMenu === link.name ? 'text-[#c800ff]' : ''}`}
+                  className={`flex items-center gap-1 transition-colors hover:text-[#9d4ae3] ${hoveredMenu === link.name ? 'text-[#9d4ae3]' : ''}`}
                 >
                   {link.name}
                   {/* Always show arrow on links that have subcategories */}
@@ -415,8 +415,8 @@ export default function Header() {
                     style={{ marginTop: '2px' }}
                   >
                     {/* Header label */}
-                    <div className="px-4 py-2 bg-gradient-to-r from-[#fcedf9] to-white border-b border-purple-100">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#c800ff]/70">{link.name}</span>
+                    <div className="px-4 py-2 bg-gradient-to-r from-[#f3ecfc] to-white border-b border-purple-100">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#9d4ae3]/70">{link.name}</span>
                     </div>
                     {link.subItems.map((sub: { name: string; href: string }, index: number) => (
                       <motion.div
@@ -424,11 +424,11 @@ export default function Header() {
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.12, delay: index * 0.02 }}
-                        whileHover={{ x: 4, backgroundColor: '#fcedf9' }}
+                        whileHover={{ x: 4, backgroundColor: '#f3ecfc' }}
                       >
                         <Link
                           href={sub.href}
-                          className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-[#c800ff] transition"
+                          className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-[#9d4ae3] transition"
                         >
                           {sub.name}
                         </Link>
@@ -448,7 +448,7 @@ export default function Header() {
           >
             <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
               <span
-                className={`flex items-center gap-1 transition-colors hover:text-[#c800ff] select-none ${hoveredMenu === 'Shop' ? 'text-[#c800ff]' : ''}`}
+                className={`flex items-center gap-1 transition-colors hover:text-[#9d4ae3] select-none ${hoveredMenu === 'Shop' ? 'text-[#9d4ae3]' : ''}`}
               >
                 Shop
                 <motion.span
@@ -476,7 +476,7 @@ export default function Header() {
                       {shopCategories.map((section, idx) => (
                         <div key={idx}>
                           {/* Plain non-clickable category header */}
-                          <h3 className="mb-3 text-sm font-black text-[#c800ff] uppercase tracking-wide border-b border-purple-100 pb-1.5">
+                          <h3 className="mb-3 text-sm font-black text-[#9d4ae3] uppercase tracking-wide border-b border-purple-100 pb-1.5">
                             {section.name}
                           </h3>
                           {section.subcategories.length > 0 ? (
@@ -485,7 +485,7 @@ export default function Header() {
                                 <li key={i}>
                                   <Link
                                     href={`/categories/${section.slug}?subcategory=${subItem.slug}`}
-                                    className="text-sm text-gray-600 hover:text-[#c800ff] transition-colors font-medium"
+                                    className="text-sm text-gray-600 hover:text-[#9d4ae3] transition-colors font-medium"
                                   >
                                     {subItem.name}
                                   </Link>
@@ -495,7 +495,7 @@ export default function Header() {
                           ) : (
                             <Link
                               href={`/categories/${section.slug}`}
-                              className="text-sm text-gray-500 hover:text-[#c800ff] transition-colors font-medium"
+                              className="text-sm text-gray-500 hover:text-[#9d4ae3] transition-colors font-medium"
                             >
                               All {section.name}
                             </Link>
@@ -514,14 +514,14 @@ export default function Header() {
 
         {/* RIGHT: Contact */}
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/vendor-registration">
-            <button className="bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white px-4 py-2 rounded-md hover:from-[#b500e6] hover:to-[#802699] transition-colors">
+          <Link href="/become-a-vendor">
+            <button className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-4 py-2 rounded-md hover:from-[#8236be] hover:to-[#692a99] transition-colors">
               Become a vendor
             </button>
           </Link>
           <Headphones size={24} className="text-gray-700" />
           <div className="hidden sm:block text-right leading-tight">
-            <p className="font-bold text-[#c800ff] text-lg">09069910407</p>
+            <p className="font-bold text-[#9d4ae3] text-lg">09069910407</p>
             <p className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">
               24/7 Support Center
             </p>

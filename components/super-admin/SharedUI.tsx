@@ -4,7 +4,7 @@ export const SidebarLink = ({ icon, label, active, onClick }: any) => (
   <button 
     onClick={onClick}
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
-      active ? 'bg-gradient-to-r from-[#c800ff] to-[#912cad] text-white shadow-lg shadow-fuchsia-100' : 'text-gray-400 hover:bg-gray-50 hover:text-slate-700'
+      active ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-lg shadow-fuchsia-100' : 'text-gray-400 hover:bg-gray-50 hover:text-slate-700'
     }`}
   >
     {icon}
