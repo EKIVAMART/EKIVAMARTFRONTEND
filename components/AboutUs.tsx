@@ -77,15 +77,18 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
           <motion.div {...fadeInUp}>
             <SectionHeading sub="WHO" title="WE ARE" />
-            <p className="text-gray-600 leading-loose mb-6"> 
-              We are Nigeria largest marketplace and a one stop expert solution for all business needs, 
-              empowering <span className="font-bold text-gray-800">86 lakh suppliers</span> by connecting 
-              them with <span className="font-bold text-gray-800">21.9 crore buyers</span> across the nation.
-            </p>
-            <p className="text-gray-600 leading-loose mb-8">
-              At the heart of our commitment is creating value for business communities through strong 
-              network effects. We make business effortless for all by ensuring access to a wider market, technology, and finance.
-            </p>
+              <p className="text-gray-600 leading-loose mb-6">
+                Faflora is a modern multi-vendor marketplace connecting trusted businesses 
+                with customers through a seamless online shopping experience. We empower 
+                vendors of all sizes to showcase their products, grow their businesses, 
+                and reach more customers across Nigeria and beyond.
+              </p>
+
+              <p className="text-gray-600 leading-loose mb-8">
+                Our mission is to make buying and selling simple, secure, and accessible. 
+                By combining innovative technology with a customer first approach, we help businesses thrive while providing shoppers 
+                with quality products, competitive prices, and reliable service all in one place.
+              </p>
             <TealButton text="Our Core Values" />
           </motion.div>
 
@@ -175,7 +178,7 @@ export default function AboutUs() {
       </section>
 
       {/* 6. HISTORY SECTION */}
-      <section className="py-24 bg-white">
+      {/* <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
           <motion.div {...fadeInUp}>
             <SectionHeading sub="OUR" title="HISTORY" />
@@ -193,7 +196,7 @@ export default function AboutUs() {
              </div>
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
       {/* 7. SOCIAL RESPONSIBILITY */}
       <section className="py-24">
