@@ -223,10 +223,7 @@ export default function AboutUs() {
         </div>
         <motion.div className="relative z-10 max-w-2xl mx-auto px-4" {...fadeInUp}>
           <SectionHeading sub="JOIN THE" title="TEAM" />
-          <p className="opacity-80 leading-loose mb-10 text-lg">
-            At our company, we are always on the lookout for talented individuals who are willing 
-            to become a part of our success story. If you share our commitment, join us.
-          </p>
+          <p className="opacity-80 leading-loose mb-10 text-lg">At Faflora, we're on a mission to make online shopping easier, smarter, and more accessible. We're always looking for passionate individuals who are eager to learn, innovate, and grow with us. If you're ready to make an impact and be part of our success story, join the Faflora team. </p>
           <div className="flex justify-center">
             <TealButton text="View Open Roles" />
           </div>
