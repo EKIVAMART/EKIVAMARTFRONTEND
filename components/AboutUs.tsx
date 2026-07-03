@@ -78,7 +78,7 @@ export default function AboutUs() {
           <motion.div {...fadeInUp}>
             <SectionHeading sub="WHO" title="WE ARE" />
             <p className="text-gray-600 leading-loose mb-6"> 
-              We are India's largest marketplace and a one-stop expert solution for all business needs, 
+              We are Nigeria largest marketplace and a one stop expert solution for all business needs, 
               empowering <span className="font-bold text-gray-800">86 lakh suppliers</span> by connecting 
               them with <span className="font-bold text-gray-800">21.9 crore buyers</span> across the nation.
             </p>
