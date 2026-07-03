@@ -96,7 +96,7 @@ export default function AboutUs() {
           <motion.div className="space-y-12" {...fadeInUp}>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#9d4ae3]">56+</h3>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">100+</h3>
                   <p className="text-gray-500 font-bold">Industries</p>
                 </div>
                 <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
@@ -105,8 +105,8 @@ export default function AboutUs() {
              </div>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#9d4ae3]">11CR+</h3>
-                  <p className="text-gray-500 font-bold">Products</p>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">500+</h3>
+                  <p className="text-gray-500 font-bold">Vendors</p>
                 </div>
                 <div className="flex-1 grid grid-cols-6 gap-2 border-l pl-8 opacity-80">
                    {[ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen, Coffee, Utensils, Package, Gift, Camera, Headphones].map((Icon, i) => <div key={i} className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"><Icon size={20} className="text-[#9d4ae3]" /></div>)}
@@ -114,7 +114,7 @@ export default function AboutUs() {
              </div>
              <div className="flex items-center gap-8">
                 <div className="text-right w-32">
-                  <h3 className="text-4xl font-black text-[#9d4ae3]">1000+</h3>
+                  <h3 className="text-4xl font-black text-[#9d4ae3]">6+</h3>
                   <p className="text-gray-500 font-bold">Cities</p>
                 </div>
                 <div className="flex-1 border-l pl-8">
