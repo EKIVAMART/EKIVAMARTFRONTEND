@@ -42,8 +42,36 @@ import {
   GlassWater,
 } from 'lucide-react';
 import { categoryApi } from '@/lib/api';
+import type { LucideIcon } from 'lucide-react';
 
-const categoryIconMap: Record<string, any> = {
+type CategoryApiItem = {
+  id?: string;
+  _id?: string;
+  categoryId?: string;
+  uuid?: string;
+  name?: string;
+  title?: string;
+  displayName?: string;
+  parentId?: string | null;
+  isActive?: boolean;
+  is_active?: boolean;
+  status?: string;
+};
+
+type SubcategoryNode = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type CategoryNode = {
+  id: string;
+  name: string;
+  slug: string;
+  subcategories: SubcategoryNode[];
+};
+
+const categoryIconMap: Record<string, LucideIcon> = {
   'fashion': ShoppingBag,
   'footwear': Footprints,
   'bags & luggage': Backpack,
@@ -94,6 +122,9 @@ const getCategoryIcon = (name: string) => {
   return categoryIconMap[norm] || categoryIconMap[norm.replace(/&/g, 'and')] || Package;
 };
 
+const normalizeString = (value?: string) => (value || '').toLowerCase().replace(/&/g, 'and').trim();
+const createSlug = (value?: string) => normalizeString(value).replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+
 export default function Header() {
   const [isBrowseOpen, setIsBrowseOpen] = useState(false);
   const [hoveredCategoryInBrowse, setHoveredCategoryInBrowse] = useState<string | null>(null);
@@ -104,8 +135,7 @@ export default function Header() {
   const headerRef = useRef<HTMLDivElement>(null);
   const headerOffsetRef = useRef(0);
 
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<CategoryNode[]>([]);
 
   // Close browse dropdown on outside click
   useEffect(() => {
@@ -148,41 +178,39 @@ export default function Header() {
     const fetchCats = async () => {
       try {
         const res = await categoryApi.getCategories({ limit: 100 });
-        let data: any[] = [];
-        if (res?.data && Array.isArray(res.data)) {
+        let data: CategoryApiItem[] = [];
+        if (res && Array.isArray(res.data)) {
           data = res.data;
-        } else if (res?.data?.data && Array.isArray(res.data.data)) {
-          data = res.data.data;
-        } else if (res?.data?.categories && Array.isArray(res.data.categories)) {
-          data = res.data.categories;
-        } else if (res?.data?.docs && Array.isArray(res.data.docs)) {
-          data = res.data.docs;
+        } else if (res?.data && typeof res.data === 'object' && Array.isArray((res.data as { data?: unknown }).data)) {
+          data = (res.data as { data: CategoryApiItem[] }).data;
+        } else if (res?.data && typeof res.data === 'object' && Array.isArray((res.data as { categories?: unknown }).categories)) {
+          data = (res.data as { categories: CategoryApiItem[] }).categories;
+        } else if (res?.data && typeof res.data === 'object' && Array.isArray((res.data as { docs?: unknown }).docs)) {
+          data = (res.data as { docs: CategoryApiItem[] }).docs;
         }
 
-        const publishedData = data.filter((item: any) => {
+        const publishedData = data.filter((item) => {
           const isPublished = Boolean(item.isActive ?? item.is_active ?? (item.status === 'published' || item.status === 'active'));
           const isDraft = item.status === 'draft';
           return isPublished && !isDraft;
         });
 
-        // Separate parents
-        const parents = publishedData.filter((item: any) => !item.parentId);
-        
-        // Fetch subcategories for each parent using categoryApi.getSubcategories
+        const parents = publishedData.filter((item) => !item.parentId);
+
         const formatted = await Promise.all(
-          parents.map(async (parent: any) => {
+          parents.map(async (parent) => {
             const parentId = String(parent.id || parent._id || parent.categoryId || parent.uuid);
-            let subData: any[] = [];
+            let subData: CategoryApiItem[] = [];
             try {
               const subRes = await categoryApi.getSubcategories(parentId);
-              if (subRes?.data && Array.isArray(subRes.data)) {
+              if (subRes && Array.isArray(subRes.data)) {
                 subData = subRes.data;
-              } else if (subRes?.data?.data && Array.isArray(subRes.data.data)) {
-                subData = subRes.data.data;
-              } else if (subRes?.data?.categories && Array.isArray(subRes.data.categories)) {
-                subData = subRes.data.categories;
-              } else if (subRes?.data?.docs && Array.isArray(subRes.data.docs)) {
-                subData = subRes.data.docs;
+              } else if (subRes && typeof subRes.data === 'object' && Array.isArray((subRes.data as { data?: unknown }).data)) {
+                subData = (subRes.data as { data: CategoryApiItem[] }).data;
+              } else if (subRes && typeof subRes.data === 'object' && Array.isArray((subRes.data as { categories?: unknown }).categories)) {
+                subData = (subRes.data as { categories: CategoryApiItem[] }).categories;
+              } else if (subRes && typeof subRes.data === 'object' && Array.isArray((subRes.data as { docs?: unknown }).docs)) {
+                subData = (subRes.data as { docs: CategoryApiItem[] }).docs;
               } else if (Array.isArray(subRes)) {
                 subData = subRes;
               }
@@ -190,20 +218,20 @@ export default function Header() {
               console.error(`Failed to fetch subcategories for parent ${parentId}:`, err);
             }
 
-            const subcategories = subData.filter((item: any) => {
+            const subcategories = subData.filter((item) => {
               const isPublished = Boolean(item.isActive ?? item.is_active ?? (item.status === 'published' || item.status === 'active'));
               const isDraft = item.status === 'draft';
               return isPublished && !isDraft;
-            }).map((sub: any) => ({
+            }).map((sub) => ({
               id: String(sub.id || sub._id || sub.categoryId || sub.uuid),
               name: sub.name || sub.title || sub.displayName || 'Unknown',
-              slug: (sub.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+              slug: createSlug(sub.name || sub.title || sub.displayName || 'Unknown'),
             }));
 
             return {
               id: parentId,
               name: parent.name || parent.title || parent.displayName || 'Unknown',
-              slug: (parent.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+              slug: createSlug(parent.name || parent.title || parent.displayName || 'Unknown'),
               subcategories,
             };
           })
@@ -211,11 +239,9 @@ export default function Header() {
 
         if (isMounted) {
           setCategories(formatted);
-          setLoading(false);
         }
       } catch (err) {
         console.error('Failed to fetch navbar categories:', err);
-        if (isMounted) setLoading(false);
       }
     };
     void fetchCats();
@@ -246,7 +272,7 @@ export default function Header() {
         name,
         href: matched ? `/categories/${matched.slug}` : `/categories/${name.toLowerCase().replace(/\s+/g, '-')}`,
         hasDropdown: matched ? matched.subcategories.length > 0 : false,
-        subItems: matched ? matched.subcategories.map((sub: any) => ({
+        subItems: matched ? matched.subcategories.map((sub: SubcategoryNode) => ({
           name: sub.name,
           href: `/categories/${matched.slug}?subcategory=${sub.slug}`
         })) : []
@@ -313,7 +339,7 @@ export default function Header() {
                 style={{ maxHeight: '340px', overflowY: 'auto', scrollbarWidth: 'thin' }}
               >
                 {categories.length > 0 ? (
-                  categories.map((cat, index) => {
+                  categories.map((cat) => {
                     const Icon = getCategoryIcon(cat.name);
                     const hasSubs = cat.subcategories && cat.subcategories.length > 0;
                     return (
@@ -349,7 +375,7 @@ export default function Header() {
                             <p className="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#9d4ae3]/70 border-b border-gray-100 mb-1">
                               {cat.name}
                             </p>
-                            {cat.subcategories.map((sub: any) => (
+                            {cat.subcategories.map((sub: SubcategoryNode) => (
                               <Link
                                 key={sub.id}
                                 href={`/categories/${cat.slug}?subcategory=${sub.slug}`}
@@ -481,8 +507,8 @@ export default function Header() {
                           </h3>
                           {section.subcategories.length > 0 ? (
                             <ul className="space-y-2">
-                              {section.subcategories.map((subItem: any, i: number) => (
-                                <li key={i}>
+                              {section.subcategories.map((subItem: SubcategoryNode) => (
+                                <li key={subItem.id}>
                                   <Link
                                     href={`/categories/${section.slug}?subcategory=${subItem.slug}`}
                                     className="text-sm text-gray-600 hover:text-[#9d4ae3] transition-colors font-medium"
