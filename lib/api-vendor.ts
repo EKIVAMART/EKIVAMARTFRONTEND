@@ -1,9 +1,14 @@
 import axiosInstance from './axios';
 import { ApiResponse } from './api';
+import { categoryApi } from './api';
 
 // Set this to true to run fully client-side (mocked endpoints)
 // Set to false to hit the actual backend APIs
-export const USE_MOCK_VENDOR_API = true;
+export const USE_MOCK_VENDOR_API = false;
+
+export const IS_DEV_MODE = USE_MOCK_VENDOR_API;
+
+// ─── Type Definitions ─────────────────────────────────────────────────────────
 
 export interface HomeAddress {
   street: string;
@@ -36,6 +41,7 @@ export interface VendorDocument {
   mimeType: string;
   status: 'pending' | 'in_review' | 'verified' | 'rejected' | 'requires_resubmission';
   rejectionReason: string | null;
+  uploadedAt?: string;
   createdAt?: string;
 }
 
@@ -48,6 +54,16 @@ export interface VendorBankAccount {
   accountType: 'savings' | 'current';
   isPrimary: boolean;
   isVerified: boolean;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  imageUrl?: string;
+  parentId?: string | null;
+  isActive?: boolean;
 }
 
 export interface VendorApplicationStatus {
@@ -68,16 +84,21 @@ export interface VendorApplicationStatus {
     id?: string;
     originalFilename?: string;
     fileSizeBytes?: number;
+    documentUrl?: string;
   }[];
+  sellingCategories: Category[];
+  sellingCategoriesComplete: boolean;
   personalInfoComplete: boolean;
   businessInfoComplete: boolean;
+  storeInfoComplete: boolean;
+  documentsComplete: boolean;
   bankAccountsCount: number;
-  // Steps check for routing
-  storeInfoComplete?: boolean;
+  /** @deprecated use documentsComplete */
   documentsInfoComplete?: boolean;
 }
 
 export interface VendorApplicationDraft {
+  // Flat fields kept for internal mock storage convenience
   storeName: string;
   vendorType: 'individual' | 'registered_business' | 'brand' | 'reseller' | 'dropshipper' | '';
   storePhone: string;
@@ -87,8 +108,8 @@ export interface VendorApplicationDraft {
     dateOfBirth: string;
     gender: string;
     homeAddress: HomeAddress;
-    bvn: string;
-    nin?: string;
+    nin: string;
+    ninProvided?: boolean;
   } | null;
   businessInfo: {
     businessName: string;
@@ -106,13 +127,65 @@ export interface VendorApplicationDraft {
   } | null;
   documents: VendorDocument[];
   bankAccounts: VendorBankAccount[];
+  sellingCategories: Category[];
+  // API-spec step-keyed shape (populated when fetching draft from real API)
+  step1?: {
+    storeName: string;
+    storeSlug: string;
+    vendorType: string;
+    storePhone: string;
+    storeEmail: string;
+  };
+  step2?: { categories: Category[] };
+  step3?: {
+    fullName: string;
+    dateOfBirth: string;
+    gender: string;
+    homeAddress: HomeAddress;
+    ninProvided: boolean;
+  } | null;
+  step4?: {
+    businessName: string | null;
+    businessType: string | null;
+    cacNumber: string | null;
+    tinNumber: string | null;
+    vatNumber: string | null;
+    dateOfIncorporation: string | null;
+  } | null;
+  step5?: {
+    storeDescription: string | null;
+    yearsInBusiness: string | null;
+    businessAddress: BusinessAddress | null;
+    socialLinks: SocialLinks | null;
+  } | null;
 }
 
-// Client-side local storage mock database to support full end-to-end user flow verification
+export interface CheckStoreNameResponse {
+  available: boolean;
+  name: string;
+  slug: string;
+}
+
+// ─── Mock Data ────────────────────────────────────────────────────────────────
+
 const STORAGE_KEYS = {
   STATUS: 'faflora_vendor_status',
   DRAFT: 'faflora_vendor_draft',
 };
+
+// Mock categories for testing
+const MOCK_CATEGORIES: Category[] = [
+  { id: 'cat-1', name: 'Fashion', slug: 'fashion', description: 'Clothing, accessories, and more' },
+  { id: 'cat-2', name: 'Electronics', slug: 'electronics', description: 'Gadgets, phones, and appliances' },
+  { id: 'cat-3', name: 'Home & Living', slug: 'home-living', description: 'Furniture, decor, and kitchenware' },
+  { id: 'cat-4', name: 'Beauty', slug: 'beauty', description: 'Cosmetics, skincare, and grooming' },
+  { id: 'cat-5', name: 'Groceries', slug: 'groceries', description: 'Food, beverages, and essentials' },
+  { id: 'cat-6', name: 'Footwear', slug: 'footwear', description: 'Shoes, sandals, and sneakers' },
+  { id: 'cat-7', name: 'Bags & Luggage', slug: 'bags-luggage', description: 'Handbags, backpacks, and travel gear' },
+  { id: 'cat-8', name: 'Wellness', slug: 'wellness', description: 'Health, fitness, and supplements' },
+  { id: 'cat-9', name: 'Jewellery', slug: 'jewellery', description: 'Necklaces, rings, and bracelets' },
+  { id: 'cat-10', name: 'Drinks', slug: 'drinks', description: 'Beverages, juices, and spirits' },
+];
 
 const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorApplicationDraft } => {
   if (typeof window === 'undefined') {
@@ -128,8 +201,12 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
         resubmissionNote: null,
         rejectionReason: null,
         documents: [],
+        sellingCategories: [],
+        sellingCategoriesComplete: false,
         personalInfoComplete: false,
         businessInfoComplete: false,
+        storeInfoComplete: false,
+        documentsComplete: false,
         bankAccountsCount: 0,
       },
       draft: {
@@ -142,6 +219,7 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
         storeInfo: null,
         documents: [],
         bankAccounts: [],
+        sellingCategories: [],
       },
     };
   }
@@ -160,8 +238,12 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
     resubmissionNote: null,
     rejectionReason: null,
     documents: [],
+    sellingCategories: [],
+    sellingCategoriesComplete: false,
     personalInfoComplete: false,
     businessInfoComplete: false,
+    storeInfoComplete: false,
+    documentsComplete: false,
     bankAccountsCount: 0,
   };
 
@@ -175,10 +257,17 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
     storeInfo: null,
     documents: [],
     bankAccounts: [],
+    sellingCategories: [],
   };
 
+  // Migrate old format: ensure documentsComplete is present
+  let parsedStatus: VendorApplicationStatus | null = savedStatus ? JSON.parse(savedStatus) : null;
+  if (parsedStatus && parsedStatus.documentsInfoComplete !== undefined && parsedStatus.documentsComplete === undefined) {
+    parsedStatus.documentsComplete = !!parsedStatus.documentsInfoComplete;
+  }
+
   return {
-    status: savedStatus ? JSON.parse(savedStatus) : defaultStatus,
+    status: parsedStatus || defaultStatus,
     draft: savedDraft ? JSON.parse(savedDraft) : defaultDraft,
   };
 };
@@ -197,28 +286,192 @@ export const resetMockData = () => {
   }
 };
 
+// ─── API Functions ────────────────────────────────────────────────────────────
+
 export const vendorApi = {
-  // A13: Check Application Status
-  async getApplicationStatus(): Promise<ApiResponse<VendorApplicationStatus>> {
+  /**
+   * A0: Check Store Name Availability
+   * GET /vendor/application/check-store-name?name=...
+   * Rate limit: 30 requests per minute per IP
+   */
+  async checkStoreName(name: string): Promise<ApiResponse<CheckStoreNameResponse>> {
     if (USE_MOCK_VENDOR_API) {
-      const { status } = getInitialMockData();
-      return { success: true, data: status };
+      const isTaken = name.toLowerCase().includes('taken');
+      const slug = name.toLowerCase().replace(/\s+/g, '-');
+      return {
+        success: true,
+        message: 'Store name checked',
+        data: {
+          available: !isTaken,
+          name: name,
+          slug: slug,
+        },
+      };
     }
-    const response = await axiosInstance.get<ApiResponse<VendorApplicationStatus>>('/vendor/application/status');
+    const response = await axiosInstance.get<ApiResponse<CheckStoreNameResponse>>(
+      `/vendor/application/check-store-name?name=${encodeURIComponent(name)}`
+    );
     return response.data;
   },
 
-  // GET Draft endpoint (fetches all details entered per each step)
-  async getApplicationDraft(): Promise<ApiResponse<VendorApplicationDraft>> {
+  /**
+   * Get All Categories (for the selling categories step)
+   * This uses the existing categoryApi to fetch categories
+   * Even in mock mode, this attempts to fetch real categories
+   */
+  async getAllCategories(): Promise<ApiResponse<Category[]>> {
+    // In mock mode, try to fetch real categories first, fallback to mock
+    if (USE_MOCK_VENDOR_API) {
+      try {
+        // Try to fetch real categories from the API
+        const response = await categoryApi.getCategories({ limit: 100 });
+        let categories: Category[] = [];
+        if (response?.data && Array.isArray(response.data)) {
+          categories = response.data;
+        } else if (response?.data?.data && Array.isArray(response.data.data)) {
+          categories = response.data.data;
+        } else if (response?.data?.categories && Array.isArray(response.data.categories)) {
+          categories = response.data.categories;
+        } else if (response?.data?.docs && Array.isArray(response.data.docs)) {
+          categories = response.data.docs;
+        }
+        
+        if (categories.length > 0) {
+          return {
+            success: true,
+            message: 'Categories retrieved',
+            data: categories,
+          };
+        }
+      } catch (error) {
+        console.warn('Failed to fetch real categories in mock mode, falling back to mock data:', error);
+      }
+      
+      // Fallback to mock categories
+      return {
+        success: true,
+        message: 'Categories retrieved (mock)',
+        data: MOCK_CATEGORIES,
+      };
+    }
+    
+    // Real API mode
+    try {
+      const response = await categoryApi.getCategories({ limit: 100 });
+      let categories: Category[] = [];
+      if (response?.data && Array.isArray(response.data)) {
+        categories = response.data;
+      } else if (response?.data?.data && Array.isArray(response.data.data)) {
+        categories = response.data.data;
+      } else if (response?.data?.categories && Array.isArray(response.data.categories)) {
+        categories = response.data.categories;
+      } else if (response?.data?.docs && Array.isArray(response.data.docs)) {
+        categories = response.data.docs;
+      }
+      return {
+        success: true,
+        message: 'Categories retrieved',
+        data: categories,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Failed to fetch categories',
+        data: [],
+      };
+    }
+  },
+
+  /**
+   * A4: Update Selling Categories
+   * PATCH /vendor/application/selling-categories
+   * REPLACES the entire selection - sends complete array of category IDs
+   */
+  async updateSellingCategories(categoryIds: string[]): Promise<ApiResponse<{ categories: Category[] }>> {
+    if (USE_MOCK_VENDOR_API) {
+      const { status, draft } = getInitialMockData();
+
+      // Match from draft's existing categories first (may include real API categories),
+      // then fall back to MOCK_CATEGORIES for any remaining IDs.
+      const allKnownCategories = [
+        ...draft.sellingCategories,
+        ...MOCK_CATEGORIES,
+      ];
+      const seen = new Set<string>();
+      const deduped = allKnownCategories.filter(c => {
+        if (seen.has(c.id)) return false;
+        seen.add(c.id);
+        return true;
+      });
+
+      // Categories may come from the real API (stored in draft), not just MOCK_CATEGORIES
+      // Build a map from id -> category using all known categories
+      const catMap = new Map(deduped.map(c => [c.id, c]));
+      const selectedCategories: Category[] = categoryIds
+        .map(id => catMap.get(id))
+        .filter((c): c is Category => !!c);
+
+      // For any ids not found in known categories, create placeholder entries
+      const foundIds = new Set(selectedCategories.map(c => c.id));
+      categoryIds.forEach(id => {
+        if (!foundIds.has(id)) {
+          selectedCategories.push({ id, name: id, slug: id });
+        }
+      });
+      
+      const newDraft: VendorApplicationDraft = {
+        ...draft,
+        sellingCategories: selectedCategories,
+      };
+
+      const newStatus: VendorApplicationStatus = {
+        ...status,
+        sellingCategories: selectedCategories,
+        sellingCategoriesComplete: selectedCategories.length > 0,
+        lastUpdatedAt: new Date().toISOString(),
+      };
+
+      saveMockData(newStatus, newDraft);
+      
+      return {
+        success: true,
+        message: 'Selling categories updated',
+        data: {
+          categories: selectedCategories,
+        },
+      };
+    }
+    const response = await axiosInstance.patch<ApiResponse<{ categories: Category[] }>>(
+      '/vendor/application/selling-categories',
+      { categoryIds }
+    );
+    return response.data;
+  },
+
+  /**
+   * A5: Get Selling Categories
+   * GET /vendor/application/selling-categories
+   * Fetches the vendor's currently-saved category selections
+   */
+  async getSellingCategories(): Promise<ApiResponse<Category[]>> {
     if (USE_MOCK_VENDOR_API) {
       const { draft } = getInitialMockData();
-      return { success: true, data: draft };
+      return {
+        success: true,
+        message: 'Selling categories retrieved',
+        data: draft.sellingCategories || [],
+      };
     }
-    const response = await axiosInstance.get<ApiResponse<VendorApplicationDraft>>('/vendor/application/draft');
+    const response = await axiosInstance.get<ApiResponse<Category[]>>('/vendor/application/selling-categories');
     return response.data;
   },
 
-  // A1: Start Application
+  /**
+   * A1: Start Application
+   * POST /vendor/application/start
+   * Creates the vendor application and store identity
+   * Must be called first before any other endpoint
+   */
   async startApplication(data: {
     storeName: string;
     vendorType: 'individual' | 'registered_business' | 'brand' | 'reseller' | 'dropshipper';
@@ -262,14 +515,17 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A2: Save Personal Information - FIXED: bvn is now required (not optional)
+  /**
+   * A2: Update Personal & Identity Information
+   * PATCH /vendor/application/personal-info
+   * Saves personal identity details - full name, DOB, address, NIN (BVN removed as per docs)
+   */
   async savePersonalInfo(data: {
     fullName: string;
     dateOfBirth: string;
     gender: string;
     homeAddress: HomeAddress;
-    bvn: string;  // Changed from bvn?: string to bvn: string
-    nin?: string;
+    nin: string;
   }): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
@@ -292,7 +548,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A3: Save Business Information
+  /**
+   * A3: Update Business Registration Information
+   * PATCH /vendor/application/business-info
+   * Saves business registration data - only required for registered_business and brand
+   */
   async saveBusinessInfo(data: {
     businessName: string;
     businessType: string;
@@ -322,7 +582,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A4: Save Store Information
+  /**
+   * A6: Update Store Description & Policies
+   * PATCH /vendor/application/store-info
+   * Saves public-facing store description, business address, and social links
+   */
   async saveStoreInfo(data: {
     storeDescription: string;
     yearsInBusiness: string;
@@ -350,7 +614,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A5: Get Document Upload URL
+  /**
+   * A7: Get a Signed Upload URL for a Document
+   * POST /vendor/application/documents/upload-url
+   * First step of two-step document upload - gets temporary Cloudinary URL
+   */
   async getDocumentUploadUrl(data: {
     documentType: string;
     fileName: string;
@@ -379,7 +647,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A6: Confirm Document Upload
+  /**
+   * A8: Confirm a Document Was Uploaded
+   * POST /vendor/application/documents/confirm
+   * Second step of two-step document upload - creates document record in database
+   */
   async confirmDocumentUpload(data: {
     documentType: string;
     cloudinaryPublicId: string;
@@ -400,6 +672,7 @@ export const vendorApi = {
         mimeType: data.mimeType,
         status: 'pending',
         rejectionReason: null,
+        uploadedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
       };
 
@@ -420,16 +693,30 @@ export const vendorApi = {
         id: newDoc.id,
         originalFilename: data.originalFilename,
         fileSizeBytes: data.fileSizeBytes,
+        documentUrl: data.documentUrl,
       });
 
-      // Simple doc check: we determine completeness if all slots are filled.
-      // Individual: 3 slots, Business: 5 slots, Brand: 6 slots
-      const reqCount = status.vendorType === 'brand' ? 6 : (status.vendorType === 'registered_business' ? 5 : 3);
-      const isDocsComplete = newStatusDocuments.length >= reqCount;
+      // Per docs: individual/reseller/dropshipper = gov_id + id_selfie (2)
+      //            registered_business = gov_id + id_selfie + cac_cert + tin_cert (4)
+      //            brand = gov_id + id_selfie + cac_cert + tin_cert + brand_auth (5)
+      const requiredDocTypes: string[] =
+        status.vendorType === 'brand'
+          ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate', 'brand_authorization']
+          : status.vendorType === 'registered_business'
+            ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate']
+            : ['government_id', 'id_selfie'];
+
+      // A document counts only if it is NOT rejected/requires_resubmission
+      const isDocsComplete = requiredDocTypes.every(reqType =>
+        newStatusDocuments.some(
+          d => d.documentType === reqType && d.status !== 'rejected' && d.status !== 'requires_resubmission'
+        )
+      );
 
       const newStatus: VendorApplicationStatus = {
         ...status,
         documents: newStatusDocuments,
+        documentsComplete: isDocsComplete,
         documentsInfoComplete: isDocsComplete,
         lastUpdatedAt: new Date().toISOString(),
       };
@@ -438,7 +725,7 @@ export const vendorApi = {
 
       return {
         success: true,
-        message: 'Document upload confirmed successfully',
+        message: 'Document uploaded successfully',
         data: newDoc,
       };
     }
@@ -446,7 +733,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A7: Delete a Document
+  /**
+   * A9: Delete an Uploaded Document
+   * DELETE /vendor/application/documents/:documentId
+   * Removes a document the vendor has uploaded
+   */
   async deleteDocument(documentId: string): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
@@ -462,6 +753,7 @@ export const vendorApi = {
       const newStatus: VendorApplicationStatus = {
         ...status,
         documents: newStatusDocuments,
+        documentsComplete: false,
         documentsInfoComplete: false,
         lastUpdatedAt: new Date().toISOString(),
       };
@@ -473,7 +765,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A8: Add Bank Account
+  /**
+   * A10: Add a Bank Account
+   * POST /vendor/application/bank-accounts
+   * Saves a bank account for payouts
+   */
   async addBankAccount(data: {
     accountName: string;
     accountNumber: string;
@@ -522,7 +818,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A9: Get All Bank Accounts
+  /**
+   * A11: Get All Bank Accounts
+   * GET /vendor/application/bank-accounts
+   * Lists all bank accounts the vendor has added
+   */
   async getBankAccounts(): Promise<ApiResponse<VendorBankAccount[]>> {
     if (USE_MOCK_VENDOR_API) {
       const { draft } = getInitialMockData();
@@ -532,13 +832,16 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A10: Delete a Bank Account
+  /**
+   * A12: Delete a Bank Account
+   * DELETE /vendor/application/bank-accounts/:accountId
+   * Removes a bank account the vendor no longer wants
+   */
   async deleteBankAccount(accountId: string): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
       const newAccounts = draft.bankAccounts.filter(a => a.id !== accountId);
-      // Re-assign primary if necessary
       if (newAccounts.length > 0 && !newAccounts.some(a => a.isPrimary)) {
         newAccounts[0].isPrimary = true;
       }
@@ -561,7 +864,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A11: Set Primary Bank Account
+  /**
+   * A13: Set a Bank Account as Primary
+   * PATCH /vendor/application/bank-accounts/:accountId/set-primary
+   * Marks a bank account as the default for payouts
+   */
   async setPrimaryBankAccount(accountId: string): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
@@ -583,17 +890,89 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A12: Submit the Application
+  /**
+   * A14: Get Application Draft (pre-fill on return visit)
+   * GET /vendor/application/draft
+   * Returns everything the user has saved so far for pre-filling forms
+   */
+  async getApplicationDraft(): Promise<ApiResponse<VendorApplicationDraft>> {
+    if (USE_MOCK_VENDOR_API) {
+      const { draft, status } = getInitialMockData();
+      // Return draft with API-spec step-keyed shape per docs section 5.15
+      const enrichedDraft: VendorApplicationDraft = {
+        ...draft,
+        step1: draft.storeName ? {
+          storeName: draft.storeName,
+          storeSlug: status.storeSlug || draft.storeName.toLowerCase().replace(/\s+/g, '-'),
+          vendorType: draft.vendorType,
+          storePhone: draft.storePhone,
+          storeEmail: draft.storeEmail,
+        } : undefined,
+        step2: {
+          categories: draft.sellingCategories || [],
+        },
+        step3: draft.personalInfo ? {
+          fullName: draft.personalInfo.fullName,
+          dateOfBirth: draft.personalInfo.dateOfBirth,
+          gender: draft.personalInfo.gender,
+          homeAddress: draft.personalInfo.homeAddress,
+          // NIN is never returned in plaintext per docs security note
+          ninProvided: !!(draft.personalInfo.nin || draft.personalInfo.ninProvided),
+        } : null,
+        step4: {
+          businessName: draft.businessInfo?.businessName ?? null,
+          businessType: draft.businessInfo?.businessType ?? null,
+          cacNumber: draft.businessInfo?.cacNumber ?? null,
+          tinNumber: draft.businessInfo?.tinNumber ?? null,
+          vatNumber: draft.businessInfo?.vatNumber ?? null,
+          dateOfIncorporation: draft.businessInfo?.dateOfIncorporation ?? null,
+        },
+        step5: {
+          storeDescription: draft.storeInfo?.storeDescription ?? null,
+          yearsInBusiness: draft.storeInfo?.yearsInBusiness ?? null,
+          businessAddress: draft.storeInfo?.businessAddress ?? null,
+          socialLinks: draft.storeInfo?.socialLinks ?? null,
+        },
+      };
+      return { success: true, data: enrichedDraft };
+    }
+    const response = await axiosInstance.get<ApiResponse<VendorApplicationDraft>>('/vendor/application/draft');
+    return response.data;
+  },
+
+  /**
+   * A15: Check Application Status (progress tracker)
+   * GET /vendor/application/status
+   * Powers the progress checklist and shows application state
+   */
+  async getApplicationStatus(): Promise<ApiResponse<VendorApplicationStatus>> {
+    if (USE_MOCK_VENDOR_API) {
+      const { status } = getInitialMockData();
+      return { success: true, data: status };
+    }
+    const response = await axiosInstance.get<ApiResponse<VendorApplicationStatus>>('/vendor/application/status');
+    return response.data;
+  },
+
+  /**
+   * A16: Submit the Application for Review
+   * POST /vendor/application/submit
+   * Final action - runs full server-side validation and submits for review
+   */
   async submitApplication(): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
-      // Check validation again
+      // Validation checks
       if (draft.storeName.length < 3) {
         throw new Error('Please complete your store information (store name must be at least 3 characters)');
       }
       if (!draft.personalInfo || !draft.personalInfo.fullName) {
         throw new Error('Please complete your personal information');
+      }
+      // Fixed: Check sellingCategories with proper null/undefined handling
+      if (!status.sellingCategories || status.sellingCategories.length === 0) {
+        throw new Error('Please select at least one category you want to sell under');
       }
       if ((status.vendorType === 'registered_business' || status.vendorType === 'brand') && (!draft.businessInfo || !draft.businessInfo.businessName)) {
         throw new Error('Please complete your business registration information');
@@ -601,9 +980,21 @@ export const vendorApi = {
       if (!draft.storeInfo || draft.storeInfo.storeDescription.length < 100) {
         throw new Error('Please complete your store information (description must be at least 100 characters)');
       }
-      const reqCount = status.vendorType === 'brand' ? 6 : (status.vendorType === 'registered_business' ? 5 : 3);
-      if (draft.documents.length < reqCount) {
-        throw new Error('Missing required documents');
+      
+      // Document requirements per docs section 5.16 table
+      const requiredDocTypes: string[] =
+        status.vendorType === 'brand'
+          ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate', 'brand_authorization']
+          : status.vendorType === 'registered_business'
+            ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate']
+            : ['government_id', 'id_selfie'];
+      const missingDocs = requiredDocTypes.filter(reqType =>
+        !draft.documents.some(
+          d => d.documentType === reqType && d.status !== 'rejected' && d.status !== 'requires_resubmission'
+        )
+      );
+      if (missingDocs.length > 0) {
+        throw new Error(`Missing required documents: ${missingDocs.join(', ')}`);
       }
       if (draft.bankAccounts.length === 0) {
         throw new Error('Please add at least one bank account');
@@ -633,7 +1024,11 @@ export const vendorApi = {
     return response.data;
   },
 
-  // A14: Resubmit After Corrections
+  /**
+   * A17: Resubmit After Corrections
+   * POST /vendor/application/resubmit
+   * Used when status is requires_resubmission - sends application back for review
+   */
   async resubmitApplication(): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
@@ -646,7 +1041,7 @@ export const vendorApi = {
         resubmissionNote: null,
       };
 
-      // Set all documents to pending
+      // Reset all documents to pending
       const updatedDocs = draft.documents.map(d => ({
         ...d,
         status: 'pending' as const,
