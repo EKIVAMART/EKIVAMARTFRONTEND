@@ -202,8 +202,8 @@ export default function AboutUs() {
             <span className="font-bold uppercase tracking-widest text-sm text-blue-300">OUR SOCIAL</span>
             <h2 className="text-4xl font-extrabold mt-2 mb-6">RESPONSIBILITY</h2>
             <p className="opacity-80 leading-loose mb-8">
-              Social development is at the heart of our mission. Over the last two decades, this 
-              commitment has driven transformational change, reducing carbon footprints & paper usage.
+              We're passionate about helping vendors grow and making online shopping effortless. Every order 
+              placed on Faflora supports local businesses and brings communities closer through commerce.
             </p>
             <TealButton text="Our Social Impact" />
           </motion.div>
@@ -223,7 +223,10 @@ export default function AboutUs() {
         </div>
         <motion.div className="relative z-10 max-w-2xl mx-auto px-4" {...fadeInUp}>
           <SectionHeading sub="JOIN THE" title="TEAM" />
-          <p className="opacity-80 leading-loose mb-10 text-lg">At Faflora, we're on a mission to make online shopping easier, smarter, and more accessible. We're always looking for passionate individuals who are eager to learn, innovate, and grow with us. If you're ready to make an impact and be part of our success story, join the Faflora team. </p>
+          <p className="opacity-80 leading-loose mb-10 text-lg">At Faflora, we're on a mission to make online shopping easier, smarter,
+             and more accessible. We're always looking for passionate individuals 
+             who are eager to learn, innovate, and grow with us. If you're ready to make an 
+             impact and be part of our success story, join the Faflora team. </p>
           <div className="flex justify-center">
             <TealButton text="View Open Roles" />
           </div>
