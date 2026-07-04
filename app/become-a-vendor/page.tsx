@@ -132,8 +132,13 @@ export default function BecomeAVendorPage() {
       }));
       toast.success('Welcome back! Redirecting to application...');
       const statusRes = await vendorApi.getApplicationStatus();
-      if (statusRes.success && statusRes.data && statusRes.data.vendorType) {
-        router.push('/vendor/application/status');
+      if (statusRes.success && statusRes.data) {
+        const app = statusRes.data;
+        if (app.status === 'draft' || !app.vendorType) {
+          router.push('/vendor/apply');
+        } else {
+          router.push('/vendor/application/status');
+        }
       } else {
         router.push('/vendor/apply');
       }
@@ -404,13 +409,13 @@ export default function BecomeAVendorPage() {
                     {checkingStatus ? 'Loading...' : 'Apply as a Vendor'}
                     <ArrowRight size={16} aria-hidden="true" />
                   </button>
-                  <a
-                    href="mailto:vendors@faflora.com"
+                  <button
+                    onClick={() => router.push('/contact-us')}
                     className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-2xl transition-all text-sm"
                   >
                     <Mail size={16} aria-hidden="true" />
                     Contact Vendor Team
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
