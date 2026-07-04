@@ -39,7 +39,12 @@ export interface VendorDocument {
   originalFilename: string;
   fileSizeBytes: number;
   mimeType: string;
-  status: 'pending' | 'in_review' | 'verified' | 'rejected' | 'requires_resubmission';
+  status:
+    | 'pending'
+    | 'in_review'
+    | 'verified'
+    | 'rejected'
+    | 'requires_resubmission';
   rejectionReason: string | null;
   uploadedAt?: string;
   createdAt?: string;
@@ -68,8 +73,22 @@ export interface Category {
 
 export interface VendorApplicationStatus {
   applicationReference: string;
-  status: 'draft' | 'submitted' | 'in_review' | 'requires_resubmission' | 'approved' | 'rejected' | 'suspended' | 'banned';
-  vendorType: 'individual' | 'registered_business' | 'brand' | 'reseller' | 'dropshipper' | '';
+  status:
+    | 'draft'
+    | 'submitted'
+    | 'in_review'
+    | 'requires_resubmission'
+    | 'approved'
+    | 'rejected'
+    | 'suspended'
+    | 'banned';
+  vendorType:
+    | 'individual'
+    | 'registered_business'
+    | 'brand'
+    | 'reseller'
+    | 'dropshipper'
+    | '';
   storeName: string;
   storeSlug: string;
   submittedAt: string | null;
@@ -78,7 +97,12 @@ export interface VendorApplicationStatus {
   rejectionReason: string | null;
   documents: {
     documentType: string;
-    status: 'pending' | 'in_review' | 'verified' | 'rejected' | 'requires_resubmission';
+    status:
+      | 'pending'
+      | 'in_review'
+      | 'verified'
+      | 'rejected'
+      | 'requires_resubmission';
     rejectionReason: string | null;
     uploadedAt: string;
     id?: string;
@@ -100,7 +124,13 @@ export interface VendorApplicationStatus {
 export interface VendorApplicationDraft {
   // Flat fields kept for internal mock storage convenience
   storeName: string;
-  vendorType: 'individual' | 'registered_business' | 'brand' | 'reseller' | 'dropshipper' | '';
+  vendorType:
+    | 'individual'
+    | 'registered_business'
+    | 'brand'
+    | 'reseller'
+    | 'dropshipper'
+    | '';
   storePhone: string;
   storeEmail: string;
   personalInfo: {
@@ -175,19 +205,72 @@ const STORAGE_KEYS = {
 
 // Mock categories for testing
 const MOCK_CATEGORIES: Category[] = [
-  { id: 'cat-1', name: 'Fashion', slug: 'fashion', description: 'Clothing, accessories, and more' },
-  { id: 'cat-2', name: 'Electronics', slug: 'electronics', description: 'Gadgets, phones, and appliances' },
-  { id: 'cat-3', name: 'Home & Living', slug: 'home-living', description: 'Furniture, decor, and kitchenware' },
-  { id: 'cat-4', name: 'Beauty', slug: 'beauty', description: 'Cosmetics, skincare, and grooming' },
-  { id: 'cat-5', name: 'Groceries', slug: 'groceries', description: 'Food, beverages, and essentials' },
-  { id: 'cat-6', name: 'Footwear', slug: 'footwear', description: 'Shoes, sandals, and sneakers' },
-  { id: 'cat-7', name: 'Bags & Luggage', slug: 'bags-luggage', description: 'Handbags, backpacks, and travel gear' },
-  { id: 'cat-8', name: 'Wellness', slug: 'wellness', description: 'Health, fitness, and supplements' },
-  { id: 'cat-9', name: 'Jewellery', slug: 'jewellery', description: 'Necklaces, rings, and bracelets' },
-  { id: 'cat-10', name: 'Drinks', slug: 'drinks', description: 'Beverages, juices, and spirits' },
+  {
+    id: 'cat-1',
+    name: 'Fashion',
+    slug: 'fashion',
+    description: 'Clothing, accessories, and more',
+  },
+  {
+    id: 'cat-2',
+    name: 'Electronics',
+    slug: 'electronics',
+    description: 'Gadgets, phones, and appliances',
+  },
+  {
+    id: 'cat-3',
+    name: 'Home & Living',
+    slug: 'home-living',
+    description: 'Furniture, decor, and kitchenware',
+  },
+  {
+    id: 'cat-4',
+    name: 'Beauty',
+    slug: 'beauty',
+    description: 'Cosmetics, skincare, and grooming',
+  },
+  {
+    id: 'cat-5',
+    name: 'Groceries',
+    slug: 'groceries',
+    description: 'Food, beverages, and essentials',
+  },
+  {
+    id: 'cat-6',
+    name: 'Footwear',
+    slug: 'footwear',
+    description: 'Shoes, sandals, and sneakers',
+  },
+  {
+    id: 'cat-7',
+    name: 'Bags & Luggage',
+    slug: 'bags-luggage',
+    description: 'Handbags, backpacks, and travel gear',
+  },
+  {
+    id: 'cat-8',
+    name: 'Wellness',
+    slug: 'wellness',
+    description: 'Health, fitness, and supplements',
+  },
+  {
+    id: 'cat-9',
+    name: 'Jewellery',
+    slug: 'jewellery',
+    description: 'Necklaces, rings, and bracelets',
+  },
+  {
+    id: 'cat-10',
+    name: 'Drinks',
+    slug: 'drinks',
+    description: 'Beverages, juices, and spirits',
+  },
 ];
 
-const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorApplicationDraft } => {
+const getInitialMockData = (): {
+  status: VendorApplicationStatus;
+  draft: VendorApplicationDraft;
+} => {
   if (typeof window === 'undefined') {
     return {
       status: {
@@ -261,8 +344,14 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
   };
 
   // Migrate old format: ensure documentsComplete is present
-  let parsedStatus: VendorApplicationStatus | null = savedStatus ? JSON.parse(savedStatus) : null;
-  if (parsedStatus && parsedStatus.documentsInfoComplete !== undefined && parsedStatus.documentsComplete === undefined) {
+  let parsedStatus: VendorApplicationStatus | null = savedStatus
+    ? JSON.parse(savedStatus)
+    : null;
+  if (
+    parsedStatus &&
+    parsedStatus.documentsInfoComplete !== undefined &&
+    parsedStatus.documentsComplete === undefined
+  ) {
     parsedStatus.documentsComplete = !!parsedStatus.documentsInfoComplete;
   }
 
@@ -272,7 +361,10 @@ const getInitialMockData = (): { status: VendorApplicationStatus; draft: VendorA
   };
 };
 
-export const saveMockData = (status: VendorApplicationStatus, draft: VendorApplicationDraft) => {
+export const saveMockData = (
+  status: VendorApplicationStatus,
+  draft: VendorApplicationDraft
+) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.STATUS, JSON.stringify(status));
     localStorage.setItem(STORAGE_KEYS.DRAFT, JSON.stringify(draft));
@@ -294,7 +386,9 @@ export const vendorApi = {
    * GET /vendor/application/check-store-name?name=...
    * Rate limit: 30 requests per minute per IP
    */
-  async checkStoreName(name: string): Promise<ApiResponse<CheckStoreNameResponse>> {
+  async checkStoreName(
+    name: string
+  ): Promise<ApiResponse<CheckStoreNameResponse>> {
     if (USE_MOCK_VENDOR_API) {
       const isTaken = name.toLowerCase().includes('taken');
       const slug = name.toLowerCase().replace(/\s+/g, '-');
@@ -308,9 +402,9 @@ export const vendorApi = {
         },
       };
     }
-    const response = await axiosInstance.get<ApiResponse<CheckStoreNameResponse>>(
-      `/vendor/application/check-store-name?name=${encodeURIComponent(name)}`
-    );
+    const response = await axiosInstance.get<
+      ApiResponse<CheckStoreNameResponse>
+    >(`/vendor/application/check-store-name?name=${encodeURIComponent(name)}`);
     return response.data;
   },
 
@@ -330,12 +424,15 @@ export const vendorApi = {
           categories = response.data;
         } else if (response?.data?.data && Array.isArray(response.data.data)) {
           categories = response.data.data;
-        } else if (response?.data?.categories && Array.isArray(response.data.categories)) {
+        } else if (
+          response?.data?.categories &&
+          Array.isArray(response.data.categories)
+        ) {
           categories = response.data.categories;
         } else if (response?.data?.docs && Array.isArray(response.data.docs)) {
           categories = response.data.docs;
         }
-        
+
         if (categories.length > 0) {
           return {
             success: true,
@@ -344,9 +441,12 @@ export const vendorApi = {
           };
         }
       } catch (error) {
-        console.warn('Failed to fetch real categories in mock mode, falling back to mock data:', error);
+        console.warn(
+          'Failed to fetch real categories in mock mode, falling back to mock data:',
+          error
+        );
       }
-      
+
       // Fallback to mock categories
       return {
         success: true,
@@ -354,7 +454,7 @@ export const vendorApi = {
         data: MOCK_CATEGORIES,
       };
     }
-    
+
     // Real API mode
     try {
       const response = await categoryApi.getCategories({ limit: 100 });
@@ -363,7 +463,10 @@ export const vendorApi = {
         categories = response.data;
       } else if (response?.data?.data && Array.isArray(response.data.data)) {
         categories = response.data.data;
-      } else if (response?.data?.categories && Array.isArray(response.data.categories)) {
+      } else if (
+        response?.data?.categories &&
+        Array.isArray(response.data.categories)
+      ) {
         categories = response.data.categories;
       } else if (response?.data?.docs && Array.isArray(response.data.docs)) {
         categories = response.data.docs;
@@ -387,7 +490,9 @@ export const vendorApi = {
    * PATCH /vendor/application/selling-categories
    * REPLACES the entire selection - sends complete array of category IDs
    */
-  async updateSellingCategories(categoryIds: string[]): Promise<ApiResponse<{ categories: Category[] }>> {
+  async updateSellingCategories(
+    categoryIds: string[]
+  ): Promise<ApiResponse<{ categories: Category[] }>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
@@ -398,7 +503,7 @@ export const vendorApi = {
         ...MOCK_CATEGORIES,
       ];
       const seen = new Set<string>();
-      const deduped = allKnownCategories.filter(c => {
+      const deduped = allKnownCategories.filter((c) => {
         if (seen.has(c.id)) return false;
         seen.add(c.id);
         return true;
@@ -406,19 +511,19 @@ export const vendorApi = {
 
       // Categories may come from the real API (stored in draft), not just MOCK_CATEGORIES
       // Build a map from id -> category using all known categories
-      const catMap = new Map(deduped.map(c => [c.id, c]));
+      const catMap = new Map(deduped.map((c) => [c.id, c]));
       const selectedCategories: Category[] = categoryIds
-        .map(id => catMap.get(id))
+        .map((id) => catMap.get(id))
         .filter((c): c is Category => !!c);
 
       // For any ids not found in known categories, create placeholder entries
-      const foundIds = new Set(selectedCategories.map(c => c.id));
-      categoryIds.forEach(id => {
+      const foundIds = new Set(selectedCategories.map((c) => c.id));
+      categoryIds.forEach((id) => {
         if (!foundIds.has(id)) {
           selectedCategories.push({ id, name: id, slug: id });
         }
       });
-      
+
       const newDraft: VendorApplicationDraft = {
         ...draft,
         sellingCategories: selectedCategories,
@@ -432,7 +537,7 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      
+
       return {
         success: true,
         message: 'Selling categories updated',
@@ -441,10 +546,9 @@ export const vendorApi = {
         },
       };
     }
-    const response = await axiosInstance.patch<ApiResponse<{ categories: Category[] }>>(
-      '/vendor/application/selling-categories',
-      { categoryIds }
-    );
+    const response = await axiosInstance.patch<
+      ApiResponse<{ categories: Category[] }>
+    >('/vendor/application/selling-categories', { categoryIds });
     return response.data;
   },
 
@@ -462,7 +566,9 @@ export const vendorApi = {
         data: draft.sellingCategories || [],
       };
     }
-    const response = await axiosInstance.get<ApiResponse<Category[]>>('/vendor/application/selling-categories');
+    const response = await axiosInstance.get<ApiResponse<Category[]>>(
+      '/vendor/application/selling-categories'
+    );
     return response.data;
   },
 
@@ -474,13 +580,18 @@ export const vendorApi = {
    */
   async startApplication(data: {
     storeName: string;
-    vendorType: 'individual' | 'registered_business' | 'brand' | 'reseller' | 'dropshipper';
+    vendorType:
+      | 'individual'
+      | 'registered_business'
+      | 'brand'
+      | 'reseller'
+      | 'dropshipper';
     storePhone?: string;
     storeEmail?: string;
   }): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
-      
+
       const newStatus: VendorApplicationStatus = {
         ...status,
         status: 'draft',
@@ -511,7 +622,32 @@ export const vendorApi = {
         },
       };
     }
-    const response = await axiosInstance.post<ApiResponse<any>>('/vendor/application/start', data);
+
+    const payload: {
+      storeName: string;
+      vendorType: string;
+      storePhone?: string;
+      storeEmail?: string;
+    } = {
+      storeName: data.storeName.trim(),
+      vendorType: data.vendorType,
+    };
+
+    const storePhone = data.storePhone?.trim();
+    const storeEmail = data.storeEmail?.trim();
+
+    if (storePhone) {
+      payload.storePhone = storePhone;
+    }
+
+    if (storeEmail) {
+      payload.storeEmail = storeEmail;
+    }
+
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      '/vendor/application/start',
+      payload
+    );
     return response.data;
   },
 
@@ -529,7 +665,7 @@ export const vendorApi = {
   }): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
-      
+
       const newDraft: VendorApplicationDraft = {
         ...draft,
         personalInfo: data,
@@ -542,9 +678,16 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      return { success: true, message: 'Personal information saved successfully', data: null };
+      return {
+        success: true,
+        message: 'Personal information saved successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/application/personal-info', data);
+    const response = await axiosInstance.patch<ApiResponse<any>>(
+      '/vendor/application/personal-info',
+      data
+    );
     return response.data;
   },
 
@@ -576,9 +719,16 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      return { success: true, message: 'Business information saved successfully', data: null };
+      return {
+        success: true,
+        message: 'Business information saved successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/application/business-info', data);
+    const response = await axiosInstance.patch<ApiResponse<any>>(
+      '/vendor/application/business-info',
+      data
+    );
     return response.data;
   },
 
@@ -608,9 +758,16 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      return { success: true, message: 'Store information saved successfully', data: null };
+      return {
+        success: true,
+        message: 'Store information saved successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/application/store-info', data);
+    const response = await axiosInstance.patch<ApiResponse<any>>(
+      '/vendor/application/store-info',
+      data
+    );
     return response.data;
   },
 
@@ -631,7 +788,8 @@ export const vendorApi = {
         success: true,
         message: 'Upload URL generated successfully',
         data: {
-          uploadUrl: 'https://api.cloudinary.com/v1_1/faflora/auto/upload?signature=mock',
+          uploadUrl:
+            'https://api.cloudinary.com/v1_1/faflora/auto/upload?signature=mock',
           publicId: `${folder}/${Math.random().toString(36).substring(7)}`,
           folder,
           fields: {
@@ -643,7 +801,10 @@ export const vendorApi = {
         },
       };
     }
-    const response = await axiosInstance.post<ApiResponse<any>>('/vendor/application/documents/upload-url', data);
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      '/vendor/application/documents/upload-url',
+      data
+    );
     return response.data;
   },
 
@@ -662,7 +823,7 @@ export const vendorApi = {
   }): Promise<ApiResponse<VendorDocument>> {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
-      
+
       const newDoc: VendorDocument = {
         id: `doc-${Math.random().toString(36).substring(7)}`,
         documentType: data.documentType,
@@ -676,7 +837,9 @@ export const vendorApi = {
         createdAt: new Date().toISOString(),
       };
 
-      const newDocumentsList = draft.documents.filter(d => d.documentType !== data.documentType);
+      const newDocumentsList = draft.documents.filter(
+        (d) => d.documentType !== data.documentType
+      );
       newDocumentsList.push(newDoc);
 
       const newDraft: VendorApplicationDraft = {
@@ -684,7 +847,9 @@ export const vendorApi = {
         documents: newDocumentsList,
       };
 
-      const newStatusDocuments = status.documents.filter(d => d.documentType !== data.documentType);
+      const newStatusDocuments = status.documents.filter(
+        (d) => d.documentType !== data.documentType
+      );
       newStatusDocuments.push({
         documentType: data.documentType,
         status: 'pending',
@@ -701,15 +866,29 @@ export const vendorApi = {
       //            brand = gov_id + id_selfie + cac_cert + tin_cert + brand_auth (5)
       const requiredDocTypes: string[] =
         status.vendorType === 'brand'
-          ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate', 'brand_authorization']
+          ? [
+              'government_id',
+              'id_selfie',
+              'cac_certificate',
+              'tin_certificate',
+              'brand_authorization',
+            ]
           : status.vendorType === 'registered_business'
-            ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate']
+            ? [
+                'government_id',
+                'id_selfie',
+                'cac_certificate',
+                'tin_certificate',
+              ]
             : ['government_id', 'id_selfie'];
 
       // A document counts only if it is NOT rejected/requires_resubmission
-      const isDocsComplete = requiredDocTypes.every(reqType =>
+      const isDocsComplete = requiredDocTypes.every((reqType) =>
         newStatusDocuments.some(
-          d => d.documentType === reqType && d.status !== 'rejected' && d.status !== 'requires_resubmission'
+          (d) =>
+            d.documentType === reqType &&
+            d.status !== 'rejected' &&
+            d.status !== 'requires_resubmission'
         )
       );
 
@@ -729,7 +908,10 @@ export const vendorApi = {
         data: newDoc,
       };
     }
-    const response = await axiosInstance.post<ApiResponse<VendorDocument>>('/vendor/application/documents/confirm', data);
+    const response = await axiosInstance.post<ApiResponse<VendorDocument>>(
+      '/vendor/application/documents/confirm',
+      data
+    );
     return response.data;
   },
 
@@ -742,8 +924,12 @@ export const vendorApi = {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
-      const newDocumentsList = draft.documents.filter(d => d.id !== documentId);
-      const newStatusDocuments = status.documents.filter(d => d.id !== documentId);
+      const newDocumentsList = draft.documents.filter(
+        (d) => d.id !== documentId
+      );
+      const newStatusDocuments = status.documents.filter(
+        (d) => d.id !== documentId
+      );
 
       const newDraft: VendorApplicationDraft = {
         ...draft,
@@ -759,9 +945,15 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      return { success: true, message: 'Document deleted successfully', data: null };
+      return {
+        success: true,
+        message: 'Document deleted successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.delete<ApiResponse<any>>(`/vendor/application/documents/${documentId}`);
+    const response = await axiosInstance.delete<ApiResponse<any>>(
+      `/vendor/application/documents/${documentId}`
+    );
     return response.data;
   },
 
@@ -814,7 +1006,10 @@ export const vendorApi = {
         data: newAccount,
       };
     }
-    const response = await axiosInstance.post<ApiResponse<VendorBankAccount>>('/vendor/application/bank-accounts', data);
+    const response = await axiosInstance.post<ApiResponse<VendorBankAccount>>(
+      '/vendor/application/bank-accounts',
+      data
+    );
     return response.data;
   },
 
@@ -828,7 +1023,9 @@ export const vendorApi = {
       const { draft } = getInitialMockData();
       return { success: true, data: draft.bankAccounts };
     }
-    const response = await axiosInstance.get<ApiResponse<VendorBankAccount[]>>('/vendor/application/bank-accounts');
+    const response = await axiosInstance.get<ApiResponse<VendorBankAccount[]>>(
+      '/vendor/application/bank-accounts'
+    );
     return response.data;
   },
 
@@ -841,8 +1038,8 @@ export const vendorApi = {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
-      const newAccounts = draft.bankAccounts.filter(a => a.id !== accountId);
-      if (newAccounts.length > 0 && !newAccounts.some(a => a.isPrimary)) {
+      const newAccounts = draft.bankAccounts.filter((a) => a.id !== accountId);
+      if (newAccounts.length > 0 && !newAccounts.some((a) => a.isPrimary)) {
         newAccounts[0].isPrimary = true;
       }
 
@@ -858,9 +1055,15 @@ export const vendorApi = {
       };
 
       saveMockData(newStatus, newDraft);
-      return { success: true, message: 'Bank account removed successfully', data: null };
+      return {
+        success: true,
+        message: 'Bank account removed successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.delete<ApiResponse<any>>(`/vendor/application/bank-accounts/${accountId}`);
+    const response = await axiosInstance.delete<ApiResponse<any>>(
+      `/vendor/application/bank-accounts/${accountId}`
+    );
     return response.data;
   },
 
@@ -873,7 +1076,7 @@ export const vendorApi = {
     if (USE_MOCK_VENDOR_API) {
       const { status, draft } = getInitialMockData();
 
-      const newAccounts = draft.bankAccounts.map(a => ({
+      const newAccounts = draft.bankAccounts.map((a) => ({
         ...a,
         isPrimary: a.id === accountId,
       }));
@@ -884,9 +1087,15 @@ export const vendorApi = {
       };
 
       saveMockData(status, newDraft);
-      return { success: true, message: 'Primary bank account updated successfully', data: null };
+      return {
+        success: true,
+        message: 'Primary bank account updated successfully',
+        data: null,
+      };
     }
-    const response = await axiosInstance.patch<ApiResponse<any>>(`/vendor/application/bank-accounts/${accountId}/set-primary`);
+    const response = await axiosInstance.patch<ApiResponse<any>>(
+      `/vendor/application/bank-accounts/${accountId}/set-primary`
+    );
     return response.data;
   },
 
@@ -901,24 +1110,32 @@ export const vendorApi = {
       // Return draft with API-spec step-keyed shape per docs section 5.15
       const enrichedDraft: VendorApplicationDraft = {
         ...draft,
-        step1: draft.storeName ? {
-          storeName: draft.storeName,
-          storeSlug: status.storeSlug || draft.storeName.toLowerCase().replace(/\s+/g, '-'),
-          vendorType: draft.vendorType,
-          storePhone: draft.storePhone,
-          storeEmail: draft.storeEmail,
-        } : undefined,
+        step1: draft.storeName
+          ? {
+              storeName: draft.storeName,
+              storeSlug:
+                status.storeSlug ||
+                draft.storeName.toLowerCase().replace(/\s+/g, '-'),
+              vendorType: draft.vendorType,
+              storePhone: draft.storePhone,
+              storeEmail: draft.storeEmail,
+            }
+          : undefined,
         step2: {
           categories: draft.sellingCategories || [],
         },
-        step3: draft.personalInfo ? {
-          fullName: draft.personalInfo.fullName,
-          dateOfBirth: draft.personalInfo.dateOfBirth,
-          gender: draft.personalInfo.gender,
-          homeAddress: draft.personalInfo.homeAddress,
-          // NIN is never returned in plaintext per docs security note
-          ninProvided: !!(draft.personalInfo.nin || draft.personalInfo.ninProvided),
-        } : null,
+        step3: draft.personalInfo
+          ? {
+              fullName: draft.personalInfo.fullName,
+              dateOfBirth: draft.personalInfo.dateOfBirth,
+              gender: draft.personalInfo.gender,
+              homeAddress: draft.personalInfo.homeAddress,
+              // NIN is never returned in plaintext per docs security note
+              ninProvided: !!(
+                draft.personalInfo.nin || draft.personalInfo.ninProvided
+              ),
+            }
+          : null,
         step4: {
           businessName: draft.businessInfo?.businessName ?? null,
           businessType: draft.businessInfo?.businessType ?? null,
@@ -936,7 +1153,9 @@ export const vendorApi = {
       };
       return { success: true, data: enrichedDraft };
     }
-    const response = await axiosInstance.get<ApiResponse<VendorApplicationDraft>>('/vendor/application/draft');
+    const response = await axiosInstance.get<
+      ApiResponse<VendorApplicationDraft>
+    >('/vendor/application/draft');
     return response.data;
   },
 
@@ -950,7 +1169,9 @@ export const vendorApi = {
       const { status } = getInitialMockData();
       return { success: true, data: status };
     }
-    const response = await axiosInstance.get<ApiResponse<VendorApplicationStatus>>('/vendor/application/status');
+    const response = await axiosInstance.get<
+      ApiResponse<VendorApplicationStatus>
+    >('/vendor/application/status');
     return response.data;
   },
 
@@ -965,36 +1186,65 @@ export const vendorApi = {
 
       // Validation checks
       if (draft.storeName.length < 3) {
-        throw new Error('Please complete your store information (store name must be at least 3 characters)');
+        throw new Error(
+          'Please complete your store information (store name must be at least 3 characters)'
+        );
       }
       if (!draft.personalInfo || !draft.personalInfo.fullName) {
         throw new Error('Please complete your personal information');
       }
       // Fixed: Check sellingCategories with proper null/undefined handling
       if (!status.sellingCategories || status.sellingCategories.length === 0) {
-        throw new Error('Please select at least one category you want to sell under');
+        throw new Error(
+          'Please select at least one category you want to sell under'
+        );
       }
-      if ((status.vendorType === 'registered_business' || status.vendorType === 'brand') && (!draft.businessInfo || !draft.businessInfo.businessName)) {
-        throw new Error('Please complete your business registration information');
+      if (
+        (status.vendorType === 'registered_business' ||
+          status.vendorType === 'brand') &&
+        (!draft.businessInfo || !draft.businessInfo.businessName)
+      ) {
+        throw new Error(
+          'Please complete your business registration information'
+        );
       }
       if (!draft.storeInfo || draft.storeInfo.storeDescription.length < 100) {
-        throw new Error('Please complete your store information (description must be at least 100 characters)');
+        throw new Error(
+          'Please complete your store information (description must be at least 100 characters)'
+        );
       }
-      
+
       // Document requirements per docs section 5.16 table
       const requiredDocTypes: string[] =
         status.vendorType === 'brand'
-          ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate', 'brand_authorization']
+          ? [
+              'government_id',
+              'id_selfie',
+              'cac_certificate',
+              'tin_certificate',
+              'brand_authorization',
+            ]
           : status.vendorType === 'registered_business'
-            ? ['government_id', 'id_selfie', 'cac_certificate', 'tin_certificate']
+            ? [
+                'government_id',
+                'id_selfie',
+                'cac_certificate',
+                'tin_certificate',
+              ]
             : ['government_id', 'id_selfie'];
-      const missingDocs = requiredDocTypes.filter(reqType =>
-        !draft.documents.some(
-          d => d.documentType === reqType && d.status !== 'rejected' && d.status !== 'requires_resubmission'
-        )
+      const missingDocs = requiredDocTypes.filter(
+        (reqType) =>
+          !draft.documents.some(
+            (d) =>
+              d.documentType === reqType &&
+              d.status !== 'rejected' &&
+              d.status !== 'requires_resubmission'
+          )
       );
       if (missingDocs.length > 0) {
-        throw new Error(`Missing required documents: ${missingDocs.join(', ')}`);
+        throw new Error(
+          `Missing required documents: ${missingDocs.join(', ')}`
+        );
       }
       if (draft.bankAccounts.length === 0) {
         throw new Error('Please add at least one bank account');
@@ -1020,7 +1270,9 @@ export const vendorApi = {
         },
       };
     }
-    const response = await axiosInstance.post<ApiResponse<any>>('/vendor/application/submit');
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      '/vendor/application/submit'
+    );
     return response.data;
   },
 
@@ -1042,12 +1294,12 @@ export const vendorApi = {
       };
 
       // Reset all documents to pending
-      const updatedDocs = draft.documents.map(d => ({
+      const updatedDocs = draft.documents.map((d) => ({
         ...d,
         status: 'pending' as const,
       }));
 
-      const updatedStatusDocs = status.documents.map(d => ({
+      const updatedStatusDocs = status.documents.map((d) => ({
         ...d,
         status: 'pending' as const,
       }));
@@ -1063,11 +1315,14 @@ export const vendorApi = {
 
       return {
         success: true,
-        message: 'Application resubmitted for review. Our team will be in touch soon.',
+        message:
+          'Application resubmitted for review. Our team will be in touch soon.',
         data: null,
       };
     }
-    const response = await axiosInstance.post<ApiResponse<any>>('/vendor/application/resubmit');
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      '/vendor/application/resubmit'
+    );
     return response.data;
   },
 };
