@@ -224,7 +224,7 @@ export default function AboutUs() {
         <div className="absolute inset-0 opacity-30 bg-gray-900 border-none">
           <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80" alt="Hands" fill className="object-cover mix-blend-screen" sizes="100vw" loading="lazy" />
         </div>
-        <motion.div className="relative z-10 max-w-2xl mx-auto px-4" {...fadeInUp}>
+        <motion.div className="relative z-10 max-w-2xl mx-auto px-6" {...fadeInUp}>
           <SectionHeading sub="JOIN THE" title="TEAM" />
           <p className="opacity-80 leading-loose mb-10 text-lg">At Faflora, we're on a mission to make online shopping easier, smarter,
              and more accessible. We're always looking for passionate individuals 
