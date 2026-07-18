@@ -1,6 +1,22 @@
 import { HelpCircle, Upload } from 'lucide-react';
 
-export const InputGroup = ({ label, required, isTextArea, isSelect, type = "text", placeholder }: any) => (
+type InputGroupProps = {
+  label: string;
+  required?: boolean;
+  isTextArea?: boolean;
+  isSelect?: boolean;
+  type?: string;
+  placeholder?: string;
+};
+
+export const InputGroup = ({
+  label,
+  required,
+  isTextArea,
+  isSelect,
+  type = 'text',
+  placeholder,
+}: InputGroupProps) => (
   <div className="space-y-1.5">
     <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
       {label} {required && <span className="text-red-500">*</span>}
@@ -13,22 +29,31 @@ export const InputGroup = ({ label, required, isTextArea, isSelect, type = "text
         <option>Nigeria</option>
       </select>
     ) : (
-      <input type={type} placeholder={placeholder} className="w-full p-3 rounded-xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none transition text-sm" />
+      <input
+        type={type}
+        placeholder={placeholder}
+        className="w-full p-3 rounded-xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none transition text-sm"
+      />
     )}
   </div>
 );
 
 export const UploadBox = ({ label }: { label: string }) => (
-    <div className="space-y-1.5">
-      <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
-        {label} <span className="text-red-500">*</span> <HelpCircle size={14} className="text-[#9d4ae3]" />
-      </label>
-      <div className="border-2 border-dashed border-[#f3ecfc] rounded-2xl p-8 bg-[#F8FDFF] flex flex-col items-center justify-center cursor-pointer hover:bg-[#F0F9FA] transition">
-          <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white p-3 rounded-xl mb-3 shadow-md">
-            <Upload size={24}/>
-          </div>
-          <p className="text-sm font-bold text-gray-700">Click to upload or drag and drop</p>
-          <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">PDF, JPG, PNG (Max 2MB)</p>
+  <div className="space-y-1.5">
+    <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
+      {label} <span className="text-red-500">*</span>{' '}
+      <HelpCircle size={14} className="text-[#9d4ae3]" />
+    </label>
+    <div className="border-2 border-dashed border-[#f3ecfc] rounded-2xl p-8 bg-[#F8FDFF] flex flex-col items-center justify-center cursor-pointer hover:bg-[#F0F9FA] transition">
+      <div className="bg-linear-to-r from-[#9d4ae3] to-[#8236be] text-white p-3 rounded-xl mb-3 shadow-md">
+        <Upload size={24} />
       </div>
+      <p className="text-sm font-bold text-gray-700">
+        Click to upload or drag and drop
+      </p>
+      <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">
+        PDF, JPG, PNG (Max 2MB)
+      </p>
     </div>
-  );
+  </div>
+);
