@@ -26,7 +26,8 @@ export default function LayoutWrapper({
   const isVendorRegistration = pathname === '/vendor-registration' || pathname === '/vendor/apply' || pathname?.startsWith('/vendor/application'); //|| pathname === '/become-a-vendor';
   const isSuperAdminRoute = pathname?.startsWith('/super-admin');
   const isAdminRoute = pathname?.startsWith('/admin');
-  const hideNavigation = isVendorRegistration || isSuperAdminRoute || isAdminRoute;
+  const isLanding = pathname?.startsWith('/landing');
+  const hideNavigation = isVendorRegistration || isSuperAdminRoute || isAdminRoute || isLanding;
 
   return (
     <>
