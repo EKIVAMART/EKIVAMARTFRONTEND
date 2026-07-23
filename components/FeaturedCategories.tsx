@@ -46,7 +46,7 @@ const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
     >
       <div
         className={`
-          w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full
+          w-24 h-23 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full
           overflow-hidden
           ${rowBg}
           border-2 border-white/60
