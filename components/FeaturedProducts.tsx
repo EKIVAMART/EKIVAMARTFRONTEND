@@ -189,11 +189,10 @@ const FeaturedProducts = () => {
               <button
                 onClick={() => scroll('left')}
                 disabled={!canScrollLeft}
-                className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
-                  canScrollLeft
+                className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${canScrollLeft
                     ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#9d4ae3]/30 text-[#9d4ae3] cursor-pointer'
                     : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
-                }`}
+                  }`}
                 aria-label="Scroll left"
               >
                 <ChevronLeft size={24} className="font-bold" />
@@ -231,11 +230,11 @@ const FeaturedProducts = () => {
                     </div>
                   ))
                 ) : featuredProducts.map((product) => {
-                  const coverImage = product.images && product.images.length > 0 
-                    ? product.images.find(img => img.isPrimary)?.url || product.images[0].url 
+                  const coverImage = product.images && product.images.length > 0
+                    ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                     : '/placeholder.png';
                   const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category || 'Fashion');
-                  const storeName = product.store?.name || product.storeId || 'Faflories Store';
+                  const storeName = product.store?.name || product.storeId || 'Faflora Store';
 
                   return (
                     <div
@@ -264,11 +263,10 @@ const FeaturedProducts = () => {
               <button
                 onClick={() => scroll('right')}
                 disabled={!canScrollRight}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${
-                  canScrollRight
+                className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${canScrollRight
                     ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#9d4ae3]/30 text-[#9d4ae3] cursor-pointer'
                     : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
-                }`}
+                  }`}
                 aria-label="Scroll right"
               >
                 <ChevronRight size={24} className="font-bold" />

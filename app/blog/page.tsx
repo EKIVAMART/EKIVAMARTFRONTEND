@@ -295,7 +295,7 @@ export default function BlogPage() {
       </section>
 
       {/* ══ BODY ══ */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 pb-28 pt-10">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 md:pb-28 pb-12 pt-10">
 
         {/* ── FEATURED POST ── */}
         <div className="mb-12">

@@ -133,7 +133,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
         if (isMounted && prod) {
           setProduct(prod);
-          
+
           // Get category slug for breadcrumbs
           let catName = '';
           if (prod.category && typeof prod.category === 'object') {
@@ -228,7 +228,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   const priceVal = typeof product.price === 'object' && product.price !== null ? (product.price as any).amount : (product.price ?? 0);
   const mrpVal = typeof product.compareAtPrice === 'object' && product.compareAtPrice !== null ? (product.compareAtPrice as any).amount : (product.compareAtPrice ?? priceVal);
   const discount = mrpVal > priceVal ? Math.round(((mrpVal - priceVal) / mrpVal) * 100) : 0;
-  
+
   // Calculate average rating
   const avgRating = product.rating?.length
     ? product.rating.reduce((sum, r) => sum + r.rating, 0) / product.rating.length
@@ -240,7 +240,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-      
+
     return escaped
       .replace(/^### (.*?)$/gm, '<h3 class="text-base font-bold my-2 text-gray-900">$1</h3>')
       .replace(/^## (.*?)$/gm, '<h2 class="text-lg font-bold my-3 text-gray-900">$1</h2>')
@@ -290,7 +290,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   };
 
   const categoryName = typeof product.category === 'object' ? product.category?.name : (product.category || 'Shop');
-  const storeName = product.store?.name || product.storeId || 'Faflories Store';
+  const storeName = product.store?.name || product.storeId || 'Faflora Store';
 
   // Format metadata keys for technical specifications table
   const metadataRows = Object.entries(product.metadata || {}).filter(([key]) => {
@@ -374,7 +374,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             <span className="text-xs font-bold text-[#9d4ae3] uppercase tracking-wider">
               {categoryName}
             </span>
-            
+
             <h1 className="pd-title">{product.name}</h1>
 
             {/* Rating */}
@@ -555,7 +555,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
               </button>
             </div>
-            
+
             {/* Vendor Card */}
             <div className="pd-vendor-card group cursor-pointer mt-4">
               <div className="pd-vendor-header">
@@ -631,12 +631,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 const secondHalf = sentences.slice(mid).join('').trim();
                 return (
                   <>
-                    <div 
+                    <div
                       className="pd-desc-block pd-desc-block--primary"
                       dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(firstHalf) }}
                     />
                     {secondHalf && (
-                      <div 
+                      <div
                         className="pd-desc-block pd-desc-block--secondary"
                         dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(secondHalf) }}
                       />
@@ -772,8 +772,8 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         ) : relatedProducts.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {relatedProducts.map((related) => {
-              const relImage = related.images && related.images.length > 0 
-                ? related.images[0].url 
+              const relImage = related.images && related.images.length > 0
+                ? related.images[0].url
                 : '/placeholder.png';
               return (
                 <Link

@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { categoryApi } from '@/lib/api';
+import { categoryApi, authApi } from '@/lib/api';
 import { fetchWishlistCount } from '@/lib/features/wishlist/wishlistSlice';
 import { fetchCartCount, fetchCart } from '@/lib/features/cart/cartSlice';
+import { setUser } from '@/lib/features/auth/authSlice';
 
 import TopBar from './TopBar';
 import DesktopNavbar from './DesktopNavbar';
 import MobileHeader from './MobileHeader';
 import MobileCategorySidebar from './MobileCategorySidebar';
-import BottomNavMobile from './BottomNavMobile';
 
 import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
@@ -35,6 +35,7 @@ export default function Navbar() {
 
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -43,6 +44,22 @@ export default function Navbar() {
       dispatch(fetchCart());
     }
   }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      const fetchUserProfile = async () => {
+        try {
+          const res = await authApi.getProfile();
+          if (res?.success && res.data) {
+            dispatch(setUser(res.data));
+          }
+        } catch (err) {
+          console.error('Failed to fetch user profile in navbar:', err);
+        }
+      };
+      void fetchUserProfile();
+    }
+  }, [isAuthenticated, user, dispatch]);
 
   // Fetch categories from API
   useEffect(() => {
@@ -159,8 +176,6 @@ export default function Navbar() {
           onOpenLogin={() => setIsLoginModalOpen(true)}
         />
 
-        {/* Mobile bottom tab bar */}
-        <BottomNavMobile onOpenCategories={() => setMobileSidebarOpen(true)} />
       </header>
 
       {/* Auth modals */}

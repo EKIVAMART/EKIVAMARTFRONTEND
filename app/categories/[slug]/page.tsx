@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import ProductCard from '@/components/ProductCard';
+import ProductCard from '@/components/home/ProductCard';
 import CategoriesGrid from '@/components/CategoriesGrid';
 import ProductFilters from '@/components/ProductFilters';
 import CategoryPromoBanner from '@/components/CategoryPromoBanner';
@@ -54,7 +54,7 @@ export default function CategoryPage() {
       dispatch(fetchWishlist());
     }
   }, [isAuthenticated, dispatch]);
-  
+
   const slug = String(params?.slug || '').toLowerCase();
   const subcategoryQuery = searchParams.get('subcategory');
 
@@ -82,7 +82,7 @@ export default function CategoryPage() {
       setCanScrollLeft(container.scrollLeft > 0);
       setCanScrollRight(
         container.scrollLeft <
-          container.scrollWidth - container.clientWidth - 10
+        container.scrollWidth - container.clientWidth - 10
       );
     }
   };
@@ -115,7 +115,7 @@ export default function CategoryPage() {
         }
 
         // Filter published categories
-        const published = data.filter((item: any) => 
+        const published = data.filter((item: any) =>
           Boolean(item.isActive ?? item.is_active ?? (item.status === 'published'))
         );
 
@@ -139,7 +139,7 @@ export default function CategoryPage() {
     if (categories.length === 0) return;
 
     // Normalize slug helper
-    const getSlug = (name: string) => 
+    const getSlug = (name: string) =>
       name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
     // Find main parent category matching the slug
@@ -183,7 +183,7 @@ export default function CategoryPage() {
         }
 
         // Filter only active subcategories
-        const activeSubCats = subCats.filter((item: any) => 
+        const activeSubCats = subCats.filter((item: any) =>
           Boolean(item.isActive ?? item.is_active ?? (item.status === 'published'))
         );
 
@@ -209,7 +209,7 @@ export default function CategoryPage() {
       }
       return;
     }
-    
+
     const parentId = activeCategory.id || activeCategory._id;
 
     if (!subcategoryQuery) {
@@ -218,10 +218,10 @@ export default function CategoryPage() {
     }
 
     // Find matching subcategory
-    const getSlug = (name: string) => 
+    const getSlug = (name: string) =>
       name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
-    const matchedSub = subcategories.find((sub: any) => 
+    const matchedSub = subcategories.find((sub: any) =>
       getSlug(sub.name) === subcategoryQuery || sub.name.toLowerCase() === subcategoryQuery.toLowerCase()
     );
 
@@ -270,7 +270,7 @@ export default function CategoryPage() {
 
         if (isMounted) {
           setProducts(productList);
-          
+
           // Reset price filters based on fetched products
           if (productList.length > 0) {
             const prices = productList.map((p) => {
@@ -349,13 +349,13 @@ export default function CategoryPage() {
       const productLoc = typeof p.location === 'object' && p.location
         ? p.location.state || p.location.town || 'Lagos'
         : (p.location || 'Lagos');
-      
+
       const locLower = productLoc.toLowerCase();
       const queryLower = locationQuery.toLowerCase();
       const matchesLocation = locationQuery === 'All' || locationQuery === 'Location' ||
-                             locLower === queryLower ||
-                             locLower.includes(queryLower) ||
-                             queryLower.includes(locLower);
+        locLower === queryLower ||
+        locLower.includes(queryLower) ||
+        queryLower.includes(locLower);
       if (!matchesLocation) return false;
 
       return true;
@@ -398,18 +398,18 @@ export default function CategoryPage() {
   })();
 
   // Normalization for matching slugs
-  const getSlug = (name: string) => 
+  const getSlug = (name: string) =>
     name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
   return (
     <main className="py-8 sm:py-6 bg-gray-50 min-h-screen">
       <div className="mx-auto w-[90%] max-w-7xl">
-        
+
         {/* Banner Section */}
         <div className="rounded-2xl bg-gradient-to-r from-[#f3ecfc] via-[#f5eeff] to-[#f3ecfc] p-6 sm:p-8 mb-6 shadow-md border border-[#e8d5f5]/30 relative overflow-hidden">
           <div className="absolute right-0 top-0 w-32 h-32 bg-[#9d4ae3]/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-[#8236be]/5 rounded-full blur-3xl pointer-events-none" />
-          
+
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#8236be] tracking-tight mb-2">
             {categoryName}
           </h1>
@@ -448,11 +448,10 @@ export default function CategoryPage() {
               {/* "All" chip */}
               <button
                 onClick={() => selectSubcategory(null)}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${
-                  !subcategoryQuery
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${!subcategoryQuery
                     ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
                     : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
-                }`}
+                  }`}
               >
                 All {categoryName}
               </button>
@@ -465,11 +464,10 @@ export default function CategoryPage() {
                   <button
                     key={sub.id || sub._id}
                     onClick={() => selectSubcategory(subSlug)}
-                    className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${
-                      isSelected
+                    className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${isSelected
                         ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
                         : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
-                    }`}
+                      }`}
                   >
                     {sub.name}
                   </button>
@@ -490,7 +488,7 @@ export default function CategoryPage() {
 
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
+
           {/* Sidebar Filters */}
           <aside className="hidden lg:flex lg:flex-col gap-6 lg:col-span-1">
             {/* Categories sidebar navigation list */}
@@ -521,7 +519,7 @@ export default function CategoryPage() {
 
           {/* Products List Area */}
           <section className="lg:col-span-3">
-            
+
             {/* Results status header */}
             <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
               <div className="text-sm font-semibold text-gray-600">
@@ -535,8 +533,8 @@ export default function CategoryPage() {
 
             {/* Products Grid or Empty/Loading States */}
             {productsLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, idx) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, idx) => (
                   <div key={idx} className="w-full bg-white rounded-2xl h-[360px] border border-gray-100 shadow-sm animate-pulse flex flex-col p-4 gap-4">
                     <div className="w-full h-48 bg-gray-100 rounded-xl" />
                     <div className="h-4 bg-gray-200 rounded w-1/3" />
@@ -546,28 +544,41 @@ export default function CategoryPage() {
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6 animate-[fadeIn_0.4s_ease-out]">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-[fadeIn_0.4s_ease-out]">
                 {filteredProducts.map((p: Product) => {
                   const ratingVal = calculateAverageRating(p.rating);
-                  const storeName = p.store?.name || p.storeId || 'Faflories Store';
-                  const coverImage = p.images && p.images.length > 0 
-                    ? p.images.find(img => img.isPrimary)?.url || p.images[0].url 
+                  const storeName = p.store?.name || p.storeId || 'Faflora Store';
+                  const coverImage = p.images && p.images.length > 0
+                    ? p.images.find(img => img.isPrimary)?.url || p.images[0].url
                     : '/placeholder.png';
-                  
+
+                  const priceVal = typeof p.price === 'object' && p.price !== null ? (p.price as any).amount : (p.price ?? 0);
+                  const compareAt = p.compareAtPrice ?? p.mrp;
+                  const discountPct = p.discount ?? (compareAt && compareAt > priceVal ? Math.round(((compareAt - priceVal) / compareAt) * 100) : undefined);
+
+                  const locObj = p.location;
+                  const locationStr =
+                    typeof locObj === 'object' && locObj !== null
+                      ? [locObj.town, locObj.lga, locObj.state].filter(Boolean).join(', ') || 'Nigeria'
+                      : (typeof locObj === 'string' ? locObj : 'Nigeria');
+
+                  const mapped = {
+                    id: p.id,
+                    name: p.name,
+                    image: coverImage,
+                    price: priceVal,
+                    compareAtPrice: compareAt,
+                    discountPercent: discountPct,
+                    rating: ratingVal,
+                    reviewCount: Array.isArray(p.rating) ? p.rating.length : 0,
+                    location: locationStr,
+                    vendor: storeName,
+                    href: `/products/${p.id}`,
+                  };
+
                   return (
-                    <div key={p.id} className="w-full">
-                      <ProductCard
-                        id={p.id}
-                        image={coverImage}
-                        category={activeCategory?.name || 'Fashion'}
-                        title={p.name}
-                        price={p.price}
-                        originalPrice={p.compareAtPrice || p.mrp}
-                        rating={ratingVal}
-                        author={storeName}
-                        location={p.location || 'Lagos'}
-                        href={`/products/${p.id}`}
-                      />
+                    <div key={p.id} className="w-full flex">
+                      <ProductCard product={mapped} />
                     </div>
                   );
                 })}
@@ -590,7 +601,7 @@ export default function CategoryPage() {
           </section>
         </div>
       </div>
-      
+
       <style jsx>{`
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { scrollbar-width: none; }

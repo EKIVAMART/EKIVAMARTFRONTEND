@@ -35,7 +35,7 @@ function SearchIcon({ size = 20 }: { size?: number }) {
 
 function HeartIcon({ filled }: { filled?: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.94 12 5C12.2 3.94 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
         fill={filled ? '#9d4ae3' : 'none'}
@@ -50,17 +50,47 @@ function HeartIcon({ filled }: { filled?: boolean }) {
 
 function CartIcon({ filled }: { filled?: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-        fill={filled ? '#9d4ae3' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
-      <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 23 21"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <g fill={filled ? '#9d4ae3' : 'currentColor'}>
+        <rect x="0" y="0" width="1" height="1" />
+        <rect x="0" y="1" width="2" height="1" />
+        <rect x="0" y="2" width="2" height="1" />
+        <rect x="1" y="3" width="1" height="1" />
+        <rect x="1" y="4" width="20" height="1" />
+        <rect x="1" y="5" width="22" height="1" />
+        <rect x="1" y="6" width="2" height="1" />
+        <rect x="21" y="6" width="2" height="1" />
+        <rect x="2" y="7" width="1" height="1" />
+        <rect x="21" y="7" width="2" height="1" />
+        <rect x="2" y="8" width="1" height="1" />
+        <rect x="21" y="8" width="2" height="1" />
+        <rect x="2" y="9" width="2" height="1" />
+        <rect x="21" y="9" width="2" height="1" />
+        <rect x="2" y="10" width="2" height="1" />
+        <rect x="21" y="10" width="1" height="1" />
+        <rect x="3" y="11" width="1" height="1" />
+        <rect x="21" y="11" width="1" height="1" />
+        <rect x="3" y="12" width="1" height="1" />
+        <rect x="9" y="12" width="7" height="1" />
+        <rect x="20" y="12" width="2" height="1" />
+        <rect x="3" y="13" width="2" height="1" />
+        <rect x="20" y="13" width="1" height="1" />
+        <rect x="4" y="14" width="1" height="1" />
+        <rect x="19" y="14" width="2" height="1" />
+        <rect x="4" y="15" width="3" height="1" />
+        <rect x="18" y="15" width="2" height="1" />
+        <rect x="6" y="16" width="13" height="1" />
+        <rect x="8" y="19" width="2" height="1" />
+        <rect x="14" y="19" width="2" height="1" />
+        <rect x="9" y="20" width="1" height="1" />
+        <rect x="15" y="20" width="1" height="1" />
+      </g>
     </svg>
   );
 }

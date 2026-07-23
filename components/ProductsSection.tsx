@@ -93,13 +93,13 @@ export default function ProductsSection() {
 
   const findMatchingSubcategory = (chip: string, allSubcategories: any[]) => {
     const chipNorm = chip.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
+
     // First pass: exact match
     let matched = allSubcategories.find(sub => {
       const nameNorm = sub.name.toLowerCase().replace(/[^a-z0-9]/g, '');
       return nameNorm === chipNorm;
     });
-    
+
     if (matched) return matched;
 
     // Second pass: contains / is contained in
@@ -187,7 +187,7 @@ export default function ProductsSection() {
         const parents = publishedData.filter((item: any) => !item.parentId);
 
         const allSubs: any[] = [];
-        
+
         // Push parent categories to search space
         parents.forEach((parent: any) => {
           allSubs.push({
@@ -294,23 +294,23 @@ export default function ProductsSection() {
 
   const filterByChip = (product: Product, chip: string) => {
     const chipNorm = chip.toLowerCase().trim();
-    
+
     // Check product's category name if it exists
-    const prodCat = typeof product.category === 'object' 
-      ? product.category?.name 
+    const prodCat = typeof product.category === 'object'
+      ? product.category?.name
       : product.category;
     if (prodCat && String(prodCat).toLowerCase().includes(chipNorm)) {
       return true;
     }
-    
+
     // Fallback: check if the product name or description contains the chip word
     const nameNorm = product.name.toLowerCase();
     const descNorm = (product.description || '').toLowerCase();
-    
+
     if (nameNorm.includes(chipNorm) || descNorm.includes(chipNorm)) {
       return true;
     }
-    
+
     // Additional direct alias matching to be extremely robust
     if (chipNorm === 'smartphones') {
       return nameNorm.includes('phone') || nameNorm.includes('iphone') || nameNorm.includes('samsung') || nameNorm.includes('android');
@@ -350,7 +350,7 @@ export default function ProductsSection() {
       setCanScrollLeft(container.scrollLeft > 0);
       setCanScrollRight(
         container.scrollLeft <
-          container.scrollWidth - container.clientWidth - 10
+        container.scrollWidth - container.clientWidth - 10
       );
     }
   };
@@ -395,9 +395,9 @@ export default function ProductsSection() {
       const locLower = productLoc.toLowerCase();
       const queryLower = selectedLocation.toLowerCase();
       const matchesLocation = selectedLocation === 'All' || selectedLocation === 'Location' ||
-                             locLower === queryLower ||
-                             locLower.includes(queryLower) ||
-                             queryLower.includes(locLower);
+        locLower === queryLower ||
+        locLower.includes(queryLower) ||
+        queryLower.includes(locLower);
       return matchesCategory && matchesLocation;
     });
     // Return at most 10 random products from the category, but avoid shuffling during SSR to prevent hydration errors
@@ -441,11 +441,10 @@ export default function ProductsSection() {
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase transition-all duration-200 border ${
-                    activeCategory === category
+                  className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase transition-all duration-200 border ${activeCategory === category
                       ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/30'
                       : 'bg-white text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
-                  }`}
+                    }`}
                 >
                   {category}
                 </button>
@@ -478,11 +477,11 @@ export default function ProductsSection() {
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 animate-[fadeIn_0.5s_ease-out]">
             {filteredProducts.map((product) => {
-              const coverImage = product.images && product.images.length > 0 
-                ? product.images.find(img => img.isPrimary)?.url || product.images[0].url 
+              const coverImage = product.images && product.images.length > 0
+                ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                 : '/placeholder.png';
               const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category || 'Fashion');
-              const storeName = product.store?.name || product.storeId || 'Faflories Store';
+              const storeName = product.store?.name || product.storeId || 'Faflora Store';
 
               return (
                 <ProductCard

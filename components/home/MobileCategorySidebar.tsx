@@ -167,17 +167,27 @@ export default function MobileCategorySidebar({
           {/* Subcategory panel */}
           <div className="flex-1 overflow-y-auto p-3 bg-white">
             {activeSlug === FEATURED_SLUG ? (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {FEATURED_CHIPS.map((chip) => (
-                  <Link
-                    key={chip.name}
-                    href={chip.href}
-                    onClick={onClose}
-                    className="rounded-full bg-white text-neutral-700 border border-neutral-200 hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50 px-3 py-1.5 text-xs font-semibold transition-all"
-                  >
-                    {chip.name}
-                  </Link>
-                ))}
+              <div className="pt-1">
+                <Link
+                  href="/categories/shop"
+                  onClick={onClose}
+                  className="block mb-3 rounded-full bg-brand-600 text-white text-center text-xs font-bold py-1.5 px-3 hover:bg-brand-700 transition-all"
+                >
+                  All Products
+                </Link>
+
+                <div className="flex flex-wrap gap-2">
+                  {FEATURED_CHIPS.slice(1).map((chip) => (
+                    <Link
+                      key={chip.name}
+                      href={chip.href}
+                      onClick={onClose}
+                      className="rounded-full bg-white border border-neutral-200 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-all"
+                    >
+                      {chip.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="pt-1">

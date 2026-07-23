@@ -8,8 +8,7 @@ import { useEffect, useRef } from 'react';
 interface CategoryDropdownProps {
   categories: any[];
   onClose: () => void;
-  /** ref of the Categories button so modal can be positioned directly below it */
-  anchorRef?: React.RefObject<HTMLButtonElement>;
+  anchorRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 const FEATURED_SLUG = '__featured__';

@@ -35,7 +35,7 @@ export default function AboutUs() {
   };
 
   return (
-    <div className="font-sans overflow-x-hidden mb-20">
+    <div className="font-sans overflow-x-hidden">
       
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-20">
