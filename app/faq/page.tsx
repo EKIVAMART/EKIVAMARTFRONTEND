@@ -333,7 +333,7 @@ export default function FAQPage() {
       </section>
 
       {/* ══ CONTENT BODY ══ */}
-      <div className="max-w-5xl mx-auto px-6 md:px-12 pb-24 -mt-10 relative z-10">
+      <div className="max-w-5xl mx-auto px-6 md:px-12 md:pb-24 pb-12 -mt-10 relative z-10">
 
         {/* SEARCH RESULTS MODE */}
         {filteredResults !== null ? (

@@ -2,8 +2,8 @@
 
 import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '@/components/home/Navbar';
+import Footer from '@/components/home/Footer';
 import { Toast } from '@/components/ui/Toast';
 import CartNoteModal from './CartNoteModal';
 
@@ -23,7 +23,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isVendorRegistration = pathname === '/vendor-registration' || pathname === '/vendor/apply' || pathname?.startsWith('/vendor/application'); //|| pathname === '/become-a-vendor';
+  const isVendorRegistration = pathname === '/vendor-registration' || pathname === '/vendor/apply' || pathname?.startsWith('/vendor/application');
   const isSuperAdminRoute = pathname?.startsWith('/super-admin');
   const isAdminRoute = pathname?.startsWith('/admin');
   const isLanding = pathname?.startsWith('/landing');

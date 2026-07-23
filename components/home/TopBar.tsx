@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Separator = () => <div className="h-8 w-[1px] bg-white/40 mx-2 shrink-0" />;
 
@@ -13,13 +14,13 @@ function VendorBlock() {
           Become A Vendor
         </span>
       </div>
-      <button
-        type="button"
+      <Link
+        href="/become-a-vendor"
         className="flex items-center gap-1.5 rounded-lg bg-black/15 hover:bg-black/25 border border-white/10 px-3.5 py-1.5 font-bold text-white text-xs cursor-pointer transition-all"
       >
         <span className="font-normal md:text-sm text-[10px]">Sell on faflora</span>
         <Image src="/icons/ph_shopping-bag-duotone.png" alt="" width={14} height={14} className="brightness-0 invert md:w-7 md:h-7" />
-      </button>
+      </Link>
     </div>
   );
 }

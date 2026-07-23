@@ -26,7 +26,7 @@ function CollapseMenuIcon() {
 
 function HeartIcon({ filled }: { filled?: boolean }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.94 12 5C12.2 3.94 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
         fill={filled ? '#9d4ae3' : 'none'}
@@ -42,8 +42,8 @@ function HeartIcon({ filled }: { filled?: boolean }) {
 function CartIcon({ filled }: { filled?: boolean }) {
   return (
     <svg
-      width="22"
-      height="22"
+      width="25"
+      height="25"
       viewBox="0 0 23 21"
       shapeRendering="crispEdges"
       aria-hidden
@@ -178,7 +178,7 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
               }`}
               aria-label="Wishlist"
             >
-              <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-sm">
                 {wishlistCount}
               </span>
               <HeartIcon filled={onWishlist} />
@@ -192,7 +192,7 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
               }`}
               aria-label="Cart"
             >
-              <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-sm">
                 {cartCount}
               </span>
               <CartIcon filled={onCart} />
