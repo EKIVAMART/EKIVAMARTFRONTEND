@@ -12,7 +12,7 @@ import ActionModal, {
 import CategoriesModal from '@/components/super-admin/CategoriesModal';
 import ImageUploadModal from '@/components/super-admin/ImageUploadModal';
 import ViewProductModal from '@/components/super-admin/ViewProductModal';
-import ProductTable from '@/components/super-admin/ProductTable';
+import ProductTable, { Product as ProductTableItem } from '@/components/super-admin/ProductTable';
 import VendorTable from '@/components/super-admin/VendorTable';
 import OrderTable from '@/components/super-admin/OrderTable';
 import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
@@ -752,6 +752,13 @@ export default function AdminPage() {
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
     setIsModalOpen(true);
+  };
+
+  const openProductModal = (item: ProductTableItem) => {
+    openModal({
+      ...item,
+      image: typeof item.image === 'string' ? item.image : item.image.src,
+    });
   };
 
   const openViewModal = (item: AdminProduct) => {
@@ -1510,8 +1517,8 @@ export default function AdminPage() {
                 )}
                 <ProductTable
                   data={resolvedProducts}
-                  onEdit={openModal}
-                  onView={openViewModal}
+                  onEdit={openProductModal}
+                  onView={openProductModal}
                   onDelete={handleDeleteProduct}
                   onPublish={handlePublishClick}
                   publishingProductId={publishingProductId}

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import Image, { StaticImageData } from 'next/image';
 import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 
-interface Product {
+export interface Product {
   id: string;
   name: string;
   price: number;
