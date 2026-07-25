@@ -13,7 +13,8 @@ import CategoriesModal from '@/components/super-admin/CategoriesModal';
 import ImageUploadModal from '@/components/super-admin/ImageUploadModal';
 import ViewProductModal from '@/components/super-admin/ViewProductModal';
 import ProductTable, { Product as ProductTableItem } from '@/components/super-admin/ProductTable';
-import VendorTable from '@/components/super-admin/VendorTable';
+import VendorManagementView from '@/components/admin/VendorManagementView';
+import SessionTimeoutModal from '@/components/admin/SessionTimeoutModal';
 import OrderTable from '@/components/super-admin/OrderTable';
 import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
 import AdminTable, { AdminUser } from '@/components/super-admin/AdminTable';
@@ -1667,6 +1668,9 @@ export default function AdminPage() {
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
 
+      {/* Session Timeout Warning */}
+      <SessionTimeoutModal loginPath="/super-admin/login" />
+
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
@@ -1824,21 +1828,19 @@ export default function AdminPage() {
                 <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
                 <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
               </div>
-              {activeTab !== 'orders' && (
+              {activeTab === 'products' && (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  {activeTab === 'products' && (
-                    <button
-                      onClick={() => setIsCategoriesModalOpen(true)}
-                      className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
-                    >
-                      All Categories
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setIsCategoriesModalOpen(true)}
+                    className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                  >
+                    All Categories
+                  </button>
                   <button
                     onClick={() => openModal()}
                     className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
                   >
-                    <Plus size={18} /> Add {activeTab === 'products' ? 'Product' : 'Vendor'}
+                    <Plus size={18} /> Add Product
                   </button>
                 </div>
               )}
@@ -1918,7 +1920,7 @@ export default function AdminPage() {
               </div>
             )}
             {activeTab === 'vendors' && (
-              <VendorTable data={vendors} onEdit={openModal} onDelete={(id: number) => setVendors(vendors.filter(v => v.id !== id))} searchQuery={searchQuery} />
+              <VendorManagementView isSuperAdmin={true} currentUserId={currentUserId} globalSearchQuery={searchQuery} />
             )}
             {activeTab === 'orders' && (
               <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />

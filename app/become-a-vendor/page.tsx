@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Store,
@@ -190,8 +191,8 @@ export default function BecomeAVendorPage() {
           aria-hidden="true"
         />
 
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-center relative z-10">
-          <div className="md:col-span-7 space-y-7">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="md:w-7/12 lg:w-[54%] space-y-7">
 
             <FadeInSection type="fadeDown" delay={0.05}>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-700/50 border border-brand-500/20 rounded-full text-xs font-bold text-brand-200 backdrop-blur-sm">
@@ -253,48 +254,71 @@ export default function BecomeAVendorPage() {
               </div>
             </FadeInSection>
           </div>
+        </div>
 
-          {/* Right panel */}
-          <div className="md:col-span-5 relative hidden md:block">
-            <FadeInSection type="slideRight" delay={0.3}>
-              <div className="absolute -inset-3 bg-gradient-to-r from-brand-500/20 to-accent-teal/20 rounded-3xl blur-xl" aria-hidden="true" />
-              <div className="relative bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
-                <div className="flex items-center justify-between border-b border-white/10 pb-6 mb-6">
-                  <div>
-                    <h2 className="font-extrabold text-lg text-white">Vendor Portal</h2>
-                    <p className="text-xs text-brand-300">Application Preview</p>
-                  </div>
-                  <Store className="w-8 h-8 text-accent-teal" aria-hidden="true" />
-                </div>
+        {/* Right panel — image side */}
+        <div className="hidden md:block absolute inset-y-0 right-0 w-[46%] lg:w-[50%] xl:w-[52%]">
+          <FadeInSection type="slideRight" delay={0.3}>
+            <div className="absolute inset-0">
+              {/* Soft glow bleeding past the arc edge */}
+              <div
+                className="absolute -inset-3 bg-gradient-to-r from-brand-500/20 to-accent-teal/20 blur-xl"
+                style={{ clipPath: 'url(#vendor-hero-arc-clip)' }}
+                aria-hidden="true"
+              />
 
-                <div className="space-y-5">
-                  {[
-                    { label: '1. Store Profile Setup', status: '100% Ready', color: 'text-green-400', width: '100%' },
-                    { label: '2. Identity Verification', status: 'Fully Secure', color: 'text-accent-teal', width: '100%' },
-                    { label: '3. Document Upload', status: 'Awaiting', color: 'text-brand-300', width: '65%' },
-                  ].map((item, i) => (
-                    <div key={i}>
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-brand-200">{item.label}</span>
-                        <span className={`${item.color} font-bold text-xs`}>{item.status}</span>
-                      </div>
-                      <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                        <motion.div
-                          className="bg-gradient-to-r from-accent-teal to-brand-400 h-full rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: item.width }}
-                          transition={{ duration: 1.2, delay: 0.5 + i * 0.2, ease: 'easeOut' }}
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Status section info container removed as requested */}
+              {/* Arc-clipped image + glass panel */}
+              <div
+                className="relative w-full h-full overflow-hidden shadow-2xl"
+                style={{ clipPath: 'url(#vendor-hero-arc-clip)' }}
+              >
+                <Image
+                  src="/images/vendor-hero.avif"
+                  alt="Faflora vendor preparing products for sale"
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 52vw, 0px"
+                  className="object-cover"
+                />
+                {/* Glassmorphism layer*/}
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-950/30 via-brand-900/5 to-accent-teal/10" />
+                <div className="absolute inset-0 border border-white/15" />
               </div>
-            </FadeInSection>
-          </div>
+
+              {/* Bright stroke tracing the arc boundary itself */}
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="vendor-hero-arc-stroke" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                    <stop offset="50%" stopColor="rgba(255,255,255,0.55)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M 35,0 C 15,25 15,75 35,100"
+                  fill="none"
+                  stroke="url(#vendor-hero-arc-stroke)"
+                  strokeWidth="0.6"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </div>
+          </FadeInSection>
+
+          {/* Reusable clip-path definition — an arc whose outward curve faces left */}
+          <svg width="0" height="0" className="absolute" aria-hidden="true">
+            <defs>
+              <clipPath id="vendor-hero-arc-clip" clipPathUnits="objectBoundingBox">
+                <path d="M 0.35,0 C 0.15,0.25 0.15,0.75 0.35,1 L 1,1 L 1,0 Z" />
+              </clipPath>
+            </defs>
+          </svg>
         </div>
       </section>
 

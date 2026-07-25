@@ -11,7 +11,7 @@ import ProductCard, { type LandingProduct } from './ProductCard';
 
 function TimeBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center w-14 md:w-16 bg-neutral-100 border border-neutral-200/80 px-2.5 py-1 min-w-[45px] sm:min-w-[50px] shadow-sm">
+    <div className="flex flex-col items-center max-w-14 md:w-16 bg-neutral-100 border border-neutral-200/80 px-1 py-1 min-w-[45px] sm:min-w-[50px] shadow-sm">
       <span className="text-[8px] sm:text-[9px] uppercase tracking-wider text-neutral-600 font-medium border-b border-neutral-600 pb-0.5 w-full text-center">
         {label}
       </span>
