@@ -138,21 +138,14 @@ export default function Navbar() {
 
   return (
     <>
-      {/*
-        The <header> is sticky so all three rows stay visible while scrolling.
-        On mobile the whole header (rows 2 + 3) is fixed to the viewport top.
-        On desktop only TopBar animates out; rows 2 & 3 stay.
-      */}
-      <header className="!sticky top-0 z-40 w-full bg-white shadow-sm">
-        {/* Row 1: TopBar — collapses on scroll (desktop & mobile) */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            topBarHidden ? 'max-h-0 opacity-0' : 'max-h-24 opacity-100'
-          }`}
-        >
-          <TopBar />
-        </div>
+      {/* Row 1: TopBar — scrolls out of view naturally without causing sticky layout shifts */}
+      <TopBar />
 
+      {/*
+        The <header> is sticky so rows 2 & 3 stay visible while scrolling.
+        On mobile and desktop, the sticky header height remains constant, avoiding scrolling jitter.
+      */}
+      <header className="!sticky top-0 z-50 w-full bg-white shadow-sm">
         {/* Rows 2 & 3: Desktop navbar */}
         <DesktopNavbar
           categories={categories}
@@ -160,7 +153,7 @@ export default function Navbar() {
           onOpenProfile={() => setIsProfileModalOpen(true)}
         />
 
-        {/* Rows 2 & 3: Mobile header — fixed inside sticky header = always on screen */}
+        {/* Rows 2 & 3: Mobile header */}
         <MobileHeader
           categories={categories}
           onOpenCategories={() => setMobileSidebarOpen(true)}

@@ -10,9 +10,12 @@ function VendorBlock() {
         <span className="become-vendor-text text-accent-amber whitespace-nowrap md:text-3xl md:mt-3 text-xl">
           Show, Sell, Cashout
         </span>
-        <span className="font-bold text-white text-xs whitespace-nowrap tracking-wide md:text-lg">
+        <Link
+          href="/become-a-vendor"
+          className="font-bold text-white hover:text-neutral-100 text-xs whitespace-nowrap tracking-wide md:text-lg"
+        >
           Become A Vendor
-        </span>
+        </Link>
       </div>
       <Link
         href="/become-a-vendor"

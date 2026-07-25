@@ -116,7 +116,7 @@ export default function MobileCategorySidebar({
         {/* Two-column layout */}
         <div className="flex flex-1 overflow-hidden">
           {/* Category rail */}
-          <div className="w-[44%] shrink-0 border-r border-neutral-100 overflow-y-auto py-2 bg-neutral-50/60 scrollbar-none">
+          <div className="w-[45%] shrink-0 border-r border-neutral-100 overflow-y-auto py-2 bg-neutral-50/60 scrollbar-none">
             {/* Featured */}
             <button
               type="button"

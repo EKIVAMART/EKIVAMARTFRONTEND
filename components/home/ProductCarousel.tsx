@@ -16,9 +16,9 @@ function EmptyState({ category }: { category: string }) {
         <Package size={28} strokeWidth={1.5} />
       </div>
       <h3 className="text-base font-extrabold text-neutral-800 mb-1.5">No Products Available</h3>
-      <p className="text-neutral-500 text-sm mb-5 leading-relaxed">
+      <p className={category == "featured" ? `text-neutral-500 text-sm mb-5 leading-relaxed` : 'text-brand-300'}>
         We couldn&apos;t find any items in the{' '}
-        <span className="font-semibold text-brand-300">{category}</span> collection at the moment.
+        <span className={category == "featured" ? `font-semibold text-brand-50` : 'font-semibold text-brand-800'}>{category}</span> collection at the moment.
       </p>
       <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 rounded-full border border-brand-100">
         <Sparkles size={13} className="text-brand-500 animate-pulse" />
