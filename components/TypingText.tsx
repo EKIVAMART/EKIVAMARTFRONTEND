@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 interface TypingTextProps {
   text?: string;
@@ -37,6 +37,10 @@ const TypingText = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [hasStarted, setHasStarted] = useState(false);
+  
+  // Use ref to track cursor state without causing re-renders
+  const cursorIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
 
   const currentWord = words[currentIndex] || '';
 
@@ -56,7 +60,12 @@ const TypingText = ({
       if (displayedText.length < currentWord.length) {
         setDisplayedText(currentWord.substring(0, displayedText.length + 1));
       } else if (isCycling) {
-        setTimeout(() => setIsDeleting(true), delayBetween);
+        // When typing is complete and we're cycling, start deleting after delay
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            setIsDeleting(true);
+          }
+        }, delayBetween);
       }
     } else {
       // Deleting
@@ -75,6 +84,7 @@ const TypingText = ({
     }
   }, [displayedText, currentWord, isDeleting, currentIndex, words, isCycling, delayBetween, onCycleComplete, hasStarted]);
 
+  // Typing/deleting animation
   useEffect(() => {
     if (!hasStarted) return;
     
@@ -85,21 +95,57 @@ const TypingText = ({
     return () => clearTimeout(timeout);
   }, [animate, isDeleting, typingSpeed, deleteSpeed, hasStarted]);
 
-  // Cursor Logic
+  // FIXED: Cursor Logic with cleanup
   useEffect(() => {
-    if (keepCursorFlashing || isCycling) {
-      const interval = setInterval(() => {
-        setShowCursor(prev => !prev);
+    isMountedRef.current = true;
+
+    // Clear any existing interval
+    if (cursorIntervalRef.current) {
+      clearInterval(cursorIntervalRef.current);
+      cursorIntervalRef.current = null;
+    }
+
+    // Determine if cursor should flash
+    const shouldFlash = keepCursorFlashing || isCycling || (displayedText.length === currentWord.length && !isDeleting);
+    
+    if (shouldFlash) {
+      // Start with cursor visible
+      setShowCursor(true);
+      
+      // Flash every 500ms
+      cursorIntervalRef.current = setInterval(() => {
+        if (isMountedRef.current) {
+          setShowCursor(prev => !prev);
+        }
       }, 500);
-      return () => clearInterval(interval);
     } else {
-      if (displayedText.length === currentWord.length && !isDeleting) {
+      // When not flashing, show cursor during typing, hide when empty
+      if (displayedText.length === 0 || (isDeleting && displayedText.length === 0)) {
         setShowCursor(false);
       } else {
         setShowCursor(true);
       }
     }
-  }, [keepCursorFlashing, isCycling, displayedText.length, currentWord.length, isDeleting]);
+
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      if (cursorIntervalRef.current) {
+        clearInterval(cursorIntervalRef.current);
+        cursorIntervalRef.current = null;
+      }
+    };
+  }, [keepCursorFlashing, isCycling, displayedText.length, currentWord.length, isDeleting, displayedText]);
+
+  // Reset cursor when component unmounts
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (cursorIntervalRef.current) {
+        clearInterval(cursorIntervalRef.current);
+        cursorIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <span className={`inline ${className} ${colorClass}`}>

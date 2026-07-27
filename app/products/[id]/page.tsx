@@ -5,7 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft, MapPin } from 'lucide-react';
 import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
-import { openNoteModal } from '@/lib/features/cart/cartSlice';
+// OLD - commented out
+// import { openNoteModal } from '@/lib/features/cart/cartSlice';
+// NEW - import addItemToCartApi
+import { addItemToCartApi } from '@/lib/features/cart/cartSlice';
 import { addWishlistItem, removeWishlistItem, fetchWishlistCount, setWishlistItemStatus } from '@/lib/features/wishlist/wishlistSlice';
 import { productApi, categoryApi, wishlistApi, cartApi } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -298,6 +301,25 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     return !skipKeys.includes(key);
   });
 
+  // NEW: Handle add to cart with direct dispatch, skipping note modal
+  const handleAddToCart = () => {
+    if (isActiveInCart || isSavedInCart) return;
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to your cart');
+      return;
+    }
+    if (stockQty <= 0) {
+      toast.error('This product is out of stock');
+      return;
+    }
+    
+    // dispatch(openNoteModal({ productId: product.id, quantity }));
+    
+    // direct add to cart with no note modal
+    dispatch(addItemToCartApi({ productId: product.id, quantity }));
+    toast.success('Added to cart!');
+  };
+
   return (
     <div className="pd-container px-5 sm:px-8 md:px-12 lg:px-16 py-8">
       {/* Breadcrumb */}
@@ -525,10 +547,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
               <button
                 className={`pd-btn-primary pd-btn-add-to-cart ${(isActiveInCart || isSavedInCart) ? 'pd-btn-readonly' : ''}`}
-                onClick={() => {
-                  if (isActiveInCart || isSavedInCart) return;
-                  dispatch(openNoteModal({ productId: product.id, quantity }));
-                }}
+                onClick={handleAddToCart}
                 disabled={stockQty <= 0 || isActiveInCart || isSavedInCart}
               >
                 <ShoppingCart className="pd-cart-icon" />
@@ -587,7 +606,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 </div>
                 <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                   <Calendar size={14} className="text-gray-400" />
-                  <span>Selling on Faflories for 3 years</span>
+                  <span>Selling on Faflora for 3 years</span>
                 </div>
               </div>
             </div>

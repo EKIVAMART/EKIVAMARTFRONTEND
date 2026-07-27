@@ -5,24 +5,48 @@ const Separator = () => <div className="h-8 w-[1px] bg-white/40 mx-2 shrink-0" /
 
 function VendorBlock() {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex flex-col leading-tight">
-        <span className="become-vendor-text text-accent-amber whitespace-nowrap md:text-3xl md:mt-3 text-xl">
-          Show, Sell, Cashout
+    <div className="flex items-center gap-3 relative animate-float">
+      {/* Pulsing glow ring behind the vendor section */}
+      <div className="absolute -inset-4 rounded-2xl bg-accent-amber/5 blur-xl animate-pulse-slow pointer-events-none" />
+      <div className="absolute -inset-3 rounded-2xl bg-white/5 blur-md animate-pulse-slow pointer-events-none" style={{ animationDelay: '1s' }} />
+      
+      {/* Gradient border glow */}
+      <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-accent-amber/20 via-white/10 to-accent-amber/20 blur-sm pointer-events-none animate-border-glow" />
+      
+      {/* Animated gradient sweep overlay */}
+      <div className="absolute -inset-2 rounded-2xl gradient-sweep pointer-events-none" />
+      
+      <div className="flex flex-col leading-tight relative">
+        <span className="become-vendor-text whitespace-nowrap md:text-3xl md:mt-3 text-xl relative">
+          <span className="shimmer-text">Show, Sell, Cashout</span>
+          {/* Subtle text glow behind */}
+          <span className="absolute inset-0 text-accent-amber blur-sm opacity-30 pointer-events-none shimmer-text">Show, Sell, Cashout</span>
         </span>
+        
         <Link
           href="/become-a-vendor"
-          className="font-bold text-white hover:text-neutral-100 text-xs whitespace-nowrap tracking-wide md:text-lg"
+          className="font-bold text-white hover:text-neutral-100 text-xs whitespace-nowrap tracking-wide md:text-lg relative group flex items-center gap-1 animate-attention-pulse"
         >
           Become A Vendor
+          {/* Animated underline glow */}
+          <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-accent-amber to-white group-hover:w-full transition-all duration-500" />
+          <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent-amber/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Pulsing dot indicator 
+          <span className="relative ml-1 flex h-2 w-2">
+            <span className="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-accent-amber opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-amber animate-pulse-slow" />
+          </span>*/}
         </Link>
       </div>
+      
       <Link
         href="/become-a-vendor"
-        className="flex items-center gap-1.5 rounded-lg bg-black/15 hover:bg-black/25 border border-white/10 px-3.5 py-1.5 font-bold text-white text-xs cursor-pointer transition-all"
+        className="flex items-center gap-1.5 rounded-lg bg-black/15 hover:bg-black/25 border border-white/10 px-3.5 py-2 font-bold text-white text-xs cursor-pointer transition-all relative group overflow-hidden"
       >
-        <span className="font-normal md:text-sm text-[10px]">Sell on faflora</span>
-        <Image src="/icons/ph_shopping-bag-duotone.png" alt="" width={14} height={14} className="brightness-0 invert md:w-7 md:h-7" />
+        {/* Button glow effect on hover */}
+        <span className="absolute inset-0 bg-gradient-to-r from-accent-amber/0 via-accent-amber/10 to-accent-amber/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+        <span className="font-normal md:text-sm text-[10px] relative z-10">Sell on faflora</span>
       </Link>
     </div>
   );

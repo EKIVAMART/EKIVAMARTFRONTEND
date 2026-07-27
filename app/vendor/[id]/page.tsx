@@ -74,7 +74,7 @@ export default function VendorPage({ params }: VendorPageProps) {
               <span>{vendor.name.substring(0, 2).toUpperCase()}</span>
             )}
           </div>
-          
+
           <div className="vp-profile-actions">
             <button className="vp-follow-btn -mt-8">
               <UserPlus size={16} /> Follow
@@ -91,7 +91,7 @@ export default function VendorPage({ params }: VendorPageProps) {
 
         <div className="vp-joined-date mt-4">
           <Calendar size={16} className="text-gray-400" />
-          <span>Started to sell on Faflories 3 years ago</span>
+          <span>Started to sell on Faflora 3 years ago</span>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default function VendorPage({ params }: VendorPageProps) {
                         <MapPin size={12} />
                         <span>From {product.location || 'Lagos'}</span>
                       </div>
-                      <button 
+                      <button
                         className="vp-add-to-cart-btn"
                         onClick={() => dispatch(openNoteModal({ productId: product.id, quantity: 1 }))}
                       >
@@ -253,7 +253,7 @@ export default function VendorPage({ params }: VendorPageProps) {
                   <div className="vp-review-stars mb-1.5 flex">{renderStars(review.rating)}</div>
                   <div className="vp-review-variant">Purchased: {review.variant}</div>
                   <p className="vp-review-text">{review.text}</p>
-                  
+
                   {/* Product Mini Card inside review */}
                   <div className="vp-review-product-card">
                     <Image src={vendorProducts[0].images[0]} alt="Product" width={40} height={40} className="rounded-lg object-contain bg-yellow-400 p-1" />

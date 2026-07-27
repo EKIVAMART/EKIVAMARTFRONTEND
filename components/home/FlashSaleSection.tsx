@@ -114,7 +114,8 @@ function mapProduct(raw: any): LandingProduct {
     rating: 4.2,
     reviewCount: 0,
     location: locationStr,
-    vendor: raw.store?.name || raw.vendor?.name || 'Faflora',
+    // FIXED: Use 'Faflora Store' as fallback instead of raw.vendor?.name which might be 'fadlora'
+    vendor: raw.store?.name || raw.vendor?.name || 'Faflora Store',
     href: `/products/${raw.id || raw._id}`,
   };
 }
@@ -249,18 +250,18 @@ export default function FlashSaleSection() {
             onScroll={updateScrollState}
             className="flex gap-3 md:gap-6 overflow-x-auto scroll-smooth scrollbar-hide px-1 py-1"
           >
-            {/* Leading banner slides */}
-            <div className="relative h-[270px] w-44 shrink-0 overflow-hidden rounded sm:w-52 shadow-sm">
-              <Image src="/images/flash_sale_banner_2.png" alt="Step with confidence" fill sizes="208px" className="object-contain" />
+            {/* Leading banner slides - FIXED height to match product card (h-[415px] from ProductCard) */}
+            <div className="relative h-[415px] w-44 shrink-0 overflow-hidden rounded sm:w-52 shadow-sm">
+              <Image src="/images/flash_sale_banner_2.png" alt="Step with confidence" fill sizes="208px" className="object-fill" />
             </div>
-            <div className="relative h-[270px] w-44 shrink-0 overflow-hidden rounded sm:w-52 shadow-sm">
-              <Image src="/images/flash_sale_banner_1.png" alt="Step with confidence" fill sizes="208px" className="object-contain" />
+            <div className="relative h-[415px] w-44 shrink-0 overflow-hidden rounded sm:w-52 shadow-sm">
+              <Image src="/images/flash_sale_banner_1.png" alt="Step with confidence" fill sizes="208px" className="object-fill" />
             </div>
 
             {/* Flash sale product cards */}
             {loading ? (
               Array.from({ length: 5 }).map((_, idx) => (
-                <div key={idx} className="w-52 shrink-0 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm animate-pulse flex flex-col gap-3">
+                <div key={idx} className="w-52 shrink-0 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm animate-pulse flex flex-col gap-3 h-[415px]">
                   <div className="aspect-square rounded-xl bg-neutral-200" />
                   <div className="h-3 rounded bg-neutral-200 w-3/4" />
                   <div className="h-3 rounded bg-neutral-200 w-1/2" />
@@ -296,12 +297,12 @@ export default function FlashSaleSection() {
 
         {/* Mobile: 2-column grid — banners first, then products */}
         <div className="grid grid-cols-2 gap-3 md:hidden">
-          {/* Banner 1 */}
-          <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-2xl shadow-sm">
+          {/* Banner 1 - FIXED height to match mobile product card */}
+          <div className="relative w-full overflow-hidden rounded-2xl shadow-sm" style={{ aspectRatio: '3/4' }}>
             <Image src="/images/flash_sale_banner_2.png" alt="Step with confidence" fill className="object-contain" />
           </div>
-          {/* Banner 2 */}
-          <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-2xl shadow-sm">
+          {/* Banner 2 - FIXED height to match mobile product card */}
+          <div className="relative w-full overflow-hidden rounded-2xl shadow-sm" style={{ aspectRatio: '3/4' }}>
             <Image src="/images/flash_sale_banner_1.png" alt="Step with confidence" fill className="object-contain" />
           </div>
 

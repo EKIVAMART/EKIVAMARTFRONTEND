@@ -23,14 +23,14 @@ export default function AdCarousel({ images, intervalMs = 4000, className = '' }
   }, [images.length, intervalMs]);
 
   return (
-    <div className={`relative overflow-hidden rounded-lg md:rounded-xl ${className}`}>
+    <div className={`relative overflow-hidden rounded ${className}`}>
       <div
         className="flex h-full transition-transform duration-700 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {images.map((image, i) => (
           <div key={`${image.src}-${i}`} className="relative h-full w-full shrink-0">
-            <Image src={image.src} alt={image.alt} fill sizes="50vw" className="object-cover" />
+            <Image src={image.src} alt={image.alt} fill sizes="50vw" className="object-fill" />
           </div>
         ))}
       </div>

@@ -35,8 +35,19 @@ const bgClasses = [
 ];
 
 const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
-  const isStaticImage = typeof category.icon !== 'string';
-  const rowBg = row === 0 ? 'bg-white/80' : 'bg-purple-50/80';
+  // Check if the icon is a valid image object (Next.js Image import)
+  const isStaticImage = typeof category.icon !== 'string' && category.icon !== null && category.icon !== undefined && category.icon.src;
+  // Check if the icon is a data URI (which would be the emoji fallback)
+  const isDataUri = typeof category.icon === 'string' && category.icon.startsWith('data:');
+  // Check if the icon is a valid string URL
+  const isValidStringUrl = typeof category.icon === 'string' && category.icon.length > 0 && !category.icon.startsWith('data:');
+  // Check if we should show the initial instead of an image
+  const showInitial = !isStaticImage && !isDataUri && !isValidStringUrl;
+  
+  const rowBg = row === 0 ? 'bg-brand-50' : 'bg-brand-50/90';
+  
+  // Get first letter of category name for the stylized initial
+  const firstLetter = category.name?.charAt(0).toUpperCase() || '?';
 
   return (
     <Link
@@ -45,7 +56,7 @@ const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
       className="group flex-shrink-0 flex flex-col items-center text-center cursor-pointer px-1"
     >
       <div
-        className="relative flex items-center justify-center bg-[#8236be] shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 transition-all duration-300 ease-out group-hover:scale-110"
+        className="relative flex items-center justify-center bg-brand-600 shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 transition-all duration-300 ease-out group-hover:scale-110"
         style={{
           clipPath: 'url(#category-curved-triangle)',
           filter: 'drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15))',
@@ -57,7 +68,12 @@ const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
             clipPath: 'url(#category-curved-triangle)',
           }}
         >
-          {isStaticImage ? (
+          {showInitial ? (
+            // Show stylized initial as fallback
+            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-600 select-none">
+              {firstLetter}
+            </span>
+          ) : isStaticImage ? (
             <Image
               src={category.icon}
               alt={category.name}
@@ -66,13 +82,19 @@ const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
               draggable={false}
               className="object-cover transition-transform duration-300 group-hover:scale-110 pointer-events-none"
             />
-          ) : (
+          ) : isDataUri || isValidStringUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={category.icon}
               alt={category.name}
               draggable={false}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 pointer-events-none"
             />
+          ) : (
+            // Final fallback - show initial
+            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-600 select-none">
+              {firstLetter}
+            </span>
           )}
         </div>
       </div>
@@ -88,10 +110,10 @@ const RowSkeleton = () => (
     {Array.from({ length: 12 }).map((_, idx) => (
       <div key={idx} className="flex flex-col items-center gap-3 animate-pulse shrink-0">
         <div
-          className="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-purple-200/40"
+          className="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-brand-200/40"
           style={{ clipPath: 'url(#category-curved-triangle)' }}
         />
-        <div className="h-3 w-16 bg-purple-200/40 rounded" />
+        <div className="h-3 w-16 bg-brand-200/40 rounded" />
       </div>
     ))}
   </div>
@@ -161,14 +183,25 @@ export default function CategoryScroller() {
           .map((item: any, index: number) => {
             const name = item.name || item.title || item.displayName || 'Unknown';
             const slug = (item.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-            const fallbackIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug] || fashion;
-            const icon = item.imageUrl || item.image || fallbackIcon;
+            
+            // Get the icon from the API or from the asset map
+            let icon = item.imageUrl || item.image || null;
+            
+            // If no icon from API, check the asset map
+            if (!icon) {
+              const mappedIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug];
+              if (mappedIcon) {
+                icon = mappedIcon;
+              }
+            }
+            
+            // If still no icon, leave as null - CategoryCard will show initial
 
             return {
               id: String(item.id || item._id || item.categoryId || item.uuid),
               name,
               slug,
-              icon,
+              icon, // Can be null/undefined - handled in CategoryCard
               bg: bgClasses[index % bgClasses.length],
             };
           });

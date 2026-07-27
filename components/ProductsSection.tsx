@@ -480,7 +480,7 @@ export default function ProductsSection() {
               const coverImage = product.images && product.images.length > 0
                 ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                 : '/placeholder.png';
-              const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category || 'Fashion');
+              const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category);
               const storeName = product.store?.name || product.storeId || 'Faflora Store';
 
               return (

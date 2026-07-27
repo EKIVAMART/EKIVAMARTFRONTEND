@@ -165,9 +165,9 @@ export default function MobileHeader({
   })();
 
   return (
-    <div className="md:hidden w-full bg-white relative">
+    <div className="md:hidden w-full bg-white relative overflow-hidden">
       {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
-      <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-4">
+      <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 overflow-x-auto min-w-0">
         
         {/* Categories button */}
         <button
@@ -181,7 +181,7 @@ export default function MobileHeader({
         </button>
 
         {/* Logo (moved left, close to categories but with equal layout spacing) */}
-        <Link href="/" className="flex items-center shrink-0 ml-1 mr-auto">
+        <Link href="/" className="flex items-center shrink-0 ml-[5%] mr-auto">
           <Image
             src="/fa_logo_brand.png"
             alt="Faflora"
@@ -193,7 +193,7 @@ export default function MobileHeader({
         </Link>
 
         {/* 4 icons group (placed close to the searchbar/other icons on the right) */}
-        <div className="flex items-center gap-3.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Search trigger (only visible when not active) */}
           {!searchOpen && (
             <button
