@@ -1,9 +1,13 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAppSelector } from '@/lib/hooks';
+import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import type { RootState } from '@/lib/store';
+import { useState } from 'react';
+import { logout } from '@/lib/features/auth/authSlice';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   activeTab: string;
@@ -14,6 +18,31 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
   const authUser = useAppSelector((state: RootState) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogout = async () => {
+    setShowLogoutConfirm(false);
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ sessionId: null })
+        }).catch(() => {});
+      }
+    } finally {
+      dispatch(logout());
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      router.replace('/super-admin/login');
+    }
+  };
 
   return (
     <>
@@ -95,17 +124,61 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           />
         </nav>
         <div className="p-6 border-t mt-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600">
-              {authUser?.firstName?.[0] || 'A'}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600">
+                {authUser?.firstName?.[0] || 'A'}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800 truncate max-w-[100px]">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'super-admin' ? 'Super Admin' : 'Admin'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'super-admin' ? 'Super Admin' : 'Admin'}</p>
-            </div>
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
       </aside>
+
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center border"
+            >
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
+                <LogOut size={24} />
+              </div>
+              <h3 className="font-extrabold text-slate-800 text-lg">Confirm Logout</h3>
+              <p className="text-xs text-gray-500 font-semibold leading-relaxed mt-2">
+                Are you sure you want to sign out of your account? Any unsaved changes may be lost.
+              </p>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-3 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md"
+                >
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

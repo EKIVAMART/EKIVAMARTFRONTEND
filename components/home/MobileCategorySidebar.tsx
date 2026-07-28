@@ -30,9 +30,18 @@ const FEATURED_CHIPS = [
   { name: 'Fragrances', href: '/categories/beauty?subcategory=fragrances' },
 ];
 
+// CategoryImage component with proper fallback logic
 function CategoryImage({ src, alt, size = 32 }: { src: string; alt: string; size?: number }) {
-  const [imgSrc, setImgSrc] = useState(src || '/images/product_cover_image.png');
-  useEffect(() => { setImgSrc(src || '/images/product_cover_image.png'); }, [src]);
+  const [imgError, setImgError] = useState(false);
+
+  // Check if the src is valid
+  const isValidSrc = src && typeof src === 'string' && src.length > 0;
+
+  // Determine what to display
+  const showImage = isValidSrc && !imgError;
+
+  // Get first letter for fallback
+  const firstLetter = alt?.charAt(0).toUpperCase() || '?';
 
   return (
     <span
@@ -43,16 +52,23 @@ function CategoryImage({ src, alt, size = 32 }: { src: string; alt: string; size
         className="relative flex items-center justify-center bg-white overflow-hidden"
         style={{ width: `${size - 4}px`, height: `${size - 4}px`, clipPath: 'url(#curved-triangle)' }}
       >
-        <Image
-          src={imgSrc}
-          alt={alt}
-          fill
-          sizes={`${size}px`}
-          className="object-cover"
-          onError={() => setImgSrc('/images/product_cover_image.png')}
-          unoptimized={imgSrc.startsWith('http')}
-          aria-hidden
-        />
+        {showImage ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={`${size}px`}
+            className="object-cover"
+            onError={() => setImgError(true)}
+            unoptimized={src.startsWith('http')}
+            aria-hidden
+          />
+        ) : (
+          // Fallback: show stylized initial
+          <span className="text-base font-extrabold text-brand-600 select-none">
+            {firstLetter}
+          </span>
+        )}
       </span>
     </span>
   );
@@ -96,9 +112,8 @@ export default function MobileCategorySidebar({
 
       {/* Panel */}
       <div
-        className={`absolute left-0 top-0 flex h-full w-[85vw] max-w-[340px] flex-col bg-white shadow-[4px_0_40px_-4px_rgba(0,0,0,0.2)] transition-transform duration-300 ${
-          open ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`absolute left-0 top-0 flex h-full w-[85vw] max-w-[340px] flex-col bg-white shadow-[4px_0_40px_-4px_rgba(0,0,0,0.2)] transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Header — purple title */}
         <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3.5 shrink-0">
@@ -116,16 +131,15 @@ export default function MobileCategorySidebar({
         {/* Two-column layout */}
         <div className="flex flex-1 overflow-hidden">
           {/* Category rail */}
-          <div className="w-[44%] shrink-0 border-r border-neutral-100 overflow-y-auto py-2 bg-neutral-50/60 scrollbar-none">
+          <div className="w-[45%] shrink-0 border-r border-neutral-100 overflow-y-auto py-2 bg-neutral-50/60 scrollbar-none">
             {/* Featured */}
             <button
               type="button"
               onClick={() => setActiveSlug(FEATURED_SLUG)}
-              className={`flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-all ${
-                activeSlug === FEATURED_SLUG
+              className={`flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-all ${activeSlug === FEATURED_SLUG
                   ? 'bg-brand-50 text-brand-700 font-bold border-l-[3px] border-brand-600'
                   : 'border-l-[3px] border-transparent text-neutral-700 font-semibold hover:bg-neutral-100'
-              }`}
+                }`}
             >
               {/* Star icon using same curved border shape */}
               <span
@@ -137,7 +151,7 @@ export default function MobileCategorySidebar({
                   style={{ width: 28, height: 28, clipPath: 'url(#curved-triangle)' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-                    <path d="M8 1l1.8 3.6L14 5.5l-3 2.9.7 4.1L8 10.4l-3.7 2.1.7-4.1-3-2.9 4.2-.9z" fill="#9d4ae3"/>
+                    <path d="M8 1l1.8 3.6L14 5.5l-3 2.9.7 4.1L8 10.4l-3.7 2.1.7-4.1-3-2.9 4.2-.9z" fill="#9d4ae3" />
                   </svg>
                 </span>
               </span>
@@ -149,11 +163,10 @@ export default function MobileCategorySidebar({
                 key={category.id}
                 type="button"
                 onClick={() => setActiveSlug(category.slug)}
-                className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition-all ${
-                  activeSlug === category.slug
+                className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition-all ${activeSlug === category.slug
                     ? 'bg-brand-50 text-brand-700 font-bold border-l-[3px] border-brand-600'
                     : 'border-l-[3px] border-transparent text-neutral-700 font-medium hover:bg-neutral-100'
-                }`}
+                  }`}
               >
                 <CategoryImage src={category.imageUrl} alt={category.name} size={32} />
                 {/* Full name — no truncation, wraps naturally */}

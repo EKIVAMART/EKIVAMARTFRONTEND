@@ -35,8 +35,8 @@ export default function Home() {
       <div className="bg-[#8236be] w-full">
         <section className="px-4 md:px-12 py-3 md:py-4">
           <div className="grid md:gap-3 gap-2 sm:grid-cols-2">
-            <AdCarousel images={leftAdSlides} className="h-20 md:h-36" />
-            <AdCarousel images={rightAdSlides} className="h-20 md:h-36" />
+            <AdCarousel images={leftAdSlides} className="h-20 md:h-[144px]" />
+            <AdCarousel images={rightAdSlides} className="h-20 md:h-[144px]" />
           </div>
         </section>
         <CategoryScroller />

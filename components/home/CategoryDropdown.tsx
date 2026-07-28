@@ -27,12 +27,24 @@ const FEATURED_CHIPS = [
   { name: 'Fragrances', href: '/categories/beauty?subcategory=fragrances' },
 ];
 
+// CategoryImage component with proper fallback logic
 export function CategoryImage({ src, alt, size = 36 }: { src: string; alt: string; size?: number }) {
-  const [imgSrc, setImgSrc] = useState(src || '/images/product_cover_image.png');
+  const [imgError, setImgError] = useState(false);
+  
+  // Debug: Log what's being passed
+  console.log('CategoryImage - src:', src, 'alt:', alt, 'type:', typeof src);
+  
+  // Check if the src is valid (not null, undefined, or empty string)
+  const hasValidSrc = src && typeof src === 'string' && src.trim().length > 0;
+  
+  // Determine if we should show the image
+  const shouldShowImage = hasValidSrc && !imgError;
+  
+  // Get first letter for fallback
+  const firstLetter = alt?.charAt(0).toUpperCase() || '?';
 
-  useEffect(() => {
-    setImgSrc(src || '/images/product_cover_image.png');
-  }, [src]);
+  // Debug: Log what we're displaying
+  console.log('CategoryImage - hasValidSrc:', hasValidSrc, 'shouldShowImage:', shouldShowImage);
 
   return (
     <span
@@ -51,16 +63,26 @@ export function CategoryImage({ src, alt, size = 36 }: { src: string; alt: strin
           clipPath: 'url(#curved-triangle)',
         }}
       >
-        <Image
-          src={imgSrc}
-          alt={alt}
-          fill
-          sizes={`${size}px`}
-          className="object-cover"
-          onError={() => setImgSrc('/images/product_cover_image.png')}
-          aria-hidden
-          unoptimized={imgSrc.startsWith('http')}
-        />
+        {shouldShowImage ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={`${size}px`}
+            className="object-cover"
+            onError={() => {
+              console.log('Image failed to load:', src);
+              setImgError(true);
+            }}
+            aria-hidden
+            unoptimized={src.startsWith('http')}
+          />
+        ) : (
+          // Fallback: show stylized initial with brand color
+          <span className="text-base font-extrabold text-brand-600 select-none">
+            {firstLetter}
+          </span>
+        )}
       </span>
     </span>
   );
@@ -117,22 +139,27 @@ export default function CategoryDropdown({ categories, onClose, anchorRef }: Cat
           <span className="text-sm font-semibold">Featured</span>
         </button>
 
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            onMouseEnter={() => setActiveSlug(category.slug)}
-            onClick={() => setActiveSlug(category.slug)}
-            className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-all ${
-              activeSlug === category.slug
-                ? 'bg-brand-50 border-l-[3px] border-brand-600 text-brand-700 font-bold'
-                : 'border-l-[3px] border-transparent text-neutral-700 hover:bg-neutral-100 font-medium'
-            }`}
-          >
-            <CategoryImage src={category.imageUrl} alt={category.name} size={36} />
-            <span className="text-sm leading-tight">{category.name}</span>
-          </button>
-        ))}
+        {categories.map((category) => {
+          // Debug: Log category data
+          console.log('Category:', category.name, 'imageUrl:', category.imageUrl);
+          
+          return (
+            <button
+              key={category.id}
+              type="button"
+              onMouseEnter={() => setActiveSlug(category.slug)}
+              onClick={() => setActiveSlug(category.slug)}
+              className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-all ${
+                activeSlug === category.slug
+                  ? 'bg-brand-50 border-l-[3px] border-brand-600 text-brand-700 font-bold'
+                  : 'border-l-[3px] border-transparent text-neutral-700 hover:bg-neutral-100 font-medium'
+              }`}
+            >
+              <CategoryImage src={category.imageUrl} alt={category.name} size={36} />
+              <span className="text-sm leading-tight">{category.name}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Right panel */}

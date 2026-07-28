@@ -309,8 +309,7 @@ const Subnavbar = (): JSX.Element => {
 
       {/* ===== MOBILE HEADER ===== */}
       <header
-        className={`md:hidden w-full bg-white text-black z-50 border-2 border-amber-950 transition-all duration-300 ease-in-out overflow-hidden ${showMobileHeader ? 'sticky top-0' : 'fixed -top-full'
-          }`}
+        className="md:hidden w-full bg-white text-black z-50 border-b border-neutral-100 !sticky top-0"
       >
         <div className="px-3 py-3">
           <div className="flex items-center justify-between gap-2 mb-3">

@@ -110,6 +110,7 @@ export default function Footer() {
               height={44}
               className="md:h-11 h-8 w-auto object-contain"
               style={{ filter: 'invert(1) brightness(10)' }}
+              priority
             />
           </div>
 

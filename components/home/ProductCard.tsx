@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector, useWishlist } from '@/lib/hooks';
 import { addWishlistItem, removeWishlistItem } from '@/lib/features/wishlist/wishlistSlice';
 import { openNoteModal } from '@/lib/features/cart/cartSlice';
+// Import the API action for direct add to cart
+import { addItemToCartApi } from '@/lib/features/cart/cartSlice';
 import toast from 'react-hot-toast';
 
 function formatNaira(amount: number) {
@@ -81,7 +83,12 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       toast.error('Please log in to add items to your cart');
       return;
     }
-    dispatch(openNoteModal({ productId: product.id, quantity: 1 }));
+    
+    // dispatch(openNoteModal({ productId: product.id, quantity: 1 }));
+    
+    // direct add to cart with no note modal
+    dispatch(addItemToCartApi({ productId: product.id, quantity: 1 }));
+    toast.success('Added to cart!');
   };
 
   return (
@@ -132,7 +139,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       </div>
 
       {/* Product Name */}
-      <p className="mb-1 text-xs sm:text-sm font-medium text-neutral-600 group-hover:text-brand-600 transition-colors duration-200 h-10 line-clamp-2 overflow-hidden leading-tight">
+      <p className="mb-1 text-xs sm:text-sm font-medium text-neutral-600 group-hover:text-brand-600 transition-colors duration-200 h-12 line-clamp-2 overflow-hidden leading-tight">
         {product.name}
       </p>
 
@@ -159,10 +166,10 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       </div>
 
       {/* Location & Vendor */}
-      <div className="mb-2.5 flex items-start gap-1.5 text-[11px] text-neutral-500">
+      <div className="mb-2.5 flex items-start gap-1.1 text-[11px] text-neutral-500">
         <Image src="/icons/location.png" alt="" width={14} height={14} className="shrink-0 mt-px" />
         <span className="flex-1 break-words">{product.location}</span>
-        <span className="rounded bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-700 shrink-0">
+        <span className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%]">
           {product.vendor}
         </span>
       </div>

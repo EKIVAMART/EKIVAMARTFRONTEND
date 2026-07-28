@@ -166,7 +166,7 @@ const FeaturedCategories = () => {
           .map((item: any, index: number) => {
             const name = item.name || item.title || item.displayName || 'Unknown';
             const slug = (item.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-            const fallbackIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug] || fashion;
+            const fallbackIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug];
             const icon = item.imageUrl || item.image || fallbackIcon;
 
             return {
