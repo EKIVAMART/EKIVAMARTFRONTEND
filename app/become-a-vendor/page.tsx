@@ -31,6 +31,7 @@ import PhoneInput from 'react-phone-number-input';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import TypingText from '@/components/TypingText';
 import FadeInSection from '@/components/FadeInSection';
+import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 
 import 'react-phone-number-input/style.css';
 
@@ -89,6 +90,8 @@ export default function BecomeAVendorPage() {
   const [regLoading, setRegLoading] = useState(false);
 
   const [checkingStatus, setCheckingStatus] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleStartSellingClick = async () => {
     if (!isAuthenticated) {
@@ -161,8 +164,22 @@ export default function BecomeAVendorPage() {
     setRegLoading(true);
     try {
       await authApi.register({ firstName: regFirstName, lastName: regLastName, email: regEmail, password: regPassword, phoneNumber: regPhone });
-      toast.success('Account created! Signing you in...');
-      const loginResponse = await authApi.login({ email: regEmail, password: regPassword });
+      toast.success('Account created! Please verify your email.');
+      setRegisteredEmail(regEmail);
+      setIsVerificationModalOpen(true);
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed.');
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
+  const handleVerificationComplete = async () => {
+    setIsVerificationModalOpen(false);
+    setRegLoading(true);
+    try {
+      toast.success('Email verified! Signing you in...');
+      const loginResponse = await authApi.login({ email: registeredEmail, password: regPassword });
       dispatch(setCredentials({
         user: loginResponse?.data.user,
         accessToken: loginResponse?.data.accessToken,
@@ -170,7 +187,9 @@ export default function BecomeAVendorPage() {
       }));
       router.push('/vendor/apply');
     } catch (err: any) {
-      toast.error(err.message || 'Registration failed.');
+      toast.error(err.message || 'Login failed after verification. Please sign in manually.');
+      setAuthTab('login');
+      setLoginEmail(registeredEmail);
     } finally {
       setRegLoading(false);
     }
@@ -204,14 +223,14 @@ export default function BecomeAVendorPage() {
             <FadeInSection type="fadeUp" delay={0.15}>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05]">
                 <span className="block">Grow Your Business.</span>
-                <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-200 to-accent-teal">
+                <span className="block mt-2 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-200 to-brand-100">
                   <TypingText
                     texts={['Sell on Faflora.', 'Reach New Buyers.', 'Scale Across Nigeria.']}
                     typingSpeed={65}
                     deleteSpeed={40}
                     delayBetween={2200}
                     colorClass=""
-                    keepCursorFlashing
+                    keepCursorFlashing={true}
                     disableCursorOnMobile={false}
                   />
                 </span>
@@ -257,7 +276,7 @@ export default function BecomeAVendorPage() {
         </div>
 
         {/* Right panel — image side */}
-        <div className="hidden md:block absolute inset-y-0 right-0 w-[46%] lg:w-[50%] xl:w-[52%]">
+        <div className="hidden md:block absolute inset-y-0 right-0 w-[46%] md:w-[46%]">
           <FadeInSection type="slideRight" delay={0.3}>
             <div className="absolute inset-0">
               {/* Soft glow bleeding past the arc edge */}
@@ -273,17 +292,17 @@ export default function BecomeAVendorPage() {
                 style={{ clipPath: 'url(#vendor-hero-arc-clip)' }}
               >
                 <Image
-                  src="/images/vendor-hero.avif"
+                  src="/images/vendor-hero-image.jpg"
                   alt="Faflora vendor preparing products for sale"
                   fill
                   priority
-                  sizes="(min-width: 768px) 52vw, 0px"
-                  className="object-cover"
+                  sizes="(min-width: 768px) 46vw, 0px"
+                  className="lg:object-contain lg:pl-32 md:object-cover"
                 />
-                {/* Glassmorphism layer*/}
+                {/* Glassmorphism layer
                 <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
                 <div className="absolute inset-0 bg-gradient-to-br from-brand-950/30 via-brand-900/5 to-accent-teal/10" />
-                <div className="absolute inset-0 border border-white/15" />
+                <div className="absolute inset-0 border border-white/15" />*/}
               </div>
 
               {/* Bright stroke tracing the arc boundary itself */}
@@ -395,7 +414,22 @@ export default function BecomeAVendorPage() {
         <section className="py-12 max-w-5xl mx-auto px-6 text-center" aria-label="Product categories">
           <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-6">Sell across all categories</p>
           <div className="flex flex-wrap justify-center gap-3">
-            {['Flowers & Floristry', 'Gift Boxes & Hampers', 'Cakes & Confectioneries', 'Perfumes & Cosmetics', 'Fashion & Apparel', 'Phones & Tech Accessories', 'Handmade Crafts', 'Jewelry & Watches', 'Art & Decor', 'Books & Stationery'].map((cat) => (
+            {['Fashion',
+        'Footwear',
+        'Bags & Luggage',
+        'Jewelry & Accessories',
+        'Mobile Phones & Accessories',
+        'Computers & Accessories',
+        'Electronics',
+        'Photography & Video',
+        'Gaming',
+        'Musical Instruments',
+        'Audio Equipment',
+        'Home Appliances',
+        'Home & Kitchen',
+        'Home Decor',
+        'Furniture',
+        'Groceries',].map((cat) => (
               <span
                 key={cat}
                 className="px-4 py-2 bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold rounded-full hover:bg-brand-100 hover:border-brand-200 transition-colors"
@@ -403,6 +437,9 @@ export default function BecomeAVendorPage() {
                 {cat}
               </span>
             ))}
+            <span className="px-4 py-2 bg-brand-50 border border-brand-200 text-brand-800 text-xs font-bold rounded-full">
+        + {'16+'} More Categories
+      </span>
           </div>
         </section>
       </FadeInSection>
@@ -644,6 +681,14 @@ export default function BecomeAVendorPage() {
           </FadeInSection>
         </div>
       </footer>
+
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        email={registeredEmail}
+        onVerified={handleVerificationComplete}
+      />
     </div>
   );
 }

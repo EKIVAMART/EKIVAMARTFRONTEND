@@ -87,14 +87,25 @@ const CategoriesGrid = () => {
           .map((item: any, index: number) => {
             const name = item.name || item.title || item.displayName || 'Unknown';
             const slug = (item.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-            const fallbackIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug] || fashion;
-            const icon = item.imageUrl || item.image || fallbackIcon;
+            
+            // Get icon from API or asset map
+            let icon = item.imageUrl || item.image || null;
+            
+            // If no icon from API, check the asset map
+            if (!icon) {
+              const mappedIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug];
+              if (mappedIcon) {
+                icon = mappedIcon;
+              }
+            }
+            
+            // If still no icon, leave as null - CategoryCard will show initial
 
             return {
               id: String(item.id || item._id || item.categoryId || item.uuid),
               name,
               slug,
-              icon,
+              icon, // Can be null/undefined - handled in the render
               bg: bgClasses[index % bgClasses.length],
             };
           });
@@ -129,8 +140,29 @@ const CategoriesGrid = () => {
           ))
         ) : categories.length > 0 ? (
           categories.map((category) => {
-            const isStaticImage = typeof category.icon !== 'string';
+            // Check if the icon is a valid image object (Next.js Image import)
+            const isStaticImage = typeof category.icon !== 'string' && 
+                                  category.icon !== null && 
+                                  category.icon !== undefined && 
+                                  category.icon.src;
+            
+            // Check if the icon is a valid string URL
+            const isValidStringUrl = typeof category.icon === 'string' && 
+                                     category.icon.length > 0 && 
+                                     !category.icon.startsWith('data:');
+            
+            // Check if the icon is a data URI (emoji fallback)
+            const isDataUri = typeof category.icon === 'string' && 
+                              category.icon.startsWith('data:');
+            
+            // Determine if we should show the initial
+            const showInitial = !isStaticImage && !isValidStringUrl && !isDataUri;
+            
+            // Get first letter for fallback
+            const firstLetter = category.name?.charAt(0).toUpperCase() || '?';
+            
             const isSelected = category.slug === activeSlug || category.name.toLowerCase() === activeSlug;
+            
             return (
               <Link
                 key={category.id}
@@ -149,7 +181,12 @@ const CategoriesGrid = () => {
                     transition-all duration-300
                   `}
                 >
-                  {isStaticImage ? (
+                  {showInitial ? (
+                    // Show stylized initial as fallback
+                    <span className="text-base font-extrabold text-brand-600 select-none">
+                      {firstLetter}
+                    </span>
+                  ) : isStaticImage ? (
                     <Image
                       src={category.icon}
                       alt={category.name}
@@ -157,12 +194,18 @@ const CategoriesGrid = () => {
                       height={22}
                       className="transition-transform duration-300 object-contain"
                     />
-                  ) : (
+                  ) : (isDataUri || isValidStringUrl) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={category.icon}
                       alt={category.name}
                       className="w-7 h-7 transition-transform duration-300 object-contain rounded-md"
                     />
+                  ) : (
+                    // Final fallback - show initial
+                    <span className="text-base font-extrabold text-brand-600 select-none">
+                      {firstLetter}
+                    </span>
                   )}
                 </div>
 

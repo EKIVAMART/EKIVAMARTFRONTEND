@@ -27,7 +27,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fafloriesbackend-5.onrender.com/api/v1'}/auth/logout`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
