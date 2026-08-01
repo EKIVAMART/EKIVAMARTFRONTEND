@@ -3,11 +3,28 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, ShoppingBag, Package, Users, DollarSign,
+  TrendingUp, TrendingDown, ShoppingBag, Package, Users,
   ArrowUpRight, ArrowDownRight, Sparkles, ChevronRight,
   Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity
 } from 'lucide-react';
 import { useAppSelector } from '@/lib/hooks';
+
+export const NairaIcon = (props: any) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+    width={props.size || 20}
+    height={props.size || 20}
+    {...props}
+  >
+    <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
+  </svg>
+);
 
 interface DashboardStats {
   totalRevenue: number;
@@ -330,7 +347,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
           title="Total Revenue" 
           value={stats.totalRevenue} 
           change={stats.revenueChange} 
-          icon={DollarSign} 
+          icon={NairaIcon} 
           trend="up"
           subtext={`Compared to previous ${timeframe === 'daily' ? 'day' : timeframe === 'weekly' ? 'week' : 'month'}`}
         />

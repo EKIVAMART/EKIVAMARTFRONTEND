@@ -57,7 +57,10 @@ export function AuthCallbackClient() {
           isNewUser ? 'Account created successfully!' : 'Welcome back!'
         );
         setMessage('Signed in successfully. Redirecting...');
-        router.replace('/');
+        const targetPath = response.data?.role?.toUpperCase() === 'VENDOR'
+          ? '/vendor/dashboard'
+          : '/';
+        router.replace(targetPath);
       } catch (error: unknown) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

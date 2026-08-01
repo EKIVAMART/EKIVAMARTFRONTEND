@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -118,9 +118,9 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           />
           <SidebarLink
             icon={<Settings size={20} />}
-            label="Settings"
-            active={false}
-            onClick={() => { }}
+            label="Tax Rules"
+            active={activeTab === 'taxes'}
+            onClick={() => setActiveTab('taxes')}
           />
         </nav>
         <div className="p-6 border-t mt-auto">
