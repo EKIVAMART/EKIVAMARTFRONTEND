@@ -5,14 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Calendar, Package, ArrowLeft, MapPin } from 'lucide-react';
 import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
-// OLD - commented out
 // import { openNoteModal } from '@/lib/features/cart/cartSlice';
 // NEW - import addItemToCartApi
 import { addItemToCartApi } from '@/lib/features/cart/cartSlice';
 import { addWishlistItem, removeWishlistItem, fetchWishlistCount, setWishlistItemStatus } from '@/lib/features/wishlist/wishlistSlice';
 import { productApi, categoryApi, wishlistApi, cartApi, storePublicApi, reviewsApi } from '@/lib/api';
 import toast from 'react-hot-toast';
-import './product-details.module.css';
+import './product-details.css';
 
 interface Rating {
   id: string;
