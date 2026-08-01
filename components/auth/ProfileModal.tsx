@@ -182,7 +182,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             className="bg-linear-to-br from-gray-50 via-white to-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 min-h-105 sm:min-h-120 md:min-h-130 border border-gray-100 shadow-sm"
           >
             <div className="space-y-4 sm:space-y-6">
-              {activeTab === 'profile' && <ProfileTab />}
+              {activeTab === 'profile' && <ProfileTab onClose={onClose} />}
               {activeTab === 'security' && <SecurityTab />}
               {activeTab === 'sessions' && <SessionsTab />}
             </div>

@@ -23,7 +23,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isVendorRegistration = pathname === '/vendor-registration' || pathname === '/vendor/apply' || pathname?.startsWith('/vendor/application');
+  const isVendorRegistration = pathname === '/vendor-registration' || pathname === '/vendor/apply' || pathname?.startsWith('/vendor/application') || pathname?.startsWith('/vendor/dashboard');
   const isSuperAdminRoute = pathname?.startsWith('/super-admin');
   const isAdminRoute = pathname?.startsWith('/admin');
   const isLanding = pathname?.startsWith('/landing');

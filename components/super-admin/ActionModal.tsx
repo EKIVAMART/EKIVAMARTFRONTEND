@@ -5,7 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, AlertCircle, X, Check, Layers, DollarSign, Info, ChevronLeft, ChevronRight, Trash2, Zap, Image as ImageIcon, UploadCloud, GripVertical, CheckCircle2, Edit2 } from 'lucide-react';
-import { categoryApi, productApi, requestUploadUrls, uploadFileToStorage } from '@/lib/api';
+import { categoryApi, productApi, requestUploadUrls, uploadFileToStorage, type StoreOption } from '@/lib/api';
+
 import { toast } from 'react-hot-toast';
 import ImageUploadModal from './ImageUploadModal';
 
@@ -35,6 +36,8 @@ export function categoryIncludesWeightAndDimensions(categoryName: string): boole
 export interface ProductFormData {
   id?: string;
   vendorId: string;
+  /** Store ID (vendorProfileId) — for admin/super-admin store picker only */
+  vendorProfileId?: string;
   name: string;
   preview: string;
   description: string;
@@ -93,12 +96,14 @@ export interface ProductCategoryOption {
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'admins';
+  activeTab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'admins' | 'taxes';
   editingItem?: EditableProduct;
   categories?: ProductCategoryOption[];
   isLoadingCategories?: boolean;
   currentUserId?: string;
   onSave?: (data: ProductFormData) => void | Promise<void>;
+  /** When true (vendor role), hides the store/vendor dropdown — backend auto-resolves the vendor's store */
+  isVendorRole?: boolean;
 }
 
 type BackendValidationErrors =
@@ -305,7 +310,8 @@ export default function ActionModal({
   categories = [],
   isLoadingCategories = false,
   currentUserId = '',
-  onSave
+  onSave,
+  isVendorRole = false,
 }: ActionModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -580,7 +586,25 @@ export default function ActionModal({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className={`grid gap-5 mb-5 ${isVendorRole ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+        {!isVendorRole && (
+          <div>
+            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Store <span className="text-[#9d4ae3] ml-1">*</span></label>
+            <select
+              value={formData.vendorProfileId || ''}
+              onChange={e => setFormData(prev => ({ ...prev, vendorProfileId: e.target.value || undefined }))}
+              className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+              disabled={isLoadingStores}
+            >
+              <option value="">
+                {isLoadingStores ? 'Loading stores...' : stores.length === 0 ? 'Default (Faflora Official Store)' : 'Default (Faflora Official Store)'}
+              </option>
+              {stores.map(s => (
+                <option key={s.id} value={s.id}>{s.storeName}{s.isFafloraOfficialStore ? ' (Official)' : ''}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#9d4ae3] ml-1">*</span></label>
           <input
@@ -592,6 +616,9 @@ export default function ActionModal({
             placeholder="e.g. Vintage Leather Jacket"
           />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#9d4ae3] ml-1">*</span></label>
           <select
@@ -830,6 +857,10 @@ export default function ActionModal({
   const [subcategories, setSubcategories] = useState<ProductCategoryOption[]>([]);
   const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
 
+  // Stores list for admin product creation dropdown (GET /products/stores)
+  const [stores, setStores] = useState<StoreOption[]>([]);
+  const [isLoadingStores, setIsLoadingStores] = useState(false);
+
   const selectedCategory = findCategory(categories, formData.categoryId);
   const selectedCategoryValue = selectedCategory?.id || formData.categoryId;
   const selectedCategoryName = selectedCategory?.name || '';
@@ -990,6 +1021,25 @@ export default function ActionModal({
     void fetchSubs();
     return () => { isMounted = false; };
   }, [formData.categoryId]);
+
+  // Fetch approved stores for admin product-creation dropdown (GET /products/stores)
+  useEffect(() => {
+    if (!isOpen) return;
+    let isMounted = true;
+    const fetchStores = async () => {
+      setIsLoadingStores(true);
+      try {
+        const list = await productApi.getStores();
+        if (isMounted) setStores(Array.isArray(list) ? list : []);
+      } catch {
+        if (isMounted) setStores([]);
+      } finally {
+        if (isMounted) setIsLoadingStores(false);
+      }
+    };
+    void fetchStores();
+    return () => { isMounted = false; };
+  }, [isOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -1410,7 +1460,27 @@ export default function ActionModal({
                         <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
                       </div>
 
-                      <input type="hidden" value={formData.vendorId} readOnly />
+                      {/* Store / Vendor selector — only shown for admin/super-admin, not vendor */}
+                      {!isVendorRole && (
+                        <div>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">
+                            Store / Vendor <span className="text-[#9d4ae3] ml-1">*</span>
+                          </label>
+                          <select
+                            value={formData.vendorId}
+                            onChange={e => updateField('vendorId', e.target.value)}
+                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            disabled={isLoadingStores}
+                          >
+                            <option value="">
+                              {isLoadingStores ? 'Loading stores...' : stores.length === 0 ? 'No approved stores found' : 'Select a store'}
+                            </option>
+                            {stores.map(s => (
+                              <option key={s.id} value={s.id}>{s.storeName}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>

@@ -33,7 +33,7 @@ import TypingText from '@/components/TypingText';
 import FadeInSection from '@/components/FadeInSection';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 
-import 'react-phone-number-input/style.css';
+//import 'react-phone-number-input/style.css';
 
 const benefits = [
   {
@@ -276,7 +276,7 @@ export default function BecomeAVendorPage() {
         </div>
 
         {/* Right panel — image side */}
-        <div className="hidden md:block absolute inset-y-0 right-0 w-[46%] md:w-[46%]">
+        <div className="hidden md:block absolute inset-y-0 right-0 w-[46%] md:w-[54%]">
           <FadeInSection type="slideRight" delay={0.3}>
             <div className="absolute inset-0">
               {/* Soft glow bleeding past the arc edge */}
@@ -296,8 +296,8 @@ export default function BecomeAVendorPage() {
                   alt="Faflora vendor preparing products for sale"
                   fill
                   priority
-                  sizes="(min-width: 768px) 46vw, 0px"
-                  className="lg:object-contain lg:pl-32 md:object-cover"
+                  sizes="(min-width: 768px) 52vw, 0px"
+                  className="lg:object-contain lg:py-12 md:object-cover right-0"
                 />
                 {/* Glassmorphism layer
                 <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />

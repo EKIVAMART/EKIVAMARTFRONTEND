@@ -547,7 +547,7 @@ export default function CategoryPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-[fadeIn_0.4s_ease-out]">
                 {filteredProducts.map((p: Product) => {
                   const ratingVal = calculateAverageRating(p.rating);
-                  const storeName = p.store?.name || p.storeId || 'Faflora Store';
+                  const storeName = p.storeName || p.store?.name || p.storeId || 'Faflora Store';
                   const coverImage = p.images && p.images.length > 0
                     ? p.images.find(img => img.isPrimary)?.url || p.images[0].url
                     : '/placeholder.png';
@@ -573,6 +573,7 @@ export default function CategoryPage() {
                     reviewCount: Array.isArray(p.rating) ? p.rating.length : 0,
                     location: locationStr,
                     vendor: storeName,
+                    storeName: storeName,
                     href: `/products/${p.id}`,
                   };
 
