@@ -1,6 +1,7 @@
 import './globals.css';
 import StoreProvider from './StoreProvider';
 import LayoutWrapper from '@/components/LayoutWrapper';
+import TawkWidget from '@/components/TawkWidget';
 
 export default function RootLayout({
   children,
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}>
         <StoreProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
+          <TawkWidget />
           {/* Portal target for modals and overlays */}
           <div id="modal-root" />
         </StoreProvider>

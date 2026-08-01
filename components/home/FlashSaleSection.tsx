@@ -114,8 +114,8 @@ function mapProduct(raw: any): LandingProduct {
     rating: 4.2,
     reviewCount: 0,
     location: locationStr,
-    // FIXED: Use 'Faflora Store' as fallback instead of raw.vendor?.name which might be 'fadlora'
-    vendor: raw.store?.name || raw.vendor?.name || 'Faflora Store',
+    vendor: raw.storeName || raw.store?.name || raw.vendor?.name || 'Faflora Store',
+    storeName: raw.storeName || raw.store?.name || raw.vendor?.name || 'Faflora Store',
     href: `/products/${raw.id || raw._id}`,
   };
 }
@@ -142,7 +142,7 @@ export default function FlashSaleSection() {
       setLoading(true);
       try {
         const categoryId = await resolveSmartphonesCategoryId();
-        const params: any = { limit: 10, status: 'active', sortBy: 'createdAt', sortOrder: 'desc' };
+        const params: any = { limit: 10, status: 'active', sortBy: 'createdAt', sortOrder: 'desc', skipAuth: true };
         if (categoryId) params.categoryId = categoryId;
 
         const res = await productApi.getAllProducts(params);

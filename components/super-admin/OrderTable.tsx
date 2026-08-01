@@ -125,7 +125,7 @@ export default function OrderTable({ data, searchQuery = '', onViewDetails }: Or
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead className="bg-gray-50/50 border-b">
             <tr>
-              <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Order ID</th>
+              <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Order Number</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize">User</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Items</th>
               <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Total</th>

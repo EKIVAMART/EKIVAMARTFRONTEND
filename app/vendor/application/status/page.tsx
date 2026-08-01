@@ -547,7 +547,7 @@ export default function VendorStatusPage() {
                     
                     <div className="pt-2">
                       <button
-                        onClick={() => router.push('/admin/dashboard')}
+                        onClick={() => router.push('/vendor/dashboard')}
                         className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
                       >
                         Go to My Dashboard

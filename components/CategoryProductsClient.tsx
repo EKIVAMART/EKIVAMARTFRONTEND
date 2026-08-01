@@ -12,6 +12,8 @@ type SimpleProduct = {
   category?: string;
   rating?: number;
   store?: string;
+  storeName?: string;
+  storeSlug?: string;
   location?: string | { town?: string; state?: string; lga?: string };
 };
 
@@ -162,6 +164,8 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                       originalPrice={p.mrp}
                       rating={p.rating}
                       author={p.store}
+                      storeName={p.storeName || p.store || 'Faflora Store'}
+                      storeSlug={p.storeSlug || ''}
                       location={p.location}
                       href={`/products/${p.id}`}
                     />

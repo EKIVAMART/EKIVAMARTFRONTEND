@@ -559,6 +559,7 @@ export type ReturnWindow = 3 | 7 | 14 | 30;
 export interface ProductSearchParams {
   categoryId?: string;
   vendorId?: string;
+  vendorProfileId?: string;
   status?: ProductStatus;
   condition?: ProductCondition;
   brand?: string;
@@ -598,6 +599,7 @@ export interface ProductSearchParams {
   | 'createdAt'
   | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
+  skipAuth?: boolean;
 }
 
 /**
@@ -605,7 +607,9 @@ export interface ProductSearchParams {
  * Extra fields (weight, dimensions, color, size, condition) must go under metadata.
  */
 export interface CreateProductDto {
-  vendorId: string;
+  /** Store ID (vendorProfileId). For vendors, omit entirely — backend auto-resolves.
+   * For admin/super-admin, pass the store ID from GET /products/stores. */
+  vendorProfileId?: string;
   categoryId: string;
   name: string;
   preview: string;
@@ -643,24 +647,38 @@ const toQueryParams = (params: ProductSearchParams = {}) => {
 
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') return;
+    if (key === 'skipAuth') return;
     queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value));
   });
 
   return queryParams;
 };
 
+export interface StoreOption {
+  id: string;
+  storeName: string;
+  storeSlug: string;
+  storeLogoUrl: string | null;
+  applicationStatus: string;
+  isFafloraOfficialStore: boolean;
+}
+
 export const productApi = {
   async getAllProducts(params: ProductSearchParams = {}) {
     try {
+      const { skipAuth, ...rest } = params as any;
       const queryParams = toQueryParams({
         page: 1,
         limit: 20,
         sortBy: 'createdAt',
         sortOrder: 'desc',
-        ...params,
+        ...rest,
       });
+      // When skipAuth is true, pass the flag so the axios interceptor skips the token
+      const config: any = skipAuth ? { skipAuth: true } : {};
       const response = await axiosInstance.get<ApiResponse<any>>(
-        `/products?${queryParams.toString()}`
+        `/products?${queryParams.toString()}`,
+        config
       );
       return response.data;
     } catch (error) {
@@ -724,6 +742,105 @@ export const productApi = {
   async deleteProduct(id: string) {
     try {
       await axiosInstance.delete(`/products/${id}`);
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getVendorProducts(params: {
+    page?: number;
+    limit?: number;
+    searchQuery?: string;
+    categoryId?: string;
+    status?: string;
+    vendorProfileId?: string;
+    vendorId?: string;
+  } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/products?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getVendorProductFull(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/vendor/products/${id}/full`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getVendorProductStats(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/vendor/products/${id}/stats`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
+   * GET /api/v1/products/stores
+   * Returns all approved stores for the store-picker dropdown on admin product creation.
+   * Admin / Super-Admin only — vendors get a 403.
+   */
+  async getStores(): Promise<StoreOption[]> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<StoreOption[]>>('/products/stores');
+      const data = response.data?.data;
+      if (!Array.isArray(data)) return [];
+      return data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
+   * Uploads product images via the signed-URL flow, then PATCHes the product
+   * with the resulting image metadata.  Accepts either a FormData (multipart)
+   * or a typed array of { file, altText } objects.
+   *
+   * @param productId  The product to attach images to.
+   * @param payload    FormData or { file: File; alt: string }[] from ImageUploadModal.
+   */
+  async uploadProductImages(
+    productId: string,
+    payload: FormData | { file: File; alt: string }[]
+  ) {
+    try {
+      // Normalise to an array of { file, altText } so we can use uploadImages()
+      const items: { file: File; altText: string }[] = Array.isArray(payload)
+        ? payload.map((p) => ({ file: p.file, altText: p.alt || '' }))
+        : Array.from((payload as FormData).getAll('images') as File[]).map(
+            (file, idx) => ({
+              file,
+              altText:
+                ((payload as FormData).get(`altText[${idx}]`) as string) || '',
+            })
+          );
+
+      const imageObjects = await uploadImages(items, 'products');
+
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/products/${productId}`,
+        { images: imageObjects }
+      );
+      return response.data;
     } catch (error) {
       handleApiError(error);
     }
@@ -1234,3 +1351,419 @@ export const cartApi = {
     }
   },
 };
+
+export const vendorDashboardApi = {
+  /** B1 — Get vendor dashboard overview */
+  async getDashboardOverview() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/vendor/dashboard');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** B2 — Get vendor's own store profile */
+  async getStoreProfile() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/vendor/store');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** B2 — Update store branding (name, description, logo/banner URLs) */
+  async updateStoreBranding(payload: {
+    storeName?: string;
+    storeDescription?: string;
+    storeLogoUrl?: string;
+    storeBannerUrl?: string;
+  }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/store/branding', payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** B2 — Get signed upload URL for store logo or banner */
+  async getStoreImageUploadUrl(payload: {
+    imageType: 'logo' | 'banner';
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+  }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/vendor/store/upload-url', payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** B2 — Update store policies (return, shipping) */
+  async updateStorePolicies(payload: {
+    returnPolicy?: string;
+    shippingPolicy?: string;
+  }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/store/policies', payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** B2 — Toggle vacation mode. Pass null/undefined to turn off, or a message string to enable */
+  async toggleVacationMode(vacationMessage: string | null) {
+    try {
+      const payload = vacationMessage
+        ? { isOnVacation: true, vacationMessage }
+        : { isOnVacation: false };
+      const response = await axiosInstance.patch<ApiResponse<any>>('/vendor/store/vacation-mode', payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const storePublicApi = {
+  async getStoreProfile(storeSlug: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/stores/${storeSlug}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreProducts(
+    storeSlug: string,
+    params: {
+      categoryId?: string;
+      minPrice?: number;
+      maxPrice?: number;
+      search?: string;
+      sort?: 'newest' | 'price_asc' | 'price_desc' | 'popular';
+      page?: number;
+      limit?: number;
+    } = {}
+  ) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== '') {
+          queryParams.set(key, String(val));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlug}/products?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreReviews(
+    storeSlug: string,
+    params: { rating?: number; page?: number; limit?: number } = {}
+  ) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          queryParams.set(key, String(val));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlug}/reviews?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreShippingOptions(storeSlug: string, state: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlug}/shipping?state=${encodeURIComponent(state)}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const ordersApi = {
+  async create(body: any) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/orders', body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getMyOrders(params: { page?: number; limit?: number } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.set('page', String(params.page));
+      if (params.limit) queryParams.set('limit', String(params.limit));
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/my-orders?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async search(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== '') {
+          queryParams.set(key, String(val));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/search?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getStatistics(params: { customerId?: string; startDate?: string; endDate?: string } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== '') {
+          queryParams.set(key, String(val));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/statistics?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getByNumber(orderNumber: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/number/${orderNumber}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async cancel(id: string, reason: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/cancel`, { reason });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async reorder(id: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/reorder`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async refundRequest(id: string, payload: { reason: string; amount?: number }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/refund-request`, payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async refundReview(id: string, payload: { action: 'approve' | 'reject' | 'process'; rejectionNote?: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/refund-review`, payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateStatus(id: string, status: string) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/orders/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getNotes(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/orders/${id}/notes`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async addNote(id: string, note: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/notes`, { note });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async processPayment(id: string, payload: { paymentMethod: string; paymentIntentId?: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/payment`, payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const taxRulesApi = {
+  async list() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/tax-rules');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async create(body: { country: string; region?: string | null; ratePercentage: number }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/tax-rules', body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async update(id: string, body: { ratePercentage?: number; isActive?: boolean }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/tax-rules/${id}`, body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(`/tax-rules/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const reviewsApi = {
+  async listByProduct(productId: string, params: { rating?: number; page?: number; limit?: number } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          queryParams.set(key, String(val));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(`/products/${productId}/reviews?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getSingle(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getEligible(params: { page?: number; limit?: number; includeReviewed?: boolean } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.set('page', String(params.page));
+      if (params.limit) queryParams.set('limit', String(params.limit));
+      if (params.includeReviewed !== undefined) queryParams.set('includeReviewed', String(params.includeReviewed));
+      const response = await axiosInstance.get<ApiResponse<any>>(`/reviews/eligible-products?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async create(productId: string, body: { orderId: string; rating: number; title?: string; comment?: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/products/${productId}/reviews`, body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async edit(id: string, body: { rating?: number; title?: string | null; comment?: string | null }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/reviews/${id}`, body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(`/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async reply(id: string, message: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/reviews/${id}/replies`, { message });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async moderate(id: string, body: { action: 'hide' | 'restore' | 'flag' | 'unflag'; reason?: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/reviews/${id}/moderate`, body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+
+

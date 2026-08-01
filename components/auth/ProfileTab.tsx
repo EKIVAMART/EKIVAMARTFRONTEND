@@ -2,12 +2,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { User, Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../lib/hooks';
 import { setUser } from '@/lib/features/auth/authSlice';
 import { authApi } from '@/lib/api';
 
-export const ProfileTab: React.FC = () => {
+export const ProfileTab: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
@@ -164,13 +165,24 @@ export const ProfileTab: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
           {!isEditing ? (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all"
-            >
-              Edit profile
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all"
+              >
+                Edit profile
+              </button>
+              {user?.role?.toUpperCase() === 'VENDOR' && (
+                <Link
+                  href="/vendor/dashboard"
+                  onClick={onClose}
+                  className="px-6 py-2.5 bg-[#9d4ae3] hover:bg-[#8236be] text-white font-medium rounded-lg transition-all flex items-center justify-center"
+                >
+                  Go to my dashboard
+                </Link>
+              )}
+            </div>
           ) : (
             <>
               <button
