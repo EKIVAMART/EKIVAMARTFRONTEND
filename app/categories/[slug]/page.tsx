@@ -37,6 +37,7 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
+  storeName?: string;   // ← added: fixes "Property 'storeName' does not exist on type 'Product'"
   location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[] | number;
 }
