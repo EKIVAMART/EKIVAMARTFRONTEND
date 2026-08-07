@@ -10,6 +10,12 @@ interface MockCheckoutPageProps {
   params: Promise<{ reference: string }>;
 }
 
+interface MockCheckoutResponse {
+  success?: boolean;
+  redirectUrl?: string;
+  message?: string;
+}
+
 export default function MockCheckoutPage({ params }: MockCheckoutPageProps) {
   const { reference } = use(params);
   const router = useRouter();
@@ -23,7 +29,7 @@ export default function MockCheckoutPage({ params }: MockCheckoutPageProps) {
     setLoading(true);
     try {
       // Direct call to complete or fail mock checkout
-      const response = await axios.post(`${API_BASE_URL}/payments/mock/checkout/${reference}/${action}`);
+      const response = await axios.post<MockCheckoutResponse>(`${API_BASE_URL}/payments/mock/checkout/${reference}/${action}`);
       toast.success(action === 'complete' ? 'Payment simulation successful!' : 'Payment simulation failed.');
       
       // The endpoint returns a redirect URL or success response. Let's extract callback URL.
