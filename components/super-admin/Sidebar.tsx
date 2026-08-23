@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'tax') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -111,16 +111,10 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             onClick={() => setActiveTab('users')}
           />
           <SidebarLink
-            icon={<Clock size={20} />}
-            label="Waitlist"
-            active={activeTab === 'waitlist'}
-            onClick={() => setActiveTab('waitlist')}
-          />
-          <SidebarLink
-            icon={<Settings size={20} />}
-            label="Settings"
-            active={false}
-            onClick={() => { }}
+            icon={<Percent size={20} />}
+            label="Tax & Compliance"
+            active={activeTab === 'tax'}
+            onClick={() => setActiveTab('tax')}
           />
         </nav>
         <div className="p-6 border-t mt-auto">

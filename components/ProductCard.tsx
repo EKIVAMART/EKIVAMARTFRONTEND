@@ -15,6 +15,8 @@ type ProductCardProps = {
   title: string;
   rating?: number;
   author?: string;
+  /** Optional: ID used to link to /vendor/[vendorId] */
+  vendorId?: string;
   price: number | { amount: number; currency?: string };
   originalPrice?: number | { amount: number; currency?: string };
   currency?: string;
@@ -30,6 +32,7 @@ export default function ProductCard({
   title,
   rating = 4.2,
   author = 'Tazo',
+  vendorId,
   price,
   originalPrice,
   currency = '₦',
@@ -133,7 +136,17 @@ export default function ProductCard({
 
         <div className="pc-author-section">
           <span className="pc-seller-badge">Sold by</span>
-          <span className="pc-author">{author}</span>
+          {vendorId ? (
+            <Link
+              href={`/vendor/${vendorId}`}
+              onClick={(e) => e.stopPropagation()}
+              className="pc-author hover:underline"
+            >
+              {author}
+            </Link>
+          ) : (
+            <span className="pc-author">{author}</span>
+          )}
         </div>
 
         <div className="pc-price-row">

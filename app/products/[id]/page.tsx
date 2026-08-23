@@ -41,6 +41,10 @@ interface Product {
   categoryId: string;
   store?: { id: string; name: string; logo?: string };
   storeId?: string;
+  /** Enriched by GetProductUseCase */
+  storeName?: string;
+  storeSlug?: string;
+  vendorProfileId?: string;
   location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[];
   stock: number | { quantity: number };
@@ -293,7 +297,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   };
 
   const categoryName = typeof product.category === 'object' ? product.category?.name : (product.category || 'Shop');
-  const storeName = product.store?.name || product.storeId || 'Faflora Store';
+  const storeName = product.storeName || product.store?.name || product.storeId || 'Faflora Store';
+  // Build the href to the vendor's store page
+  const vendorId = product.storeSlug || product.vendorProfileId || product.storeId || product.store?.id;
+  const vendorHref = vendorId ? `/vendor/${vendorId}` : null;
 
   // Format metadata keys for technical specifications table
   const metadataRows = Object.entries(product.metadata || {}).filter(([key]) => {
@@ -575,41 +582,78 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </button>
             </div>
 
-            {/* Vendor Card */}
-            <div className="pd-vendor-card group cursor-pointer mt-4">
-              <div className="pd-vendor-header">
-                <div className="pd-vendor-avatar">
-                  {product.store?.logo ? (
-                    <img src={product.store.logo} alt={storeName} className="pd-vendor-logo-img" />
-                  ) : (
-                    <span className="pd-vendor-initials">{storeName.substring(0, 2).toUpperCase()}</span>
-                  )}
-                </div>
-                <div className="pd-vendor-info">
-                  <h4 className="pd-vendor-name">{storeName}</h4>
-                  <p className="pd-vendor-stats">450K+ Sold <span className="pd-info-icon">?</span> | 156 Items</p>
-                </div>
-                <ChevronRight size={20} className="pd-vendor-chevron group-hover:translate-x-1 transition-transform text-gray-400" />
-              </div>
-              <div className="pd-vendor-footer">
-                <div className="pd-vendor-rating">
-                  <div className="pd-stars-mini flex items-center gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        className={i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
-                      />
-                    ))}
+            {/* Vendor Card - clickable link to vendor store */}
+            {vendorHref ? (
+              <Link href={vendorHref} className="block pd-vendor-card group cursor-pointer mt-4 hover:border-purple-300 transition-colors no-underline">
+                <div className="pd-vendor-header">
+                  <div className="pd-vendor-avatar">
+                    {product.store?.logo ? (
+                      <img src={product.store.logo} alt={storeName} className="pd-vendor-logo-img" />
+                    ) : (
+                      <span className="pd-vendor-initials">{storeName.substring(0, 2).toUpperCase()}</span>
+                    )}
                   </div>
-                  <span className="text-xs font-bold ml-1 text-gray-700">4.7</span>
+                  <div className="pd-vendor-info">
+                    <h4 className="pd-vendor-name">{storeName}</h4>
+                    <p className="pd-vendor-stats">Tap to visit store <span className="pd-info-icon">→</span></p>
+                  </div>
+                  <ChevronRight size={20} className="pd-vendor-chevron group-hover:translate-x-1 transition-transform text-gray-400" />
                 </div>
-                <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                  <Calendar size={14} className="text-gray-400" />
-                  <span>Selling on Faflora for 3 years</span>
+                <div className="pd-vendor-footer">
+                  <div className="pd-vendor-rating">
+                    <div className="pd-stars-mini flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          size={12}
+                          className={i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs font-bold ml-1 text-gray-700">4.7</span>
+                  </div>
+                  <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                    <Calendar size={14} className="text-gray-400" />
+                    <span>Selling on Faflora for 3 years</span>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <div className="pd-vendor-card group cursor-pointer mt-4">
+                <div className="pd-vendor-header">
+                  <div className="pd-vendor-avatar">
+                    {product.store?.logo ? (
+                      <img src={product.store.logo} alt={storeName} className="pd-vendor-logo-img" />
+                    ) : (
+                      <span className="pd-vendor-initials">{storeName.substring(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <div className="pd-vendor-info">
+                    <h4 className="pd-vendor-name">{storeName}</h4>
+                    <p className="pd-vendor-stats">450K+ Sold <span className="pd-info-icon">?</span> | 156 Items</p>
+                  </div>
+                  <ChevronRight size={20} className="pd-vendor-chevron group-hover:translate-x-1 transition-transform text-gray-400" />
+                </div>
+                <div className="pd-vendor-footer">
+                  <div className="pd-vendor-rating">
+                    <div className="pd-stars-mini flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          size={12}
+                          className={i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs font-bold ml-1 text-gray-700">4.7</span>
+                  </div>
+                  <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                    <Calendar size={14} className="text-gray-400" />
+                    <span>Selling on Faflora for 3 years</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
           </div>
         </div>

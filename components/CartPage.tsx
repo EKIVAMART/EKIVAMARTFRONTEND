@@ -17,6 +17,8 @@ import {
   MapPin,
   FileText,
   AlertTriangle,
+  CreditCard,
+  ShieldCheck,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -33,7 +35,7 @@ import {
   moveSavedCartItemToCartApi,
   clearCartApi,
 } from '@/lib/features/cart/cartSlice';
-import { cartApi } from '@/lib/api';
+import { cartApi, orderApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
@@ -57,6 +59,7 @@ export default function CartPage() {
   // Checkout flow state
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'mock'>('paystack');
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine1: '',
@@ -265,29 +268,67 @@ export default function CartPage() {
       toast.error('Please fill in all required shipping address fields.');
       return;
     }
+    if (!paymentMethod) {
+      toast.error('Please select a payment method.');
+      return;
+    }
 
     setIsProcessing(true);
-    const checkoutToast = toast.loading('Placing your order...');
+    const checkoutToast = toast.loading('Creating order & connecting to payment gateway...');
 
     try {
       const res = await cartApi.checkout(shippingAddress, checkoutNotes);
+
+      if (!res?.success || !res?.data) {
+        setIsProcessing(false);
+        toast.error(res?.message || 'Checkout failed. Please try again.', { id: checkoutToast });
+        return;
+      }
+
+      const createdOrder = res.data;
+      const orderId = createdOrder.id || createdOrder.orderId || createdOrder.order?.id;
+      const orderNo = createdOrder.orderNumber || createdOrder.orderId || 'N/A';
+
+      if (!orderId) {
+        setIsProcessing(false);
+        toast.error('Order placed, but failed to retrieve order identifier for payment.', { id: checkoutToast });
+        return;
+      }
+
+      // Initialize payment collection with chosen gateway (paystack, flutterwave, or mock)
+      toast.loading('Redirecting to secure payment...', { id: checkoutToast });
+      const paymentRes = await orderApi.processPayment(orderId, paymentMethod);
+
       setIsProcessing(false);
 
-      if (res?.success) {
-        toast.dismiss(checkoutToast);
-        const orderNo = res.data?.orderNumber || res.data?.orderId || 'N/A';
-        setPlacedOrderNumber(orderNo);
+      if (paymentRes?.success && paymentRes.data) {
+        const paymentData = paymentRes.data;
+        const checkoutUrl =
+          paymentData.payment?.paymentUrl ||
+          paymentData.checkoutUrl ||
+          (paymentData as any).paymentUrl;
+
         dispatch(fetchCart());
         dispatch(fetchCartCount());
         dispatch(fetchCartSummary());
+
+        if (checkoutUrl) {
+          toast.success('Redirecting to payment gateway...', { id: checkoutToast });
+          window.location.href = checkoutUrl;
+          return;
+        }
+
+        // Direct success without redirect URL
+        toast.success('Order placed successfully!', { id: checkoutToast });
+        setPlacedOrderNumber(orderNo);
         setIsCheckingOut(false);
         setShowOrderSuccessModal(true);
       } else {
-        toast.error(res?.message || 'Checkout failed. Please try again.', { id: checkoutToast });
+        toast.error(paymentRes?.message || 'Payment initialization failed. Please try again.', { id: checkoutToast });
       }
     } catch (err: any) {
       setIsProcessing(false);
-      toast.error(err?.message || 'Failed to place order.', { id: checkoutToast });
+      toast.error(err?.message || 'Failed to place order and process payment.', { id: checkoutToast });
     }
   };
 
@@ -720,6 +761,98 @@ export default function CartPage() {
                           className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-100 text-gray-500 focus:outline-none"
                           disabled
                         />
+                      </div>
+                    </div>
+
+                    {/* Payment Method Selector */}
+                    <div className="pt-2">
+                      <label className="text-xs font-bold text-slate-700 block mb-2 flex items-center justify-between">
+                        <span>Payment Method *</span>
+                        <span className="text-[10px] text-purple-600 font-semibold flex items-center gap-1">
+                          <ShieldCheck size={12} /> Secure 256-bit SSL
+                        </span>
+                      </label>
+                      <div className="space-y-2">
+                        <label
+                          onClick={() => setPaymentMethod('paystack')}
+                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                            paymentMethod === 'paystack'
+                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
+                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="paystack"
+                              checked={paymentMethod === 'paystack'}
+                              onChange={() => setPaymentMethod('paystack')}
+                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            />
+                            <div>
+                              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <span>Paystack</span>
+                                <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.2 rounded font-bold">Recommended</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500 font-medium">Card, Bank Transfer, USSD, Apple Pay</p>
+                            </div>
+                          </div>
+                          <CreditCard size={18} className="text-[#9d4ae3] shrink-0" />
+                        </label>
+
+                        <label
+                          onClick={() => setPaymentMethod('flutterwave')}
+                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                            paymentMethod === 'flutterwave'
+                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
+                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="flutterwave"
+                              checked={paymentMethod === 'flutterwave'}
+                              onChange={() => setPaymentMethod('flutterwave')}
+                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            />
+                            <div>
+                              <div className="text-xs font-bold text-slate-800">Flutterwave</div>
+                              <p className="text-[11px] text-gray-500 font-medium">Cards, Mobile Money, Bank Account</p>
+                            </div>
+                          </div>
+                          <CreditCard size={18} className="text-amber-500 shrink-0" />
+                        </label>
+
+                        <label
+                          onClick={() => setPaymentMethod('mock')}
+                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                            paymentMethod === 'mock'
+                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
+                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="mock"
+                              checked={paymentMethod === 'mock'}
+                              onChange={() => setPaymentMethod('mock')}
+                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            />
+                            <div>
+                              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <span>Mock Payment Gateway</span>
+                                <span className="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.2 rounded font-bold">Test/Dev</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500 font-medium">Sandbox simulator for test orders</p>
+                            </div>
+                          </div>
+                          <ShieldCheck size={18} className="text-blue-500 shrink-0" />
+                        </label>
                       </div>
                     </div>
 

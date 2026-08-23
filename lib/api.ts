@@ -483,11 +483,13 @@ export const authApi = {
   },
 
   async searchUsers(params: {
+    searchQuery?: string;
     email?: string;
     firstName?: string;
     lastName?: string;
     phoneNumber?: string;
     role?: 'customer' | 'vendor' | 'admin' | 'super-admin';
+    isActive?: boolean | string;
     page?: number;
     limit?: number;
     sortBy?: 'createdAt' | 'updatedAt';
@@ -1234,3 +1236,323 @@ export const cartApi = {
     }
   },
 };
+
+// ─── Order & Payment API Types ───────────────────────────────────────────────
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productSku?: string;
+  productImage?: string;
+  unitPrice: { amount: number; currency: string; formatted?: string };
+  quantity: number;
+  subtotal: { amount: number; currency: string; formatted?: string };
+}
+
+export interface OrderData {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  items: OrderItem[];
+  itemCount: number;
+  shippingAddress: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phoneNumber: string;
+    formatted?: string;
+  };
+  subtotal: { amount: number; currency: string; formatted?: string };
+  shippingCost: { amount: number; currency: string; formatted?: string };
+  taxAmount: { amount: number; currency: string; formatted?: string };
+  discountAmount?: { amount: number; currency: string; formatted?: string };
+  totalAmount: { amount: number; currency: string; formatted?: string };
+  status: string;
+  paymentMethod?: string;
+  paymentStatus: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderSearchResponse {
+  data: OrderData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface TaxRuleData {
+  id: string;
+  country: string;
+  region: string | null;
+  ratePercentage: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcessPaymentData {
+  order: OrderData;
+  payment?: {
+    paymentUrl: string;
+    accessCode?: string;
+    paymentReference: string;
+  };
+  checkoutUrl?: string;
+}
+
+export const orderApi = {
+  async processPayment(
+    orderId: string,
+    paymentMethod: 'paystack' | 'flutterwave' | 'mock',
+    paymentIntentId?: string
+  ): Promise<ApiResponse<ProcessPaymentData>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<ProcessPaymentData>>(
+        `/orders/${orderId}/payment`,
+        { paymentMethod, paymentIntentId }
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getOrder(orderId: string): Promise<ApiResponse<OrderData>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<OrderData>>(`/orders/${orderId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getOrderByNumber(orderNumber: string): Promise<ApiResponse<OrderData>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<OrderData>>(`/orders/number/${orderNumber}`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getMyOrders(params: { page?: number; limit?: number } = {}): Promise<ApiResponse<OrderSearchResponse>> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.set('page', String(params.page));
+      if (params.limit) queryParams.set('limit', String(params.limit));
+      const response = await axiosInstance.get<ApiResponse<OrderSearchResponse>>(
+        `/orders/my-orders?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async searchOrders(params: {
+    searchQuery?: string;
+    status?: string;
+    refundStatus?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}): Promise<ApiResponse<OrderSearchResponse>> {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '' && value !== 'All') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<OrderSearchResponse>>(
+        `/orders/search?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getOrderStatistics(): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/orders/statistics');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async updateOrderStatus(orderId: string, status: string, reason?: string): Promise<ApiResponse<OrderData>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<OrderData>>(`/orders/${orderId}/status`, {
+        status,
+        reason,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async cancelOrder(orderId: string, reason: string): Promise<ApiResponse<OrderData>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<OrderData>>(`/orders/${orderId}/cancel`, {
+        reason,
+      });
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const taxRuleApi = {
+  async getTaxRules(): Promise<ApiResponse<TaxRuleData[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<TaxRuleData[]>>('/tax-rules');
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async createTaxRule(data: {
+    country: string;
+    region?: string | null;
+    ratePercentage: number;
+  }): Promise<ApiResponse<TaxRuleData>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<TaxRuleData>>('/tax-rules', data);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async updateTaxRule(
+    id: string,
+    data: {
+      ratePercentage?: number;
+      isActive?: boolean;
+    }
+  ): Promise<ApiResponse<TaxRuleData>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<TaxRuleData>>(`/tax-rules/${id}`, data);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteTaxRule(id: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/tax-rules/${id}`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+};
+
+// ─── Public Store API ──────────────────────────────────────────────────────────
+
+export interface PublicStoreProfile {
+  id: string;
+  storeName: string;
+  storeSlug: string;
+  storeDescription?: string | null;
+  storeLogoUrl?: string | null;
+  storeBannerUrl?: string | null;
+  storePhone?: string | null;
+  storeEmail?: string | null;
+  vendorType?: string | null;
+  trustLevel?: string | null;
+  averageRating?: number | null;
+  isVacationMode?: boolean;
+  vacationMessage?: string | null;
+  returnPolicy?: string | null;
+  shippingPolicy?: string | null;
+  socialLinks?: Record<string, string> | null;
+  approvedAt?: string | null;
+}
+
+export const storeApi = {
+  async getStoreProfile(storeSlugOrId: string): Promise<ApiResponse<PublicStoreProfile>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<PublicStoreProfile>>(`/stores/${storeSlugOrId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreProducts(storeSlugOrId: string, params: {
+    categoryId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    search?: string;
+    sort?: 'newest' | 'price_asc' | 'price_desc' | 'popular';
+    page?: number;
+    limit?: number;
+  } = {}): Promise<ApiResponse<any>> {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && (value as any) !== '') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlugOrId}/products?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreReviews(storeSlugOrId: string, params: {
+    rating?: number;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<ApiResponse<any>> {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && (value as any) !== '') {
+          queryParams.set(key, String(value));
+        }
+      });
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlugOrId}/reviews?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+
+  async getStoreShipping(storeSlugOrId: string, state: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/stores/${storeSlugOrId}/shipping?state=${encodeURIComponent(state)}`
+      );
+      return response.data;
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  },
+};
+
+

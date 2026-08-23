@@ -31,6 +31,7 @@ import {
   WarrantyPeriod,
   authApi,
   categoryApi,
+  orderApi,
   productApi,
   uploadImages,
 } from '@/lib/api';
@@ -673,23 +674,12 @@ export default function AdminPage() {
   const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
-  const [orders] = useState<AdminOrder[]>([
-    { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing', paymentStatus: 'Paid' },
-    { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing', paymentStatus: 'Pending' },
-    { id: '#CM9812', user: { name: 'Orlando Diggs', avatar: 'https://i.pravatar.cc/150?u=orlandodiggs' }, items: '1 item', total: 1200000, address: 'Washburn Baton Rouge', date: 'Apr 24, 2026 • 02:00 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9811', user: { name: 'Andi Lane', avatar: 'https://i.pravatar.cc/150?u=andilane' }, items: '4 items', total: 65000, address: 'Nest Lane Olivette', date: 'Apr 24, 2026 • 11:45 AM', status: 'Cancelled', paymentStatus: 'Failed' },
-    { id: '#CM9810', user: { name: 'Lori Daniels', avatar: 'https://i.pravatar.cc/150?u=loridaniels' }, items: '1 item', total: 32000, address: 'Pin Oak Drive, NY', date: 'Apr 23, 2026 • 05:30 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9809', user: { name: 'Rene Wells', avatar: 'https://i.pravatar.cc/150?u=renewells' }, items: '2 items', total: 210000, address: 'Broad St, Atlanta', date: 'Apr 23, 2026 • 01:15 PM', status: 'Ongoing', paymentStatus: 'Refunded' },
-    { id: '#CM9808', user: { name: 'Tom Hardy', avatar: 'https://i.pravatar.cc/150?u=tomhardy' }, items: '5 items', total: 450000, address: 'Main St, Boston', date: 'Apr 22, 2026 • 10:05 AM', status: 'Returned', paymentStatus: 'Paid' },
-    { id: '#CM9807', user: { name: 'Sarah Connor', avatar: 'https://i.pravatar.cc/150?u=sarahconnor' }, items: '1 item', total: 180000, address: 'Tech Park, Seattle', date: 'Apr 21, 2026 • 03:45 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9806', user: { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?u=johnsmith' }, items: '2 items', total: 55000, address: 'Library Ave, Austin', date: 'Apr 20, 2026 • 09:20 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9805', user: { name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?u=emilyclark' }, items: '1 item', total: 290000, address: 'Home Blvd, Chicago', date: 'Apr 19, 2026 • 02:10 PM', status: 'Cancelled', paymentStatus: 'Failed' },
-    { id: '#CM9804', user: { name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?u=michaellee' }, items: '3 items', total: 155000, address: 'Fitness Way, Miami', date: 'Apr 18, 2026 • 11:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
-    { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
-  ]);
+  // Orders state - live from API
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [ordersTotalPages, setOrdersTotalPages] = useState(1);
+  const [ordersTotal, setOrdersTotal] = useState(0);
 
   // User States
   const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
@@ -1017,28 +1007,6 @@ export default function AdminPage() {
       setUsersLoadError('');
 
       try {
-        let emailParam: string | undefined;
-        let phoneParam: string | undefined;
-        let firstParam: string | undefined;
-        let lastParam: string | undefined;
-
-        if (searchQuery) {
-          const trimmed = searchQuery.trim();
-          if (trimmed.includes('@')) {
-            emailParam = trimmed;
-          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
-            phoneParam = trimmed;
-          } else {
-            const parts = trimmed.split(/\s+/);
-            if (parts.length > 1) {
-              firstParam = parts[0];
-              lastParam = parts.slice(1).join(' ');
-            } else {
-              firstParam = trimmed;
-            }
-          }
-        }
-
         const [field, dir] = usersSortBy.split('-');
         const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
         const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
@@ -1047,10 +1015,7 @@ export default function AdminPage() {
           page: usersPage,
           limit: usersLimit,
           role: 'customer',
-          email: emailParam,
-          firstName: firstParam,
-          lastName: lastParam,
-          phoneNumber: phoneParam,
+          searchQuery: searchQuery.trim() || undefined,
           sortBy: sortField as any,
           sortOrder: sortOrder as any,
         });
@@ -1083,6 +1048,64 @@ export default function AdminPage() {
   useEffect(() => {
     setUsersPage(1);
   }, [searchQuery, usersSortBy]);
+
+  // Orders fetching effect
+  useEffect(() => {
+    if (isCheckingAuth || !hasAdminRole || activeTab !== 'orders') return;
+    let isMounted = true;
+
+    const loadOrders = async () => {
+      setIsLoadingOrders(true);
+      try {
+        const res = await orderApi.searchOrders({
+          searchQuery: searchQuery.trim() || undefined,
+          page: ordersPage,
+          limit: 15,
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
+        });
+        if (!isMounted) return;
+        if (res?.success && res.data) {
+          const data = (res.data as any).data || res.data;
+          const apiOrders = Array.isArray(data) ? data : [];
+          // Normalize backend OrderData to table-compatible shape
+          const normalized = apiOrders.map((o: any) => ({
+            ...o,
+            id: o.orderNumber || o.id,
+            user: {
+              name: o.shippingAddress?.fullName || 'Customer',
+              avatar: '',
+            },
+            items: `${o.itemCount ?? (Array.isArray(o.items) ? o.items.length : 1)} item(s)`,
+            total: typeof o.totalAmount === 'object' ? o.totalAmount.amount : (Number(o.totalAmount) || Number(o.total) || 0),
+            address: o.shippingAddress?.formatted || [o.shippingAddress?.city, o.shippingAddress?.state].filter(Boolean).join(', ') || 'N/A',
+            date: o.createdAt ? new Date(o.createdAt).toLocaleString() : '',
+            status: o.status || 'PENDING_PAYMENT',
+            paymentStatus: o.paymentStatus || 'Pending',
+          }));
+          setOrders(normalized);
+          const pagination = (res.data as any);
+          setOrdersTotal(pagination.total || normalized.length);
+          setOrdersTotalPages(pagination.totalPages || 1);
+        }
+      } catch (err) {
+        console.error('Failed to fetch orders', err);
+        if (isMounted) setOrders([]);
+      } finally {
+        if (isMounted) setIsLoadingOrders(false);
+      }
+    };
+
+    loadOrders();
+
+    return () => { isMounted = false; };
+  }, [isCheckingAuth, hasAdminRole, activeTab, ordersPage, searchQuery]);
+
+  useEffect(() => {
+    if (activeTab === 'orders') {
+      setOrdersPage(1);
+    }
+  }, [searchQuery, activeTab]);
 
 
   // Subcategory filter loader
@@ -1537,7 +1560,17 @@ export default function AdminPage() {
               <VendorManagementView isSuperAdmin={false} currentUserId={currentUserId} globalSearchQuery={searchQuery} />
             )}
             {activeTab === 'orders' && (
-              <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+              <>
+                {isLoadingOrders && (
+                  <div className="text-center py-10 text-gray-500 text-sm font-medium">Loading orders...</div>
+                )}
+                {!isLoadingOrders && (
+                  <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
+                )}
+                {!isLoadingOrders && orders.length === 0 && (
+                  <div className="text-center py-10 text-gray-400 text-sm">No orders found.</div>
+                )}
+              </>
             )}
           </>
         )}
@@ -1583,6 +1616,7 @@ export default function AdminPage() {
           isOpen={isModalOpen && activeTab === 'orders'}
           onClose={() => setIsModalOpen(false)}
           order={editingItem}
+          onStatusUpdated={() => setOrdersPage(p => p)}
         />
       </main>
     </div>
