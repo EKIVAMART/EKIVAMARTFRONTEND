@@ -364,6 +364,14 @@ export default function CartPage() {
 
           {/* Action buttons */}
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/orders"
+              className="px-4 py-2 bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 font-bold rounded-xl transition text-sm flex items-center gap-2 shadow-sm"
+            >
+              <Package size={16} />
+              View Orders
+            </Link>
+
             {selectedCount > 1 && activeTab === 'active' && (
               <button
                 onClick={() => setShowClearSelectedModal(true)}

@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'tax') => void;
+  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -111,10 +111,16 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             onClick={() => setActiveTab('users')}
           />
           <SidebarLink
+            icon={<Clock size={20} />}
+            label="Waitlist"
+            active={activeTab === 'waitlist'}
+            onClick={() => setActiveTab('waitlist')}
+          />
+          <SidebarLink
             icon={<Percent size={20} />}
             label="Tax & Compliance"
-            active={activeTab === 'tax'}
-            onClick={() => setActiveTab('tax')}
+            active={activeTab === 'taxes'}
+            onClick={() => setActiveTab('taxes')}
           />
         </nav>
         <div className="p-6 border-t mt-auto">

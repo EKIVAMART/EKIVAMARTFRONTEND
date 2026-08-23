@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import Sidebar from '@/components/super-admin/Sidebar';
 import DashboardView from '@/components/super-admin/DashboardView';
 import ActionModal, {
@@ -23,7 +23,7 @@ import ViewAdminModal from '@/components/super-admin/ViewAdminModal';
 import UserTable, { AppUser } from '@/components/super-admin/UserTable';
 import ViewUserModal from '@/components/super-admin/ViewUserModal';
 import WaitlistView from '@/components/admin/WaitlistView';
-import TaxRulesView from '@/components/super-admin/TaxRulesView';
+import TaxRulesManagement from '@/components/admin/TaxRulesManagement';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -35,10 +35,11 @@ import {
   WarrantyPeriod,
   authApi,
   categoryApi,
-  orderApi,
+  ordersApi,
   productApi,
   uploadImages,
 } from '@/lib/api';
+import { adminVendorApi } from '@/lib/api-vendor';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import type { RootState } from '@/lib/store';
 import { setUser } from '@/lib/features/auth/authSlice';
@@ -571,7 +572,6 @@ const buildProductPayload = (
     : resolveCategoryId(formData.categoryId, categoryOptions);
 
   const payload: CreateProductDto = {
-    vendorId: formData.vendorId,
     categoryId: resolvedCategoryId,
     name: formData.name,
     preview: formData.preview,
@@ -586,6 +586,10 @@ const buildProductPayload = (
       lga: formData.location?.lga || '',
     },
   };
+
+  if (formData.vendorProfileId) {
+    payload.vendorProfileId = formData.vendorProfileId;
+  }
 
   if (formData.brand) payload.brand = formData.brand;
   if (formData.sku) payload.sku = formData.sku;
@@ -659,7 +663,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'tax'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -684,6 +688,8 @@ export default function AdminPage() {
   const [filterCategoryId, setFilterCategoryId] = useState('all');
   const [filterSubcategoryId, setFilterSubcategoryId] = useState('all');
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
+  const [filterVendorId, setFilterVendorId] = useState('all');
+  const [filterVendors, setFilterVendors] = useState<Array<{ value: string; label: string; vendorProfileId?: string; vendorId?: string }>>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
   const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin', 'SUPER_ADMIN'];
@@ -720,18 +726,31 @@ export default function AdminPage() {
   const [usersAuthFilter, setUsersAuthFilter] = useState('All');
   const [usersDateFrom, setUsersDateFrom] = useState('');
   const [usersDateTo, setUsersDateTo] = useState('');
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+  const [ordersLoadError, setOrdersLoadError] = useState('');
 
   // Initialize products as empty array (will be populated from API)
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [vendors, setVendors] = useState<AdminVendor[]>([
     { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
   ]);
-  // Orders state - live from API
-  const [orders, setOrders] = useState<any[]>([]);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
-  const [ordersPage, setOrdersPage] = useState(1);
-  const [ordersTotalPages, setOrdersTotalPages] = useState(1);
-  const [ordersTotal, setOrdersTotal] = useState(0);
+  const [orders, setOrders] = useState<AdminOrder[]>([
+    { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing', paymentStatus: 'Paid' },
+    { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing', paymentStatus: 'Pending' },
+    { id: '#CM9812', user: { name: 'Orlando Diggs', avatar: 'https://i.pravatar.cc/150?u=orlandodiggs' }, items: '1 item', total: 1200000, address: 'Washburn Baton Rouge', date: 'Apr 24, 2026 • 02:00 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9811', user: { name: 'Andi Lane', avatar: 'https://i.pravatar.cc/150?u=andilane' }, items: '4 items', total: 65000, address: 'Nest Lane Olivette', date: 'Apr 24, 2026 • 11:45 AM', status: 'Cancelled', paymentStatus: 'Failed' },
+    { id: '#CM9810', user: { name: 'Lori Daniels', avatar: 'https://i.pravatar.cc/150?u=loridaniels' }, items: '1 item', total: 32000, address: 'Pin Oak Drive, NY', date: 'Apr 23, 2026 • 05:30 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9809', user: { name: 'Rene Wells', avatar: 'https://i.pravatar.cc/150?u=renewells' }, items: '2 items', total: 210000, address: 'Broad St, Atlanta', date: 'Apr 23, 2026 • 01:15 PM', status: 'Ongoing', paymentStatus: 'Refunded' },
+    { id: '#CM9808', user: { name: 'Tom Hardy', avatar: 'https://i.pravatar.cc/150?u=tomhardy' }, items: '5 items', total: 450000, address: 'Main St, Boston', date: 'Apr 22, 2026 • 10:05 AM', status: 'Returned', paymentStatus: 'Paid' },
+    { id: '#CM9807', user: { name: 'Sarah Connor', avatar: 'https://i.pravatar.cc/150?u=sarahconnor' }, items: '1 item', total: 180000, address: 'Tech Park, Seattle', date: 'Apr 21, 2026 • 03:45 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9806', user: { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?u=johnsmith' }, items: '2 items', total: 55000, address: 'Library Ave, Austin', date: 'Apr 20, 2026 • 09:20 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9805', user: { name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?u=emilyclark' }, items: '1 item', total: 290000, address: 'Home Blvd, Chicago', date: 'Apr 19, 2026 • 02:10 PM', status: 'Cancelled', paymentStatus: 'Failed' },
+    { id: '#CM9804', user: { name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?u=michaellee' }, items: '3 items', total: 155000, address: 'Fitness Way, Miami', date: 'Apr 18, 2026 • 11:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
+    { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
+    { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
+  ]);
 
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
@@ -903,16 +922,66 @@ export default function AdminPage() {
     };
   }, [isCheckingAuth, hasSuperAdminRole]);
 
+  // Fetch vendor list for the filter dropdown
+  useEffect(() => {
+    if (isCheckingAuth || !hasSuperAdminRole) return;
+    let isMounted = true;
+    const fetchVendors = async () => {
+      try {
+        const stores = await productApi.getStores();
+        const mappedStores = (Array.isArray(stores) ? stores : [])
+          .filter((store: any) => store?.storeName || store?.storeSlug || store?.id)
+          .map((store: any) => ({
+            value: store.vendorProfileId || store.vendorId || store.id || '',
+            label: store.storeName || store.storeSlug || 'Unnamed Store',
+            vendorProfileId: store.vendorProfileId || '',
+            vendorId: store.vendorId || store.userId || store.vendorProfileId || store.id || '',
+          }))
+          .filter((store) => Boolean(store.value));
+
+        if (isMounted && mappedStores.length > 0) {
+          setFilterVendors(mappedStores);
+          return;
+        }
+
+        const response = await adminVendorApi.listVendors({ status: 'approved', limit: 200 });
+        const vendors = response?.data?.vendors || [];
+        if (isMounted) {
+          setFilterVendors(
+            vendors
+              .filter((v: any) => v.storeName || v.userId || v.vendorProfileId || v.vendorId)
+              .map((v: any) => ({
+                value: v.vendorProfileId || v.vendorId || v.userId || '',
+                label: v.storeName || 'Unnamed Store',
+                vendorProfileId: v.vendorProfileId || '',
+                vendorId: v.vendorId || v.userId || '',
+              }))
+              .filter((option) => Boolean(option.value))
+          );
+        }
+      } catch {
+        if (isMounted) setFilterVendors([]);
+      }
+    };
+    void fetchVendors();
+    return () => { isMounted = false; };
+  }, [isCheckingAuth, hasSuperAdminRole]);
+
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
     setProductLoadError('');
 
     try {
+      const selectedVendor = filterVendors.find((vendor) => vendor.value === filterVendorId);
+      const vendorProfileId = filterVendorId !== 'all' ? selectedVendor?.vendorProfileId : undefined;
+      const vendorId = filterVendorId !== 'all' ? selectedVendor?.vendorId : undefined;
       const response = await productApi.getAllProducts({
         page: productPage,
         limit: PRODUCT_PAGE_LIMIT,
         searchQuery: searchQuery || undefined,
         categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
+        ...(vendorProfileId ? { vendorProfileId } : {}),
+        ...(vendorId ? { vendorId } : {}),
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
@@ -947,11 +1016,16 @@ export default function AdminPage() {
       setProductLoadError('');
 
       try {
+        const selectedVendor = filterVendors.find((vendor) => vendor.value === filterVendorId);
+        const vendorProfileId = filterVendorId !== 'all' ? selectedVendor?.vendorProfileId : undefined;
+        const vendorId = filterVendorId !== 'all' ? selectedVendor?.vendorId : undefined;
         const response = await productApi.getAllProducts({
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
           categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
+          ...(vendorProfileId ? { vendorProfileId } : {}),
+          ...(vendorId ? { vendorId } : {}),
           sortBy: 'createdAt',
           sortOrder: 'desc',
         });
@@ -986,7 +1060,151 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
+  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId, filterVendorId]);
+
+  const resolveAmount = (value: any): number => {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value))) return Number(value);
+    if (typeof value === 'object' && value !== null) {
+      return resolveAmount(value.amount ?? value.total ?? value.value ?? value.grandTotal ?? value.orderTotal);
+    }
+    return 0;
+  };
+
+  const mapOrderToRow = (order: any, customerUsers: AppUser[] = users) => {
+    const customerId =
+      order.customer?.id ||
+      order.customer?.uuid ||
+      order.customer?.customerId ||
+      order.customer?.customerUuid ||
+      order.customerId ||
+      order.customerUuid ||
+      order.user?.id ||
+      order.user?.uuid ||
+      order.userId ||
+      order.userUuid ||
+      order.customer_uuid ||
+      order.customerUuid ||
+      '';
+
+    const fallbackCustomerName =
+      order.customer?.name ||
+      order.customerName ||
+      [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ') ||
+      order.user?.name ||
+      'Customer';
+
+    const matchingCustomer = customerUsers.find((user) => {
+      const userIds = [user.id, (user as any).uuid, (user as any)._id, (user as any).customerId, (user as any).customerUuid].filter(Boolean);
+      return userIds.some((candidate) => String(candidate).toLowerCase() === String(customerId).toLowerCase());
+    });
+
+    const customerName = matchingCustomer
+      ? [matchingCustomer.firstName, matchingCustomer.lastName].filter(Boolean).join(' ') || matchingCustomer.fullName || matchingCustomer.email || fallbackCustomerName
+      : fallbackCustomerName;
+
+    const getOrderStatus = (status: any) => {
+      if (!status) return 'Ongoing';
+      const normalized = String(status).toLowerCase();
+      if (normalized.includes('delivered')) return 'Delivered';
+      if (normalized.includes('cancel') || normalized.includes('cancelled')) return 'Cancelled';
+      if (normalized.includes('return') || normalized.includes('refunded')) return 'Returned';
+      return 'Ongoing';
+    };
+
+    const getPaymentStatus = (status: any) => {
+      if (!status) return 'Pending';
+      const normalized = String(status).toLowerCase();
+      if (normalized.includes('paid') || normalized.includes('success') || normalized.includes('completed')) return 'Paid';
+      if (normalized.includes('refund')) return 'Refunded';
+      if (normalized.includes('fail') || normalized.includes('failed')) return 'Failed';
+      return 'Pending';
+    };
+
+    const itemCount = Array.isArray(order.items)
+      ? order.items.length
+      : order.itemCount ?? order.totalItems ?? order.items?.length ?? 0;
+
+    const address =
+      order.shippingAddress?.addressLine1 ||
+      order.shippingAddress?.address ||
+      order.deliveryAddress ||
+      order.address ||
+      '';
+
+    return {
+      id: String(order.orderNumber || order.id || order._id || ''),
+      orderNumber: String(order.orderNumber || order.id || order._id || ''),
+      orderId: String(order.id || order._id || ''),
+      user: {
+        name: customerName,
+        avatar: order.customer?.avatar || order.customer?.profilePicture || order.user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(customerName),
+      },
+      items: `${itemCount} item${itemCount === 1 ? '' : 's'}`,
+      total: resolveAmount(order.totalAmount ?? order.total ?? order.grandTotal ?? order.amount ?? order.orderTotal ?? 0),
+      address,
+      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : String(order.date || ''),
+      status: getOrderStatus(order.status || order.paymentStatus),
+      paymentStatus: getPaymentStatus(order.paymentStatus || order.status),
+    };
+  };
+
+  const loadOrders = useCallback(async (signal: { current: boolean }) => {
+    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'orders' || !signal.current) return;
+    setIsLoadingOrders(true);
+    setOrdersLoadError('');
+
+    try {
+      const customerUsersResponse = users.length
+        ? { data: users }
+        : await authApi.searchUsers({ page: 1, limit: 100 });
+      const customerUsersPayload = (customerUsersResponse as any)?.data ?? customerUsersResponse;
+      const customerUserList = Array.isArray(customerUsersPayload?.users)
+        ? customerUsersPayload.users
+        : Array.isArray(customerUsersPayload?.data)
+          ? customerUsersPayload.data
+          : Array.isArray(customerUsersPayload)
+            ? customerUsersPayload
+            : [];
+      const resolvedCustomerUsers = customerUserList.map((user: any) => ({
+        ...user,
+        id: String(user.id || user._id || ''),
+        firstName: user.firstName || user.first_name || '',
+        lastName: user.lastName || user.last_name || '',
+        fullName: user.fullName || user.full_name || [user.firstName, user.lastName].filter(Boolean).join(' '),
+      })) as AppUser[];
+
+      const response = await ordersApi.search({
+        page: 1,
+        limit: 50,
+        searchQuery: searchQuery || undefined,
+      });
+
+      const payload = (response as any)?.data ?? response;
+      const list = Array.isArray(payload?.orders)
+        ? payload.orders
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : [];
+
+      if (!signal.current) return;
+      setOrders(list.map((order: any) => mapOrderToRow(order, resolvedCustomerUsers)));
+    } catch (error) {
+      if (!signal.current) return;
+      setOrders([]);
+      setOrdersLoadError(getApiErrorMessage(error) || 'Could not load orders. Please try again.');
+    } finally {
+      if (signal.current) setIsLoadingOrders(false);
+    }
+  }, [activeTab, hasSuperAdminRole, isCheckingAuth, searchQuery, users]);
+
+  useEffect(() => {
+    const signal = { current: true };
+    void loadOrders(signal);
+    return () => { signal.current = false; };
+  }, [loadOrders]);
 
   const fetchUsers = async () => {
     try {
@@ -1131,6 +1349,10 @@ export default function AdminPage() {
           limit: usersLimit,
           searchQuery: searchQuery.trim() || undefined,
           isActive: isActiveFilter,
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
           sortBy: sortField as any,
           sortOrder: sortOrder as any,
         });
@@ -1179,11 +1401,36 @@ export default function AdminPage() {
       setAdminsLoadError('');
 
       try {
+        let emailParam: string | undefined;
+        let phoneParam: string | undefined;
+        let firstParam: string | undefined;
+        let lastParam: string | undefined;
+
+        if (searchQuery) {
+          const trimmed = searchQuery.trim();
+          if (trimmed.includes('@')) {
+            emailParam = trimmed;
+          } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
+            phoneParam = trimmed;
+          } else {
+            const parts = trimmed.split(/\s+/);
+            if (parts.length > 1) {
+              firstParam = parts[0];
+              lastParam = parts.slice(1).join(' ');
+            } else {
+              firstParam = trimmed;
+            }
+          }
+        }
+
         const response = await authApi.searchUsers({
           page: adminsPage,
           limit: adminsLimit,
           role: 'admin',
-          searchQuery: searchQuery.trim() || undefined,
+          email: emailParam,
+          firstName: firstParam,
+          lastName: lastParam,
+          phoneNumber: phoneParam,
           sortBy: 'createdAt',
           sortOrder: adminsSortOrder,
         });
@@ -1221,64 +1468,6 @@ export default function AdminPage() {
   useEffect(() => {
     setAdminsPage(1);
   }, [searchQuery, adminsSortOrder]);
-
-  // Orders fetching effect
-  useEffect(() => {
-    if (isCheckingAuth || !hasSuperAdminRole || activeTab !== 'orders') return;
-    let isMounted = true;
-
-    const loadOrders = async () => {
-      setIsLoadingOrders(true);
-      try {
-        const res = await orderApi.searchOrders({
-          searchQuery: searchQuery.trim() || undefined,
-          page: ordersPage,
-          limit: 15,
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
-        });
-        if (!isMounted) return;
-        if (res?.success && res.data) {
-          const data = (res.data as any).data || res.data;
-          const apiOrders = Array.isArray(data) ? data : [];
-          // Normalize backend OrderData to table-compatible shape
-          const normalized = apiOrders.map((o: any) => ({
-            ...o,
-            id: o.orderNumber || o.id,
-            user: {
-              name: o.shippingAddress?.fullName || 'Customer',
-              avatar: '',
-            },
-            items: `${o.itemCount ?? (Array.isArray(o.items) ? o.items.length : 1)} item(s)`,
-            total: typeof o.totalAmount === 'object' ? o.totalAmount.amount : (Number(o.totalAmount) || Number(o.total) || 0),
-            address: o.shippingAddress?.formatted || [o.shippingAddress?.city, o.shippingAddress?.state].filter(Boolean).join(', ') || 'N/A',
-            date: o.createdAt ? new Date(o.createdAt).toLocaleString() : '',
-            status: o.status || 'PENDING_PAYMENT',
-            paymentStatus: o.paymentStatus || 'Pending',
-          }));
-          setOrders(normalized);
-          const pagination = (res.data as any);
-          setOrdersTotal(pagination.total || normalized.length);
-          setOrdersTotalPages(pagination.totalPages || 1);
-        }
-      } catch (err) {
-        console.error('Failed to fetch orders', err);
-        if (isMounted) setOrders([]);
-      } finally {
-        if (isMounted) setIsLoadingOrders(false);
-      }
-    };
-
-    loadOrders();
-
-    return () => { isMounted = false; };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, ordersPage, searchQuery]);
-
-  useEffect(() => {
-    if (activeTab === 'orders') {
-      setOrdersPage(1);
-    }
-  }, [searchQuery, activeTab]);
 
   useEffect(() => {
     if (isCheckingAuth || !hasSuperAdminRole) return;
@@ -1319,11 +1508,11 @@ export default function AdminPage() {
     try {
       const productFormData = {
         ...formData,
-        vendorId: formData.vendorId || currentUserId,
+        vendorProfileId: formData.vendorProfileId || formData.vendorId,
       };
 
-      if (!productFormData.vendorId) {
-        const message = 'Could not determine the current user ID for vendorId. Please sign in again.';
+      if (!productFormData.vendorProfileId) {
+        const message = 'Please select a store/vendor for this product.';
         setProductLoadError(message);
         throw new Error(message);
       }
@@ -1749,8 +1938,6 @@ export default function AdminPage() {
           <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
         ) : activeTab === 'waitlist' ? (
           <WaitlistView />
-        ) : activeTab === 'tax' ? (
-          <TaxRulesView />
         ) : activeTab === 'users' ? (
           <>
             <header className="flex justify-between items-center mb-8">
@@ -1918,6 +2105,20 @@ export default function AdminPage() {
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
+
+                <select
+                  value={filterVendorId}
+                  onChange={(e) => {
+                    setFilterVendorId(e.target.value);
+                    setProductPage(1);
+                  }}
+                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1"
+                >
+                  <option value="all">All Vendors</option>
+                  {filterVendors.map((vendor) => (
+                    <option key={vendor.value} value={vendor.value}>{vendor.label}</option>
+                  ))}
+                </select>
               </div>
             )}
 
@@ -1934,7 +2135,10 @@ export default function AdminPage() {
                 <ProductTable
                   data={resolvedProducts}
                   onEdit={openProductModal}
-                  onView={openProductModal}
+                  onView={(item) => openViewModal({
+                    ...item,
+                    image: typeof item.image === 'string' ? item.image : item.image.src,
+                  } as AdminProduct)}
                   onDelete={handleDeleteProduct}
                   onPublish={handlePublishClick}
                   publishingProductId={publishingProductId}
@@ -1944,6 +2148,7 @@ export default function AdminPage() {
                   itemsPerPage={productLimit}
                   onPageChange={setProductPage}
                   isLoading={isLoadingProducts}
+                  showReviewRepliesButton
                 />
               </div>
             )}
@@ -1951,17 +2156,23 @@ export default function AdminPage() {
               <VendorManagementView isSuperAdmin={true} currentUserId={currentUserId} globalSearchQuery={searchQuery} />
             )}
             {activeTab === 'orders' && (
-              <>
-                {isLoadingOrders && (
-                  <div className="text-center py-10 text-gray-500 text-sm font-medium">Loading orders...</div>
+              <div className="space-y-4">
+                {ordersLoadError && (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                    {ordersLoadError}
+                  </div>
                 )}
-                {!isLoadingOrders && (
+                {isLoadingOrders ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                  </div>
+                ) : (
                   <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
                 )}
-                {!isLoadingOrders && orders.length === 0 && (
-                  <div className="text-center py-10 text-gray-400 text-sm">No orders found.</div>
-                )}
-              </>
+              </div>
+            )}
+            {activeTab === 'taxes' && (
+              <TaxRulesManagement />
             )}
           </>
         )}
@@ -2001,7 +2212,10 @@ export default function AdminPage() {
           isOpen={isModalOpen && activeTab === 'orders'}
           onClose={() => setIsModalOpen(false)}
           order={editingItem}
-          onStatusUpdated={() => setOrdersPage(p => p)}
+          onOrderUpdated={() => {
+            const signal = { current: true };
+            void loadOrders(signal);
+          }}
         />
 
         <InviteAdminModal

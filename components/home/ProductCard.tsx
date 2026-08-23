@@ -40,8 +40,7 @@ export interface LandingProduct {
   reviewCount: number;
   location: string;
   vendor: string;
-  /** Optional: ID used to link to /vendor/[vendorId] */
-  vendorId?: string;
+  storeName: string;
   href?: string;
 }
 
@@ -171,19 +170,9 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       <div className="mb-2.5 flex items-start gap-1.1 text-[11px] text-neutral-500">
         <Image src="/icons/location.png" alt="" width={14} height={14} className="shrink-0 mt-px" />
         <span className="flex-1 break-words">{product.location}</span>
-        {product.vendorId ? (
-          <Link
-            href={`/vendor/${product.vendorId}`}
-            onClick={(e) => e.stopPropagation()}
-            className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%] hover:bg-purple-200 transition-colors"
-          >
-            {product.vendor}
-          </Link>
-        ) : (
-          <span className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%]">
-            {product.vendor}
-          </span>
-        )}
+        <span className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%]">
+          {product.storeName || product.vendor}
+        </span>
       </div>
 
       {/* Add to Cart Button */}

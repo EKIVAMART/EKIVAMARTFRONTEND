@@ -15,8 +15,8 @@ type ProductCardProps = {
   title: string;
   rating?: number;
   author?: string;
-  /** Optional: ID used to link to /vendor/[vendorId] */
-  vendorId?: string;
+  storeName: string;
+  storeSlug: string;
   price: number | { amount: number; currency?: string };
   originalPrice?: number | { amount: number; currency?: string };
   currency?: string;
@@ -31,14 +31,16 @@ export default function ProductCard({
   subcategory,
   title,
   rating = 4.2,
-  author = 'Tazo',
-  vendorId,
+  author,
+  storeName,
+  storeSlug,
   price,
   originalPrice,
   currency = '₦',
   href = '#',
   location = 'Lagos',
 }: ProductCardProps) {
+  const sellerName = storeName || author || 'Faflora Store';
   const locationStr = typeof location === 'object' && location !== null
     ? [location.town, location.lga, location.state].filter(Boolean).join(', ') || 'Lagos'
     : (location || 'Lagos');
@@ -64,19 +66,21 @@ export default function ProductCard({
     : 0;
 
   return (
-    <a className="pc-card" href={href}>
-      <div className="pc-image-wrap">
-        <div className="pc-image-inner">
-          <Image
-            src={image}
-            alt={title}
-            className="pc-image"
-            width={260}
-            height={260}
-            style={{ objectFit: 'contain' }}
-          />
+    <div className="pc-card">
+      <Link href={href} className="pc-card-link-wrapper block">
+        <div className="pc-image-wrap">
+          <div className="pc-image-inner">
+            <Image
+              src={image}
+              alt={title}
+              className="pc-image"
+              width={260}
+              height={260}
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
         </div>
-      </div>
+      </Link>
 
       <div className="pc-body">
         {(category || subcategory) && (
@@ -86,7 +90,7 @@ export default function ProductCard({
         )}
 
         <h3 className="pc-title" title={title}>
-          {title}
+          <Link href={href} className="hover:text-[#9d4ae3] transition-colors">{title}</Link>
         </h3>
 
         <div className="pc-rating-row">
@@ -136,16 +140,12 @@ export default function ProductCard({
 
         <div className="pc-author-section">
           <span className="pc-seller-badge">Sold by</span>
-          {vendorId ? (
-            <Link
-              href={`/vendor/${vendorId}`}
-              onClick={(e) => e.stopPropagation()}
-              className="pc-author hover:underline"
-            >
-              {author}
+          {storeSlug ? (
+            <Link href={`/stores/${storeSlug}`} className="pc-author hover:underline font-bold text-[#9d4ae3]">
+              {sellerName}
             </Link>
           ) : (
-            <span className="pc-author">{author}</span>
+            <span className="pc-author font-bold text-[#9d4ae3]">{sellerName}</span>
           )}
         </div>
 
@@ -652,6 +652,6 @@ export default function ProductCard({
           }
         }
       `}</style>
-    </a>
+    </div>
   );
 }

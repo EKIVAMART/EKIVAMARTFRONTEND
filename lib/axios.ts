@@ -20,9 +20,13 @@ export const axiosInstance = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - Add auth token to requests
 axiosInstance.interceptors.request.use(
   (config: any) => {
+    if (config.skipAuth || config.headers?.skipAuth || config.headers?.noAuth) {
+      if (config.headers?.skipAuth) delete config.headers.skipAuth;
+      if (config.headers?.noAuth) delete config.headers.noAuth;
+      return config;
+    }
     try {
       // Primary: read from localStorage — shared across all store instances
       let token: string | null = null;

@@ -32,7 +32,9 @@ interface Product {
   images?: Array<{ url: string; altText: string; isPrimary: boolean; order: number }>;
   category?: { id: string; name: string } | string;
   categoryId: string;
-  store?: { id: string; name: string; logo?: string };
+  store?: { id: string; name: string; logo?: string; slug?: string };
+  storeName?: string;
+  storeSlug?: string;
   storeId?: string;
   location?: string | { town?: string; state?: string; lga?: string };
   rating?: Rating[] | number;
@@ -70,7 +72,7 @@ const FeaturedProducts = () => {
     const fetchPublishedProducts = async () => {
       setLoading(true);
       try {
-        const res = await productApi.getAllProducts({ status: 'active', limit: 100 });
+        const res = await productApi.getAllProducts({ status: 'active', limit: 100, skipAuth: true });
         let list: Product[] = [];
         if (res?.data && Array.isArray(res.data)) {
           list = res.data;
@@ -234,7 +236,8 @@ const FeaturedProducts = () => {
                     ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                     : '/placeholder.png';
                   const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category);
-                  const storeName = product.store?.name || product.storeId || 'Faflora Store';
+                  const storeName = product.storeName || product.store?.name || product.storeId || 'Faflora Store';
+                  const storeSlug = product.storeSlug || product.store?.slug || '';
 
                   return (
                     <div
@@ -249,6 +252,8 @@ const FeaturedProducts = () => {
                         title={product.name}
                         rating={calculateAverageRating(product.rating)}
                         author={storeName}
+                        storeName={storeName}
+                        storeSlug={storeSlug}
                         location={product.location || 'Lagos'}
                         price={product.price}
                         originalPrice={product.compareAtPrice || product.mrp}

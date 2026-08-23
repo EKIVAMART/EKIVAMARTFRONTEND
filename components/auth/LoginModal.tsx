@@ -8,6 +8,7 @@ import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { authApi, type ApiError } from '@/lib/api';
 import { useAppDispatch } from '@/lib/hooks';
+import { useRouter } from 'next/navigation';
 import { setCredentials } from '@/lib/features/auth/authSlice';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -60,6 +61,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onSwitchToForgotPassword,
 }) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [rateLimitInfo, setRateLimitInfo] = useState<{
     blocked: boolean;
@@ -92,6 +94,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       toast.success('Welcome back! 🎉');
       onClose();
       reset();
+
+      if (response?.data?.user?.role?.toUpperCase() === 'VENDOR') {
+        router.push('/vendor/dashboard');
+      }
     } catch (error: unknown) {
       if (isApiError(error) && error.statusCode === 429) {
         const retryAfter = error.retryAfter || 900;
