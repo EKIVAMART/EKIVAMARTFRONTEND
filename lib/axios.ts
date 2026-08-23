@@ -9,7 +9,7 @@ export const injectStore = (s: any) => {
   storeInstance = s;
 };
 
-const API_BASE_URL = 'https://faflora-staging.onrender.com/api/v1'; //process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create axios instance
 export const axiosInstance = axios.create({
