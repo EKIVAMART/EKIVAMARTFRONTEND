@@ -17,7 +17,7 @@ export default function TaxRulesView() {
   const [formData, setFormData] = useState({
     country: 'NG',
     region: '',
-    ratePercentage: 10, // Default to 10%
+    ratePercentage: 10,
     isActive: true,
   });
 
@@ -57,7 +57,7 @@ export default function TaxRulesView() {
     setFormData({
       country: rule.country,
       region: rule.region || '',
-      ratePercentage: Math.round(rule.ratePercentage * 1000) / 10, // e.g. 0.10 -> 10%
+      ratePercentage: Math.round(rule.ratePercentage * 1000) / 10,
       isActive: rule.isActive,
     });
     setIsModalOpen(true);
@@ -66,8 +66,8 @@ export default function TaxRulesView() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.ratePercentage < 10) {
-      toast.error('Platform compliance rule: Tax rate cannot be set below the 10% platform floor.');
+    if (formData.ratePercentage < 0 || formData.ratePercentage > 100) {
+      toast.error('Tax rate must be between 0% and 100%.');
       return;
     }
 
@@ -149,10 +149,10 @@ export default function TaxRulesView() {
         <div>
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <Percent className="text-[#9d4ae3]" size={24} />
-            Tax Configuration & Compliance
+            Tax Configuration & Rates
           </h2>
           <p className="text-xs text-gray-500 mt-1">
-            Manage regional tax rules and compliance rates. Platform default tax rate floor is strictly set to 10%.
+            Manage regional tax rules and jurisdiction rates. Tax rates are fully configurable.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -173,13 +173,13 @@ export default function TaxRulesView() {
         </div>
       </div>
 
-      {/* Compliance Policy Banner */}
+      {/* Policy Banner */}
       <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex items-start gap-3">
-        <ShieldAlert className="text-[#9d4ae3] shrink-0 mt-0.5" size={20} />
+        <ShieldAlert className="text-[#9d4ae3]" size={20} />
         <div className="text-xs text-purple-900 leading-relaxed">
-          <p className="font-bold mb-0.5">Platform Minimum Tax Floor (10%) Enforced</p>
+          <p className="font-bold mb-0.5">Flexible Tax Rates Active</p>
           <p className="text-purple-800/90">
-            All jurisdictions fall back to the platform standard 10% tax rate. Custom regional rules can be configured to standard or higher rates, but cannot be configured below the 10% minimum threshold to prevent tax compliance discrepancies.
+            Configure jurisdiction and region-specific tax rates to any desired percentage. The matched active rule will be applied to the order subtotal during checkout.
           </p>
         </div>
       </div>
@@ -201,7 +201,7 @@ export default function TaxRulesView() {
             <Globe size={32} className="mx-auto mb-2 text-gray-300" />
             <p className="font-bold text-slate-700 text-sm">No custom regional rules configured</p>
             <p className="text-xs text-gray-400 mt-1 max-w-md mx-auto">
-              All checkout orders currently use the platform fallback tax rate of 10% (0.10). Click &ldquo;Add Tax Rule&rdquo; to add region-specific configurations.
+              All checkout orders currently use the platform default tax rate of 10% (0.10). Click &ldquo;Add Tax Rule&rdquo; to add region-specific configurations.
             </p>
           </div>
         ) : (
@@ -324,23 +324,23 @@ export default function TaxRulesView() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Tax Rate (%) * <span className="text-[#9d4ae3] font-semibold">(Min 10%)</span>
+                    Tax Rate (%) * <span className="text-[#9d4ae3] font-semibold">(0% - 100%)</span>
                   </label>
                   <div className="relative">
                     <input
                       type="number"
                       required
-                      min={10}
+                      min={0}
                       max={100}
                       step={0.1}
                       value={formData.ratePercentage}
-                      onChange={(e) => setFormData({ ...formData, ratePercentage: parseFloat(e.target.value) || 10 })}
+                      onChange={(e) => setFormData({ ...formData, ratePercentage: parseFloat(e.target.value) || 0 })}
                       className="w-full px-3.5 py-2.5 pr-8 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] font-bold text-slate-800"
                     />
                     <span className="absolute right-3.5 top-2.5 text-gray-400 font-bold text-sm">%</span>
                   </div>
-                  <p className="text-[11px] text-purple-700 mt-1 font-medium">
-                    Platform compliance requires a minimum rate of 10% (0.10).
+                  <p className="text-[11px] text-gray-500 mt-1 font-medium">
+                    Enter percentage value (e.g. 5 for 5%, 7.5 for 7.5%, 10 for 10%).
                   </p>
                 </div>
 

@@ -487,6 +487,7 @@ const getUserPagination = (
 };
 
 const normalizeAppUser = (user: any): AppUser => {
+  const isActive = typeof user.isActive === 'boolean' ? user.isActive : (user.status === 'active' || user.status === true);
   return {
     id: user.id || user._id || '',
     email: user.email || '',
@@ -494,30 +495,31 @@ const normalizeAppUser = (user: any): AppUser => {
     lastName: user.lastName || '',
     fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
     role: user.role || 'customer',
-    isEmailVerified: !!user.isEmailVerified,
-    isTwoFactorEnabled: !!user.isTwoFactorEnabled,
+    isEmailVerified: Boolean(user.isEmailVerified),
+    isTwoFactorEnabled: Boolean(user.isTwoFactorEnabled),
     avatar: user.avatar || null,
     phoneNumber: user.phoneNumber || user.phone || null,
     lastLoginAt: user.lastLoginAt || null,
     createdAt: user.createdAt || new Date().toISOString(),
     updatedAt: user.updatedAt || new Date().toISOString(),
-    status: user.status || 'active',
-    isAuthenticated: !!user.isEmailVerified,
+    status: isActive ? 'active' : 'blocked',
+    isAuthenticated: Boolean(user.isEmailVerified),
   };
 };
 
 const normalizeAdminUser = (user: any): AdminUser => {
+  const isActive = typeof user.isActive === 'boolean' ? user.isActive : (user.status === 'active' || user.status === true);
   return {
     id: user.id || user._id || '',
     firstName: user.firstName || '',
     lastName: user.lastName || '',
     email: user.email || '',
     phone: user.phoneNumber || user.phone || '',
-    status: user.status || 'active',
+    status: isActive ? 'active' : 'blocked',
     role: user.role || 'sub_admin',
     avatar: user.avatar || undefined,
     invitedAt: user.createdAt || new Date().toISOString(),
-    activatedAt: user.status === 'active' ? user.updatedAt : undefined,
+    activatedAt: isActive ? user.updatedAt : undefined,
     lastUpdated: user.updatedAt || new Date().toISOString(),
     permissions: user.permissions || {
       manageProducts: true,
@@ -684,8 +686,9 @@ export default function AdminPage() {
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
-  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
-  const hasSuperAdminRole = authUser && SUPER_ADMIN_ROLES.includes(authUser.role);
+  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin', 'SUPER_ADMIN'];
+  const userRoleNormalized = String(authUser?.role || '').toLowerCase().replace('_', '-');
+  const hasSuperAdminRole = Boolean(authUser && (SUPER_ADMIN_ROLES.includes(authUser.role) || userRoleNormalized === 'super-admin'));
 
   // Admin States
   const [isInviteAdminModalOpen, setIsInviteAdminModalOpen] = useState(false);
@@ -1121,11 +1124,13 @@ export default function AdminPage() {
         const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
         const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
 
+        const isActiveFilter = usersStatusFilter === 'active' ? true : (usersStatusFilter === 'blocked' ? false : undefined);
+
         const response = await authApi.searchUsers({
           page: usersPage,
           limit: usersLimit,
-          role: 'customer',
           searchQuery: searchQuery.trim() || undefined,
+          isActive: isActiveFilter,
           sortBy: sortField as any,
           sortOrder: sortOrder as any,
         });
@@ -1157,12 +1162,12 @@ export default function AdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy]);
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter]);
 
   // Reset users page on search/filter changes
   useEffect(() => {
     setUsersPage(1);
-  }, [searchQuery, usersSortBy]);
+  }, [searchQuery, usersSortBy, usersStatusFilter]);
 
   // Admins fetching effect
   useEffect(() => {
