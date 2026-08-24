@@ -483,11 +483,13 @@ export const authApi = {
   },
 
   async searchUsers(params: {
+    searchQuery?: string;
     email?: string;
     firstName?: string;
     lastName?: string;
     phoneNumber?: string;
     role?: 'customer' | 'vendor' | 'admin' | 'super-admin';
+    isActive?: boolean | string;
     page?: number;
     limit?: number;
     sortBy?: 'createdAt' | 'updatedAt';
@@ -1765,5 +1767,112 @@ export const reviewsApi = {
   },
 };
 
+// ─── Backward-compat types & aliases ─────────────────────────────────────────
 
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productSku?: string;
+  productImage?: string;
+  unitPrice: { amount: number; currency: string; formatted?: string };
+  quantity: number;
+  subtotal: { amount: number; currency: string; formatted?: string };
+}
+
+export interface OrderData {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  items: OrderItem[];
+  itemCount: number;
+  shippingAddress: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phoneNumber: string;
+    formatted?: string;
+  };
+  subtotal: { amount: number; currency: string; formatted?: string };
+  shippingCost: { amount: number; currency: string; formatted?: string };
+  taxAmount: { amount: number; currency: string; formatted?: string };
+  discountAmount?: { amount: number; currency: string; formatted?: string };
+  totalAmount: { amount: number; currency: string; formatted?: string };
+  status: string;
+  paymentMethod?: string;
+  paymentStatus: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderSearchResponse {
+  data: OrderData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface TaxRuleData {
+  id: string;
+  country: string;
+  region: string | null;
+  ratePercentage: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcessPaymentData {
+  order: OrderData;
+  payment?: {
+    paymentUrl: string;
+    accessCode?: string;
+    paymentReference: string;
+  };
+  checkoutUrl?: string;
+}
+
+/** Backward-compat alias — CartPage.tsx and PaymentCallback use orderApi */
+export const orderApi = {
+  processPayment: (orderId: string, paymentMethod: string, paymentIntentId?: string) =>
+    ordersApi.processPayment(orderId, { paymentMethod, paymentIntentId }),
+  getOrder: (id: string) => ordersApi.getById(id),
+  getOrderByNumber: (orderNumber: string) => ordersApi.getByNumber(orderNumber),
+  getMyOrders: (params?: { page?: number; limit?: number }) => ordersApi.getMyOrders(params),
+  searchOrders: (params?: any) => ordersApi.search(params),
+  getOrderStatistics: () => ordersApi.getStatistics(),
+  updateOrderStatus: (id: string, status: string, reason?: string) => ordersApi.updateStatus(id, status),
+  cancelOrder: (id: string, reason: string) => ordersApi.cancel(id, reason),
+};
+
+/** Backward-compat alias — TaxRulesView.tsx uses taxRuleApi */
+export const taxRuleApi = {
+  getTaxRules: () => taxRulesApi.list(),
+  createTaxRule: (data: { country: string; region?: string | null; ratePercentage: number }) => taxRulesApi.create(data),
+  updateTaxRule: (id: string, data: { ratePercentage?: number; isActive?: boolean }) => taxRulesApi.update(id, data),
+  deleteTaxRule: (id: string) => taxRulesApi.delete(id),
+};
+
+export interface PublicStoreProfile {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logoUrl: string | null;
+  bannerUrl: string | null;
+  trustLevel?: string;
+  isOnVacation?: boolean;
+  vacationMessage?: string | null;
+  createdAt?: string;
+  [key: string]: any;
+}
+
+/** Backward-compat alias — vendor page uses storeApi */
+export const storeApi = storePublicApi;
 

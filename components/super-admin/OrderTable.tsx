@@ -15,14 +15,20 @@ interface Order {
   paymentStatus: 'Paid' | 'Pending' | 'Failed' | 'Refunded';
 }
 
-const statusStyles = {
+const statusStyles: Record<string, string> = {
   'Ongoing': 'bg-blue-100 text-blue-600',
+  'CONFIRMED': 'bg-blue-100 text-blue-600',
+  'PROCESSING': 'bg-amber-100 text-amber-600',
+  'SHIPPED': 'bg-purple-100 text-purple-600',
   'Delivered': 'bg-green-100 text-green-600',
+  'DELIVERED': 'bg-green-100 text-green-600',
   'Cancelled': 'bg-red-100 text-red-600',
+  'CANCELLED': 'bg-red-100 text-red-600',
   'Returned': 'bg-orange-100 text-orange-600',
+  'PENDING_PAYMENT': 'bg-yellow-100 text-yellow-700',
 };
 
-const allStatuses = ['All', 'Ongoing', 'Delivered', 'Cancelled', 'Returned'];
+const allStatuses = ['All', 'Ongoing', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'Delivered', 'Cancelled', 'Returned'];
 const allPaymentStatuses = ['All', 'Paid', 'Pending', 'Failed', 'Refunded'];
 
 interface OrderTableProps {

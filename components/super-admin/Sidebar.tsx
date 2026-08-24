@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -117,8 +117,8 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             onClick={() => setActiveTab('waitlist')}
           />
           <SidebarLink
-            icon={<Settings size={20} />}
-            label="Tax Rules"
+            icon={<Percent size={20} />}
+            label="Tax & Compliance"
             active={activeTab === 'taxes'}
             onClick={() => setActiveTab('taxes')}
           />

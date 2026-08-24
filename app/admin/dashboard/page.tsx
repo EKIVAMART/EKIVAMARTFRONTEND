@@ -492,23 +492,26 @@ const getUserPagination = (
   };
 };
 
-const normalizeAppUser = (user: any): import('@/components/super-admin/UserTable').AppUser => ({
-  id: user.id || user._id || '',
-  email: user.email || '',
-  firstName: user.firstName || '',
-  lastName: user.lastName || '',
-  fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-  role: user.role || 'customer',
-  isEmailVerified: !!user.isEmailVerified,
-  isTwoFactorEnabled: !!user.isTwoFactorEnabled,
-  avatar: user.avatar || null,
-  phoneNumber: user.phoneNumber || user.phone || null,
-  lastLoginAt: user.lastLoginAt || null,
-  createdAt: user.createdAt || new Date().toISOString(),
-  updatedAt: user.updatedAt || new Date().toISOString(),
-  status: user.status || 'active',
-  isAuthenticated: !!user.isEmailVerified,
-});
+const normalizeAppUser = (user: any): import('@/components/super-admin/UserTable').AppUser => {
+  const isActive = typeof user.isActive === 'boolean' ? user.isActive : (user.status === 'active' || user.status === true);
+  return {
+    id: user.id || user._id || '',
+    email: user.email || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+    role: user.role || 'customer',
+    isEmailVerified: Boolean(user.isEmailVerified),
+    isTwoFactorEnabled: Boolean(user.isTwoFactorEnabled),
+    avatar: user.avatar || null,
+    phoneNumber: user.phoneNumber || user.phone || null,
+    lastLoginAt: user.lastLoginAt || null,
+    createdAt: user.createdAt || new Date().toISOString(),
+    updatedAt: user.updatedAt || new Date().toISOString(),
+    status: isActive ? 'active' : 'blocked',
+    isAuthenticated: Boolean(user.isEmailVerified),
+  };
+};
 
 
 const buildProductPayload = (
@@ -673,8 +676,9 @@ export default function AdminPage() {
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
   const ADMIN_ROLES = ['ADMIN', 'admin'];
-  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
-  const hasAdminRole = authUser && (ADMIN_ROLES.includes(authUser.role) || SUPER_ADMIN_ROLES.includes(authUser.role));
+  const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin', 'SUPER_ADMIN'];
+  const userRoleNormalized = String(authUser?.role || '').toLowerCase().replace('_', '-');
+  const hasAdminRole = Boolean(authUser && (ADMIN_ROLES.includes(authUser.role) || SUPER_ADMIN_ROLES.includes(authUser.role) || userRoleNormalized === 'admin' || userRoleNormalized === 'super-admin'));
 
   // Initialize products as empty array (will be populated from API)
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -1252,10 +1256,13 @@ export default function AdminPage() {
         const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
         const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
 
+        const isActiveFilter = usersStatusFilter === 'active' ? true : (usersStatusFilter === 'blocked' ? false : undefined);
+
         const response = await authApi.searchUsers({
           page: usersPage,
           limit: usersLimit,
-          role: 'customer',
+          searchQuery: searchQuery.trim() || undefined,
+          isActive: isActiveFilter,
           email: emailParam,
           firstName: firstParam,
           lastName: lastParam,
@@ -1286,12 +1293,12 @@ export default function AdminPage() {
 
     loadUsers();
     return () => { isMounted = false; };
-  }, [isCheckingAuth, hasAdminRole, activeTab, usersPage, searchQuery, usersSortBy]);
+  }, [isCheckingAuth, hasAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter]);
 
   // Reset users page when search or sort changes
   useEffect(() => {
     setUsersPage(1);
-  }, [searchQuery, usersSortBy]);
+  }, [searchQuery, usersSortBy, usersStatusFilter]);
 
 
   // Subcategory filter loader

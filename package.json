@@ -16,6 +16,7 @@
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
+    "@next/swc-win32-x64-msvc": "^16.3.2",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cookie": "^0.5.0",
