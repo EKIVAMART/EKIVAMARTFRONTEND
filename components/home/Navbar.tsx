@@ -117,7 +117,7 @@ export default function Navbar() {
 
         if (isMounted) setCategories(formatted);
       } catch (err) {
-        console.error('Failed to load navbar categories:', err);
+        console.warn('Failed to load navbar categories:', err);
       }
     };
     void loadCategories();

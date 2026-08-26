@@ -229,7 +229,7 @@ async function resolveCategoryId(
       );
     }
   } catch (err) {
-    console.error('resolveCategoryId error:', err);
+    console.warn('resolveCategoryId error:', err);
   }
 
   return undefined;

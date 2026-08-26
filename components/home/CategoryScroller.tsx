@@ -211,7 +211,7 @@ export default function CategoryScroller() {
           setLoading(false);
         }
       } catch (err) {
-        console.error('Failed to fetch carousel categories:', err);
+        console.warn('Failed to fetch carousel categories:', err);
         if (isMounted) setLoading(false);
       }
     };
