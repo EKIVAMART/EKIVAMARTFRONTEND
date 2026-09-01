@@ -9,8 +9,10 @@ const linkColumns = [
     links: [
       { label: 'About Us', href: '/about-us' },
       { label: 'Delivery Information', href: '#' },
+      { label: 'Acceptable Use Policy', href: '/acceptable-use-policy' },
       { label: 'Privacy Policy', href: '/privacy-policy' },
       { label: 'Terms & Conditions', href: '/terms-and-conditions' },
+      { label: 'Return, Refund & Exchange Policy', href: '/return-policy' },
       { label: 'Contact Us', href: '/contact-us' },
       { label: 'Support Center', href: '/support' },
     ],
