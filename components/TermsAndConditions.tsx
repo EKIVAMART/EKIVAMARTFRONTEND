@@ -89,9 +89,9 @@ export default function TermsAndConditions() {
             </div>
             <h1
               className="text-white font-black uppercase leading-[0.95] tracking-tight lg:-skew-x-8 -skew-x-6 text-5xl md:text-7xl lg:text-[5.5rem] drop-shadow-[0_4px_32px_rgba(199,64,176,0.4)]"
-              style={{ fontFamily: "'Georgia', serif", textShadow: '0 2px 40px rgba(199,64,176,0.35)' }}
+              style={{ fontFamily: "'Georgia', serif", textShadow: '0 2px 40px rgba(248, 243, 247, 0.35)' }}
             >
-              <TypingText text="Terms of Service & Privacy Policy" delay={300} typingSpeed={65} />
+              <TypingText text="Terms of Service & Privacy Policy" className='text-brand-300' delay={300} typingSpeed={65} />
             </h1>
             <div className="mt-6 flex items-center gap-3">
               <div className="h-[3px] w-16 rounded-full bg-[#ff69e0]" />
