@@ -829,12 +829,12 @@ export const productApi = {
       const items: { file: File; altText: string }[] = Array.isArray(payload)
         ? payload.map((p) => ({ file: p.file, altText: p.alt || '' }))
         : Array.from((payload as FormData).getAll('images') as File[]).map(
-            (file, idx) => ({
-              file,
-              altText:
-                ((payload as FormData).get(`altText[${idx}]`) as string) || '',
-            })
-          );
+          (file, idx) => ({
+            file,
+            altText:
+              ((payload as FormData).get(`altText[${idx}]`) as string) || '',
+          })
+        );
 
       const imageObjects = await uploadImages(items, 'products');
 
@@ -1005,11 +1005,26 @@ export interface UpdateLaunchConfigDto {
   broadcastReason?: string;
 }
 
+export interface BroadcastUploadCredentials {
+  uploadUrl: string;
+  upload_url?: string;
+  signature: string;
+  timestamp: number;
+  apiKey?: string;
+  api_key?: string;
+  cloudName?: string;
+  cloud_name?: string;
+  folder: string;
+}
+
 export interface SendBroadcastDto {
+  targetRole?: 'customer' | 'vendor';
   subject: string;
-  bodyText: string;
+  bodyHtml: string;
+  bodyText?: string;
   previewText?: string;
-  role?: 'customer' | 'vendor';
+  attachedImageUrls?: string[];
+  heroBannerUrl?: string;
 }
 
 export const waitlistApi = {
@@ -1062,9 +1077,25 @@ export const waitlistApi = {
     }
   },
 
-  async sendBroadcast(data: SendBroadcastDto): Promise<ApiResponse<{ sent: number }>> {
+  async getBroadcastUploadUrl(payload?: {
+    fileName?: string;
+    mimeType?: string;
+    fileSize?: number;
+  }): Promise<ApiResponse<BroadcastUploadCredentials>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<{ sent: number }>>('/waitlist/broadcast', data);
+      const response = await axiosInstance.post<ApiResponse<BroadcastUploadCredentials>>(
+        '/waitlist/broadcast/upload-url',
+        payload ?? {}
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async sendBroadcast(data: SendBroadcastDto): Promise<ApiResponse<{ sent: number; targetRole: string }>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<{ sent: number; targetRole: string }>>('/waitlist/broadcast', data);
       return response.data;
     } catch (error) {
       handleApiError(error);

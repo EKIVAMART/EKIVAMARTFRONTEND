@@ -15,7 +15,9 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { subject, bodyText, previewText, role } = body;
+    const { targetRole, role, subject, bodyHtml, bodyText, previewText, attachedImageUrls, heroBannerUrl } = body;
+
+    const effectiveRole = targetRole || role;
 
     // Field validations
     if (!subject || !subject.trim()) {
@@ -35,7 +37,8 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!bodyText || !bodyText.trim()) {
+    const htmlBody = bodyHtml || bodyText;
+    if (!htmlBody || !htmlBody.trim()) {
       return NextResponse.json(
         { success: false, message: 'Bad Request - Email body is required' },
         { status: 400 }
@@ -52,19 +55,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (role && !['customer', 'vendor'].includes(role)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Bad Request - Role must be one of: customer, vendor',
-        },
-        { status: 400 }
-      );
-    }
-
     const query: any = { status: 'active' };
-    if (role) {
-      query.role = role;
+    if (effectiveRole === 'VENDOR' || effectiveRole === 'vendor') {
+      query.role = 'vendor';
+    } else if (effectiveRole === 'BUYER' || effectiveRole === 'customer') {
+      query.role = 'customer';
     }
 
     const subscribersCollection = await db.waitlistSubscribers();
@@ -73,9 +68,10 @@ export async function POST(request: Request) {
     if (activeSubscribers.length === 0) {
       return NextResponse.json({
         success: true,
-        message: 'Broadcast skipped - no active subscribers',
+        message: 'Broadcast skipped - no active subscribers for selected role',
         data: {
           sent: 0,
+          targetRole: effectiveRole || 'ALL',
         },
       });
     }
@@ -84,19 +80,17 @@ export async function POST(request: Request) {
     for (let i = 0; i < activeSubscribers.length; i += batchSize) {
       const batch = activeSubscribers.slice(i, i + batchSize);
 
-      // Simulate sending emails to each subscriber in the batch
       batch.forEach((sub: any) => {
         const unsubscribeLink = `${
           request.headers.get('origin') || 'http://localhost:3000'
         }/unsubscribe?token=${sub.unsubscribeToken || 'token'}`;
         console.log(
-          `[Email Broadcast] Sent email to ${sub.email}. Subject: "${subject}". Preview: "${
+          `[Email Broadcast] Sent email to ${sub.email}. TargetRole: ${effectiveRole || 'ALL'}. Subject: "${subject}". Preview: "${
             previewText || ''
-          }". Body: "${bodyText}". Unsubscribe: ${unsubscribeLink}`
+          }". Hero: "${heroBannerUrl || 'none'}". Attached Images: ${attachedImageUrls?.length || 0}. Unsubscribe: ${unsubscribeLink}`
         );
       });
 
-      // Pause 500ms between batches
       if (i + batchSize < activeSubscribers.length) {
         await delay(500);
       }
@@ -107,6 +101,7 @@ export async function POST(request: Request) {
       message: `Broadcast sent successfully to ${activeSubscribers.length} subscribers`,
       data: {
         sent: activeSubscribers.length,
+        targetRole: effectiveRole || 'ALL',
       },
     });
   } catch (error: any) {
