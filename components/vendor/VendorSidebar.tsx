@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart, Bell } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type VendorTab = 'dashboard' | 'products' | 'store-settings' | 'orders';
+export type VendorTab = 'dashboard' | 'products' | 'store-settings' | 'orders' | 'notifications';
 
 interface VendorSidebarProps {
   activeTab: VendorTab;
@@ -51,9 +51,11 @@ export default function VendorSidebar({ activeTab, setActiveTab, isOpen, onClose
   const navItems: { icon: React.ReactNode; label: string; tab: VendorTab }[] = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', tab: 'dashboard' },
     { icon: <Package size={20} />, label: 'My Products', tab: 'products' },
-    { icon: <Store size={20} />, label: 'Store Settings', tab: 'store-settings' },
     { icon: <ShoppingCart size={20} />, label: 'Store Orders', tab: 'orders' },
+    { icon: <Bell size={20} />, label: 'Notifications', tab: 'notifications' },
+    { icon: <Store size={20} />, label: 'Store Settings', tab: 'store-settings' },
   ];
+
 
   return (
     <>

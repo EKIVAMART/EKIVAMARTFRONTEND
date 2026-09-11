@@ -287,6 +287,8 @@ interface ProductCarouselProps {
   title: string;
   /** URL to navigate to when "View all" is clicked */
   viewAllHref?: string;
+  /** Direct category ID override */
+  categoryId?: string;
   icon?: ReactNode;
   headerAccessory?: ReactNode;
   leadingSlides?: ReactNode;
@@ -301,6 +303,7 @@ interface ProductCarouselProps {
 export default function ProductCarousel({
   title,
   viewAllHref = '#',
+  categoryId: directCategoryId,
   icon,
   headerAccessory,
   leadingSlides,
@@ -310,7 +313,7 @@ export default function ProductCarousel({
 }: ProductCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const [products, setProducts] = useState<LandingProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -326,6 +329,23 @@ export default function ProductCarousel({
     }
   }, [isAuthenticated, dispatch]);
 
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollWidth > el.clientWidth && el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const timer = setTimeout(updateScrollState, 150);
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [products, loading, updateScrollState]);
+
   // Fetch products for this section
   useEffect(() => {
     let cancelled = false;
@@ -338,7 +358,7 @@ export default function ProductCarousel({
         // or /categories/all) intentionally has no specific category —
         // it shows the newest products across the whole catalog.
         const slug = slugFromHref(viewAllHref);
-        const categoryId = await resolveCategoryId(slug);
+        const categoryId = directCategoryId || (await resolveCategoryId(slug));
         const params: any = {
           limit: 10,
           status: 'active',
@@ -375,14 +395,9 @@ export default function ProductCarousel({
     return () => {
       cancelled = true;
     };
-  }, [title, viewAllHref]);
+  }, [title, viewAllHref, directCategoryId]);
 
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
-  }, []);
+
 
   function scroll(direction: 1 | -1) {
     const el = scrollRef.current;

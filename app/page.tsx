@@ -1,13 +1,14 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import AdCarousel from '@/components/home/AdCarousel';
 import CategoryScroller from '@/components/home/CategoryScroller';
 import FlashSaleSection from '@/components/home/FlashSaleSection';
 import ProductCarousel from '@/components/home/ProductCarousel';
+import { categoryApi, productApi } from '@/lib/api';
 
-// Each ad section cycles through 4 slides. Only two distinct banner assets
-// were supplied (Ad_image.png, shop_sale_banner.png), so each carousel
-// repeats them to fill out the 4-slide requirement.
 const leftAdSlides = [
   { src: '/images/Ad_image.png', alt: 'Up to 50% off — stay connected' },
   { src: '/images/shop_sale_banner.png', alt: 'TV Tuesday — up to 25% off' },
@@ -28,7 +29,124 @@ const shopTheSaleBanners = Array.from({ length: 5 }).map((_, i) => ({
   key: `shop-sale-${i}`,
 }));
 
+interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+function CarouselSectionSkeleton() {
+  return (
+    <div className="px-4 py-5 md:px-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-6 w-36 sm:w-48 bg-neutral-200/80 rounded-lg animate-pulse" />
+        <div className="h-7 w-20 bg-neutral-200/80 rounded-full animate-pulse" />
+      </div>
+      <div className="flex gap-3 md:gap-6 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <div
+            key={idx}
+            className="w-44 sm:w-52 md:w-56 shrink-0 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm animate-pulse flex flex-col gap-3"
+          >
+            <div className="aspect-square rounded-xl bg-neutral-200" />
+            <div className="h-3 rounded bg-neutral-200 w-3/4" />
+            <div className="h-3 rounded bg-neutral-200 w-1/2" />
+            <div className="h-8 rounded-xl bg-neutral-200 mt-auto" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const checkCategoryHasProducts = async (catId: string): Promise<boolean> => {
+  if (!catId) return true;
+  try {
+    const res = await productApi.getAllProducts({
+      categoryId: catId,
+      limit: 1,
+      status: 'active',
+      skipAuth: true,
+    });
+    let list: any[] = [];
+    if (res?.data && Array.isArray(res.data)) list = res.data;
+    else if (res?.data?.data && Array.isArray(res.data.data)) list = res.data.data;
+    else if (res?.data?.products && Array.isArray(res.data.products)) list = res.data.products;
+    else if (res?.data?.docs && Array.isArray(res.data.docs)) list = res.data.docs;
+    return list.length > 0;
+  } catch {
+    return false;
+  }
+};
+
 export default function Home() {
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRandomCategories = async () => {
+      try {
+        const res = await categoryApi.getCategories({ limit: 100 });
+        let list: any[] = [];
+        if (res?.data && Array.isArray(res.data)) list = res.data;
+        else if (res?.data?.data && Array.isArray(res.data.data)) list = res.data.data;
+        else if (res?.data?.categories && Array.isArray(res.data.categories)) list = res.data.categories;
+        else if (res?.data?.docs && Array.isArray(res.data.docs)) list = res.data.docs;
+        else if (Array.isArray(res)) list = res;
+
+        const activeParents = list
+          .filter(
+            (c: any) =>
+              Boolean(c.isActive ?? c.is_active ?? (c.status === 'published' || c.status === 'active')) &&
+              c.status !== 'draft' &&
+              !c.parentId
+          )
+          .map((c: any) => {
+            const name = c.name || c.title || 'Category';
+            const slug = (c.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+            return {
+              id: String(c.id || c._id || c.categoryId || c.uuid),
+              name,
+              slug,
+            };
+          });
+
+        if (activeParents.length > 0 && isMounted) {
+          const shuffled = [...activeParents].sort(() => 0.5 - Math.random());
+          
+          // Check categories in parallel to ensure they actually contain products
+          const checks = await Promise.all(
+            shuffled.map(async (cat) => {
+              const hasItems = await checkCategoryHasProducts(cat.id);
+              return hasItems ? cat : null;
+            })
+          );
+
+          const validCats = checks.filter(Boolean) as CategoryItem[];
+
+          if (validCats.length > 0 && isMounted) {
+            setCategories(validCats.slice(0, 5));
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load random home categories:', err);
+      } finally {
+        if (isMounted) {
+          setLoadingCategories(false);
+        }
+      }
+    };
+
+    void fetchRandomCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const firstCat = categories[0];
+  const remainingCats = categories.slice(1);
+
   return (
     <main className="min-h-screen bg-neutral-50 pb-0">
       {/* Zone 1: Ads + Category Scroller */}
@@ -66,62 +184,48 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Fashion bridge split */}
+      {/* First Random Category Bridge Split */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 bottom-1/2 bg-[#f3ecfc]" />
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#8236be]" />
         <div className="relative z-10 px-4 md:px-12 py-6">
           <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
-            <ProductCarousel
-              title="Fashion"
-              viewAllHref="/categories/fashion"
-              titleColor="text-neutral-800"
-            />
+            {loadingCategories ? (
+              <CarouselSectionSkeleton />
+            ) : firstCat ? (
+              <ProductCarousel
+                title={firstCat.name}
+                categoryId={firstCat.id || undefined}
+                viewAllHref={`/categories/${firstCat.slug}`}
+                titleColor="text-neutral-800"
+              />
+            ) : null}
           </div>
         </div>
       </div>
 
-      {/* Zone 3: Footwear, Bags, Jewellery & Mobile Accessories */}
+      {/* Zone 3: Remaining Dynamic Categories */}
       <div className="bg-[#8236be] w-full pt-0 pb-6">
-        <div className="px-4 md:px-12 mb-6 w-full">
-          <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
-            <ProductCarousel
-              title="Foot wear"
-              viewAllHref="/categories/footwear"
-              titleColor="text-neutral-800"
-            />
-          </div>
-        </div>
-
-        <div className="px-4 md:px-12 mb-6 w-full">
-          <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
-            <ProductCarousel
-              title="Bags & Luggages"
-              viewAllHref="/categories/bags--luggage"
-              titleColor="text-neutral-800"
-            />
-          </div>
-        </div>
-
-        <div className="px-4 md:px-12 mb-6 w-full">
-          <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
-            <ProductCarousel
-              title="Jewellery & Fashion Accessories"
-              viewAllHref="/categories/jewelry--fashion-accessories"
-              titleColor="text-neutral-800"
-            />
-          </div>
-        </div>
-
-        <div className="px-4 md:px-12 mb-0 w-full">
-          <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
-            <ProductCarousel
-              title="Mobile Phones & Accessories"
-              viewAllHref="/categories/mobile-phones--accessories"
-              titleColor="text-neutral-800"
-            />
-          </div>
-        </div>
+        {loadingCategories
+          ? Array.from({ length: 4 }).map((_, idx) => (
+              <div key={`skeleton-${idx}`} className={`px-4 md:px-12 w-full ${idx < 3 ? 'mb-6' : 'mb-0'}`}>
+                <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
+                  <CarouselSectionSkeleton />
+                </div>
+              </div>
+            ))
+          : remainingCats.map((cat, idx) => (
+              <div key={`${cat.id}-${cat.slug}-${idx}`} className={`px-4 md:px-12 w-full ${idx < remainingCats.length - 1 ? 'mb-6' : 'mb-0'}`}>
+                <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
+                  <ProductCarousel
+                    title={cat.name}
+                    categoryId={cat.id || undefined}
+                    viewAllHref={`/categories/${cat.slug}`}
+                    titleColor="text-neutral-800"
+                  />
+                </div>
+              </div>
+            ))}
       </div>
 
       {/* Zone 4: Marquee & Footer */}
@@ -189,7 +293,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-  
       </div>
     </main>
   );

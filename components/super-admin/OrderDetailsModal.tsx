@@ -92,9 +92,30 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
     setLoading(true);
     try {
       const lookupIdentifier = basicOrder?.orderNumber || basicOrder?.orderId || basicOrder?.id;
-      const res = basicOrder?.orderNumber
-        ? await ordersApi.getByNumber(lookupIdentifier)
-        : await ordersApi.getById(lookupIdentifier);
+      if (!lookupIdentifier) {
+        toast.error('Could not load order details: missing identifier');
+        return;
+      }
+
+      // Detect if the identifier is an order number (human-readable) vs a UUID
+      const isOrderNumber =
+        basicOrder?.orderNumber != null ||
+        /^(ORD-|#|CM)/i.test(String(lookupIdentifier)) ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}/i.test(String(lookupIdentifier));
+
+      let res: any;
+      if (isOrderNumber) {
+        // Try by order number first (e.g. ORD-20260822-5PJ76)
+        res = await ordersApi.getByNumber(lookupIdentifier).catch(() => null);
+      }
+      // Fallback to getById if getByNumber failed or wasn't tried
+      if (!res?.success || !res.data) {
+        res = await ordersApi.getById(lookupIdentifier).catch(() => null);
+      }
+      // Last resort: try getByNumber if getById also failed
+      if (!res?.success || !res.data) {
+        res = await ordersApi.getByNumber(lookupIdentifier).catch(() => null);
+      }
 
       if (res?.success && res.data) {
         setOrder(res.data);

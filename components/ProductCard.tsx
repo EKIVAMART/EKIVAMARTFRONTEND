@@ -42,8 +42,8 @@ export default function ProductCard({
 }: ProductCardProps) {
   const sellerName = storeName || author || 'Faflora Store';
   const locationStr = typeof location === 'object' && location !== null
-    ? [location.town, location.lga, location.state].filter(Boolean).join(', ') || 'Lagos'
-    : (location || 'Lagos');
+    ? (location.state || location.town || location.lga || 'Lagos')
+    : (typeof location === 'string' && location.includes(',') ? location.split(',').pop()?.trim() || location : (location || 'Lagos'));
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useWishlist();

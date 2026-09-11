@@ -421,8 +421,8 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     : (product.stock ?? 0);
 
   const locationStr = typeof product.location === 'object' && product.location !== null
-    ? [product.location.town, product.location.lga, product.location.state].filter(Boolean).join(', ')
-    : (product.location || '');
+    ? (product.location.state || product.location.town || product.location.lga || '')
+    : (typeof product.location === 'string' && product.location.includes(',') ? product.location.split(',').pop()?.trim() || product.location : (product.location || ''));
 
   // Derive available sizes from metadata; hide selector when none
   const sizes: string[] = (() => {

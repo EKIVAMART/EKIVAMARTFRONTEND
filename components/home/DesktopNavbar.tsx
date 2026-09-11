@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
 import { useAppSelector, useCartCount } from '@/lib/hooks';
 import CategoryDropdown from './CategoryDropdown';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface DesktopNavbarProps {
   categories: any[];
@@ -197,6 +198,10 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
               </span>
               <CartIcon filled={onCart} />
             </Link>
+
+            {/* In-App Notifications Bell (Renders strictly for authenticated users) */}
+            <NotificationBell />
+
 
             {/* Account Profile Section */}
             {isAuthenticated && user ? (

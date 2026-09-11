@@ -1,8 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
 import Sidebar from '@/components/super-admin/Sidebar';
 import DashboardView from '@/components/super-admin/DashboardView';
+import NotificationsView from '@/components/notifications/NotificationsView';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import ActionModal, {
   ProductCategoryOption,
   ProductFormData,
@@ -45,7 +49,6 @@ import type { RootState } from '@/lib/store';
 import { setUser } from '@/lib/features/auth/authSlice';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 type AdminProduct = Partial<ProductFormData> & {
@@ -81,6 +84,7 @@ type AdminVendor = {
 
 type AdminOrder = {
   id: string;
+  orderNumber?: string;
   user: {
     name: string;
     avatar: string;
@@ -658,12 +662,24 @@ const buildProductPayload = (
   return payload;
 };
 
-export default function AdminPage() {
+function AdminPageContent() {
   const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramTab = searchParams ? searchParams.get('tab') : null;
+  const paramOrderId = searchParams ? searchParams.get('orderId') : null;
+
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications'>('dashboard');
+
+  const handleTabChange = (t: string) => {
+    setActiveTab(t as any);
+    if (t !== 'orders' && typeof window !== 'undefined' && (window.location.search.includes('tab=orders') || window.location.search.includes('orderId='))) {
+      router.replace('/super-admin/dashboard');
+    }
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -673,6 +689,8 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<AdminProduct | AdminVendor | AdminOrder | null>(null);
   const [viewingItem, setViewingItem] = useState<AdminProduct | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productLoadError, setProductLoadError] = useState('');
@@ -752,6 +770,41 @@ export default function AdminPage() {
     { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
   ]);
 
+  useEffect(() => {
+    if (paramTab) {
+      setActiveTab(paramTab as any);
+    }
+  }, [paramTab]);
+
+  useEffect(() => {
+    if (paramOrderId) {
+      const cleanId = String(paramOrderId).replace('#', '');
+      const matched = orders.find(
+        (o) =>
+          String(o.id).replace('#', '') === cleanId ||
+          String(o.orderNumber || '').replace('#', '') === cleanId
+      );
+      if (matched) {
+        setEditingItem(matched);
+      } else {
+        // Stub: pass orderNumber so OrderDetailsModal uses getByNumber endpoint
+        setEditingItem({
+          id: paramOrderId,
+          orderNumber: paramOrderId,
+          user: { name: 'Order Details', avatar: '' },
+          items: '1 item',
+          total: 0,
+          address: 'Customer Address',
+          date: new Date().toLocaleDateString(),
+          status: 'Ongoing',
+          paymentStatus: 'Paid',
+        });
+      }
+      setActiveTab('orders');
+      setIsModalOpen(true);
+    }
+  }, [paramOrderId, orders]);
+
   const openModal = (item: AdminProduct | AdminVendor | AdminOrder | null = null) => {
     setEditingItem(item);
     setIsModalOpen(true);
@@ -767,6 +820,14 @@ export default function AdminPage() {
   const openViewModal = (item: AdminProduct) => {
     setViewingItem(item);
     setIsViewModalOpen(true);
+  };
+
+  const handleCloseOrderModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
+    if (typeof window !== 'undefined' && window.location.search.includes('orderId')) {
+      router.replace('/super-admin/dashboard?tab=orders');
+    }
   };
 
   const resolvedProducts = useMemo(() => {
@@ -1895,6 +1956,7 @@ export default function AdminPage() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <NotificationBell />
           <div className="relative">
             <div
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -1928,16 +1990,44 @@ export default function AdminPage() {
 
       <Sidebar
         activeTab={activeTab}
-        setActiveTab={(t) => { setActiveTab(t); setIsSidebarOpen(false); }}
+        setActiveTab={(t) => { handleTabChange(t); setIsSidebarOpen(false); }}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+        {/* Desktop Top Header Bar */}
+        <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-gray-200/60">
+          <div>
+            <span className="text-xs font-bold text-[#9d4ae3] bg-fuchsia-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+              Super Admin Portal
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <NotificationBell />
+            <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
+              <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm border border-teal-200 shadow-sm">
+                {authUser?.firstName?.[0] || 'S'}
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-slate-800 leading-tight">
+                  {authUser?.firstName || 'Super'} {authUser?.lastName || 'Admin'}
+                </p>
+                <p className="text-[10px] text-gray-400 font-medium truncate max-w-[140px]">
+                  {authUser?.email || 'superadmin@faflora.com'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {activeTab === 'dashboard' ? (
-          <DashboardView onNavigate={(tab: string) => setActiveTab(tab as any)} />
+          <DashboardView onNavigate={(tab: string) => handleTabChange(tab)} />
+        ) : activeTab === 'notifications' ? (
+          <NotificationsView />
         ) : activeTab === 'waitlist' ? (
           <WaitlistView />
+
         ) : activeTab === 'users' ? (
           <>
             <header className="flex justify-between items-center mb-8">
@@ -2210,7 +2300,7 @@ export default function AdminPage() {
 
         <OrderDetailsModal
           isOpen={isModalOpen && activeTab === 'orders'}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseOrderModal}
           order={editingItem}
           onOrderUpdated={() => {
             const signal = { current: true };
@@ -2247,5 +2337,19 @@ export default function AdminPage() {
         />
       </main>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <AdminPageContent />
+    </Suspense>
   );
 }
