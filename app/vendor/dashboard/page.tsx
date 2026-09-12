@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import type { RootState } from '@/lib/store';
 import { setUser } from '@/lib/features/auth/authSlice';
@@ -25,6 +25,8 @@ import VendorSidebar from '@/components/vendor/VendorSidebar';
 import type { VendorTab } from '@/components/vendor/VendorSidebar';
 import VendorDashboardOverview from '@/components/vendor/VendorDashboardOverview';
 import VendorStoreSettings from '@/components/vendor/VendorStoreSettings';
+import NotificationsView from '@/components/notifications/NotificationsView';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import OrderTable from '@/components/super-admin/OrderTable';
 import OrderDetailsModal from '@/components/super-admin/OrderDetailsModal';
 import { toast } from 'react-hot-toast';
@@ -568,14 +570,30 @@ function ProductStatsModal({
 
 // ─── Main Page ──────────────────────────────────────────────────────────────────
 
-export default function VendorDashboardPage() {
+function VendorDashboardContent() {
   const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramTab = searchParams ? searchParams.get('tab') : null;
+  const paramOrderId = searchParams ? searchParams.get('orderId') : null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeTab, setActiveTab] = useState<VendorTab>('dashboard');
+
+  const handleTabChange = (t: VendorTab) => {
+    setActiveTab(t);
+    if (t !== 'orders' && typeof window !== 'undefined' && (window.location.search.includes('tab=orders') || window.location.search.includes('orderId='))) {
+      router.replace('/vendor/dashboard');
+    }
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (paramTab) {
+      setActiveTab(paramTab as VendorTab);
+    }
+  }, [paramTab]);
 
   // Product state
   const [products, setProducts] = useState<VendorProduct[]>([]);
@@ -611,6 +629,14 @@ export default function VendorDashboardPage() {
   const [statsProduct, setStatsProduct] = useState<VendorProduct | null>(null);
   const [productStats, setProductStats] = useState<ProductStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+  const handleCloseVendorOrderModal = () => {
+    setIsOrderModalOpen(false);
+    setSelectedOrder(null);
+    if (typeof window !== 'undefined' && window.location.search.includes('orderId')) {
+      router.replace('/vendor/dashboard?tab=orders');
+    }
+  };
 
   // Orders state
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -951,6 +977,28 @@ export default function VendorDashboardPage() {
     }
   }, [activeTab, fetchVendorOrders]);
 
+  // Auto-open order modal when navigating from a notification link (?orderId=...)
+  useEffect(() => {
+    if (paramOrderId) {
+      const cleanId = String(paramOrderId).replace('#', '');
+      const matched = vendorOrders.find(
+        (o) => String(o.id).replace('#', '') === cleanId ||
+               String(o.orderNumber || '').replace('#', '') === cleanId
+      );
+      if (matched) {
+        setSelectedOrder(matched);
+      } else {
+        // Stub so the modal can still fetch full details by order number/id
+        setSelectedOrder({
+          id: paramOrderId,
+          orderNumber: paramOrderId,
+        });
+      }
+      setActiveTab('orders');
+      setIsOrderModalOpen(true);
+    }
+  }, [paramOrderId, vendorOrders]);
+
   const openOrderModal = (order: any) => {
     setSelectedOrder(order);
     setIsOrderModalOpen(true);
@@ -1038,28 +1086,62 @@ export default function VendorDashboardPage() {
             <span className="text-[10px] text-fuchsia-600 font-bold uppercase tracking-wider bg-fuchsia-50 px-2 py-0.5 rounded border border-fuchsia-100">Vendor</span>
           </Link>
         </div>
-        <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-gray-700 hover:bg-gray-100 rounded-xl transition -mr-2">
-          <Menu size={24} />
-        </button>
+        <div className="flex items-center gap-3">
+          <NotificationBell />
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-gray-700 hover:bg-gray-100 rounded-xl transition -mr-2">
+            <Menu size={24} />
+          </button>
+        </div>
       </div>
 
       <VendorSidebar
         activeTab={activeTab}
-        setActiveTab={(tab) => setActiveTab(tab as VendorTab)}
+        setActiveTab={(tab) => handleTabChange(tab as VendorTab)}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+        {/* Desktop Top Header Bar */}
+        <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-gray-200/60">
+          <div>
+            <span className="text-xs font-bold text-fuchsia-600 bg-fuchsia-50 px-2.5 py-1 rounded-full uppercase tracking-wider border border-fuchsia-100">
+              Vendor Portal
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <NotificationBell />
+            <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
+              <div className="w-8 h-8 rounded-full bg-fuchsia-100 flex items-center justify-center font-bold text-fuchsia-700 text-sm border border-fuchsia-200 shadow-sm">
+                {authUser?.firstName?.[0] || 'V'}
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-slate-800 leading-tight">
+                  {authUser?.firstName || 'Vendor'} {authUser?.lastName || ''}
+                </p>
+                <p className="text-[10px] text-gray-400 font-medium truncate max-w-[140px]">
+                  {authUser?.email || 'vendor@faflora.com'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Dashboard Overview Tab */}
         {activeTab === 'dashboard' && (
           <VendorDashboardOverview vendorDashboardApi={vendorDashboardApi} />
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 'notifications' && (
+          <NotificationsView />
         )}
 
         {/* Store Settings Tab */}
         {activeTab === 'store-settings' && (
           <VendorStoreSettings vendorDashboardApi={vendorDashboardApi} />
         )}
+
 
         {/* Products Tab */}
         {activeTab === 'products' && (<>
@@ -1260,7 +1342,7 @@ export default function VendorDashboardPage() {
 
       <OrderDetailsModal
         isOpen={isOrderModalOpen}
-        onClose={() => { setIsOrderModalOpen(false); setSelectedOrder(null); }}
+        onClose={handleCloseVendorOrderModal}
         order={selectedOrder}
         onOrderUpdated={fetchVendorOrders}
       />
@@ -1277,5 +1359,19 @@ export default function VendorDashboardPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function VendorDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <VendorDashboardContent />
+    </Suspense>
   );
 }

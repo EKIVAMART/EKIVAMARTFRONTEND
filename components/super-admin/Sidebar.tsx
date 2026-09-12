@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent, Bell } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,9 +9,11 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
+export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications';
+
 interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes') => void;
+  activeTab: SuperAdminTab | string;
+  setActiveTab: (tab: SuperAdminTab) => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -73,56 +75,63 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             </button>
           )}
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <SidebarLink
             icon={<LayoutDashboard size={20} />}
             label="Dashboard"
             active={activeTab === 'dashboard'}
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => { setActiveTab('dashboard'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Package size={20} />}
             label="Products"
             active={activeTab === 'products'}
-            onClick={() => setActiveTab('products')}
+            onClick={() => { setActiveTab('products'); onClose?.(); }}
           />
           <SidebarLink
             icon={<ShoppingCart size={20} />}
             label="Orders"
             active={activeTab === 'orders'}
-            onClick={() => setActiveTab('orders')}
+            onClick={() => { setActiveTab('orders'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Users size={20} />}
             label="Vendor Settings"
             active={activeTab === 'vendors'}
-            onClick={() => setActiveTab('vendors')}
+            onClick={() => { setActiveTab('vendors'); onClose?.(); }}
           />
           <SidebarLink
             icon={<UserCog size={20} />}
             label="Admins"
             active={activeTab === 'admins'}
-            onClick={() => setActiveTab('admins')}
+            onClick={() => { setActiveTab('admins'); onClose?.(); }}
           />
           <SidebarLink
             icon={<UserCircle size={20} />}
             label="Users"
             active={activeTab === 'users'}
-            onClick={() => setActiveTab('users')}
+            onClick={() => { setActiveTab('users'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Clock size={20} />}
             label="Waitlist"
             active={activeTab === 'waitlist'}
-            onClick={() => setActiveTab('waitlist')}
+            onClick={() => { setActiveTab('waitlist'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<Bell size={20} />}
+            label="Notifications"
+            active={activeTab === 'notifications'}
+            onClick={() => { setActiveTab('notifications'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Percent size={20} />}
             label="Tax & Compliance"
             active={activeTab === 'taxes'}
-            onClick={() => setActiveTab('taxes')}
+            onClick={() => { setActiveTab('taxes'); onClose?.(); }}
           />
         </nav>
+
         <div className="p-6 border-t mt-auto">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">

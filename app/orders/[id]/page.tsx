@@ -60,9 +60,27 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   }, [id]);
 
   const fetchOrderDetails = async () => {
+    if (!id || id === 'undefined' || id === 'null') {
+      toast.error('Invalid order identifier');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await ordersApi.getById(id);
+      let res: any;
+      const isNumberLike = id.startsWith('ORD-') || id.startsWith('#') || !/^[0-9a-f]{8}-[0-9a-f]{4}/i.test(id);
+      
+      if (isNumberLike) {
+        res = await ordersApi.getByNumber(id).catch(() => null);
+      }
+      if (!res?.success || !res.data) {
+        res = await ordersApi.getById(id).catch(() => null);
+      }
+      if (!res?.success || !res.data) {
+        res = await ordersApi.getByNumber(id).catch(() => null);
+      }
+
       if (res?.success && res.data) {
         setOrder(res.data);
       } else {

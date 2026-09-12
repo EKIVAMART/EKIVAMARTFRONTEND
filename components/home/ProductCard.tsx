@@ -168,8 +168,14 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
 
       {/* Location & Vendor */}
       <div className="mb-2.5 flex items-start gap-1.1 text-[11px] text-neutral-500">
-        <Image src="/icons/location.png" alt="" width={14} height={14} className="shrink-0 mt-px" />
-        <span className="flex-1 break-words">{product.location}</span>
+        <Image src="/icons/location.png" alt="" width={14} height={14} className="shrink-0 mt-px mr-1" />
+        <span className="flex-1 break-words">
+          {typeof product.location === 'object' && product.location !== null
+            ? ((product.location as any).state || 'Lagos')
+            : typeof product.location === 'string' && product.location.includes(',')
+            ? product.location.split(',').pop()?.trim() || product.location
+            : (product.location || 'Lagos')}
+        </span>
         <span className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%]">
           {product.storeName || product.vendor}
         </span>

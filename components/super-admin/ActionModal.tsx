@@ -96,7 +96,8 @@ export interface ProductCategoryOption {
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  activeTab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'admins' | 'taxes';
+  activeTab: 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'admins' | 'taxes' | 'notifications';
+
   editingItem?: EditableProduct;
   categories?: ProductCategoryOption[];
   isLoadingCategories?: boolean;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useCartCount } from '@/lib/hooks';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface MobileHeaderProps {
   categories: any[];
@@ -165,7 +166,7 @@ export default function MobileHeader({
   })();
 
   return (
-    <div className="md:hidden w-full bg-white relative overflow-hidden">
+    <div className="md:hidden w-full bg-white relative z-40">
       {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
       <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 overflow-x-auto min-w-0">
         
@@ -234,7 +235,11 @@ export default function MobileHeader({
             <CartIcon filled={onCart} />
           </Link>
 
+          {/* In-App Notifications Bell (Renders strictly for authenticated users) */}
+          <NotificationBell />
+
           {/* Account Icon */}
+
           {isAuthenticated && user ? (
             <button
               type="button"

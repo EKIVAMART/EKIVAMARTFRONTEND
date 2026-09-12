@@ -6,6 +6,7 @@ import Navbar from '@/components/home/Navbar';
 import Footer from '@/components/home/Footer';
 import { Toast } from '@/components/ui/Toast';
 import CartNoteModal from './CartNoteModal';
+import { NotificationProvider } from '@/context/NotificationContext';
 
 import { ResetPasswordModalTrigger } from '@/components/auth/ResetPasswordModalTrigger';
 
@@ -30,7 +31,7 @@ export default function LayoutWrapper({
   const hideNavigation = isVendorRegistration || isSuperAdminRoute || isAdminRoute || isLanding;
 
   return (
-    <>
+    <NotificationProvider>
       {!hideNavigation && (
         <Suspense fallback={<NavbarSkeleton />}>
           <Navbar />
@@ -45,6 +46,7 @@ export default function LayoutWrapper({
       <Suspense fallback={null}>
         <ResetPasswordModalTrigger />
       </Suspense>
-    </>
+    </NotificationProvider>
   );
 }
+
