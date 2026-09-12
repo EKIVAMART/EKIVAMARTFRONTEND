@@ -782,7 +782,7 @@ function AdminPageContent() {
       const matched = orders.find(
         (o) =>
           String(o.id).replace('#', '') === cleanId ||
-          String(o.orderNumber || '').replace('#', '') === cleanId
+          String((o as any).orderNumber || '').replace('#', '') === cleanId
       );
       if (matched) {
         setEditingItem(matched);

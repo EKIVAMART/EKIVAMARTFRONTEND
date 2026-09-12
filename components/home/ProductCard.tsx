@@ -98,7 +98,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       className="group flex w-full h-full sm:w-52 sm:h-[415px] sm:shrink-0 flex-col rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm hover:shadow-md hover:scale-103 transition-shadow duration-200 relative"
     >
       {/* Image container — no overflow-hidden so the rosette badge overflows beautifully */}
-      <div className="relative mb-2.5 aspect-square rounded-xl bg-neutral-50 border border-neutral-100/50">
+      <div className="relative mb-3.5 aspect-square rounded-xl bg-neutral-50 border border-neutral-100/50">
         <Image
           src={product.image}
           alt={product.name}
@@ -111,16 +111,14 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
         {product.discountPercent ? (
           <RosetteBadge percent={product.discountPercent} />
         ) : null}
-      </div>
 
-      {/* Wishlist Button Row — between image and product name, aligned right */}
-      <div className="flex justify-end mb-1">
+        {/* Wishlist Button — Positioned at bottom-right over the image */}
         <button
           type="button"
           onClick={handleWishlistToggle}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          className={`flex h-7 w-7 items-center justify-center rounded-full bg-neutral-50 hover:bg-neutral-100 border border-neutral-200/80 hover:border-brand-600 transition-all duration-200 ${
-            isWishlisted ? 'text-brand-600 border-brand-400' : 'text-neutral-400 hover:text-brand-600'
+          className={`absolute bottom-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 hover:bg-white border border-neutral-200/80 hover:border-brand-600 shadow-sm transition-all duration-200 ${
+            isWishlisted ? 'text-brand-600 border-brand-400' : 'text-neutral-500 hover:text-brand-600'
           }`}
         >
           <svg
@@ -140,7 +138,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       </div>
 
       {/* Product Name */}
-      <p className="mb-1 text-xs sm:text-sm font-medium text-neutral-600 group-hover:text-brand-600 transition-colors duration-200 h-12 line-clamp-2 overflow-hidden leading-tight">
+      <p className="mb-1 text-xs sm:text-sm font-medium text-neutral-600 group-hover:text-brand-600 transition-colors duration-200 h-13 line-clamp-2 overflow-hidden leading-tight">
         {product.name}
       </p>
 
