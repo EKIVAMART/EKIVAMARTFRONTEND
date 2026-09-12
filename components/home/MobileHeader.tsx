@@ -168,7 +168,7 @@ export default function MobileHeader({
   return (
     <div className="md:hidden w-full bg-white relative z-40">
       {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
-      <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 overflow-x-auto min-w-0">
+      <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 min-w-0">
         
         {/* Categories button */}
         <button
@@ -195,17 +195,17 @@ export default function MobileHeader({
 
         {/* 4 icons group (placed close to the searchbar/other icons on the right) */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Search trigger (only visible when not active) */}
-          {!searchOpen && (
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="text-neutral-700 p-0.5 hover:text-brand-600 transition-colors cursor-pointer"
-            >
-              <SearchIcon />
-            </button>
-          )}
+          {/* Search trigger */}
+          <button
+            type="button"
+            onClick={() => setSearchOpen((prev) => !prev)}
+            aria-label="Search"
+            className={`p-0.5 transition-colors cursor-pointer ${
+              searchOpen ? 'text-brand-600' : 'text-neutral-700 hover:text-brand-600'
+            }`}
+          >
+            <SearchIcon />
+          </button>
 
           {/* Wishlist */}
           <Link
@@ -264,38 +264,6 @@ export default function MobileHeader({
         </div>
       </div>
 
-      {/* ── Row 2.5: Search bar dropdown with NO active border styling ── */}
-      {searchOpen && (
-        <div
-          ref={searchContainerRef}
-          className="absolute left-0 right-0 top-full z-45 bg-white border-b border-brand-100 shadow-brand-lg px-4 py-3 flex items-center gap-2"
-        >
-          <div className="flex-1 flex items-center bg-neutral-50 rounded-full px-3 py-1.5">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-              autoFocus
-              className="w-full bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:!border-none !border-none !outline-none active:!border-none focus:!ring-0"
-            />
-            <button
-              type="button"
-              onClick={handleSearch}
-              disabled={!searchQuery.trim()}
-              className={`p-1.5 rounded-full transition-all shrink-0 ${
-                searchQuery.trim()
-                  ? 'bg-brand-600 text-white cursor-pointer active:scale-95'
-                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-              }`}
-            >
-              <SearchIcon size={14} />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ── Row 3: Horizontal category names strip (no underline, no scroll buttons, allow swipe scrolling) ── */}
       <div className="w-full bg-white flex flex-col border-t border-neutral-100">
         <div
@@ -330,6 +298,45 @@ export default function MobileHeader({
           />
         </div>
       </div>
+
+      {/* ── Row 3.5: Search bar dropdown positioned directly underneath the entire navbar ── */}
+      {searchOpen && (
+        <div
+          ref={searchContainerRef}
+          className="absolute left-0 right-0 top-full z-50 bg-white border-b border-brand-100 shadow-xl px-4 py-3 flex items-center gap-2"
+        >
+          <div className="flex-1 flex items-center bg-neutral-50 rounded-full px-3 py-1.5 border border-neutral-200">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+              autoFocus
+              className="w-full bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:!border-none !border-none !outline-none active:!border-none focus:!ring-0"
+            />
+            <button
+              type="button"
+              onClick={handleSearch}
+              disabled={!searchQuery.trim()}
+              className={`p-1.5 rounded-full transition-all shrink-0 ${
+                searchQuery.trim()
+                  ? 'bg-brand-600 text-white cursor-pointer active:scale-95'
+                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+              }`}
+            >
+              <SearchIcon size={14} />
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSearchOpen(false)}
+            className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 shrink-0 px-1 py-1"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }
