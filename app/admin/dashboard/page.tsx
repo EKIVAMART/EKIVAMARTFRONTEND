@@ -80,6 +80,7 @@ type AdminVendor = {
 
 type AdminOrder = {
   id: string;
+  orderNumber?: string;
   user: {
     name: string;
     avatar: string;
