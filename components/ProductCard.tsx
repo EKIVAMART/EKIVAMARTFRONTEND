@@ -289,13 +289,13 @@ export default function ProductCard({
         /* Wishlist Button */
         .pc-wishlist-btn {
           position: absolute;
-          top: 12px;
-          left: 12px;
-          width: 40px;
-          height: 40px;
+          bottom: 12px;
+          right: 12px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          background: white;
-          border: 2px solid #9d4ae3;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1.5px solid #9d4ae3;
           color: #9d4ae3;
           display: flex;
           align-items: center;
@@ -303,7 +303,7 @@ export default function ProductCard({
           cursor: pointer;
           transition: all 0.3s ease;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(157, 74, 227, 0.15);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
         }
 
         .pc-wishlist-btn:hover {
@@ -380,10 +380,10 @@ export default function ProductCard({
 
         /* Body */
         .pc-body {
-          padding: 16px;
+          padding: 10px 16px 16px 16px;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
           flex-grow: 1;
         }
 
