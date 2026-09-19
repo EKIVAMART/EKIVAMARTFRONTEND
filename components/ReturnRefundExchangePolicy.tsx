@@ -537,7 +537,7 @@ export default function ReturnRefundExchangePolicy() {
               className="text-5xl md:text-6xl lg:text-[5.2rem] lg:-skew-x-6 -skew-x-4 font-black text-[#1a0018] leading-[0.95] tracking-tight"
               style={{ fontFamily: "'Georgia', serif" }}
             >
-              <TypingText text="Returns, Refunds" delay={350} typingSpeed={55} colorClass="text-[#8236be]" />
+              <TypingText text="Returns, Refunds" delay={350} typingSpeed={55} colorClass="text-[#8236be]" hideCursorOnComplete />
               <br />
               <span className="text-[#9d4ae3]">
                 <TypingText text="& Exchanges" delay={1200} typingSpeed={55} colorClass="text-[#8236be]" />

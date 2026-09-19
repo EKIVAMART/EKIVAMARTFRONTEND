@@ -289,7 +289,7 @@ export default function MarketingSolutionsAnalyticsPage() {
                     filter: 'drop-shadow(0 0 24px rgba(168,79,154,0.35))',
                   }}
                 >
-                  <TypingText text="Marketing" delay={300} typingSpeed={60} />
+                  <TypingText text="Marketing" delay={300} typingSpeed={60} hideCursorOnComplete />
                 </span>
                 <br />
                 {/* "Solutions" — soft lavender/purple gradient */}
@@ -303,13 +303,13 @@ export default function MarketingSolutionsAnalyticsPage() {
                     filter: 'drop-shadow(0 0 18px rgba(216,172,209,0.4))',
                   }}
                 >
-                  <TypingText text="Solutions" delay={900} typingSpeed={60} />
+                  <TypingText text="Solutions" delay={900} typingSpeed={60} hideCursorOnComplete />
                 </span>
                 <span
                   className="inline-block mr-4"
                   style={{ color: 'rgba(255,255,255,0.55)', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))' }}
                 >
-                  <TypingText text="&" delay={1400} typingSpeed={60} />
+                  <TypingText text="&" delay={1400} typingSpeed={60} hideCursorOnComplete />
                 </span>
                 <br />
                 {/* "Analytics" — warm amber-gold, creating maximum contrast against the cool plum background */}

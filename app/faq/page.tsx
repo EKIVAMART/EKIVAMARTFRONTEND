@@ -261,7 +261,7 @@ export default function FAQPage() {
                     backgroundClip: 'text',
                   }}
                 >
-                  <TypingText text="Frequently" delay={350} typingSpeed={60} colorClass="" />
+                  <TypingText text="Frequently" delay={350} typingSpeed={60} colorClass="" hideCursorOnComplete />
                 </span>
                 {/* Line 2 */}
                 <span
@@ -273,7 +273,7 @@ export default function FAQPage() {
                     backgroundClip: 'text',
                   }}
                 >
-                  <TypingText text="Asked" delay={950} typingSpeed={60} colorClass="" />
+                  <TypingText text="Asked" delay={950} typingSpeed={60} colorClass="" hideCursorOnComplete />
                 </span>
                 {/* Line 3 */}
                 <span

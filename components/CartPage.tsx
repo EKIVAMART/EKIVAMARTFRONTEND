@@ -59,7 +59,7 @@ export default function CartPage() {
   // Checkout flow state
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'mock'>('paystack');
+  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'kora_pay' | 'mock'>('paystack');
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine1: '',
@@ -832,6 +832,31 @@ export default function CartPage() {
                             </div>
                           </div>
                           <CreditCard size={18} className="text-amber-500 shrink-0" />
+                        </label>
+
+                        <label
+                          onClick={() => setPaymentMethod('kora_pay')}
+                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                            paymentMethod === 'kora_pay'
+                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
+                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="kora_pay"
+                              checked={paymentMethod === 'kora_pay'}
+                              onChange={() => setPaymentMethod('kora_pay')}
+                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            />
+                            <div>
+                              <div className="text-xs font-bold text-slate-800">Korapay</div>
+                              <p className="text-[11px] text-gray-500 font-medium">Cards, Bank Transfer, Virtual Accounts, Mobile Money</p>
+                            </div>
+                          </div>
+                          <CreditCard size={18} className="text-emerald-500 shrink-0" />
                         </label>
 
                         <label

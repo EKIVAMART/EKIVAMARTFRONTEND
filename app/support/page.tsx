@@ -259,6 +259,7 @@ export default function SupportHome() {
                   delay={350}
                   typingSpeed={60}
                   colorClass="text-[#8236be]"
+                  hideCursorOnComplete
                 />
                 <br />
                 <span className="text-[#9d4ae3]">
@@ -267,6 +268,7 @@ export default function SupportHome() {
                     delay={950}
                     typingSpeed={60}
                     colorClass="text-[#8236be]"
+                    hideCursorOnComplete
                   />
                 </span>
                 <span className="text-[#8236be]">

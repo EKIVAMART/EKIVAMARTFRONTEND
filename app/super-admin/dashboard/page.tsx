@@ -28,6 +28,7 @@ import UserTable, { AppUser } from '@/components/super-admin/UserTable';
 import ViewUserModal from '@/components/super-admin/ViewUserModal';
 import WaitlistView from '@/components/admin/WaitlistView';
 import TaxRulesManagement from '@/components/admin/TaxRulesManagement';
+import BlogManagementView from '@/components/admin/BlogManagementView';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -671,7 +672,7 @@ function AdminPageContent() {
   const paramOrderId = searchParams ? searchParams.get('orderId') : null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog'>('dashboard');
 
   const handleTabChange = (t: string) => {
     setActiveTab(t as any);
@@ -2155,7 +2156,11 @@ function AdminPageContent() {
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
-                placeholder={`Search across ${activeTab}...`}
+                placeholder={
+                  activeTab === 'blog'
+                    ? 'Search blog articles by title, excerpt or author…'
+                    : `Search across ${activeTab}...`
+                }
                 className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
                 value={searchQuery}
                 onChange={(e) => {
@@ -2263,6 +2268,9 @@ function AdminPageContent() {
             )}
             {activeTab === 'taxes' && (
               <TaxRulesManagement />
+            )}
+            {activeTab === 'blog' && (
+              <BlogManagementView globalSearchQuery={searchQuery} />
             )}
           </>
         )}

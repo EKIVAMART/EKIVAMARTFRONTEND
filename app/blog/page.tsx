@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import FadeInSection from '@/components/FadeInSection';
 import {
@@ -10,32 +10,59 @@ import {
   Tag,
   Sparkles,
   TrendingUp,
-  ShoppingBag,
-  Users,
-  Zap,
-  Globe,
   ChevronRight,
+  ChevronLeft,
+  Loader2,
+  FileText,
+  Search,
+  X,
 } from 'lucide-react';
 import TypingText from '@/components/TypingText';
+import { blogApi, decodeHtmlEntities, PublicBlogPostSummary } from '@/lib/api-blog';
 
-import { BlogPost, posts, categories } from './postsData';
+export interface MappedBlogPost {
+  id: string;
+  slug: string;
+  category: string;
+  tag: string;
+  title: string;
+  excerpt: string;
+  readTime: string;
+  date: string;
+  gradient: string;
+  accentColor: string;
+  featured: boolean;
+  featuredImage?: string;
+  author: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
+}
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  All: <BookOpen size={14} />,
-  Sellers: <ShoppingBag size={14} />,
-  Buyers: <Users size={14} />,
-  'Platform Updates': <Zap size={14} />,
-  'Commerce Insights': <Globe size={14} />,
-};
+const GRADIENTS = [
+  'from-[#8b0d7a] via-[#5c0060] to-[#1a0016]',
+  'from-[#ff7043] via-[#e65100] to-[#1a0016]',
+  'from-[#00b8d9] via-[#005f73] to-[#1a0016]',
+  'from-[#43a047] via-[#1b5e20] to-[#1a0016]',
+  'from-[#9d4ae3] via-[#6a0dad] to-[#1a0016]',
+];
 
 /* ─── Sub-components ─── */
 
-const FeaturedCard = ({ post }: { post: BlogPost }) => (
+const FeaturedCard = ({ post }: { post: MappedBlogPost }) => (
   <FadeInSection type="fadeUp" delay={0.1}>
     <Link href={`/blog/${post.slug}`} className="group block">
       <div className="relative overflow-hidden rounded-3xl h-[480px] md:h-[560px]">
         {/* Gradient background */}
         <div className={`absolute inset-0 bg-gradient-to-br ${post.gradient}`} />
+        {post.featuredImage && (
+          <img
+            src={post.featuredImage}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
+          />
+        )}
         {/* Dot-grid texture */}
         <div
           className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -49,14 +76,14 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
           className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-25 blur-[80px] pointer-events-none"
           style={{ background: post.accentColor }}
         />
-        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-3/4 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-between p-8 md:p-10">
+        <div className="absolute inset-0 flex flex-col justify-between p-8 md:p-10 z-10">
           <div className="flex items-start justify-between">
             <div className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white text-[10px] font-black uppercase tracking-[3px] px-4 py-2 rounded-full">
               <Sparkles size={10} />
-              Featured
+              Featured Article
             </div>
             <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white/80 text-xs font-semibold px-3 py-1.5 rounded-full">
               <Tag size={11} />
@@ -74,19 +101,17 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
             >
               {post.title}
             </h2>
-            <p className="text-white/65 text-sm md:text-base leading-relaxed max-w-xl mb-6">
+            <p className="text-white/75 text-sm md:text-base leading-relaxed max-w-xl mb-6 line-clamp-3">
               {post.excerpt}
             </p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-white/50 text-xs font-medium">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 text-white/60 text-xs font-medium">
                 <Clock size={12} />
                 {post.readTime}
               </div>
               <div className="w-1 h-1 rounded-full bg-white/30" />
-              <span className="text-white/50 text-xs font-medium">{post.date}</span>
-              <div
-                className="ml-auto flex items-center gap-2 text-white font-bold text-sm group-hover:gap-3 transition-all"
-              >
+              <span className="text-white/60 text-xs font-medium">{post.date}</span>
+              <div className="ml-auto flex items-center gap-2 text-white font-bold text-sm group-hover:gap-3 transition-all">
                 Read Article <ArrowRight size={15} />
               </div>
             </div>
@@ -97,46 +122,58 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
   </FadeInSection>
 );
 
-const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
-  <FadeInSection type="fadeUp" delay={0.1 + index * 0.07}>
+const PostCard = ({ post, index }: { post: MappedBlogPost; index: number }) => (
+  <FadeInSection type="fadeUp" delay={0.05 + (index % 3) * 0.05}>
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <div className="flex flex-col h-full bg-white border border-[#e8e4f0] rounded-3xl overflow-hidden hover:border-[#ad74e8] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-        {/* Color block top */}
-        <div className={`relative h-44 bg-gradient-to-br ${post.gradient} overflow-hidden flex-shrink-0`}>
-          <div
-            className="absolute inset-0 opacity-[0.07] pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-            }}
-          />
-          <div
-            className="absolute -bottom-6 -right-6 w-32 h-32 rounded-full opacity-30 blur-[40px] pointer-events-none"
-            style={{ background: post.accentColor }}
-          />
-          <div className="absolute top-5 left-5">
-            <span className="inline-flex items-center gap-1.5 bg-black/25 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-[3px] px-3 py-1.5 rounded-full">
+        {/* Top visual block */}
+        <div className={`relative h-48 bg-gradient-to-br ${post.gradient} overflow-hidden flex-shrink-0`}>
+          {post.featuredImage ? (
+            <img
+              src={post.featuredImage}
+              alt={post.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <>
+              <div
+                className="absolute inset-0 opacity-[0.07] pointer-events-none"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                }}
+              />
+              <div
+                className="absolute -bottom-6 -right-6 w-32 h-32 rounded-full opacity-30 blur-[40px] pointer-events-none"
+                style={{ background: post.accentColor }}
+              />
+            </>
+          )}
+          <div className="absolute top-4 left-4 z-10">
+            <span className="inline-flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-[2px] px-3 py-1.5 rounded-full">
               <Tag size={9} />
               {post.tag}
             </span>
           </div>
-          <div className="absolute bottom-5 right-5 flex items-center gap-1.5 text-white/70 text-xs font-medium">
+          <div className="absolute bottom-4 right-4 flex items-center gap-1.5 text-white/90 text-xs font-medium bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-10">
             <Clock size={11} />
             {post.readTime}
           </div>
         </div>
 
-        {/* Text */}
+        {/* Content */}
         <div className="flex flex-col flex-1 p-6">
-          <span className="text-[10px] font-black uppercase tracking-[4px] text-[#ad74e8] mb-2">{post.category}</span>
+          <span className="text-[10px] font-black uppercase tracking-[3px] text-[#ad74e8] mb-2">
+            {post.category}
+          </span>
           <h3
-            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-3 flex-1"
+            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-3 flex-1 line-clamp-2"
             style={{ fontFamily: "'Georgia', serif" }}
           >
             {post.title}
           </h3>
-          <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-4">{post.excerpt}</p>
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-5">{post.excerpt}</p>
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
             <span className="text-xs text-gray-400 font-medium">{post.date}</span>
             <span className="inline-flex items-center gap-1 text-[#8236be] text-sm font-bold group-hover:gap-2 transition-all">
               Read <ChevronRight size={14} />
@@ -148,14 +185,82 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
   </FadeInSection>
 );
 
-/* ─── Page ─── */
+/* ─── Main Page ─── */
 export default function BlogPage() {
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [posts, setPosts] = useState<MappedBlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 1,
+  });
 
-  const featured = posts.find((p) => p.featured)!;
-  const rest = posts.filter((p) => !p.featured);
-  const filtered =
-    activeCategory === 'All' ? rest : rest.filter((p) => p.category === activeCategory);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      setLoading(true);
+      try {
+        const res = await blogApi.getPublicPosts({ page, limit: 10, search: debouncedSearch });
+        if (res.posts) {
+          const mapped: MappedBlogPost[] = res.posts.map((item: PublicBlogPostSummary, idx: number) => ({
+            id: item.id,
+            slug: item.slug,
+            category: (item as any).category?.name || 'Faflora Journal',
+            tag: (item as any).tags?.[0] || 'Article',
+            title: decodeHtmlEntities(item.title),
+            excerpt: decodeHtmlEntities(item.excerpt || 'Read article for full details...'),
+            readTime: `${item.readingTime || 3} min read`,
+            date: item.publishedAt
+              ? new Date(item.publishedAt).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : 'Recent',
+            gradient: GRADIENTS[idx % GRADIENTS.length],
+            accentColor: '#9d4ae3',
+            featured: page === 1 && idx === 0 && !debouncedSearch,
+            featuredImage: item.featuredImage?.url,
+            author: {
+              name: item.author?.name || 'Faflora Editorial',
+              role: 'Faflora Staff',
+              avatar: (item.author?.name || 'FE').substring(0, 2).toUpperCase(),
+            },
+          }));
+
+          setPosts(mapped);
+          setPagination({
+            page: Number(res.pagination?.page) || page,
+            limit: Number(res.pagination?.limit) || 10,
+            total: Number(res.pagination?.total) || mapped.length,
+            pages: Number(res.pagination?.totalPages || res.pagination?.pages) || 1,
+          });
+        } else {
+          setPosts([]);
+        }
+      } catch (err) {
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, [page, debouncedSearch]);
+
+  const featured = page === 1 ? (posts.find((p) => p.featured) || posts[0]) : null;
+  const remainingPosts = page === 1 && featured ? posts.filter((p) => p.id !== featured.id) : posts;
 
   return (
     <div
@@ -163,16 +268,15 @@ export default function BlogPage() {
       style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', 'Georgia', serif" }}
     >
       {/* ══ HERO ══ */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
-        {/* Deep plum background with a hint of dark purple/indigo at the bottom */}
+      <section className="relative min-h-[55vh] flex items-center overflow-hidden">
+        {/* Background gradient */}
         <div className="absolute inset-0 bg-[#1a0016]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#2d002a] to-[#140026]/90" />
-        {/* Ambient glow orbs */}
+        {/* Glow Orbs */}
         <div className="absolute top-[-10%] left-[-8%] w-[50vw] h-[50vw] rounded-full bg-[#8b0d7a] opacity-[0.22] blur-[130px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-[#5c0060] opacity-[0.28] blur-[110px] pointer-events-none" />
         <div className="absolute top-[10%] right-[5%] w-[28vw] h-[28vw] rounded-full bg-[#ad74e8] opacity-[0.10] blur-[90px] pointer-events-none" />
-        <div className="absolute top-[45%] right-[25%] w-[20vw] h-[20vw] rounded-full bg-[#ff69e0] opacity-[0.08] blur-[70px] pointer-events-none" />
-        {/* Grid */}
+        {/* Dot pattern */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
@@ -180,20 +284,6 @@ export default function BlogPage() {
             backgroundSize: '36px 36px',
           }}
         />
-        <div
-          className="absolute inset-0 opacity-[0.025] pointer-events-none"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(135deg, #ad74e8 0px, #ad74e8 1px, transparent 1px, transparent 48px)',
-          }}
-        />
-        {/* Floating badges */}
-        <div className="absolute top-24 right-[8%] hidden lg:flex items-center gap-2 bg-white/8 backdrop-blur-sm text-white/70 text-xs font-semibold px-4 py-2 rounded-full border border-white/15 select-none">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> New Articles Weekly
-        </div>
-        <div className="absolute top-40 right-[13%] hidden lg:flex items-center gap-2 bg-white/8 backdrop-blur-sm text-white/70 text-xs font-semibold px-4 py-2 rounded-full border border-white/15 select-none">
-          <TrendingUp size={11} /> Commerce Insights
-        </div>
 
         <div className="relative max-w-6xl mx-auto px-6 md:px-12 lg:px-16 w-full pt-28 pb-24">
           <div className="max-w-3xl">
@@ -215,7 +305,7 @@ export default function BlogPage() {
                     textShadow: '0 0 60px rgba(168,79,154,0.4), 0 2px 16px rgba(168,79,154,0.2)',
                   }}
                 >
-                  <TypingText text="Stories," delay={100} typingSpeed={70} colorClass="" />
+                  <TypingText text="Stories," delay={100} typingSpeed={70} colorClass="" hideCursorOnComplete />
                 </span>
                 <br />
                 <span
@@ -227,7 +317,7 @@ export default function BlogPage() {
                     filter: 'drop-shadow(0 0 16px rgba(232,121,249,0.55))',
                   }}
                 >
-                  <TypingText text="Tips" delay={700} typingSpeed={70} colorClass="" />
+                  <TypingText text="Tips" delay={700} typingSpeed={70} colorClass="" hideCursorOnComplete />
                 </span>
                 <span
                   style={{
@@ -235,7 +325,7 @@ export default function BlogPage() {
                   }}
                 >
                   {' '}
-                  <TypingText text="&amp;" delay={1000} typingSpeed={70} colorClass="" />{' '}
+                  <TypingText text="&amp;" delay={1000} typingSpeed={70} colorClass="" hideCursorOnComplete />{' '}
                 </span>
                 <span
                   style={{
@@ -260,33 +350,43 @@ export default function BlogPage() {
                 <div className="h-[3px] w-8 rounded-full bg-white/20" />
                 <div className="h-[3px] w-4 rounded-full bg-white/10" />
               </div>
-              <p className="mt-5 text-white/55 text-base md:text-lg max-w-2xl leading-relaxed">
+              <p className="mt-5 text-white/60 text-base md:text-lg max-w-2xl leading-relaxed">
                 Expert advice, platform updates, and commerce insights to help every buyer and seller thrive on Faflora.
               </p>
             </FadeInSection>
 
-            <FadeInSection type="fadeUp" delay={0.58}>
-              <div className="mt-8 flex flex-wrap gap-3">
-                {[
-                  { label: 'Seller Guides', dot: true },
-                  { label: 'Buyer Tips' },
-                  { label: 'Platform News' },
-                  { label: 'Commerce Data' },
-                ].map(({ label, dot }) => (
-                  <div
-                    key={label}
-                    className="inline-flex items-center gap-2 bg-white/8 border border-white/15 text-white/65 text-xs font-semibold px-4 py-2 rounded-full"
+            {/* Hero Search Bar */}
+            <FadeInSection type="fadeUp" delay={0.5}>
+              <div className="mt-8 max-w-xl relative">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                <input
+                  type="text"
+                  placeholder="Search articles by title, category, or keyword..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#ad74e8] transition shadow-lg"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setPage(1);
+                    }}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition cursor-pointer"
+                    title="Clear search"
                   >
-                    {dot && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
-                    {label}
-                  </div>
-                ))}
+                    <X size={16} />
+                  </button>
+                )}
               </div>
             </FadeInSection>
           </div>
         </div>
 
-        {/* Wave */}
+        {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none">
           <svg viewBox="0 0 1440 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="none">
             <path d="M0,32 C360,64 1080,0 1440,32 L1440,64 L0,64 Z" fill="#fdf8ff" />
@@ -295,57 +395,98 @@ export default function BlogPage() {
       </section>
 
       {/* ══ BODY ══ */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 md:pb-28 pb-12 pt-10">
-
-        {/* ── FEATURED POST ── */}
-        <div className="mb-12">
-          {(activeCategory === 'All' || featured.category === activeCategory) && (
-            <FeaturedCard post={featured} />
-          )}
-        </div>
-
-        {/* ── CATEGORY FILTERS ── */}
-        <FadeInSection type="fadeUp" delay={0.1}>
-          <div className="flex flex-wrap gap-2.5 mb-10">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
-                  activeCategory === cat
-                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-lg shadow-purple-100'
-                    : 'bg-white border border-[#e8e4f0] text-gray-600 hover:border-[#ad74e8] hover:text-[#ad74e8]'
-                }`}
-              >
-                {categoryIcons[cat]}
-                {cat}
-              </button>
-            ))}
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 pb-24 pt-10">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-3">
+            <Loader2 className="w-9 h-9 animate-spin text-[#ad74e8]" />
+            <p className="text-sm font-medium text-gray-500">Loading articles from Faflora Journal...</p>
           </div>
-        </FadeInSection>
-
-        {/* ── POSTS GRID ── */}
-        {filtered.length === 0 && activeCategory !== 'All' ? (
+        ) : posts.length === 0 ? (
+          /* EMPTY STATE */
           <FadeInSection type="fadeUp" delay={0.1}>
-            <div className="text-center py-20">
-              <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center mx-auto mb-4">
-                <BookOpen size={28} className="text-[#ad74e8]" />
+            <div className="bg-white border border-[#e8b8e4] rounded-3xl p-12 md:p-16 text-center max-w-2xl mx-auto shadow-sm my-8">
+              <div className="w-16 h-16 rounded-2xl bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] flex items-center justify-center mx-auto mb-6">
+                <FileText size={32} />
               </div>
-              <h3
-                className="text-xl font-extrabold text-[#1a0018] mb-2"
+              <h2
+                className="text-2xl md:text-3xl font-extrabold text-[#1a0018] mb-3"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
-                No articles in this category yet
-              </h3>
-              <p className="text-gray-500 text-sm">More content is coming soon. Check back shortly.</p>
+                No Blog Posts Yet
+              </h2>
+              <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-md mx-auto mb-8">
+                Our editorial team is currently crafting stories, seller guides, and platform updates. Check back soon!
+              </p>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-extrabold text-sm px-7 py-3.5 rounded-full hover:shadow-lg transition-all"
+              >
+                Return to Home <ArrowRight size={15} />
+              </Link>
             </div>
           </FadeInSection>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {filtered.map((post, i) => (
-              <PostCard key={post.slug} post={post} index={i} />
-            ))}
-          </div>
+          <>
+            {/* FEATURED POST (on page 1) */}
+            {page === 1 && featured && (
+              <div className="md:mb-12 mb-6">
+                <FeaturedCard post={featured} />
+              </div>
+            )}
+
+            {/* ARTICLES GRID */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7 md:mb-14 mb-8">
+              {(page === 1 ? remainingPosts : posts).map((post, i) => (
+                <PostCard key={post.id} post={post} index={i} />
+              ))}
+            </div>
+
+            {/* PAGINATION BAR */}
+            {pagination.pages > 1 && (
+              <FadeInSection type="fadeUp" delay={0.1}>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-[#e8e4f0] rounded-2xl p-5 mb-16 shadow-xs">
+                  <span className="text-sm font-semibold text-gray-500">
+                    Showing page <span className="text-[#1a0018] font-bold">{pagination.page}</span> of{' '}
+                    <span className="text-[#1a0018] font-bold">{pagination.pages}</span> ({pagination.total} articles)
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#ad74e8] hover:text-[#ad74e8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft size={15} /> Previous
+                    </button>
+
+                    <div className="flex items-center gap-1 px-2">
+                      {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          onClick={() => setPage(pageNum)}
+                          className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                            pageNum === page
+                              ? 'bg-[#9d4ae3] text-white'
+                              : 'text-gray-600 hover:bg-purple-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+                      disabled={page === pagination.pages}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#ad74e8] hover:text-[#ad74e8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      Next <ChevronRight size={15} />
+                    </button>
+                  </div>
+                </div>
+              </FadeInSection>
+            )}
+          </>
         )}
 
         {/* ─── DIVIDER ─── */}
@@ -393,35 +534,6 @@ export default function BlogPage() {
                 Visit Support Center <ArrowRight size={15} />
               </Link>
             </div>
-          </div>
-        </FadeInSection>
-
-        {/* ─── NEWSLETTER ─── */}
-        <FadeInSection type="fadeUp" delay={0.1}>
-          <div className="mt-12 rounded-3xl border border-[#e8b8e4] bg-white p-8 md:p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#7c3aed] flex items-center justify-center text-white mx-auto mb-5 shadow-md">
-              <Sparkles size={22} />
-            </div>
-            <h3
-              className="text-2xl md:text-3xl font-extrabold text-[#1a0018] mb-3"
-              style={{ fontFamily: "'Georgia', serif" }}
-            >
-              Never miss a story
-            </h3>
-            <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-lg mx-auto mb-8">
-              Get the best articles, seller guides, and platform updates delivered to your inbox every week.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 px-5 py-3.5 rounded-xl border border-[#e8b8e4] text-sm font-medium outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition"
-              />
-              <button className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#9d4ae3] to-[#7c3aed] hover:from-[#8236be] hover:to-[#6d31d4] text-white font-bold text-sm transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
-            <p className="mt-4 text-xs text-gray-400">No spam. Unsubscribe anytime.</p>
           </div>
         </FadeInSection>
       </div>

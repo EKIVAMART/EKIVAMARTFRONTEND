@@ -16,6 +16,7 @@ import {
   ShieldAlert,
   Bell,
   Clock,
+  BookOpen,
 } from 'lucide-react';
 import type { AppNotification } from '@/types/notification';
 import { getNotificationRoute } from '@/lib/utils/notification-routes';
@@ -131,6 +132,15 @@ export function NotificationItem({
           dot: 'bg-brand-600',
         };
 
+      case 'BLOG_POST_PUBLISHED':
+      case 'BLOG_ANNOUNCEMENT':
+      case 'NEW_BLOG_POST':
+        return {
+          icon: <BookOpen className="w-4 h-4 text-brand-600" />,
+          bg: 'bg-purple-50 border-purple-100',
+          dot: 'bg-purple-600',
+        };
+
       default:
         return {
           icon: <Bell className="w-4 h-4 text-neutral-600" />,
@@ -147,7 +157,7 @@ export function NotificationItem({
     e.preventDefault();
     onSelect?.(notification);
 
-    const route = getNotificationRoute(data, user?.role);
+    const route = getNotificationRoute(data, user?.role, String(type));
     router.push(route);
   };
 

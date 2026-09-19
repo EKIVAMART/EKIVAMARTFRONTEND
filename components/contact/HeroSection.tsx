@@ -61,8 +61,8 @@ export default function HeroSection() {
                 fontSize: 'clamp(3.2rem, 8vw, 6rem)',
               }}
             >
-              <span className="block text-white/90"><TypingText text="We're" delay={300} typingSpeed={70} /></span>
-              <span className="block text-white"><TypingText text="always" delay={800} typingSpeed={70} /></span>
+              <span className="block text-white/90"><TypingText text="We're" delay={300} typingSpeed={70} hideCursorOnComplete /></span>
+              <span className="block text-white"><TypingText text="always" delay={800} typingSpeed={70} hideCursorOnComplete /></span>
               <span
                 className="block italic font-extrabold pb-6"
                 style={{

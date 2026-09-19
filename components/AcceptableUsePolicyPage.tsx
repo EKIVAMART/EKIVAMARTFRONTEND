@@ -564,7 +564,7 @@ export default function AcceptableUsePolicy() {
                   className="text-5xl md:text-6xl lg:text-[5.2rem] lg:-skew-x-6 -skew-x-4 font-black text-white leading-[0.95] tracking-tight"
                   style={{ fontFamily: "'Georgia', serif" }}
                 >
-                  <TypingText text="Acceptable Use" delay={350} typingSpeed={55} colorClass="text-[#e8b8e4]" />
+                  <TypingText text="Acceptable Use" delay={350} typingSpeed={55} colorClass="text-[#e8b8e4]" hideCursorOnComplete />
                   <br />
                   <span className="text-[#e8b8e4]">
                     <TypingText text="Policy" delay={1200} typingSpeed={55} colorClass="text-white" />

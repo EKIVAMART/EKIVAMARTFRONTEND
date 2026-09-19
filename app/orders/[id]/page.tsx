@@ -597,6 +597,15 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                 <span>Flutterwave Gateway</span>
                 <span className="text-[10px] uppercase bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-black">Live</span>
               </button>
+              <button
+                onClick={() => setPaymentMethod('kora_pay')}
+                className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between transition ${
+                  paymentMethod === 'kora_pay' ? 'border-purple-500 bg-purple-50/20 text-purple-950 font-bold' : 'border-gray-150 hover:bg-gray-50 text-gray-600'
+                }`}
+              >
+                <span>Korapay Gateway</span>
+                <span className="text-[10px] uppercase bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-black">Live</span>
+              </button>
             </div>
 
             <div className="flex justify-end gap-2 mt-6">
