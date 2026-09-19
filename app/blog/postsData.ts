@@ -16,6 +16,7 @@ export interface BlogPost {
   gradient: string;
   accentColor: string;
   featured?: boolean;
+  featuredImage?: string;
   author: {
     name: string;
     role: string;

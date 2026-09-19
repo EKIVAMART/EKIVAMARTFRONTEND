@@ -14,6 +14,7 @@ interface TypingTextProps {
   onCycleComplete?: () => void;
   disableCursorOnMobile?: boolean;
   keepCursorFlashing?: boolean;
+  hideCursorOnComplete?: boolean;
 }
 
 const TypingText = ({
@@ -28,6 +29,7 @@ const TypingText = ({
   onCycleComplete,
   disableCursorOnMobile = true,
   keepCursorFlashing = false,
+  hideCursorOnComplete = false,
 }: TypingTextProps) => {
   const words = useMemo(() => texts || (text ? [text] : []), [texts, text]);
   const isCycling = words.length > 1;
@@ -105,8 +107,9 @@ const TypingText = ({
       cursorIntervalRef.current = null;
     }
 
+    const isComplete = displayedText.length === currentWord.length && !isDeleting;
     // Determine if cursor should flash
-    const shouldFlash = keepCursorFlashing || isCycling || (displayedText.length === currentWord.length && !isDeleting);
+    const shouldFlash = keepCursorFlashing || isCycling || (isComplete && !hideCursorOnComplete);
     
     if (shouldFlash) {
       // Start with cursor visible
@@ -119,12 +122,7 @@ const TypingText = ({
         }
       }, 500);
     } else {
-      // When not flashing, show cursor during typing, hide when empty
-      if (displayedText.length === 0 || (isDeleting && displayedText.length === 0)) {
-        setShowCursor(false);
-      } else {
-        setShowCursor(true);
-      }
+      setShowCursor(false);
     }
 
     // Cleanup on unmount or when dependencies change
@@ -134,7 +132,7 @@ const TypingText = ({
         cursorIntervalRef.current = null;
       }
     };
-  }, [keepCursorFlashing, isCycling, displayedText.length, currentWord.length, isDeleting, displayedText]);
+  }, [keepCursorFlashing, isCycling, displayedText.length, currentWord.length, isDeleting, displayedText, hideCursorOnComplete]);
 
   // Reset cursor when component unmounts
   useEffect(() => {

@@ -40,7 +40,7 @@ export interface IOrder {
   storeId: ObjectId;
   addressId: ObjectId;
   isPaid: boolean;
-  paymentMethod: 'COD' | 'STRIPE';
+  paymentMethod: 'COD' | 'STRIPE' | 'paystack' | 'flutterwave' | 'kora_pay' | 'mock';
   isCouponUsed: boolean;
   coupon?: Partial<ICoupon>;
   createdAt?: Date;

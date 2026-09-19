@@ -1,10 +1,10 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clock, Tag, Calendar, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, Calendar, BookOpen, ArrowRight } from 'lucide-react';
 import FadeInSection from '@/components/FadeInSection';
-import { posts, BlogPost } from '../postsData';
+import { blogApi, decodeHtmlEntities } from '@/lib/api-blog';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -12,11 +12,121 @@ interface BlogPostPageProps {
   }>;
 }
 
+interface ArticleDetail {
+  id: string;
+  slug: string;
+  category: string;
+  tag: string;
+  title: string;
+  excerpt: string;
+  readTime: string;
+  date: string;
+  featuredImage?: string | null;
+  author: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
+}
+
+interface RelatedArticle {
+  id: string;
+  slug: string;
+  title: string;
+  tag: string;
+  readTime: string;
+  gradient: string;
+  featuredImage?: string | null;
+}
+
 export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
   const { slug } = use(params);
-  const post = posts.find((p) => p.slug === slug);
 
-  if (!post) {
+  const [post, setPost] = useState<ArticleDetail | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<RelatedArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPostAndRelated() {
+      try {
+        setLoading(true);
+        let live = await blogApi.getPublicPostBySlug(slug).catch(() => null);
+        if (!live) {
+          const adminPost = await blogApi.getAdminPostById(slug).catch(() => null);
+          if (adminPost) {
+            live = {
+              ...adminPost,
+              author: adminPost.author ? { name: adminPost.author.name } : null,
+            };
+          }
+        }
+
+        if (live) {
+          setPost({
+            id: live.id,
+            slug: live.slug,
+            category: (live as any).category?.name || 'Faflora Journal',
+            tag: (live as any).tags?.[0] || 'Article',
+            title: decodeHtmlEntities(live.title),
+            excerpt: decodeHtmlEntities(live.excerpt || ''),
+            readTime: `${live.readingTime || 3} min read`,
+            date: live.publishedAt
+              ? new Date(live.publishedAt).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : 'Recent',
+            featuredImage: live.featuredImage?.url || null,
+            author: {
+              name: live.author?.name || 'Faflora Staff',
+              role: 'Faflora Editorial',
+              avatar: (live.author?.name || 'FE').substring(0, 2).toUpperCase(),
+            },
+          });
+          setHtmlContent(live.content);
+
+          // Fetch real related articles from API
+          try {
+            const publicPostsRes = await blogApi.getPublicPosts({ page: 1, limit: 6 });
+            if (publicPostsRes?.posts) {
+              const gradients = [
+                'from-[#8b0d7a] via-[#5c0060] to-[#1a0016]',
+                'from-[#ff7043] via-[#e65100] to-[#1a0016]',
+                'from-[#00b8d9] via-[#005f73] to-[#1a0016]',
+              ];
+              const filtered = publicPostsRes.posts
+                .filter((p) => p.slug !== live!.slug && p.id !== live!.id)
+                .slice(0, 2)
+                .map((item, idx) => ({
+                  id: item.id,
+                  slug: item.slug,
+                  title: decodeHtmlEntities(item.title),
+                  tag: (item as any).tags?.[0] || 'Article',
+                  readTime: `${item.readingTime || 3} min read`,
+                  gradient: gradients[idx % gradients.length],
+                  featuredImage: item.featuredImage?.url || null,
+                }));
+              setRelatedPosts(filtered);
+            }
+          } catch {
+            setRelatedPosts([]);
+          }
+        } else {
+          setPost(null);
+        }
+      } catch {
+        setPost(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPostAndRelated();
+  }, [slug]);
+
+  if (!post && !loading) {
     return (
       <div className="font-sans bg-[#fdf8ff] min-h-screen flex items-center justify-center py-20 px-6">
         <div className="max-w-md w-full text-center bg-white border border-[#e8b8e4] rounded-3xl p-8 shadow-xl">
@@ -40,11 +150,18 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
     );
   }
 
-  // Find 2 related posts (same category, or just other posts if none)
-  const relatedPosts = posts
-    .filter((p) => p.slug !== post.slug)
-    .filter((p) => p.category === post.category || p.featured)
-    .slice(0, 2);
+  if (loading && !post) {
+    return (
+      <div className="font-sans bg-[#1a0016] min-h-screen flex items-center justify-center py-20 px-6 text-white">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 border-4 border-[#ad74e8]/20 border-t-[#ad74e8] rounded-full animate-spin" />
+          <span className="text-sm font-bold text-purple-200">Loading article...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) return null;
 
   return (
     <div
@@ -53,10 +170,24 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
     >
       {/* ══ HERO ══ */}
       <section className="relative min-h-[50vh] flex items-center overflow-hidden">
-        {/* Deep plum background with a hint of dark purple/indigo at the bottom */}
-        <div className="absolute inset-0 bg-[#1a0016]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#2d002a] to-[#140026]/90" />
-        
+        {/* Render hero image from blog API data if present, otherwise default to background color */}
+        {post.featuredImage ? (
+          <div className="absolute inset-0 z-0">
+            <img
+              src={post.featuredImage}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#140026] via-[#1a0016]/85 to-[#1a0016]/90 backdrop-blur-[1px]" />
+          </div>
+        ) : (
+          <>
+            {/* Deep plum background fallback */}
+            <div className="absolute inset-0 bg-[#1a0016]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#2d002a] to-[#140026]/90" />
+          </>
+        )}
+
         {/* Ambient glow orbs */}
         <div className="absolute top-[-10%] left-[-8%] w-[45vw] h-[45vw] rounded-full bg-[#8b0d7a] opacity-[0.20] blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[#5c0060] opacity-[0.25] blur-[100px] pointer-events-none" />
@@ -76,7 +207,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-white/75 hover:text-white text-xs font-bold transition-colors bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full backdrop-blur-sm"
+              className="inline-flex items-center gap-2 text-white/75 hover:text-white text-xs font-bold transition-colors bg-white/10 hover:bg-white/20 border border-white/15 px-4 py-2 rounded-full backdrop-blur-md"
             >
               <ArrowLeft size={14} /> Back to Journal
             </Link>
@@ -92,7 +223,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-8"
               style={{
                 fontFamily: "'Georgia', serif",
-                textShadow: '0 2px 20px rgba(168,79,154,0.3)',
+                textShadow: '0 2px 20px rgba(0,0,0,0.5)',
               }}
             >
               {post.title}
@@ -101,18 +232,18 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
 
           {/* Author and Metadata details */}
           <FadeInSection type="fadeUp" delay={0.2}>
-            <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/10">
+            <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/15">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white font-black text-sm border-2 border-white/20">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white font-black text-sm border-2 border-white/20 shadow-md">
                   {post.author.avatar}
                 </div>
                 <div>
                   <h4 className="text-white text-sm font-bold">{post.author.name}</h4>
-                  <p className="text-white/50 text-xs font-medium">{post.author.role}</p>
+                  <p className="text-white/60 text-xs font-medium">{post.author.role}</p>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-5 text-white/50 text-xs font-medium sm:ml-auto">
+
+              <div className="flex items-center gap-5 text-white/60 text-xs font-medium sm:ml-auto">
                 <span className="flex items-center gap-1.5">
                   <Calendar size={13} />
                   {post.date}
@@ -132,75 +263,18 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
       <section className="relative py-16">
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-white border border-[#e8e4f0] rounded-3xl p-8 md:p-12 shadow-sm">
-            {/* Article Sections */}
-            <div className="space-y-8 text-gray-700 text-base md:text-lg leading-relaxed">
-              {post.content.map((section, idx) => {
-                if (section.type === 'paragraph') {
-                  // If it is the first paragraph, style it beautifully
-                  const isFirst = idx === 0;
-                  return (
-                    <p
-                      key={idx}
-                      className={`text-gray-600 font-medium ${
-                        isFirst ? 'text-lg md:text-xl text-gray-800 font-semibold first-letter:text-5xl first-letter:font-black first-letter:text-[#ad74e8] first-letter:float-left first-letter:mr-3 first-letter:line-height-1' : ''
-                      }`}
-                    >
-                      {section.text}
-                    </p>
-                  );
-                }
-                
-                if (section.type === 'heading') {
-                  return (
-                    <h2
-                      key={idx}
-                      className="text-2xl md:text-3xl font-extrabold text-[#1a0018] mt-10 mb-4 leading-tight border-b border-gray-100 pb-3"
-                      style={{ fontFamily: "'Georgia', serif" }}
-                    >
-                      {section.text}
-                    </h2>
-                  );
-                }
-
-                if (section.type === 'quote') {
-                  return (
-                    <div
-                      key={idx}
-                      className="my-8 pl-6 border-l-4 border-[#ad74e8] bg-purple-50/30 p-6 rounded-r-2xl italic text-[#1a0018] font-bold text-lg"
-                    >
-                      <p className="mb-2">"{section.text}"</p>
-                      {section.author && (
-                        <cite className="block text-xs font-bold text-[#ad74e8] not-italic uppercase tracking-widest mt-2">
-                          — {section.author}
-                        </cite>
-                      )}
-                    </div>
-                  );
-                }
-
-                if (section.type === 'list') {
-                  return (
-                    <ul key={idx} className="space-y-3 my-6 pl-4">
-                      {section.items?.map((item, itemIdx) => (
-                        <li key={itemIdx} className="flex items-start gap-3 text-gray-600">
-                          <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center shadow-sm">
-                            <svg width="8" height="6" viewBox="0 0 9 7" fill="none">
-                              <path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                }
-
-                return null;
-              })}
-            </div>
+            {/* Article Content */}
+            {htmlContent ? (
+              <div
+                className="blog-article-content max-w-none text-gray-700 text-base md:text-lg leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            ) : (
+              <p className="text-gray-500 italic">No content available for this article.</p>
+            )}
           </div>
 
-          {/* ─── SHARE / REACTIONS ─── */}
+          {/* ─── SHARE / NAVIGATION ─── */}
           <div className="mt-8 flex items-center justify-between border-t border-gray-200/60 pt-6 px-4">
             <Link
               href="/blog"
@@ -209,28 +283,45 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               <ArrowLeft size={15} /> Back to Journal
             </Link>
             <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-              Faflora Editorial · 2026
+              Faflora Editorial
             </span>
           </div>
 
           {/* ─── RELATED POSTS ─── */}
           {relatedPosts.length > 0 && (
             <div className="mt-16">
-              <h3 className="text-xl md:text-2xl font-black text-[#1a0018] mb-6 border-l-4 border-[#ad74e8] pl-3" style={{ fontFamily: "'Georgia', serif" }}>
+              <h3
+                className="text-xl md:text-2xl font-black text-[#1a0018] mb-6 border-l-4 border-[#ad74e8] pl-3"
+                style={{ fontFamily: "'Georgia', serif" }}
+              >
                 Keep Reading
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
                 {relatedPosts.map((relPost) => (
                   <Link href={`/blog/${relPost.slug}`} key={relPost.slug} className="group block">
                     <div className="bg-white border border-[#e8e4f0] rounded-2xl overflow-hidden hover:border-[#ad74e8] hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-                      <div className={`h-24 bg-gradient-to-br ${relPost.gradient} opacity-90 p-4 flex items-start justify-between flex-shrink-0`}>
-                        <span className="bg-white/25 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-[2px] px-2.5 py-1 rounded-full border border-white/15">
+                      <div
+                        className={`relative h-28 bg-gradient-to-br ${relPost.gradient} p-4 flex items-start justify-between flex-shrink-0 overflow-hidden`}
+                      >
+                        {relPost.featuredImage && (
+                          <img
+                            src={relPost.featuredImage}
+                            alt={relPost.title}
+                            className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-500"
+                          />
+                        )}
+                        <span className="relative z-10 bg-black/40 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-[2px] px-2.5 py-1 rounded-full border border-white/20">
                           {relPost.tag}
                         </span>
-                        <span className="text-white/80 text-[10px] font-semibold">{relPost.readTime}</span>
+                        <span className="relative z-10 text-white/90 text-[10px] font-semibold bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                          {relPost.readTime}
+                        </span>
                       </div>
                       <div className="p-5 flex-1 flex flex-col justify-between">
-                        <h4 className="font-extrabold text-sm text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-2 line-clamp-2" style={{ fontFamily: "'Georgia', serif" }}>
+                        <h4
+                          className="font-extrabold text-sm text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-2 line-clamp-2"
+                          style={{ fontFamily: "'Georgia', serif" }}
+                        >
                           {relPost.title}
                         </h4>
                         <span className="text-[10px] text-[#8236be] font-bold flex items-center gap-1 group-hover:gap-1.5 transition-all">
@@ -248,11 +339,13 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4] mt-16">
             <div
               className="absolute inset-0"
-              style={{ background: 'linear-gradient(135deg, #120010 0%, #1a0016 40%, #2b0129 70%, #40003b 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #120010 0%, #1a0016 40%, #2b0129 70%, #40003b 100%)',
+              }}
             />
             <div className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-[#ff69e0] opacity-[0.12] blur-[80px] pointer-events-none" />
             <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[#8236be] opacity-[0.06] blur-[60px] pointer-events-none" />
-            
+
             <div className="relative flex flex-col sm:flex-row items-center gap-6 px-8 py-8">
               <div className="flex-1 text-center sm:text-left">
                 <h4 className="text-white font-extrabold text-lg">Have more questions?</h4>

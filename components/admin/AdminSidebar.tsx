@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type AdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'taxes' | 'notifications';
+export type AdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog';
 
 interface AdminSidebarProps {
   activeTab: AdminTab | string;
@@ -111,6 +111,12 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             label="Waitlist"
             active={activeTab === 'waitlist'}
             onClick={() => { setActiveTab('waitlist'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<BookOpen size={20} />}
+            label="Blog & Articles"
+            active={activeTab === 'blog'}
+            onClick={() => { setActiveTab('blog'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Bell size={20} />}

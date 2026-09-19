@@ -6,22 +6,49 @@ import type { NotificationData } from '@/types/notification';
  */
 export function getNotificationRoute(
   data?: NotificationData | null,
-  userRole?: string
+  userRole?: string,
+  notificationType?: string
 ): string {
-  if (!data) return '/notifications';
+  if (!data && !notificationType) return '/notifications';
 
   const role = String(userRole || '').toLowerCase().replace('_', '-');
   const isSuperAdmin = role === 'super-admin';
   const isAdmin = role === 'admin';
   const isVendor = role === 'vendor';
 
-  const screen = data.screen;
+  const screen = data?.screen;
 
   const targetOrderId =
-    data.orderId ||
-    data.orderNumber ||
-    (data.data as any)?.orderId ||
-    (data.data as any)?.orderNumber;
+    data?.orderId ||
+    data?.orderNumber ||
+    (data?.data as any)?.orderId ||
+    (data?.data as any)?.orderNumber;
+
+  // Blog identifier & type resolution
+  const blogIdentifier =
+    data?.slug ||
+    (data as any)?.blogSlug ||
+    (data as any)?.postId ||
+    (data as any)?.blogId ||
+    (data?.data as any)?.slug ||
+    (data?.data as any)?.blogSlug ||
+    (data?.data as any)?.postId ||
+    (data?.data as any)?.blogId;
+
+  const isBlogScreen =
+    screen === 'BlogPost' ||
+    screen === 'BlogDetails' ||
+    screen === 'BlogArticle' ||
+    screen === 'Blog';
+
+  const typeStr = String(notificationType || '').toUpperCase();
+  const isBlogType =
+    typeStr.includes('BLOG') ||
+    typeStr.includes('ARTICLE');
+
+  if (isBlogScreen || isBlogType || (blogIdentifier && (!screen || screen === 'Notifications'))) {
+    return blogIdentifier ? `/blog/${encodeURIComponent(String(blogIdentifier))}` : '/blog';
+  }
 
   // Order routes
   if (
@@ -52,7 +79,7 @@ export function getNotificationRoute(
     case 'VendorProductReviews':
       return isVendor
         ? `/vendor/dashboard?tab=products`
-        : data.productId
+        : data?.productId
         ? `/products/${data.productId}`
         : '/products';
 
@@ -69,6 +96,12 @@ export function getNotificationRoute(
         : isAdmin
         ? `/admin/dashboard?tab=products`
         : '/admin/reviews';
+
+    case 'BlogPost':
+    case 'BlogDetails':
+    case 'BlogArticle': {
+      return blogIdentifier ? `/blog/${encodeURIComponent(String(blogIdentifier))}` : '/blog';
+    }
 
     case 'VendorDashboard':
       return isVendor ? '/vendor/dashboard' : '/';
@@ -95,8 +128,8 @@ export function getNotificationRoute(
       return '/';
 
     default:
-      if (data.productId) return `/products/${data.productId}`;
-      if (data.vendorId) {
+      if (data?.productId) return `/products/${data.productId}`;
+      if (data?.vendorId) {
         if (isSuperAdmin) return '/super-admin/dashboard?tab=vendors';
         if (isAdmin) return '/admin/dashboard?tab=vendors';
         return `/stores/${data.vendorId}`;

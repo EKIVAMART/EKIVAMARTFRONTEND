@@ -407,7 +407,7 @@ export default function PrivacyPolicy() {
                 className="relative text-5xl md:text-7xl lg:-skew-x-8 -skew-x-6 lg:text-[6rem] font-black text-[#1a0018] leading-[0.92] tracking-tight"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
-                <TypingText text="Privacy" delay={400} typingSpeed={70} colorClass="text-[#8236be]" />
+                <TypingText text="Privacy" delay={400} typingSpeed={70} colorClass="text-[#8236be]" hideCursorOnComplete />
                 <br />
                 <span className="text-[#9d4ae3]">
                   <TypingText text="Policy" delay={1100} typingSpeed={70} colorClass="text-[#8236be]" />
