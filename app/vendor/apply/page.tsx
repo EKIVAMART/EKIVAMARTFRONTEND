@@ -54,6 +54,7 @@ import {
   Category,
   resetMockData,
   IS_DEV_MODE,
+  USE_MOCK_VENDOR_API,
 } from '@/lib/api-vendor';
 import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
@@ -257,6 +258,21 @@ const formatDate = (dateString?: string) => {
   }
 };
 
+const normalizeDocument = (doc: any): VendorDocument => {
+  return {
+    id: doc.id || doc.cloudinaryPublicId || Math.random().toString(36).substring(7),
+    documentType: doc.documentType,
+    documentUrl: doc.documentUrl || doc.fileUrl || doc.url || '',
+    originalFilename: doc.originalFilename || doc.fileName || doc.filename || 'document',
+    fileSizeBytes: doc.fileSizeBytes || doc.fileSize || 0,
+    mimeType: doc.mimeType || 'application/pdf',
+    status: (doc.status || doc.verificationStatus || 'pending').toLowerCase() as any,
+    rejectionReason: doc.rejectionReason || null,
+    uploadedAt: doc.uploadedAt || doc.createdAt || new Date().toISOString(),
+    createdAt: doc.createdAt || doc.uploadedAt || new Date().toISOString(),
+  };
+};
+
 export default function VendorApplyPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -449,12 +465,14 @@ export default function VendorApplyPage() {
           setStoreEmail(draftStoreEmail || profileEmail);
           setStorePhone(draftStorePhone || profilePhone);
 
-          // Step 2 — selling categories
+          // Step 2 — selling categories (supports categoryIds array or category objects)
           const step2 = (draft as any).step2;
-          const savedCategories: { id: string }[] =
-            step2?.categories ?? draft.sellingCategories ?? [];
-          if (savedCategories.length > 0) {
-            setSelectedCategories(savedCategories.map((c: any) => c.id));
+          const savedCategoryIds: string[] =
+            step2?.categoryIds ??
+            (step2?.categories?.map((c: any) => c.id || c.categoryId) ??
+              draft.sellingCategories?.map((c: any) => c.id) ?? []);
+          if (savedCategoryIds.length > 0) {
+            setSelectedCategories(savedCategoryIds);
           }
 
           // Step 3 — personal info (support both step3 keyed and flat personalInfo)
@@ -468,8 +486,6 @@ export default function VendorApplyPage() {
             setHomeCity(personalInfo.homeAddress?.city || '');
             setHomeState(personalInfo.homeAddress?.state || '');
             setHomeLga(personalInfo.homeAddress?.lga || '');
-            // Per docs security note: NIN is never returned in plaintext.
-            // `ninProvided` boolean tells us if it was set. Flat format stores actual nin.
             const hasNin = !!(personalInfo.ninProvided ?? personalInfo.nin);
             setNinProvided(hasNin);
             setNin('');
@@ -511,11 +527,27 @@ export default function VendorApplyPage() {
             setLinkTiktok(storeInfo.socialLinks?.tiktok || '');
           }
 
-          setDocumentsList(draft.documents || []);
-          setBankAccountsList(draft.bankAccounts || []);
+          // Step 6 — documents
+          const step6 = (draft as any).step6;
+          const rawDocs: any[] = step6?.documents ?? draft.documents ?? [];
+          const normalizedDocs = rawDocs.map(normalizeDocument);
+          setDocumentsList(normalizedDocs);
 
-          // ── CRITICAL FIX: use freshApp (local var), NOT appStatus state ──
-          // appStatus state hasn't updated yet in this render cycle.
+          // Step 7 — bank accounts
+          const step7 = (draft as any).step7;
+          const rawBanks: any[] = step7?.bankAccounts ?? draft.bankAccounts ?? [];
+          const normalizedBanks: VendorBankAccount[] = rawBanks.map((b: any) => ({
+            id: b.id || Math.random().toString(36).substring(7),
+            accountName: b.accountName || '',
+            accountNumber: b.accountNumber || '',
+            bankName: b.bankName || '',
+            bankCode: b.bankCode || '',
+            accountType: (b.accountType || 'SAVINGS').toLowerCase() as any,
+            isPrimary: !!b.isPrimary,
+            isVerified: !!b.isVerified,
+          }));
+          setBankAccountsList(normalizedBanks);
+
           const completed = new Set<number>();
           if (draftStoreName && draftVendorType) completed.add(1);
           if (freshApp?.sellingCategoriesComplete) completed.add(2);
@@ -542,36 +574,49 @@ export default function VendorApplyPage() {
             completed.size > 0 ? Math.max(...Array.from(completed)) : 0;
 
           // Determine the first incomplete step to land on
-          let initialStep = 1;
-          if (!draftStoreName || !draftVendorType) {
-            initialStep = 1;
-          } else if (!freshApp?.sellingCategoriesComplete) {
-            initialStep = 2;
-          } else if (!freshApp?.personalInfoComplete) {
-            initialStep = 3;
-          } else if (requiresBusiness && !freshApp?.businessInfoComplete) {
-            initialStep = 4;
-          } else if (!freshApp?.storeInfoComplete) {
-            initialStep = 5;
-          } else if (
-            !freshApp?.documentsComplete &&
-            !(freshApp as any)?.documentsInfoComplete
-          ) {
-            initialStep = 6;
-          } else if (
-            !freshApp?.bankAccountsCount ||
-            freshApp.bankAccountsCount === 0
-          ) {
-            initialStep = 7;
-          } else {
-            initialStep = 8;
+          let initialStep = (draft as any).currentStep || 1;
+          if (!initialStep || initialStep === 1) {
+            if (!draftStoreName || !draftVendorType) {
+              initialStep = 1;
+            } else if (!freshApp?.sellingCategoriesComplete) {
+              initialStep = 2;
+            } else if (!freshApp?.personalInfoComplete) {
+              initialStep = 3;
+            } else if (requiresBusiness && !freshApp?.businessInfoComplete) {
+              initialStep = 4;
+            } else if (!freshApp?.storeInfoComplete) {
+              initialStep = 5;
+            } else if (
+              !freshApp?.documentsComplete &&
+              !(freshApp as any)?.documentsInfoComplete
+            ) {
+              initialStep = 6;
+            } else if (
+              !freshApp?.bankAccountsCount ||
+              freshApp.bankAccountsCount === 0
+            ) {
+              initialStep = 7;
+            } else {
+              initialStep = 8;
+            }
           }
           setCurrentStep(initialStep);
           // Allow navigation to all completed steps + the current one
           setHighestStepAllowed(Math.max(initialStep, maxCompleted + 1, 1));
         }
-      } catch (err) {
-        console.error('Failed to fetch vendor data:', err);
+      } catch (err: any) {
+        if (err?.response?.status === 404 || err?.status === 404) {
+          try {
+            await vendorApi.startApplication({
+              storeName: '',
+              vendorType: '' as any,
+            });
+          } catch (startErr) {
+            // Silently handle if application already started
+          }
+        } else {
+          console.error('Failed to fetch vendor data:', err);
+        }
       } finally {
         setLoading(false);
       }
@@ -1064,19 +1109,23 @@ export default function VendorApplyPage() {
       return;
     }
 
-    const acceptedTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'application/pdf',
-    ];
+    const isSelfie = docType === 'id_selfie';
+    const acceptedTypes = isSelfie
+      ? ['image/jpeg', 'image/jpg', 'image/png']
+      : ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+
     if (!acceptedTypes.includes(file.type)) {
-      toast.error('Unsupported file format. JPG, PNG or PDF only.');
+      toast.error(
+        isSelfie
+          ? 'Unsupported file format for selfie. JPG or PNG only.'
+          : 'Unsupported file format. JPG, PNG or PDF only.'
+      );
       return;
     }
 
     setUploadingDocType(docType);
     try {
+      // 1. Request signed upload credentials and authenticated delivery URL from Faflora Backend
       const signedRes = await vendorApi.getDocumentUploadUrl({
         documentType: docType,
         fileName: file.name,
@@ -1084,22 +1133,43 @@ export default function VendorApplyPage() {
         mimeType: file.type,
       });
 
-      if (signedRes.success) {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (signedRes.success && signedRes.data) {
+        const sig = signedRes.data;
 
+        // 2. Direct upload to Cloudinary using FormData with all signature fields and file blob
+        if (sig.uploadUrl && sig.fields) {
+          const formData = new FormData();
+          Object.entries(sig.fields).forEach(([key, value]) => {
+            formData.append(key, String(value));
+          });
+          formData.append('file', file);
+
+          if (!USE_MOCK_VENDOR_API) {
+            const cloudResponse = await fetch(sig.uploadUrl, {
+              method: 'POST',
+              body: formData,
+            });
+            if (!cloudResponse.ok) {
+              throw new Error('Cloudinary direct upload failed');
+            }
+          }
+        }
+
+        // 3. Confirm upload with Faflora Backend passing exact signed URL returned by Step 1
         const confirmRes = await vendorApi.confirmDocumentUpload({
           documentType: docType,
-          cloudinaryPublicId: signedRes.data.publicId,
-          documentUrl: `https://res.cloudinary.com/faflora/image/upload/v1234567890/${signedRes.data.publicId}`,
+          cloudinaryPublicId: sig.publicId,
+          documentUrl: sig.url,
           originalFilename: file.name,
           fileSizeBytes: file.size,
           mimeType: file.type,
         });
 
         if (confirmRes.success && confirmRes.data) {
+          const savedDoc = normalizeDocument(confirmRes.data);
           setDocumentsList((prev) => {
             const updated = prev.filter((d) => d.documentType !== docType);
-            return [...updated, confirmRes.data!];
+            return [...updated, savedDoc];
           });
           toast.success(
             `${DOCUMENT_DESCRIPTIONS[docType]?.label || docType} uploaded successfully!`
@@ -1206,6 +1276,12 @@ export default function VendorApplyPage() {
 
     setSubmittingApplication(true);
     try {
+      // Validate completeness status prior to submission
+      const statusRes = await vendorApi.getApplicationStatus();
+      if (statusRes.success && statusRes.data) {
+        setAppStatus(statusRes.data);
+      }
+
       const res = await vendorApi.submitApplication();
       if (res.success) {
         toast.success('Application submitted successfully! 🎉');

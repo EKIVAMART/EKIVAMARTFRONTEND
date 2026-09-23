@@ -166,7 +166,7 @@ export interface VendorApplicationDraft {
     storePhone: string;
     storeEmail: string;
   };
-  step2?: { categories: Category[] };
+  step2?: { categoryIds?: string[]; categories?: Category[] };
   step3?: {
     fullName: string;
     dateOfBirth: string;
@@ -188,6 +188,8 @@ export interface VendorApplicationDraft {
     businessAddress: BusinessAddress | null;
     socialLinks: SocialLinks | null;
   } | null;
+  step6?: { documents?: VendorDocument[] };
+  step7?: { bankAccounts?: VendorBankAccount[] };
 }
 
 export interface CheckStoreNameResponse {
@@ -644,11 +646,22 @@ export const vendorApi = {
       payload.storeEmail = storeEmail;
     }
 
-    const response = await axiosInstance.post<ApiResponse<any>>(
-      '/vendor/application/start',
-      payload
-    );
-    return response.data;
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        '/vendor/application/start',
+        payload
+      );
+      return response.data;
+    } catch (err: any) {
+      if (err.response?.status === 409) {
+        return {
+          success: true,
+          message: 'Active application already exists',
+          data: err.response?.data?.data || null,
+        };
+      }
+      throw err;
+    }
   },
 
   /**
@@ -784,17 +797,22 @@ export const vendorApi = {
   }): Promise<ApiResponse<any>> {
     if (USE_MOCK_VENDOR_API) {
       const folder = `vendor-docs/VEN-2026-00042/${data.documentType}`;
+      const publicId = `${folder}/${Math.random().toString(36).substring(7)}`;
+      const ext = data.fileName.includes('.') ? data.fileName.split('.').pop() : (data.mimeType.includes('pdf') ? 'pdf' : 'png');
       return {
         success: true,
         message: 'Upload URL generated successfully',
         data: {
           uploadUrl:
-            'https://api.cloudinary.com/v1_1/faflora/auto/upload?signature=mock',
-          publicId: `${folder}/${Math.random().toString(36).substring(7)}`,
+            'https://api.cloudinary.com/v1_1/faflora/image/upload',
+          url: `https://res.cloudinary.com/faflora/image/authenticated/s--xyz--/${publicId}.${ext}`,
+          publicId,
           folder,
           fields: {
-            api_key: 'mock-key',
+            public_id: publicId,
             timestamp: Math.floor(Date.now() / 1000),
+            type: 'authenticated',
+            api_key: '123456789012345',
             signature: 'mock-sig',
           },
           expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
@@ -1122,6 +1140,7 @@ export const vendorApi = {
             }
           : undefined,
         step2: {
+          categoryIds: (draft.sellingCategories || []).map((c) => c.id),
           categories: draft.sellingCategories || [],
         },
         step3: draft.personalInfo
@@ -1130,7 +1149,6 @@ export const vendorApi = {
               dateOfBirth: draft.personalInfo.dateOfBirth,
               gender: draft.personalInfo.gender,
               homeAddress: draft.personalInfo.homeAddress,
-              // NIN is never returned in plaintext per docs security note
               ninProvided: !!(
                 draft.personalInfo.nin || draft.personalInfo.ninProvided
               ),
@@ -1149,6 +1167,12 @@ export const vendorApi = {
           yearsInBusiness: draft.storeInfo?.yearsInBusiness ?? null,
           businessAddress: draft.storeInfo?.businessAddress ?? null,
           socialLinks: draft.storeInfo?.socialLinks ?? null,
+        },
+        step6: {
+          documents: draft.documents || [],
+        },
+        step7: {
+          bankAccounts: draft.bankAccounts || [],
         },
       };
       return { success: true, data: enrichedDraft };
