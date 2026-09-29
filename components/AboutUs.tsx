@@ -177,26 +177,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* 6. HISTORY SECTION */}
-      {/* <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
-          <motion.div {...fadeInUp}>
-            <SectionHeading sub="OUR" title="HISTORY" />
-            <p className="text-gray-600 leading-loose mb-8">
-              The story began in 1996, when Mr. Dinesh Agarwal embarked on a journey that started 
-              with a simple idea of website development but with a big dream to 'make doing business easy' for all.
-            </p>
-            <TealButton text="Our Milestones" />
-          </motion.div>
-          <motion.div className="relative" {...fadeInUp}>
-             <Image src="https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&q=80" alt="Old Office" width={800} height={600} className="w-full h-auto rounded-lg shadow-xl" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
-             <div className="absolute -bottom-10 -right-5 w-64 bg-white p-4 shadow-2xl rounded-md border transform rotate-3">
-                <p className="text-[10px] text-gray-400 font-bold mb-2">OPENING CEREMONY</p>
-                <div className="w-full h-40 bg-orange-50 rounded" />
-             </div>
-          </motion.div>
-        </div>
-      </section> */}
+ 
 
       {/* 7. SOCIAL RESPONSIBILITY */}
       <section className="py-24">
