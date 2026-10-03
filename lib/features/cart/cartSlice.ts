@@ -54,9 +54,9 @@ export const fetchCartCount = createAsyncThunk(
 
 export const fetchCartSummary = createAsyncThunk(
   'cart/fetchCartSummary',
-  async (_, { rejectWithValue }) => {
+  async (params: { country?: string; state?: string } | undefined, { rejectWithValue }) => {
     try {
-      const res = await cartApi.getCartSummary();
+      const res = await cartApi.getCartSummary(params);
       if (res?.success) {
         return res.data;
       }

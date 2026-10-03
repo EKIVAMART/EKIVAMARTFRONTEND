@@ -18,36 +18,60 @@ interface OrderDetailsModalProps {
 }
 
 const statusBadgeStyles: Record<string, string> = {
+  PENDING_PAYMENT: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
   pending_payment: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
+  PAYMENT_FAILED: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
   payment_failed: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
+  CONFIRMED: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
   confirmed: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
+  PROCESSING: 'bg-indigo-400/20 text-indigo-100 border-indigo-400/30',
   processing: 'bg-indigo-400/20 text-indigo-100 border-indigo-400/30',
+  SHIPPED: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
   shipped: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
+  DELIVERED: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
   delivered: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
+  CANCELLED: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   cancelled: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
+  REFUNDED: 'bg-purple-400/20 text-purple-100 border-purple-400/30',
   refunded: 'bg-purple-400/20 text-purple-100 border-purple-400/30',
 };
 
 const statusLabels: Record<string, string> = {
-  pending_payment: 'Payment Pending',
+  PENDING_PAYMENT: 'Pending Payment',
+  pending_payment: 'Pending Payment',
+  PAYMENT_FAILED: 'Payment Failed',
   payment_failed: 'Payment Failed',
+  CONFIRMED: 'Confirmed',
   confirmed: 'Confirmed',
+  PROCESSING: 'Processing',
   processing: 'Processing',
+  SHIPPED: 'Shipped',
   shipped: 'Shipped',
+  DELIVERED: 'Delivered',
   delivered: 'Delivered',
+  CANCELLED: 'Cancelled',
   cancelled: 'Cancelled',
+  REFUNDED: 'Refunded',
   refunded: 'Refunded',
 };
 
-// Central transition rules from transition.rules.ts
+// Central transition rules according to backend specification
 const transitionRules: Record<string, string[]> = {
+  PENDING_PAYMENT: ['CONFIRMED', 'PAYMENT_FAILED', 'CANCELLED'],
   pending_payment: ['confirmed', 'payment_failed', 'cancelled'],
+  PAYMENT_FAILED: ['PENDING_PAYMENT', 'CANCELLED'],
   payment_failed: ['pending_payment', 'cancelled'],
+  CONFIRMED: ['PROCESSING', 'CANCELLED'],
   confirmed: ['processing', 'cancelled'],
+  PROCESSING: ['SHIPPED', 'CANCELLED'],
   processing: ['shipped', 'cancelled'],
-  shipped: ['delivered'],
-  delivered: [],
+  SHIPPED: ['DELIVERED', 'CANCELLED'],
+  shipped: ['delivered', 'cancelled'],
+  DELIVERED: ['REFUNDED'],
+  delivered: ['refunded'],
+  CANCELLED: [],
   cancelled: [],
+  REFUNDED: [],
   refunded: [],
 };
 
@@ -220,7 +244,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
   if (!isOpen || !basicOrder) return null;
 
-  const allowedNextStatuses = order ? (transitionRules[order.status] || []) : [];
+  const currentStatus = order?.status;
+  const allowedNextStatuses = currentStatus
+    ? (transitionRules[currentStatus] || transitionRules[currentStatus.toUpperCase()] || transitionRules[currentStatus.toLowerCase()] || [])
+    : [];
   const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(userRole);
 
   return (

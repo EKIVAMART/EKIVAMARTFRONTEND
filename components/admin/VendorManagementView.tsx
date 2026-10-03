@@ -88,7 +88,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
   // Synchronize activeTab based on isSuperAdmin changes
   useEffect(() => {
     setActiveTab(isSuperAdmin ? 'pending' : 'assigned');
-  }, [isSuperAdmin]);
+    if (!isSuperAdmin && activeSection === 'withdrawals') {
+      setActiveSection('applications');
+    }
+  }, [isSuperAdmin, activeSection]);
 
   // Reset selection on tab/page change
   useEffect(() => {
@@ -317,10 +320,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         } else {
           setError(response?.message || 'Failed to load applications.');
         }
-      } else if (activeSection === 'withdrawals') {
+      } else if (activeSection === 'withdrawals' && isSuperAdmin) {
         const response = await adminVendorApi.getAllWithdrawalRequests({
           page,
           limit,
+          isSuperAdmin,
           status: searchQuery ? undefined : undefined // Search filter custom logic if needed
         });
         if (response?.success) {
@@ -601,10 +605,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
     if (!actionWithdrawal) return;
     const toastId = toast.loading('Processing withdrawal payout…');
     try {
-      const res = await adminVendorApi.processWithdrawal(actionWithdrawal.id, {
-        action: withdrawalAction,
-        reason: actionReason || undefined
-      });
+      const res = await adminVendorApi.processWithdrawal(
+        actionWithdrawal.id,
+        {
+          action: withdrawalAction,
+          reason: actionReason || undefined
+        },
+        isSuperAdmin
+      );
       if (res?.success) {
         toast.success(`Withdrawal payout marked as ${withdrawalAction === 'complete' ? 'Completed' : 'Failed'}!`, { id: toastId });
         setActionType(null);
@@ -850,16 +858,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         >
           Vendor Profiles
         </button>
-        <button
-          onClick={() => setActiveSection('withdrawals')}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
-            activeSection === 'withdrawals'
-              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
-              : 'bg-white border text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          Withdrawals
-        </button>
+        {isSuperAdmin && (
+          <button
+            onClick={() => setActiveSection('withdrawals')}
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+              activeSection === 'withdrawals'
+                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+                : 'bg-white border text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            Withdrawals
+          </button>
+        )}
         {isSuperAdmin && (
           <button
             onClick={() => setActiveSection('commissions')}

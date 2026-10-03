@@ -1,198 +1,106 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, ShoppingBag, Package, Users,
-  ArrowUpRight, ArrowDownRight, Sparkles, ChevronRight,
-  Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity,
-  Eye, Star, Truck, DollarSign, CreditCard, MapPin, Phone, Mail,
-  ShoppingCart, Box, Percent, Award, Target, BarChart3
+  ShoppingBag, Package, Users, Store, ChevronRight,
+  RefreshCw, BarChart3, Clock, CheckCircle2, AlertCircle,
+  TrendingDown, ShoppingCart, Filter, ArrowUpRight, FileText, Zap
 } from 'lucide-react';
 import { useAppSelector } from '@/lib/hooks';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import {
+  adminDashboardApi,
+  ordersApi,
+  categoryApi,
+  AdminDashboardStats,
+  DetailedOrderAnalytics,
+  AdminTopProductItem,
+  CardMetric
+} from '@/lib/api';
+import { toast } from 'react-hot-toast';
 
-interface DashboardStats {
-  totalOrders: number;
-  totalProducts: number;
-  ordersChange: number;
-  productsChange: number;
-  usersChange: number;
-  pendingOrders: number;
-  activeVendors: number;
-  totalUsers: number;
-  activeUsers: number;
-  blockedUsers: number;
-  timeframeLabel: string;
-}
-
-interface RecentTransaction {
-  id: string;
-  date: string;
-  customer: {
-    name: string;
-    email: string;
-    avatar?: string;
-    location?: string;
-    phone?: string;
-  };
-  product: string;
-  amount?: number;
-  status: 'SUCCESSFUL' | 'PENDING' | 'FAILED' | 'RETURNED';
-}
-
-interface TopProduct {
-  id: string;
-  name: string;
-  sales: number;
-  growth: number;
-  image?: string;
-  price?: number;
-  rating?: number;
-  stock?: number;
-}
-
-interface ActivityItem {
-  id: string;
-  type: 'order' | 'product' | 'user' | 'review';
-  message: string;
-  time: string;
-  icon: React.ReactNode;
-}
+type PeriodType = 'day' | 'week' | 'month' | 'all_time';
 
 interface AdminDashboardViewProps {
   onNavigate?: (tab: string) => void;
 }
 
-// Uniform Stat Card Component with equal height progress bars
-const UniformStatCard = ({ title, value, change, icon: Icon, trend = 'up', suffix = '', subtext = '', color = 'fuchsia', activeUsers, blockedUsers }: any) => {
-  const colorGradients: Record<string, string> = {
+// ── Skeleton loader ──────────────────────────────────────────────────────────
+const Skeleton = ({ className = '' }: { className?: string }) => (
+  <div className={`animate-pulse bg-slate-100 rounded-xl ${className}`} />
+);
+
+// ── Overview KPI stat card ────────────────────────────────────────────────────
+const OverviewCard = ({
+  title,
+  metric,
+  icon: Icon,
+  color = 'fuchsia',
+  note,
+  loading
+}: {
+  title: string;
+  metric?: CardMetric | null;
+  icon: React.ElementType;
+  color?: 'fuchsia' | 'blue' | 'emerald' | 'amber';
+  note: string;
+  loading?: boolean;
+}) => {
+  const gradients: Record<string, string> = {
     fuchsia: 'from-fuchsia-500 to-purple-600',
     blue: 'from-blue-500 to-cyan-600',
-    emerald: 'from-emerald-500 to-teal-600'
+    emerald: 'from-emerald-500 to-teal-600',
+    amber: 'from-amber-500 to-orange-500',
   };
-
-  const bgGradients: Record<string, string> = {
+  const bgColors: Record<string, string> = {
     fuchsia: 'from-fuchsia-50 to-purple-50',
     blue: 'from-blue-50 to-cyan-50',
-    emerald: 'from-emerald-50 to-teal-50'
+    emerald: 'from-emerald-50 to-teal-50',
+    amber: 'from-amber-50 to-orange-50',
   };
-
   const iconColors: Record<string, string> = {
     fuchsia: 'text-fuchsia-600',
     blue: 'text-blue-600',
-    emerald: 'text-emerald-600'
+    emerald: 'text-emerald-600',
+    amber: 'text-amber-600',
   };
 
+  const filteredVal = metric?.filtered ?? 0;
+  const totalAllTimeVal = metric?.totalAllTime ?? 0;
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
-      {/* Decorative top bar */}
-      <div className={`h-1 bg-gradient-to-r ${colorGradients[color]}`} />
-      
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
+      <div className={`h-1 bg-gradient-to-r ${gradients[color]}`} />
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-4">
-          <div className={`p-3 rounded-xl bg-gradient-to-br ${bgGradients[color]}`}>
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${bgColors[color]}`}>
             <Icon className={`w-5 h-5 ${iconColors[color]}`} />
           </div>
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
-            trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-          }`}>
-            {trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-            {Math.abs(change)}%
-          </div>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+            {title}
+          </span>
         </div>
-        
         <div className="mb-2">
-          <h3 className="text-3xl font-black text-slate-800 tracking-tight">
-            {typeof value === 'number' ? value.toLocaleString() : value}{suffix}
-          </h3>
-          <p className="text-sm text-gray-500 font-medium mt-1">{title}</p>
+          {loading ? (
+            <Skeleton className="h-9 w-28 mb-2" />
+          ) : (
+            <h3 className="text-3xl font-black text-slate-800 tracking-tight">
+              {filteredVal.toLocaleString()}
+            </h3>
+          )}
+          <p className="text-sm font-semibold text-slate-700 mt-1">{title}</p>
         </div>
-        
-        {/* Fixed height container for bottom content to ensure equal height */}
-        <div className="mt-auto pt-3">
-          {title === "Total Users" ? (
-            <div className="border-t border-gray-100 pt-3 flex items-center justify-between text-[11px] font-semibold">
-              <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                Active: {activeUsers}
-              </span>
-              <span className="text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
-                Blocked: {blockedUsers}
-              </span>
-            </div>
-          ) : subtext && (
-            <div className="border-t border-gray-100 pt-3">
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="text-gray-500">{subtext}</span>
-                {/* Dynamic bottom-right percentage based on card type */}
-                {title === "Total Orders" && (
-                  <div className="flex items-center gap-1 text-emerald-600">
-                    <TrendingUp size={10} />
-                    <span className="text-[10px] font-bold">+{change}% vs target</span>
-                  </div>
-                )}
-                {title === "Products" && (
-                  <div className="flex items-center gap-1 text-blue-600">
-                    <Package size={10} />
-                    <span className="text-[10px] font-bold">92% in stock</span>
-                  </div>
-                )}
-                {title === "Conversion Rate" && (
-                  <div className="flex items-center gap-1 text-emerald-600">
-                    <Target size={10} />
-                    <span className="text-[10px] font-bold">76% to goal</span>
-                  </div>
-                )}
-                {!["Total Orders", "Products", "Conversion Rate"].includes(title) && (
-                  <div className="flex items-center gap-1 text-emerald-600">
-                    <TrendingUp size={10} />
-                    <span className="text-[10px] font-bold">+12% vs last period</span>
-                  </div>
-                )}
+        <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-0.5">
+          {loading ? (
+            <Skeleton className="h-4 w-36" />
+          ) : (
+            <>
+              <div className="text-xs font-semibold text-slate-500">
+                Total All Time: <span className="font-bold text-slate-800">{totalAllTimeVal.toLocaleString()}</span>
               </div>
-              {/* Progress bars - all with consistent height */}
-              {title === "Total Orders" && (
-                <div className="mt-2">
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full bg-gradient-to-r ${colorGradients[color]} rounded-full`}
-                      style={{ width: '78%' }}
-                    />
-                  </div>
-                </div>
-              )}
-              {/* Stock indicator for products */}
-              {title === "Products" && (
-                <div className="mt-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-500 to-teal-500 rounded-full"
-                          style={{ width: '92%' }}
-                        />
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-medium text-gray-500">92%</span>
-                  </div>
-                </div>
-              )}
-              {/* Conversion rate progress */}
-              {title === "Conversion Rate" && (
-                <div className="mt-2">
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
-                      style={{ width: '76%' }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-1.5">
-                    <span className="text-[10px] text-gray-400">Performance: Good</span>
-                    <span className="text-[10px] text-gray-400">Target: 5.0%</span>
-                  </div>
-                </div>
-              )}
-            </div>
+              <div className="text-[10px] text-gray-400">{note}</div>
+            </>
           )}
         </div>
       </div>
@@ -200,502 +108,589 @@ const UniformStatCard = ({ title, value, change, icon: Icon, trend = 'up', suffi
   );
 };
 
+// ── Status badge component ────────────────────────────────────────────────────
+const OrderStatusBadge = ({ status }: { status: string }) => {
+  const normalized = status?.toLowerCase() ?? '';
+  const map: Record<string, { cls: string; label: string }> = {
+    pending_payment: { cls: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Pending Payment' },
+    payment_failed: { cls: 'bg-rose-50 text-rose-700 border-rose-200', label: 'Payment Failed' },
+    confirmed: { cls: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Confirmed' },
+    processing: { cls: 'bg-indigo-50 text-indigo-700 border-indigo-200', label: 'Processing' },
+    shipped: { cls: 'bg-purple-50 text-purple-700 border-purple-200', label: 'Shipped' },
+    delivered: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Delivered' },
+    completed: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Completed' },
+    cancelled: { cls: 'bg-rose-50 text-rose-700 border-rose-200', label: 'Cancelled' },
+    refunded: { cls: 'bg-gray-100 text-gray-700 border-gray-200', label: 'Refunded' },
+  };
+
+  const info = map[normalized] ?? {
+    cls: 'bg-gray-50 text-gray-700 border-gray-200',
+    label: status ? status.replace(/_/g, ' ') : 'Unknown'
+  };
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border capitalize ${info.cls}`}>
+      {info.label}
+    </span>
+  );
+};
+
 export default function AdminDashboardView({ onNavigate }: AdminDashboardViewProps) {
+  const router = useRouter();
   const authUser = useAppSelector((state) => state.auth.user);
-  const [isLoading, setIsLoading] = useState(true);
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [period, setPeriod] = useState<PeriodType>('week');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
 
-  // Dynamic stats based on timeframe
-  const stats = useMemo<DashboardStats>(() => {
-    if (timeframe === 'daily') {
-      return {
-        totalOrders: 28,
-        totalProducts: 1248,
-        ordersChange: 1.8,
-        productsChange: 0.2,
-        usersChange: 1.2,
-        pendingOrders: 5,
-        activeVendors: 156,
-        totalUsers: 3842,
-        activeUsers: 3671,
-        blockedUsers: 24,
-        timeframeLabel: 'today',
-      };
-    }
-    if (timeframe === 'monthly') {
-      return {
-        totalOrders: 1140,
-        totalProducts: 1248,
-        ordersChange: 14.5,
-        productsChange: 5.4,
-        usersChange: 8.5,
-        pendingOrders: 23,
-        activeVendors: 156,
-        totalUsers: 3842,
-        activeUsers: 3671,
-        blockedUsers: 24,
-        timeframeLabel: 'this month',
-      };
-    }
-    // weekly
-    return {
-      totalOrders: 284,
-      totalProducts: 1248,
-      ordersChange: 8,
-      productsChange: 5,
-      usersChange: 3.2,
-      pendingOrders: 23,
-      activeVendors: 156,
-      totalUsers: 3842,
-      activeUsers: 3671,
-      blockedUsers: 24,
-      timeframeLabel: 'this week',
-    };
-  }, [timeframe]);
+  // Categories list for filter
+  const [categories, setCategories] = useState<any[]>([]);
 
-  const [recentTransactions] = useState<RecentTransaction[]>([
-    { id: 'ORD-001', date: '19 May 2026, 12:14 am', customer: { name: 'Natali Craig', email: 'natali@example.com', location: 'New York, USA', phone: '+1 234 567 8900' }, product: 'Premium Headphones', amount: 299, status: 'SUCCESSFUL' },
-    { id: 'ORD-002', date: '19 May 2026, 10:30 am', customer: { name: 'Sarah Johnson', email: 'sarah@example.com', location: 'Los Angeles, USA', phone: '+1 234 567 8901' }, product: 'Wireless Headphones', amount: 199, status: 'SUCCESSFUL' },
-    { id: 'ORD-003', date: '18 May 2026, 8:45 pm', customer: { name: 'Michael Chen', email: 'michael@example.com', location: 'San Francisco, USA' }, product: 'Leather Jacket', amount: 159, status: 'SUCCESSFUL' },
-    { id: 'ORD-004', date: '18 May 2026, 3:15 pm', customer: { name: 'Emily Davis', email: 'emily@example.com', location: 'Chicago, USA' }, product: 'Smart Watch', amount: 249, status: 'PENDING' },
-    { id: 'ORD-005', date: '17 May 2026, 11:20 am', customer: { name: 'James Wilson', email: 'james@example.com', location: 'Miami, USA' }, product: 'Running Shoes', amount: 129, status: 'SUCCESSFUL' },
-    { id: 'ORD-006', date: '17 May 2026, 2:45 pm', customer: { name: 'Olivia Brown', email: 'olivia@example.com', location: 'Seattle, USA' }, product: 'Coffee Maker', amount: 89, status: 'FAILED' },
-  ]);
+  // Widget states
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  const [topProducts] = useState<TopProduct[]>([
-    { id: '1', name: 'Premium Wireless Headphones', sales: 234, growth: 23, price: 299, rating: 4.8, stock: 45 },
-    { id: '2', name: 'Smart Fitness Tracker', sales: 187, growth: 15, price: 149, rating: 4.6, stock: 78 },
-    { id: '3', name: 'Organic Cotton T-Shirt', sales: 156, growth: -8, price: 39, rating: 4.4, stock: 234 },
-    { id: '4', name: 'Gaming Mechanical Keyboard', sales: 98, growth: 12, price: 129, rating: 4.7, stock: 23 },
-  ]);
+  const [orderAnalytics, setOrderAnalytics] = useState<DetailedOrderAnalytics | null>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
-  // Pie chart data
-  const pieChartData = useMemo(() => {
-    return topProducts.map(product => ({
-      name: product.name.length > 20 ? product.name.substring(0, 17) + '...' : product.name,
-      value: product.sales,
-      fullName: product.name,
-      growth: product.growth
-    }));
-  }, [topProducts]);
+  const [topProducts, setTopProducts] = useState<AdminTopProductItem[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
-  const PIE_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6'];
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [loadingRecentOrders, setLoadingRecentOrders] = useState(true);
 
-  // Performance chart data reacting to timeframe - ORDERS ONLY
-  const performanceData = useMemo(() => {
-    if (timeframe === 'daily') {
-      return [
-        { label: '09:00', orders: 3 },
-        { label: '12:00', orders: 8 },
-        { label: '15:00', orders: 6 },
-        { label: '18:00', orders: 7 },
-        { label: '21:00', orders: 3 },
-        { label: '24:00', orders: 1 },
-      ];
-    }
-    if (timeframe === 'monthly') {
-      return [
-        { label: 'Week 1', orders: 220 },
-        { label: 'Week 2', orders: 280 },
-        { label: 'Week 3', orders: 254 },
-        { label: 'Week 4', orders: 270 },
-      ];
-    }
-    // weekly
-    return [
-      { label: 'Mon', orders: 42 },
-      { label: 'Tue', orders: 58 },
-      { label: 'Wed', orders: 49 },
-      { label: 'Thu', orders: 67 },
-      { label: 'Fri', orders: 84 },
-      { label: 'Sat', orders: 61 },
-      { label: 'Sun', orders: 53 },
-    ];
-  }, [timeframe]);
-
-  const [activities] = useState<ActivityItem[]>([
-    { id: '1', type: 'order', message: 'New order #ORD-9815 from Natali Craig', time: '5 minutes ago', icon: <CheckCircle2 size={14} className="text-emerald-500" /> },
-    { id: '2', type: 'product', message: 'Product "Wireless Headphones" inventory updated', time: '1 hour ago', icon: <Package size={14} className="text-blue-500" /> },
-    { id: '3', type: 'user', message: 'New customer registration: Jane Doe', time: '3 hours ago', icon: <Users size={14} className="text-purple-500" /> },
-    { id: '4', type: 'review', message: '5-star review received for Smart Watch', time: '5 hours ago', icon: <TrendingUp size={14} className="text-amber-500" /> },
-    { id: '5', type: 'order', message: 'Order #ORD-9814 marked as Delivered', time: 'Yesterday', icon: <CheckCircle2 size={14} className="text-emerald-500" /> },
-  ]);
-
+  // ── Fetch Categories ─────────────────────────────────────────────────────
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
+    async function loadCategories() {
+      try {
+        const res = await categoryApi.getCategories({ limit: 100 });
+        if (res?.success) {
+          const list = res.data?.categories ?? res.data?.items ?? res.data ?? [];
+          setCategories(Array.isArray(list) ? list : []);
+        }
+      } catch {
+        // category fetch silent catch
+      }
+    }
+    void loadCategories();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'SUCCESSFUL': return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-      case 'PENDING': return 'bg-amber-50 text-amber-600 border-amber-200';
-      case 'FAILED': return 'bg-rose-50 text-rose-600 border-rose-200';
-      case 'RETURNED': return 'bg-blue-50 text-blue-600 border-blue-200';
-      default: return 'bg-gray-50 text-gray-600 border-gray-200';
+  // ── Fetch Overview Stats (GET /admin/dashboard?period=...) ─────────────
+  const fetchStats = useCallback(async () => {
+    setLoadingStats(true);
+    try {
+      const res = await adminDashboardApi.getDashboard({ period });
+      if (res?.success && res.data) {
+        setStats(res.data);
+      } else if (res && !res.success) {
+        toast.error(res.message || 'Failed to load dashboard metrics');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to load dashboard metrics');
+    } finally {
+      setLoadingStats(false);
     }
-  };
+  }, [period]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'SUCCESSFUL': return <CheckCircle2 size={12} />;
-      case 'PENDING': return <Clock size={12} />;
-      case 'FAILED': return <AlertCircle size={12} />;
-      case 'RETURNED': return <TrendingDown size={12} />;
-      default: return null;
+  // ── Fetch Order Analytics (GET /admin/dashboard/order-analytics?period=...) ──
+  const fetchOrderAnalytics = useCallback(async () => {
+    setLoadingAnalytics(true);
+    try {
+      const res = await adminDashboardApi.getOrderAnalytics({ period });
+      if (res?.success && res.data) {
+        setOrderAnalytics(res.data);
+      } else if (res && !res.success) {
+        toast.error(res.message || 'Failed to load order analytics');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to load order analytics');
+    } finally {
+      setLoadingAnalytics(false);
     }
-  };
+  }, [period]);
 
-  const maxOrders = Math.max(...performanceData.map(d => d.orders));
-
-  // Custom tooltip component for pie chart
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const growth = data.growth;
-      return (
-        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-lg">
-          <p className="text-sm font-bold text-slate-800">{data.fullName || data.name}</p>
-          <p className="text-xs text-gray-600 mt-1">
-            Units Sold: <span className="font-bold text-fuchsia-600">{data.value.toLocaleString()}</span>
-          </p>
-          {growth && (
-            <p className={`text-xs mt-1 font-medium ${growth > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {growth > 0 ? '↑' : '↓'} {Math.abs(growth)}% growth
-            </p>
-          )}
-        </div>
-      );
+  // ── Fetch Top Products (GET /admin/dashboard/top-products?period=...&categoryId=...) ──
+  const fetchTopProducts = useCallback(async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await adminDashboardApi.getTopProducts({
+        period,
+        categoryId: selectedCategoryId || undefined
+      });
+      if (res?.success) {
+        const list = res.data?.products ?? [];
+        setTopProducts(Array.isArray(list) ? list : []);
+      } else if (res && !res.success) {
+        toast.error(res.message || 'Failed to load top products');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to load top products');
+    } finally {
+      setLoadingProducts(false);
     }
-    return null;
+  }, [period, selectedCategoryId]);
+
+  // ── Fetch Recent Orders (ordersApi.search sortBy=created_at sortOrder=desc limit=5) ──
+  const fetchRecentOrders = useCallback(async () => {
+    setLoadingRecentOrders(true);
+    try {
+      const res = await ordersApi.search({
+        sortBy: 'created_at',
+        sortOrder: 'desc',
+        limit: 5,
+        page: 1
+      });
+
+      const payload = (res as any)?.data ?? res ?? {};
+      const candidates = [
+        payload?.orders,
+        payload?.items,
+        payload?.results,
+        payload?.data?.orders,
+        payload?.data?.items,
+        payload?.data?.results,
+        payload?.data,
+        payload,
+      ];
+      const list = candidates.find(Array.isArray) ?? [];
+
+      setRecentOrders(Array.isArray(list) ? list.slice(0, 5) : []);
+    } catch {
+      setRecentOrders([]);
+    } finally {
+      setLoadingRecentOrders(false);
+    }
+  }, []);
+
+  const resolveCurrencyValue = (value: any): number => {
+    const raw = typeof value === 'object' && value !== null
+      ? value.amount ?? value.total ?? value.value ?? value.price ?? 0
+      : value ?? 0;
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : 0;
   };
 
-  // Custom label renderer for pie chart to handle undefined percent
-  const renderCustomLabel = ({ name, percent }: { name?: string; percent?: number }) => {
-    if (!percent) return name || '';
-    return `${name || ''} ${(percent * 100).toFixed(0)}%`;
+  const formatCurrency = (value: any) => new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+  }).format(resolveCurrencyValue(value));
+
+  const handleOpenRecentOrder = (order: any) => {
+    const realOrderId = order?.orderNumber || order?.orderId || order?.id || order?._id;
+    if (!realOrderId) return;
+    onNavigate?.('orders');
+    router.push(`/admin/dashboard?tab=orders&orderId=${encodeURIComponent(String(realOrderId))}`);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-12 h-12 rounded-full border-4 border-fuchsia-200 border-t-fuchsia-600 animate-spin" />
-        <p className="text-sm font-medium text-slate-600 mt-4">Loading dashboard insights...</p>
-      </div>
-    );
-  }
+  useEffect(() => { void fetchStats(); }, [fetchStats]);
+  useEffect(() => { void fetchOrderAnalytics(); }, [fetchOrderAnalytics]);
+  useEffect(() => { void fetchTopProducts(); }, [fetchTopProducts]);
+  useEffect(() => { void fetchRecentOrders(); }, [fetchRecentOrders]);
+
+  const handleRefreshAll = () => {
+    void fetchStats();
+    void fetchOrderAnalytics();
+    void fetchTopProducts();
+    void fetchRecentOrders();
+    toast.success('Dashboard refreshed');
+  };
+
+  const periodLabel: Record<PeriodType, string> = {
+    day: 'Today',
+    week: 'Last 7 days',
+    month: 'Last 30 days',
+    all_time: 'All Time',
+  };
+
+  // Status breakdown array sorted by count descending
+  const breakdownList = orderAnalytics?.breakdown ?? [];
 
   return (
     <div className="space-y-8">
-      {/* Top Welcome Header Bar */}
+
+      {/* ── Header Banner ──────────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-fuchsia-600 to-purple-600 rounded-2xl p-6 text-white relative overflow-hidden"
+        className="bg-gradient-to-r from-fuchsia-600 to-purple-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-fuchsia-100"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h2 className="text-2xl font-black tracking-tight">
               Welcome back, {authUser?.firstName || 'Admin'}!
             </h2>
             <p className="text-white/80 text-sm mt-1 font-medium">
-              Here's what is happening with your store {stats.timeframeLabel}.
+              Store Analytics ({periodLabel[period]})
             </p>
           </div>
+
           <div className="flex flex-wrap items-center gap-3">
+            {/* Period Filter Switcher */}
             <div className="flex bg-white/10 p-1 rounded-xl items-center border border-white/10">
-              {(['daily', 'weekly', 'monthly'] as const).map((t) => (
+              {(['day', 'week', 'month', 'all_time'] as PeriodType[]).map((t) => (
                 <button
                   key={t}
-                  onClick={() => setTimeframe(t)}
+                  onClick={() => setPeriod(t)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                    timeframe === t
+                    period === t
                       ? 'bg-white text-fuchsia-600 shadow'
                       : 'text-white/85 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  {t}
+                  {t === 'all_time' ? 'All Time' : t === 'day' ? 'Today' : t === 'week' ? 'Last 7d' : 'Last 30d'}
                 </button>
               ))}
             </div>
 
             <button
-              onClick={() => onNavigate?.('orders')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition flex items-center gap-2"
+              onClick={handleRefreshAll}
+              className="px-3.5 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition flex items-center gap-2"
+              title="Refresh Dashboard"
             >
-              View Orders <ChevronRight size={16} />
+              <RefreshCw size={14} /> Refresh
+            </button>
+
+            <button
+              onClick={() => onNavigate?.('orders')}
+              className="px-3.5 py-2 bg-white text-fuchsia-600 hover:bg-fuchsia-50 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow"
+            >
+              Manage Orders <ChevronRight size={14} />
             </button>
           </div>
         </div>
       </motion.div>
 
-      {/* FIRST ROW: Uniform Stats Cards */}
+      {/* ── 3.1 Overview Cards (GET /admin/dashboard?period=...) ───────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <UniformStatCard 
-          title="Total Orders" 
-          value={stats.totalOrders} 
-          change={stats.ordersChange} 
-          icon={ShoppingBag} 
-          trend="up"
-          suffix=""
-          subtext={`${stats.pendingOrders} orders pending execution`}
+        <OverviewCard
+          title="Orders"
+          metric={stats?.orders}
+          icon={ShoppingBag}
           color="fuchsia"
+          loading={loadingStats}
+          note="All orders across all statuses"
         />
-        <UniformStatCard 
-          title="Products" 
-          value={stats.totalProducts} 
-          change={stats.productsChange} 
-          icon={Package} 
-          trend="up"
-          suffix=""
-          subtext={`${stats.activeVendors} active vendors selling`}
+        <OverviewCard
+          title="Products"
+          metric={stats?.products}
+          icon={Package}
           color="blue"
+          loading={loadingStats}
+          note="All product rows in database"
         />
-        <UniformStatCard 
-          title="Conversion Rate" 
-          value="3.84%" 
-          change={6} 
-          icon={TrendingUp} 
-          trend="up"
-          suffix=""
-          subtext="Industry average: 2.5%"
-          color="emerald"
-        />
-        <UniformStatCard
-          title="Total Users"
-          value={stats.totalUsers}
-          change={stats.usersChange}
+        <OverviewCard
+          title="Users"
+          metric={stats?.users}
           icon={Users}
-          trend="up"
-          suffix=""
-          color="fuchsia"
-          activeUsers={stats.activeUsers}
-          blockedUsers={stats.blockedUsers}
+          color="emerald"
+          loading={loadingStats}
+          note="All user accounts (all roles)"
+        />
+        <OverviewCard
+          title="Vendors"
+          metric={stats?.vendors}
+          icon={Store}
+          color="amber"
+          loading={loadingStats}
+          note="All vendor profiles & applications"
         />
       </div>
 
-      {/* SECOND ROW: Pie Chart + Performance Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Products Pie Chart  */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="font-bold text-slate-800">Sales Volume Breakdown by Product</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Distribution of units sold</p>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-              <div className="w-2 h-2 rounded-full bg-rose-500" />
-              <span>Total: {topProducts.reduce((sum, p) => sum + p.sales, 0).toLocaleString()} units</span>
-            </div>
+      {/* ── 3.2 Order Analytics (GET /admin/dashboard/order-analytics) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-gray-100 gap-4">
+          <div>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
+              <BarChart3 size={20} className="text-fuchsia-500" />
+              Order Analytics
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Order counts and order value breakdown for {periodLabel[period]}
+            </p>
           </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  formatter={(value) => <span className="text-xs text-gray-600">{value}</span>}
-                  wrapperStyle={{ fontSize: '11px' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
 
-        {/* Weekly Performance Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-        >
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-            <div>
-              <h3 className="font-bold text-slate-800 capitalize">{timeframe} Performance</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Orders trend analysis</p>
+          <div className="flex items-center gap-6">
+            <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Orders</span>
+              <span className="text-lg font-black text-slate-800">
+                {loadingAnalytics ? '—' : (orderAnalytics?.totalOrdersCount ?? 0).toLocaleString()}
+              </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-fuchsia-500 to-purple-500" />
-              <span className="text-xs font-medium text-gray-600">Orders</span>
-            </div>
-          </div>
-          <div className="relative h-80">
-            <div className="absolute inset-0 flex items-end justify-between gap-2">
-              {performanceData.map((day, idx) => (
-                <div key={day.label} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="relative w-full flex justify-center gap-1.5 h-64 items-end">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${(day.orders / maxOrders) * 100}%` }}
-                      transition={{ delay: idx * 0.05, duration: 0.5 }}
-                      className="w-full max-w-[48px] bg-gradient-to-t from-fuchsia-500 to-purple-500 rounded-t"
-                    >
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow">
-                        {day.orders} orders
-                      </div>
-                    </motion.div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-500 whitespace-nowrap">{day.label}</span>
-                </div>
-              ))}
+            <div className="bg-fuchsia-50 px-4 py-2 rounded-xl border border-fuchsia-100">
+              <span className="text-[10px] font-bold text-fuchsia-500 uppercase tracking-wider block">Order Value</span>
+              <span className="text-lg font-black text-fuchsia-700">
+                {loadingAnalytics
+                  ? '—'
+                  : new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(orderAnalytics?.totalOrdersRevenue ?? 0)}
+              </span>
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-400 font-medium">
-            {timeframe === 'daily' && <span>Real-time hourly insights</span>}
-            {timeframe === 'weekly' && <span>Week of May 17 - May 23, 2026</span>}
-            {timeframe === 'monthly' && <span>Month of May 2026</span>}
-            <span className="flex items-center gap-2">
-              <span>Total Orders: {stats.totalOrders.toLocaleString()}</span>
-            </span>
-          </div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* THIRD ROW: Recent Orders + Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Orders */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <div className="px-6 py-5 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Truck size={18} className="text-fuchsia-500" />
-                  <h3 className="font-bold text-slate-800">Recent Orders</h3>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Latest customer transactions</p>
-              </div>
-              <button
-                onClick={() => onNavigate?.('orders')}
-                className="text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 transition flex items-center gap-1"
-              >
-                View All <ChevronRight size={12} />
-              </button>
-            </div>
+        {loadingAnalytics ? (
+          <div className="py-8 space-y-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
           </div>
-          
+        ) : breakdownList.length === 0 ? (
+          <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+            <AlertCircle size={36} className="opacity-30 mb-2" />
+            <p className="text-sm font-medium">No order analytics data for this period</p>
+          </div>
+        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50/50 border-b border-gray-100">
-                <tr>
-                  <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Customer</th>
-                  <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Product</th>
-                  <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Date</th>
-                  <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Status</th>
+              <thead>
+                <tr className="border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase">
+                  <th className="pb-3 pl-2">Status</th>
+                  <th className="pb-3 text-right">Orders</th>
+                  <th className="pb-3 text-right">Order Value</th>
+                  <th className="pb-3 text-right pr-2">Share</th>
                 </tr>
               </thead>
-              <tbody>
-                {recentTransactions.map((tx) => (
-                  <tr key={tx.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                          {tx.customer.name[0].toUpperCase()}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-slate-800 text-sm">{tx.customer.name}</span>
-                          <span className="text-[10px] text-gray-400">{tx.customer.email}</span>
-                        </div>
-                      </div>
+              <tbody className="divide-y divide-gray-50 text-sm">
+                {breakdownList.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 pl-2 font-medium">
+                      <OrderStatusBadge status={item.status} />
                     </td>
-                    <td className="p-4 text-sm font-medium text-slate-600">{tx.product}</td>
-                    <td className="p-4 text-xs font-medium text-gray-400">{tx.date}</td>
-                    <td className="p-4 text-center">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${getStatusColor(tx.status)}`}>
-                        {getStatusIcon(tx.status)}
-                        {tx.status}
-                      </span>
+                    <td className="py-3 text-right font-bold text-slate-800">
+                      {item.count.toLocaleString()}
+                    </td>
+                    <td className="py-3 text-right font-bold text-slate-700">
+                      {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(item.totalRevenue ?? 0)}
+                    </td>
+                    <td className="py-3 text-right pr-2 font-semibold text-slate-500">
+                      {item.percentage}%
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </motion.div>
+        )}
+      </motion.div>
 
-        {/* Recent Activity */}
+      {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        {/* ── Top Products Widget (GET /admin/dashboard/top-products) ──── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"
         >
-          <div className="px-6 py-5 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <Activity size={18} className="text-fuchsia-500" />
-              <h3 className="font-bold text-slate-800">Recent Activity</h3>
+          <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <Package size={18} className="text-fuchsia-500" />
+                Top Products
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">Top 5 by units sold ({periodLabel[period]})</p>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Latest store updates</p>
+
+            {/* Category Filter */}
+            <div className="flex items-center gap-2">
+              <Filter size={14} className="text-gray-400" />
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="text-xs font-semibold bg-slate-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
+              >
+                <option value="">All Categories</option>
+                {categories.map((c: any) => (
+                  <option key={c.id || c._id || c.uuid} value={c.id || c._id || c.uuid}>
+                    {c.name || c.title}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-            {activities.map((activity) => (
-              <div key={activity.id} className="px-6 py-4 flex items-center gap-3 hover:bg-slate-50/50 transition">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                  {activity.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-700 truncate">{activity.message}</p>
-                  <p className="text-[10px] text-gray-400 font-medium mt-0.5">{activity.time}</p>
-                </div>
-              </div>
-            ))}
+
+          {loadingProducts ? (
+            <div className="p-6 space-y-4">
+              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12" />)}
+            </div>
+          ) : topProducts.length === 0 ? (
+            <div className="p-10 flex flex-col items-center justify-center text-slate-400 flex-1">
+              <Package size={36} className="opacity-20 mb-3" />
+              <p className="text-sm font-medium">No top products found</p>
+              <p className="text-xs text-gray-400 mt-1">Try selecting a different category or period</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50/60 border-b border-gray-100">
+                  <tr className="text-[10px] font-bold text-gray-400 uppercase">
+                    <th className="p-3 pl-4">#</th>
+                    <th className="p-3">Product</th>
+                    <th className="p-3">Vendor</th>
+                    <th className="p-3 text-right pr-4">Units Sold</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 text-sm">
+                  {topProducts.map((p, idx) => (
+                    <tr key={p.productId || idx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-3 pl-4 text-xs font-bold text-gray-400">{idx + 1}</td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-3">
+                          {p.imageUrl ? (
+                            <img
+                              src={p.imageUrl}
+                              alt={p.name}
+                              className="w-9 h-9 rounded-lg object-cover border border-gray-100 flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-9 h-9 rounded-lg bg-fuchsia-50 flex items-center justify-center flex-shrink-0">
+                              <Package size={16} className="text-fuchsia-400" />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-slate-800 truncate max-w-[140px]">
+                              {p.name || 'Unnamed Product'}
+                            </h4>
+                            <p className="text-[10px] text-gray-400 truncate">
+                              {p.categoryName || 'General'} {p.sku ? `• SKU: ${p.sku}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3 text-xs font-medium text-slate-600 truncate max-w-[100px]">
+                        {p.vendorName || '—'}
+                      </td>
+                      <td className="p-3 text-right pr-4 font-black text-slate-800">
+                        {p.unitsSold.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+
+        {/* ── Recent Orders Widget (Replacing Recent Activity) ─────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"
+        >
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <ShoppingBag size={18} className="text-fuchsia-500" />
+                Recent Orders
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">Last 5 orders (newest first)</p>
+            </div>
+            <button
+              onClick={() => onNavigate?.('orders')}
+              className="text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 flex items-center gap-1"
+            >
+              View All <ChevronRight size={14} />
+            </button>
           </div>
+
+          {loadingRecentOrders ? (
+            <div className="p-6 space-y-4">
+              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12" />)}
+            </div>
+          ) : recentOrders.length === 0 ? (
+            <div className="p-10 flex flex-col items-center justify-center text-slate-400 flex-1">
+              <ShoppingBag size={36} className="opacity-20 mb-3" />
+              <p className="text-sm font-medium">No recent orders</p>
+              <p className="text-xs text-gray-400 mt-1">New customer orders will appear here</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {recentOrders.map((ord: any, i: number) => {
+                const orderNo = ord.orderNumber || ord.id || `ORD-${i + 1}`;
+                const custName = ord.user?.firstName
+                  ? `${ord.user.firstName} ${ord.user.lastName || ''}`
+                  : ord.customerName || ord.shippingAddress?.fullName || ord.email || 'Customer';
+                const dateStr = ord.createdAt
+                  ? new Date(ord.createdAt).toLocaleString('en-GB', {
+                      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    })
+                  : '';
+                const totalVal = resolveCurrencyValue(ord.totalAmount ?? ord.total ?? ord.grandTotal ?? ord.amount ?? ord.orderTotal ?? ord.totalPrice ?? ord.price ?? 0);
+                const status = ord.status || ord.orderStatus || 'pending';
+
+                return (
+                  <div
+                    key={ord.id || ord._id || i}
+                    onClick={() => handleOpenRecentOrder(ord)}
+                    className="px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-fuchsia-50 flex items-center justify-center flex-shrink-0 text-fuchsia-600 font-bold text-xs">
+                        <ShoppingBag size={16} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-800 truncate">
+                            {orderNo}
+                          </span>
+                          <OrderStatusBadge status={status} />
+                        </div>
+                        <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                          {custName} {dateStr ? `• ${dateStr}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <span className="text-xs font-black text-slate-800 block">
+                        {formatCurrency(totalVal)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </motion.div>
       </div>
 
-      {/* Quick Actions Row */}
+      {/* ── Quick Actions ──────────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.25 }}
         className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-wrap items-center justify-between gap-4"
       >
         <div className="flex items-center gap-2">
           <Zap size={18} className="text-amber-500" />
-          <span className="text-sm font-bold text-slate-700">Quick Actions</span>
+          <span className="text-sm font-bold text-slate-700">Quick Shortcuts</span>
         </div>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => onNavigate?.('products')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold text-slate-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
           >
-            <Package size={16} /> View Products
+            <Package size={14} /> Products
           </button>
           <button
             onClick={() => onNavigate?.('orders')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold text-slate-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
           >
-            <ShoppingBag size={16} /> View Orders
+            <ShoppingBag size={14} /> Orders
           </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold transition shadow-md shadow-fuchsia-100 flex items-center gap-2 hover:shadow-lg">
-            <FileText size={16} /> Generate Report
+          <button
+            onClick={() => onNavigate?.('vendors')}
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
+          >
+            <Store size={14} /> Vendors
           </button>
         </div>
       </motion.div>
+
     </div>
   );
 }

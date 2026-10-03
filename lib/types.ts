@@ -81,11 +81,16 @@ export interface CartState {
   savedCount: number
   total: number // totalCount
   summary: {
-    subtotal: number
-    shipping: number
-    tax: number
-    total: number
+    subtotal: number;
+    shipping: number;
+    tax: number;
+    taxRate?: number;
+    taxPercentage?: number;
+    region?: string | null;
+    country?: string;
+    total: number;
     currency: string;
+    formattedRate?: string;
   } | null
   loading: boolean
   noteModal: {

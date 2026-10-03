@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent, Bell, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent, Bell, BookOpen, Mail, Truck } from 'lucide-react';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog';
+export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists';
 
 interface SidebarProps {
   activeTab: SuperAdminTab | string;
@@ -129,6 +129,18 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             label="Notifications"
             active={activeTab === 'notifications'}
             onClick={() => { setActiveTab('notifications'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<Mail size={20} />}
+            label="Engagement"
+            active={activeTab === 'engagement'}
+            onClick={() => { setActiveTab('engagement'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<Truck size={20} />}
+            label="Vendor Specialists"
+            active={activeTab === 'specialists'}
+            onClick={() => { setActiveTab('specialists'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Percent size={20} />}

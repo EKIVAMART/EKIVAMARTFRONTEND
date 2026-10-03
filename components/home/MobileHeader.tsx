@@ -168,33 +168,34 @@ export default function MobileHeader({
   return (
     <div className="md:hidden w-full bg-white relative z-40">
       {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
-      <div className="flex w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 min-w-0">
-        
-        {/* Categories button */}
-        <button
-          type="button"
-          onClick={onOpenCategories}
-          aria-label="Open categories"
-          className="flex items-center gap-1 text-brand-600 font-bold text-xs shrink-0"
-        >
-          <CollapseMenuIcon />
-          <span>Categories</span>
-        </button>
+      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-brand-200 scrollbar-track-brand-50/60 [scrollbar-width:thin] [scrollbar-color:rgba(157,74,227,0.35)_rgba(157,74,227,0.08)]">
+        <div className="flex w-max min-w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 min-w-0">
+          
+          {/* Categories button */}
+          <button
+            type="button"
+            onClick={onOpenCategories}
+            aria-label="Open categories"
+            className="flex items-center gap-1 text-brand-600 font-bold text-xs shrink-0"
+          >
+            <CollapseMenuIcon />
+            <span>Categories</span>
+          </button>
 
-        {/* Logo (moved left, close to categories but with equal layout spacing) */}
-        <Link href="/" className="flex items-center shrink-0 ml-[5%] mr-auto">
-          <Image
-            src="/fa_logo_brand.png"
-            alt="Faflora"
-            width={82}
-            height={26}
-            className="h-6.5 w-auto object-contain"
-            priority
-          />
-        </Link>
+          {/* Logo (moved left, close to categories but with equal layout spacing) */}
+          <Link href="/" className="flex items-center shrink-0 ml-[5%] mr-auto">
+            <Image
+              src="/fa_logo_brand.png"
+              alt="Faflora"
+              width={82}
+              height={26}
+              className="h-6.5 w-auto object-contain"
+              priority
+            />
+          </Link>
 
-        {/* 4 icons group (placed close to the searchbar/other icons on the right) */}
-        <div className="flex items-center gap-2 shrink-0">
+          {/* 4 icons group (placed close to the searchbar/other icons on the right) */}
+          <div className="flex items-center gap-2 shrink-0">
           {/* Search trigger */}
           <button
             type="button"
@@ -261,6 +262,7 @@ export default function MobileHeader({
               <Image src="/icons/Frame.png" alt="Account" width={20} height={20} className="rounded-full" />
             </button>
           )}
+          </div>
         </div>
       </div>
 

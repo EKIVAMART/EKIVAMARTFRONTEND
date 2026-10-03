@@ -402,35 +402,6 @@ export default function PublicStorePage({ params }: PublicStorePageProps) {
             {store.storeDescription && (
               <p className="text-white/80 text-sm mt-1 line-clamp-2 max-w-xl">{store.storeDescription}</p>
             )}
-            {/* Social links */}
-            {store.socialLinks && (
-              <div className="flex gap-2 mt-2">
-                {store.socialLinks.instagram && (
-                  <a href={store.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
-                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-pink-500 flex items-center justify-center text-white transition-colors">
-                    <InstagramIcon size={14} />
-                  </a>
-                )}
-                {store.socialLinks.facebook && (
-                  <a href={store.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
-                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-blue-600 flex items-center justify-center text-white transition-colors">
-                    <FacebookIcon size={14} />
-                  </a>
-                )}
-                {store.socialLinks.twitter && (
-                  <a href={store.socialLinks.twitter} target="_blank" rel="noopener noreferrer"
-                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-sky-500 flex items-center justify-center text-white transition-colors">
-                    <TwitterIcon size={14} />
-                  </a>
-                )}
-                {store.socialLinks.tiktok && (
-                  <a href={store.socialLinks.tiktok} target="_blank" rel="noopener noreferrer"
-                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-black flex items-center justify-center text-white transition-colors">
-                    <TikTokIcon size={14} />
-                  </a>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -475,11 +446,10 @@ export default function PublicStorePage({ params }: PublicStorePageProps) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-5 py-4 text-sm font-semibold capitalize transition-all relative whitespace-nowrap ${
-                activeTab === tab
-                  ? 'text-purple-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-5 py-4 text-sm font-semibold capitalize transition-all relative whitespace-nowrap ${activeTab === tab
+                ? 'text-purple-700'
+                : 'text-gray-500 hover:text-gray-700'
+                }`}
             >
               {tab === 'products' && <><ShoppingBag size={14} className="inline mr-1.5 -mt-0.5" />Products</>}
               {tab === 'reviews' && <><MessageSquare size={14} className="inline mr-1.5 -mt-0.5" />Reviews</>}
@@ -769,11 +739,11 @@ export default function PublicStorePage({ params }: PublicStorePageProps) {
 
         {/* ── STORE INFO TAB ────────────────────────────────────────────── */}
         {activeTab === 'info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="">
             {/* Policies */}
-            <div className="space-y-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:space-y-5 space-y-2">
               {store.returnPolicy && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="lg:h-44 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
                       <RefreshCw size={16} className="text-emerald-600" />
@@ -784,7 +754,7 @@ export default function PublicStorePage({ params }: PublicStorePageProps) {
                 </div>
               )}
               {store.shippingPolicy && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="lg:h-44 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
                       <Truck size={16} className="text-blue-600" />
@@ -796,111 +766,6 @@ export default function PublicStorePage({ params }: PublicStorePageProps) {
               )}
             </div>
 
-            {/* Contact + Shipping checker */}
-            <div className="space-y-5">
-              {/* Contact Info */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-4">Contact Information</h3>
-                <div className="space-y-3">
-                  {store.storeEmail && (
-                    <a
-                      href={`mailto:${store.storeEmail}`}
-                      className="flex items-center gap-3 text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <Mail size={15} className="text-purple-600" />
-                      </div>
-                      <span>{store.storeEmail}</span>
-                      <ExternalLink size={12} className="ml-auto text-gray-300" />
-                    </a>
-                  )}
-                  {store.storePhone && (
-                    <a
-                      href={`tel:${store.storePhone}`}
-                      className="flex items-center gap-3 text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <Phone size={15} className="text-purple-600" />
-                      </div>
-                      <span>{store.storePhone}</span>
-                      <ExternalLink size={12} className="ml-auto text-gray-300" />
-                    </a>
-                  )}
-                  {!store.storeEmail && !store.storePhone && (
-                    <p className="text-sm text-gray-400">No contact information available.</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Shipping Options Checker */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                    <MapPin size={15} className="text-indigo-600" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wide">Shipping to Your State</h3>
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={shippingState}
-                    onChange={e => setShippingState(e.target.value)}
-                    placeholder="Enter your state (e.g. Lagos)"
-                    className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
-                  />
-                  <button
-                    onClick={fetchShipping}
-                    disabled={shippingLoading}
-                    className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition-all disabled:opacity-60 flex items-center gap-1.5"
-                  >
-                    {shippingLoading ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Truck size={14} />
-                    )}
-                    Check
-                  </button>
-                </div>
-
-                {/* Shipping result */}
-                {shippingResult && (
-                  <div className="mt-4">
-                    {!shippingResult.vendorShipsToState ? (
-                      <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-sm text-red-700 font-medium flex items-center gap-2">
-                        <AlertTriangle size={15} />
-                        {shippingResult.message || `This store doesn't ship to ${shippingState}.`}
-                      </div>
-                    ) : (
-                      <div className="space-y-2 mt-1">
-                        <p className="text-xs text-emerald-700 font-bold flex items-center gap-1">
-                          <BadgeCheck size={13} /> Ships to {shippingState}
-                        </p>
-                        {(shippingResult.shippingOptions ?? []).map((opt, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100"
-                          >
-                            <div>
-                              <p className="text-sm font-semibold text-gray-800">{opt.methodName}</p>
-                              <p className="text-xs text-gray-400">{opt.estimatedDays}</p>
-                              {opt.freeShippingThreshold != null && (
-                                <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
-                                  Free shipping above {formatNaira(opt.freeShippingThreshold)}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-0.5 text-purple-700 font-black text-sm">
-                              <NairaIcon size={12} />
-                              {formatNaira(opt.price).replace('₦', '')}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         )}
       </div>

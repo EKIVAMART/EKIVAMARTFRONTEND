@@ -511,6 +511,20 @@ export const authApi = {
     }
   },
 
+  async getUserById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/auth/users/${id}`);
+      return response.data;
+    } catch (error) {
+      try {
+        const searchRes = await axiosInstance.get<ApiResponse<any>>(`/auth/users?searchQuery=${id}`);
+        return searchRes.data;
+      } catch {
+        return null;
+      }
+    }
+  },
+
   async deleteUser(id: string) {
     try {
       const response = await axiosInstance.delete<ApiResponse<any>>(`/auth/users/${id}`);
@@ -668,15 +682,24 @@ export interface StoreOption {
 export const productApi = {
   async getAllProducts(params: ProductSearchParams = {}) {
     try {
-      const { skipAuth, ...rest } = params as any;
+      const { skipAuth, q, inStockOnly, ...rest } = params as any;
+      const normalized: Record<string, any> = { ...rest };
+
+      if (q && !normalized.searchQuery) normalized.searchQuery = q;
+      if (inStockOnly !== undefined && normalized.inStock === undefined) {
+        normalized.inStock = inStockOnly ? true : undefined;
+      }
+
+      const resolvedSortBy = normalized.sortBy ?? (normalized.searchQuery ? 'relevance' : 'createdAt');
+      const resolvedSortOrder = normalized.sortOrder ?? (resolvedSortBy === 'price' || resolvedSortBy === 'priceAmount' ? 'asc' : 'desc');
+
       const queryParams = toQueryParams({
         page: 1,
         limit: 20,
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-        ...rest,
+        sortBy: resolvedSortBy,
+        sortOrder: resolvedSortOrder,
+        ...normalized,
       });
-      // When skipAuth is true, pass the flag so the axios interceptor skips the token
       const config: any = skipAuth ? { skipAuth: true } : {};
       const response = await axiosInstance.get<ApiResponse<any>>(
         `/products?${queryParams.toString()}`,
@@ -759,10 +782,27 @@ export const productApi = {
     vendorId?: string;
   } = {}) {
     try {
+      const { q, inStockOnly, ...rest } = params as any;
+      const normalized: Record<string, any> = { ...rest };
+
+      if (q && !normalized.searchQuery) normalized.searchQuery = q;
+      if (inStockOnly !== undefined && normalized.inStock === undefined) {
+        normalized.inStock = inStockOnly ? true : undefined;
+      }
+
+      const finalParams = {
+        page: 1,
+        limit: 20,
+        sortBy: normalized.searchQuery ? 'relevance' : 'createdAt',
+        sortOrder: normalized.sortBy === 'price' || normalized.sortBy === 'priceAmount' ? 'asc' : 'desc',
+        ...normalized,
+      };
+
       const queryParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
+      Object.entries(finalParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          queryParams.set(key, String(value));
+          const normalizedValue = Array.isArray(value) ? value.join(',') : String(value);
+          queryParams.set(key, normalizedValue);
         }
       });
       const response = await axiosInstance.get<ApiResponse<any>>(
@@ -841,6 +881,67 @@ export const productApi = {
       const response = await axiosInstance.patch<ApiResponse<any>>(
         `/products/${productId}`,
         { images: imageObjects }
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
+   * Enhanced Product Search Engine
+   * GET /api/v1/products/search
+   */
+  async search(params: {
+    q?: string;
+    searchQuery?: string;
+    categoryId?: string;
+    vendorId?: string;
+    status?: string;
+    brand?: string;
+    origin?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minDiscount?: number;
+    maxDiscount?: number;
+    inStock?: boolean;
+    inStockOnly?: boolean;
+    tags?: string | string[];
+    returnWindow?: number;
+    returnShipping?: string;
+    warrantyPeriod?: string;
+    sortBy?: 'relevance' | 'createdAt' | 'updatedAt' | 'price' | 'name' | 'brand' | 'discount' | 'stock' | 'status' | 'condition' | 'origin' | 'sku' | 'description' | 'returnWindow' | 'returnShipping' | 'warrantyPeriod' | 'id';
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+  } = {}) {
+    try {
+      const { q, inStockOnly, ...rest } = params;
+      const normalized: Record<string, any> = { ...rest };
+
+      if (q && !normalized.searchQuery) normalized.searchQuery = q;
+      if (inStockOnly !== undefined && normalized.inStock === undefined) {
+        normalized.inStock = inStockOnly ? true : undefined;
+      }
+
+      const resolvedSortBy = normalized.sortBy ?? (normalized.searchQuery ? 'relevance' : 'createdAt');
+      const resolvedSortOrder = normalized.sortOrder ?? (resolvedSortBy === 'price' || resolvedSortBy === 'priceAmount' ? 'asc' : 'desc');
+
+      const queryParams = new URLSearchParams();
+      Object.entries({
+        ...normalized,
+        sortBy: resolvedSortBy,
+        sortOrder: resolvedSortOrder,
+        page: normalized.page ?? 1,
+        limit: normalized.limit ?? 20,
+      }).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== '') {
+          queryParams.set(key, Array.isArray(val) ? val.join(',') : String(val));
+        }
+      });
+
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/products?${queryParams.toString()}`
       );
       return response.data;
     } catch (error) {
@@ -1207,8 +1308,13 @@ export interface CartSummaryResponse {
   subtotal: number;
   shipping: number;
   tax: number;
+  taxRate?: number;
+  taxPercentage?: number;
+  region?: string | null;
+  country?: string;
   total: number;
   currency: string;
+  formattedRate?: string;
 }
 
 export interface CartValidationResponse {
@@ -1253,9 +1359,14 @@ export const cartApi = {
     }
   },
 
-  async getCartSummary(): Promise<ApiResponse<CartSummaryResponse>> {
+  async getCartSummary(params: { country?: string; state?: string } = {}): Promise<ApiResponse<CartSummaryResponse>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<CartSummaryResponse>>('/cart/summary');
+      const queryParams = new URLSearchParams();
+      if (params.country) queryParams.set('country', params.country);
+      if (params.state) queryParams.set('state', params.state);
+      const queryStr = queryParams.toString();
+      const url = queryStr ? `/cart/summary?${queryStr}` : '/cart/summary';
+      const response = await axiosInstance.get<ApiResponse<CartSummaryResponse>>(url);
       return response.data;
     } catch (error: any) {
       handleApiError(error);
@@ -1354,7 +1465,20 @@ export const cartApi = {
     }
   },
 
-  async checkout(shippingAddress: {
+  async checkout(payload: {
+    shippingAddress?: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2?: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+      phoneNumber: string;
+    };
+    savedAddressId?: string;
+    notes?: string;
+  } | {
     fullName: string;
     addressLine1: string;
     addressLine2?: string;
@@ -1365,10 +1489,14 @@ export const cartApi = {
     phoneNumber: string;
   }, notes?: string): Promise<ApiResponse<any>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<any>>('/cart/checkout', {
-        shippingAddress,
-        notes,
-      });
+      // Support legacy (shippingAddress, notes) signature as well as payload object
+      let body: any;
+      if ('shippingAddress' in payload || 'savedAddressId' in payload) {
+        body = payload;
+      } else {
+        body = { shippingAddress: payload, notes };
+      }
+      const response = await axiosInstance.post<ApiResponse<any>>('/cart/checkout', body);
       return response.data;
     } catch (error: any) {
       handleApiError(error);
@@ -1461,7 +1589,363 @@ export const vendorDashboardApi = {
       handleApiError(error);
     }
   },
+
+  /** Vendor stats — consolidated analytics with period filter (today, last_7_days, last_30_days, this_month, custom) */
+  async getVendorStats(params?: {
+    period?: 'today' | 'last_7_days' | 'last_30_days' | 'this_month' | 'custom';
+    startDate?: string;
+    endDate?: string;
+  }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.period) queryParams.set('period', params.period);
+      if (params?.startDate) queryParams.set('startDate', params.startDate);
+      if (params?.endDate) queryParams.set('endDate', params.endDate);
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/vendor/stats${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
+
+export const vendorEarningsApi = {
+  async getEarningsSummary() {
+    try { const response = await axiosInstance.get<ApiResponse<any>>('/vendor/earnings/summary'); return response.data; } catch (error) { handleApiError(error); }
+  },
+  async getEarnings(params?: { page?: number; limit?: number; status?: string; startDate?: string; endDate?: string }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      if (params?.startDate) queryParams.set('startDate', params.startDate);
+      if (params?.endDate) queryParams.set('endDate', params.endDate);
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/vendor/earnings${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async requestWithdrawal(body: { amount: number; bankAccountId: string }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/vendor/earnings/withdraw', body);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getWithdrawals(params?: { page?: number; limit?: number; status?: string }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/vendor/withdrawals${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getBankAccounts() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/vendor/application/bank-accounts');
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async addBankAccount(body: { accountName: string; accountNumber: string; bankName: string; bankCode: string; accountType: 'savings' | 'current' }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/vendor/application/bank-accounts', body);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async setPrimaryBankAccount(accountId: string) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/vendor/application/bank-accounts/${accountId}/set-primary`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async deleteBankAccount(accountId: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<any>>(`/vendor/application/bank-accounts/${accountId}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+};
+
+export const superAdminPayoutsApi = {
+  async getSummary() {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>('/super-admin/payouts/summary');
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getVendors(params?: { search?: string; status?: string; page?: number; limit?: number }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.set('search', params.search);
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/super-admin/payouts/vendors${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getBreakdown(params?: { vendorId?: string; orderId?: string; status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.vendorId) queryParams.set('vendorId', params.vendorId);
+      if (params?.orderId) queryParams.set('orderId', params.orderId);
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      if (params?.startDate) queryParams.set('startDate', params.startDate);
+      if (params?.endDate) queryParams.set('endDate', params.endDate);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/super-admin/payouts/breakdown${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getWithdrawals(params?: { status?: string; vendorId?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      if (params?.vendorId) queryParams.set('vendorId', params.vendorId);
+      if (params?.startDate) queryParams.set('startDate', params.startDate);
+      if (params?.endDate) queryParams.set('endDate', params.endDate);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/super-admin/payouts/withdrawals${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async processWithdrawal(withdrawalId: string, data: { action: 'complete' | 'fail'; reason?: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/super-admin/payouts/withdrawals/${withdrawalId}/process`, data);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async overrideWithdrawal(withdrawalId: string, data: { action: 'complete' | 'fail'; reason: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/super-admin/vendors/withdrawals/${withdrawalId}/override`, data);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+};
+
+export const adminWithdrawalsApi = {
+  async getWithdrawals(params?: { status?: string; vendorId?: string; page?: number; limit?: number }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      if (params?.vendorId) queryParams.set('vendorId', params.vendorId);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/admin/vendors/withdrawals${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async processWithdrawal(withdrawalId: string, data: { action: 'complete' | 'fail'; reason?: string }) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(`/admin/vendors/withdrawals/${withdrawalId}/process`, data);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+};
+
+export interface CardMetric {
+  filtered: number;
+  totalAllTime: number;
+}
+
+export interface AdminDashboardStats {
+  period: 'day' | 'week' | 'month' | 'all_time';
+  startDate: string | null;
+  endDate: string | null;
+  orders: CardMetric;
+  products: CardMetric;
+  users: CardMetric;
+  vendors: CardMetric;
+}
+
+export interface OrderStatusBreakdownItem {
+  status: string;
+  count: number;
+  totalRevenue: number;
+  percentage: number;
+}
+
+export interface DetailedOrderAnalytics {
+  period: 'day' | 'week' | 'month' | 'all_time';
+  startDate: string | null;
+  endDate: string | null;
+  totalOrdersCount: number;
+  totalOrdersRevenue: number;
+  breakdown: OrderStatusBreakdownItem[];
+}
+
+export interface AdminTopProductItem {
+  productId: string;
+  name: string;
+  sku: string | null;
+  categoryName: string | null;
+  categoryId: string | null;
+  vendorName: string | null;
+  unitsSold: number;
+  imageUrl: string | null;
+}
+
+// ─── Admin Dashboard API (ADMIN + SUPER_ADMIN) ───────────────────────────────
+// Rule: ADMIN never sees vendor/store earnings, commissions, or payouts.
+// Available endpoints: /admin/dashboard, /admin/dashboard/order-analytics, /admin/dashboard/top-products
+export const adminDashboardApi = {
+  /** GET /api/v1/admin/dashboard?period= */
+  async getDashboard(params?: { period?: 'day' | 'week' | 'month' | 'all_time' }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<AdminDashboardStats>>(`/admin/dashboard${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  /** Alias for getDashboard */
+  async getDashboardStats(params?: { period?: 'day' | 'week' | 'month' | 'all_time' }) {
+    return this.getDashboard(params);
+  },
+
+  /** GET /api/v1/admin/dashboard/order-analytics?period=&vendorId=&categoryId= */
+  async getOrderAnalytics(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; vendorId?: string; categoryId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
+      if (params?.categoryId) q.set('categoryId', params.categoryId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<DetailedOrderAnalytics>>(`/admin/dashboard/order-analytics${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  /** GET /api/v1/admin/dashboard/top-products?period=&categoryId= */
+  async getTopProducts(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; categoryId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      if (params?.categoryId) q.set('categoryId', params.categoryId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<{ products: AdminTopProductItem[] }>>(`/admin/dashboard/top-products${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+};
+
+export const superAdminDashboardApi = {
+  // 1. KPI Overview Cards
+  async getKpiOverview(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; vendorId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  // 2. Vendor Earnings Table
+  async getVendorEarnings(params?: { search?: string; vendorId?: string; page?: number; limit?: number }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.search) q.set('search', params.search);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
+      if (params?.page) q.set('page', String(params.page));
+      if (params?.limit) q.set('limit', String(params.limit));
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/vendor-earnings${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  // 3. Recent Activities
+  async getRecentActivities(params?: { limit?: number }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.limit) q.set('limit', String(params.limit));
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/recent-activities${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  // 4. Top Products Pie Chart
+  async getPieChart(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; categoryId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      if (params?.categoryId) q.set('categoryId', params.categoryId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/pie-chart${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  // 5. Earnings Line Graph
+  async getEarningsGraph(params?: { interval?: 'daily' | 'weekly' | 'monthly'; vendorId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.interval) q.set('interval', params.interval);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/earnings-graph${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+
+  // 6. Orders Bar Chart
+  async getOrdersBarChart(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; vendorId?: string }) {
+    try {
+      const q = new URLSearchParams();
+      if (params?.period) q.set('period', params.period);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
+      const qs = q.toString();
+      const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/orders-bar-chart${qs ? `?${qs}` : ''}`);
+      return res.data;
+    } catch (error) { handleApiError(error); }
+  },
+};
+
+export const vendorOrdersApi = {
+  async getOrders(params?: { page?: number; limit?: number; status?: string }) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.limit) queryParams.set('limit', String(params.limit));
+      if (params?.status && params.status !== 'all') queryParams.set('status', params.status);
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<any>>(`/vendor/orders${qs ? `?${qs}` : ''}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+  async getOrderById(orderId: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(`/vendor/orders/${orderId}`);
+      return response.data;
+    } catch (error) { handleApiError(error); }
+  },
+};
+
+export const vendorApplicationApi = {
+  async getDraft() {
+    try { const response = await axiosInstance.get<ApiResponse<any>>('/vendor/application/draft'); return response.data; } catch (error) { handleApiError(error); }
+  },
+  async getStatus() {
+    try { const response = await axiosInstance.get<ApiResponse<any>>('/vendor/application/status'); return response.data; } catch (error) { handleApiError(error); }
+  },
+};
+
 
 export const storePublicApi = {
   async getStoreProfile(storeSlug: string) {
@@ -1674,12 +2158,44 @@ export const ordersApi = {
       handleApiError(error);
     }
   },
+
+  async getQuote(body: {
+    items: Array<{ productId: string; quantity: number }>;
+    shippingAddress?: any;
+    savedAddressId?: string;
+    notes?: string;
+  }) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>('/orders/quote', body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 export const taxRulesApi = {
   async list() {
     try {
       const response = await axiosInstance.get<ApiResponse<any>>('/tax-rules');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getApplicable(params: { country?: string; state?: string; region?: string; subtotal?: number } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.country) queryParams.set('country', params.country);
+      const stateOrRegion = params.state || params.region;
+      if (stateOrRegion) {
+        queryParams.set('state', stateOrRegion);
+        queryParams.set('region', stateOrRegion);
+      }
+      if (params.subtotal !== undefined) queryParams.set('subtotal', String(params.subtotal));
+
+      const response = await axiosInstance.get<ApiResponse<any>>(`/tax-rules/applicable?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -1707,6 +2223,75 @@ export const taxRulesApi = {
   async delete(id: string) {
     try {
       const response = await axiosInstance.delete<ApiResponse<any>>(`/tax-rules/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export interface SavedAddressPayload {
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phoneNumber: string;
+}
+
+export interface SavedAddressItem extends SavedAddressPayload {
+  id: string;
+  userId?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const userAddressApi = {
+  async list(params: { page?: number; limit?: number } = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.set('page', String(params.page));
+      if (params.limit) queryParams.set('limit', String(params.limit));
+      const response = await axiosInstance.get<ApiResponse<any>>(`/user/address?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getById(id: string) {
+    try {
+      const response = await axiosInstance.get<ApiResponse<SavedAddressItem>>(`/user/address/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async create(body: SavedAddressPayload) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<SavedAddressItem>>('/user/address', body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async update(id: string, body: Partial<SavedAddressPayload>) {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<SavedAddressItem>>(`/user/address/${id}`, body);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/user/address/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -1907,3 +2492,147 @@ export interface PublicStoreProfile {
 /** Backward-compat alias — vendor page uses storeApi */
 export const storeApi = storePublicApi;
 
+// ─── Engagement Settings API ────────────────────────────────────────────────
+
+export type EngagementEmailType = 'customer_inactivity' | 'vendor_incomplete_registration';
+
+export interface EngagementSetting {
+  type: EngagementEmailType;
+  enabled: boolean;
+  thresholdDays: number;
+  subject: string;
+  bodyHtml: string;
+  updatedBy: string | null;
+  updatedAt: string;
+}
+
+export interface UpdateEngagementSettingPayload {
+  enabled?: boolean;
+  thresholdDays?: number;
+  subject?: string;
+  bodyHtml?: string;
+}
+
+export interface SweepResult {
+  enabled: boolean;
+  eligible: number;
+  sent: number;
+  failed: number;
+}
+
+export interface RunNowResponse {
+  customer_inactivity: SweepResult;
+  vendorIncompleteRegistration: SweepResult;
+  message: 'Engagement email sweep completed';
+}
+
+export const engagementApi = {
+  /** GET /api/v1/admin/engagement-settings — returns both settings */
+  async list(): Promise<ApiResponse<EngagementSetting[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<EngagementSetting[]>>('/admin/engagement-settings');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** GET /api/v1/admin/engagement-settings/:type */
+  async getByType(type: EngagementEmailType): Promise<ApiResponse<EngagementSetting>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<EngagementSetting>>(`/admin/engagement-settings/${type}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** PUT /api/v1/admin/engagement-settings/:type — send only changed fields */
+  async update(type: EngagementEmailType, payload: UpdateEngagementSettingPayload): Promise<ApiResponse<EngagementSetting>> {
+    try {
+      const response = await axiosInstance.put<ApiResponse<EngagementSetting>>(`/admin/engagement-settings/${type}`, payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /** POST /api/v1/admin/engagement-settings/run-now — runs both sweeps immediately */
+  async runNow(): Promise<ApiResponse<RunNowResponse>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<RunNowResponse>>('/admin/engagement-settings/run-now');
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+// --- Vendor Specialist API ---
+export const STATE_ENUM_VALUES = ['abia','adamawa','akwa ibom','anambra','bauchi','bayelsa','benue','borno','cross river','delta','ebonyi','edo','ekiti','enugu','fct','gombe','imo','jigawa','kaduna','kano','katsina','kebbi','kogi','kwara','lagos','nasarawa','niger','ogun','ondo','osun','oyo','plateau','rivers','sokoto','taraba','yobe','zamfara'] as const;
+export type StateEnumValue = typeof STATE_ENUM_VALUES[number];
+export interface VendorSpecialist { id: string; name: string; contactPhone: string; state: StateEnumValue; isActive: boolean; createdAt: string; updatedAt: string; }
+export interface VendorSpecialistListResponse { items: VendorSpecialist[]; total: number; page: number; limit: number; totalPages: number; }
+export interface CreateVendorSpecialistDto { name: string; contactPhone: string; state: StateEnumValue; }
+export interface UpdateVendorSpecialistDto { name?: string; contactPhone?: string; state?: StateEnumValue; isActive?: boolean; }
+export interface VendorSpecialistListParams {
+  isActive?: 'true' | 'false';
+  state?: StateEnumValue;
+  page?: number;
+  limit?: number;
+}
+
+export const vendorSpecialistApi = {
+  async create(dto: CreateVendorSpecialistDto): Promise<ApiResponse<VendorSpecialist>> {
+    try {
+      const r = await axiosInstance.post<ApiResponse<VendorSpecialist>>('/admin/vendor-specialists', dto);
+      return r.data;
+    } catch (e) {
+      handleApiError(e);
+    }
+  },
+
+  async list(params: VendorSpecialistListParams = {}): Promise<ApiResponse<VendorSpecialistListResponse>> {
+    try {
+      const q = new URLSearchParams();
+      if (params.isActive !== undefined) q.set('isActive', params.isActive);
+      if (params.state) q.set('state', params.state);
+      if (params.page) q.set('page', String(params.page));
+      if (params.limit) q.set('limit', String(params.limit));
+      const qs = q.toString();
+      const r = await axiosInstance.get<ApiResponse<VendorSpecialistListResponse>>(
+        '/admin/vendor-specialists' + (qs ? '?' + qs : '')
+      );
+      return r.data;
+    } catch (e) {
+      handleApiError(e);
+    }
+  },
+
+  async getById(id: string): Promise<ApiResponse<VendorSpecialist>> {
+    try {
+      const r = await axiosInstance.get<ApiResponse<VendorSpecialist>>('/admin/vendor-specialists/' + id);
+      return r.data;
+    } catch (e) {
+      handleApiError(e);
+    }
+  },
+
+  async update(id: string, dto: UpdateVendorSpecialistDto): Promise<ApiResponse<VendorSpecialist>> {
+    try {
+      const r = await axiosInstance.patch<ApiResponse<VendorSpecialist>>('/admin/vendor-specialists/' + id, dto);
+      return r.data;
+    } catch (e) {
+      handleApiError(e);
+    }
+  },
+
+  async delete(id: string): Promise<ApiResponse<void>> {
+    try {
+      const r = await axiosInstance.delete<ApiResponse<void>>('/admin/vendor-specialists/' + id);
+      return r.data;
+    } catch (e) {
+      handleApiError(e);
+    }
+  },
+};

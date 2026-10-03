@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, ShoppingBag, Package, Users,
-  ArrowUpRight, ArrowDownRight, Sparkles, ChevronRight,
-  Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity
+  TrendingUp, ShoppingBag, Package, Users, ArrowUpRight, ChevronRight,
+  Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity, RefreshCw,
+  Search, Filter, DollarSign, Award, Shield, Layers, CreditCard, ChevronLeft
 } from 'lucide-react';
-import { useAppSelector } from '@/lib/hooks';
+import { superAdminDashboardApi, superAdminPayoutsApi, categoryApi } from '@/lib/api';
+import { toast } from 'react-hot-toast';
 
 export const NairaIcon = (props: any) => (
   <svg
@@ -26,822 +27,1044 @@ export const NairaIcon = (props: any) => (
   </svg>
 );
 
-interface DashboardStats {
-  totalRevenue: number;
-  totalOrders: number;
-  revenueToday: number;
-  totalProducts: number;
-  revenueChange: number;
-  ordersChange: number;
-  productsChange: number;
-  usersChange: number;
-  pendingOrders: number;
-  activeVendors: number;
-  totalUsers: number;
-  activeUsers: number;
-  blockedUsers: number;
-  timeframeLabel: string;
-}
+const fmtNGN = (n?: number) =>
+  new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(n ?? 0);
 
-interface RecentTransaction {
-  id: string;
-  date: string;
-  customer: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-  product: string;
-  amount: number;
-  status: 'SUCCESSFUL' | 'PENDING' | 'FAILED' | 'REFUNDED';
-}
+const formatDateString = (dateStr?: string | null) => {
+  if (!dateStr) return 'N/A';
+  // Handle date-only strings YYYY-MM-DD directly without timezone shift
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [y, m, d] = dateStr.split('-');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${parseInt(d, 10)} ${months[parseInt(m, 10) - 1]} ${y}`;
+  }
+  try {
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
-interface TopProduct {
-  id: string;
-  name: string;
-  sales: number;
-  revenue: number;
-  growth: number;
-  image?: string;
-}
-
-interface ActivityItem {
-  id: string;
-  type: 'order' | 'product' | 'user' | 'review';
-  message: string;
-  time: string;
-  icon: React.ReactNode;
-}
+type PeriodType = 'day' | 'week' | 'month' | 'all_time';
+type IntervalType = 'daily' | 'weekly' | 'monthly';
 
 interface DashboardViewProps {
   onNavigate?: (tab: string) => void;
 }
 
-const StatCard = ({ title, value, change, icon: Icon, trend = 'up', suffix = '', subtext = '' }: any) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group"
-  >
-    <div className="flex items-center justify-between mb-4">
-      <div className="p-3 rounded-xl bg-gradient-to-br from-fuchsia-50 to-purple-50 group-hover:from-fuchsia-100 group-hover:to-purple-100 transition-colors">
-        <Icon className="w-5 h-5 text-fuchsia-600" />
-      </div>
-      <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
-        trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-      }`}>
-        {trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-        {Math.abs(change)}%
-      </div>
-    </div>
-    <h3 className="text-2xl font-black text-slate-800 tracking-tight">
-      {typeof value === 'number' ? `₦${value.toLocaleString()}` : value}{suffix}
-    </h3>
-    <p className="text-sm text-gray-500 font-medium mt-1">{title}</p>
-    {subtext && (
-      <div className="text-xs text-gray-400 mt-2">
-        {subtext}
-      </div>
-    )}
-  </motion.div>
-);
-
 export default function DashboardView({ onNavigate }: DashboardViewProps) {
-  const authUser = useAppSelector((state) => state.auth.user);
-  const [isLoading, setIsLoading] = useState(true);
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
-  const [hoveredCategory, setHoveredCategory] = useState<any | null>(null);
-  
-  // Dynamic stats based on timeframe
-  const stats = useMemo<DashboardStats>(() => {
-    if (timeframe === 'daily') {
-      return {
-        totalRevenue: 450000,
-        totalOrders: 28,
-        revenueToday: 450000,
-        totalProducts: 1248,
-        revenueChange: 4.5,
-        ordersChange: 1.8,
-        productsChange: 0.2,
-        usersChange: 1.2,
-        pendingOrders: 5,
-        activeVendors: 156,
-        totalUsers: 3842,
-        activeUsers: 3671,
-        blockedUsers: 24,
-        timeframeLabel: 'today',
-      };
-    }
-    if (timeframe === 'monthly') {
-      return {
-        totalRevenue: 14850000,
-        totalOrders: 1140,
-        revenueToday: 450000,
-        totalProducts: 1248,
-        revenueChange: 18.2,
-        ordersChange: 14.5,
-        productsChange: 5.4,
-        usersChange: 8.5,
-        pendingOrders: 23,
-        activeVendors: 156,
-        totalUsers: 3842,
-        activeUsers: 3671,
-        blockedUsers: 24,
-        timeframeLabel: 'this month',
-      };
-    }
-    // weekly
-    return {
-      totalRevenue: 3250000,
-      totalOrders: 284,
-      revenueToday: 450000,
-      totalProducts: 1248,
-      revenueChange: 12,
-      ordersChange: 8,
-      productsChange: 5,
-      usersChange: 3.2,
-      pendingOrders: 23,
-      activeVendors: 156,
-      totalUsers: 3842,
-      activeUsers: 3671,
-      blockedUsers: 24,
-      timeframeLabel: 'this week',
-    };
-  }, [timeframe]);
+  // Shared Filter Controls
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('all_time');
+  const [selectedVendorId, setSelectedVendorId] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [selectedInterval, setSelectedInterval] = useState<IntervalType>('daily');
 
-  const [recentTransactions] = useState<RecentTransaction[]>([
-    { id: 'TRX-001', date: '19 May 2026, 12:14 am', customer: { name: 'yolo', email: 'yolo@gmail.com' }, product: 'Passport pic', amount: 2000, status: 'SUCCESSFUL' },
-    { id: 'TRX-002', date: '19 May 2026, 10:30 am', customer: { name: 'Sarah Johnson', email: 'sarah@example.com' }, product: 'Wireless Headphones', amount: 45000, status: 'SUCCESSFUL' },
-    { id: 'TRX-003', date: '18 May 2026, 8:45 pm', customer: { name: 'Michael Chen', email: 'michael@example.com' }, product: 'Leather Jacket', amount: 120000, status: 'SUCCESSFUL' },
-    { id: 'TRX-004', date: '18 May 2026, 3:15 pm', customer: { name: 'Emily Davis', email: 'emily@example.com' }, product: 'Smart Watch', amount: 85000, status: 'PENDING' },
-    { id: 'TRX-005', date: '17 May 2026, 11:20 am', customer: { name: 'James Wilson', email: 'james@example.com' }, product: 'Running Shoes', amount: 32000, status: 'SUCCESSFUL' },
-    { id: 'TRX-006', date: '17 May 2026, 2:45 pm', customer: { name: 'Olivia Brown', email: 'olivia@example.com' }, product: 'Coffee Maker', amount: 55000, status: 'FAILED' },
-  ]);
+  // Filter Dropdown Options
+  const [vendorOptions, setVendorOptions] = useState<any[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
 
-  const [topProducts] = useState<TopProduct[]>([
-    { id: '1', name: 'Premium Wireless Headphones', sales: 234, revenue: 10530000, growth: 23 },
-    { id: '2', name: 'Smart Fitness Tracker', sales: 187, revenue: 5610000, growth: 15 },
-    { id: '3', name: 'Organic Cotton T-Shirt', sales: 156, revenue: 2340000, growth: -8 },
-    { id: '4', name: 'Gaming Mechanical Keyboard', sales: 98, revenue: 1960000, growth: 12 },
-  ]);
+  // 1. KPI Overview State
+  const [kpiData, setKpiData] = useState<any>(null);
+  const [loadingKpi, setLoadingKpi] = useState<boolean>(true);
+  const [errorKpi, setErrorKpi] = useState<string | null>(null);
 
-  // Performance chart data reacting to timeframe
-  const performanceData = useMemo(() => {
-    if (timeframe === 'daily') {
-      return [
-        { label: '09:00', revenue: 45000, orders: 3 },
-        { label: '12:00', revenue: 120000, orders: 8 },
-        { label: '15:00', revenue: 95000, orders: 6 },
-        { label: '18:00', revenue: 110000, orders: 7 },
-        { label: '21:00', revenue: 60000, orders: 3 },
-        { label: '24:00', revenue: 20000, orders: 1 },
-      ];
-    }
-    if (timeframe === 'monthly') {
-      return [
-        { label: 'Week 1', revenue: 3100000, orders: 220 },
-        { label: 'Week 2', revenue: 3800000, orders: 280 },
-        { label: 'Week 3', revenue: 3450000, orders: 254 },
-        { label: 'Week 4', revenue: 4450000, orders: 270 },
-      ];
-    }
-    // weekly
-    return [
-      { label: 'Mon', revenue: 320000, orders: 42 },
-      { label: 'Tue', revenue: 450000, orders: 58 },
-      { label: 'Wed', revenue: 380000, orders: 49 },
-      { label: 'Thu', revenue: 520000, orders: 67 },
-      { label: 'Fri', revenue: 680000, orders: 84 },
-      { label: 'Sat', revenue: 490000, orders: 61 },
-      { label: 'Sun', revenue: 410000, orders: 53 },
-    ];
-  }, [timeframe]);
+  // 2. Vendor Lifetime Earnings Table State
+  const [vendorEarningsData, setVendorEarningsData] = useState<any>(null);
+  const [loadingVendorEarnings, setLoadingVendorEarnings] = useState<boolean>(true);
+  const [errorVendorEarnings, setErrorVendorEarnings] = useState<string | null>(null);
+  const [tableSearch, setTableSearch] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+  const [tablePage, setTablePage] = useState<number>(1);
 
-  const [activities] = useState<ActivityItem[]>([
-    { id: '1', type: 'order', message: 'New order #CM9815 from Natali Craig', time: '5 minutes ago', icon: <CheckCircle2 size={14} className="text-emerald-500" /> },
-    { id: '2', type: 'product', message: 'Product "Wireless Headphones" added by TechHub', time: '1 hour ago', icon: <Package size={14} className="text-blue-500" /> },
-    { id: '3', type: 'user', message: 'New vendor registration: Fashion Forward', time: '3 hours ago', icon: <Users size={14} className="text-purple-500" /> },
-    { id: '4', type: 'review', message: '5-star review received for Smart Watch', time: '5 hours ago', icon: <TrendingUp size={14} className="text-amber-500" /> },
-    { id: '5', type: 'order', message: 'Order #CM9814 marked as Delivered', time: 'Yesterday', icon: <CheckCircle2 size={14} className="text-emerald-500" /> },
-  ]);
+  // 3. Recent Activities State
+  const [activitiesData, setActivitiesData] = useState<any>(null);
+  const [loadingActivities, setLoadingActivities] = useState<boolean>(true);
+  const [errorActivities, setErrorActivities] = useState<string | null>(null);
+  const [activityTab, setActivityTab] = useState<'payments' | 'payouts' | 'orders'>('payments');
 
-  // Donut chart sales distribution data reacting to timeframe
-  const categoryBreakdown = useMemo(() => {
-    if (timeframe === 'daily') {
-      return [
-        { name: 'Fashion', value: 50, color: '#9d4ae3', percentage: '50%', amount: 225000 },
-        { name: 'Electronics', value: 25, color: '#3b82f6', percentage: '25%', amount: 112500 },
-        { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 67500 },
-        { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 45000 },
-      ];
-    }
-    if (timeframe === 'monthly') {
-      return [
-        { name: 'Fashion', value: 40, color: '#9d4ae3', percentage: '40%', amount: 5940000 },
-        { name: 'Electronics', value: 35, color: '#3b82f6', percentage: '35%', amount: 5197500 },
-        { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 2227500 },
-        { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 1485000 },
-      ];
-    }
-    // weekly
-    return [
-      { name: 'Fashion', value: 45, color: '#9d4ae3', percentage: '45%', amount: 1462500 },
-      { name: 'Electronics', value: 30, color: '#3b82f6', percentage: '30%', amount: 975000 },
-      { name: 'Beauty & Wellness', value: 15, color: '#ec4899', percentage: '15%', amount: 487500 },
-      { name: 'Other', value: 10, color: '#10b981', percentage: '10%', amount: 325000 },
-    ];
-  }, [timeframe]);
+  // 4. Top Products Pie Chart State
+  const [pieChartData, setPieChartData] = useState<any>(null);
+  const [loadingPieChart, setLoadingPieChart] = useState<boolean>(true);
+  const [errorPieChart, setErrorPieChart] = useState<string | null>(null);
 
-  const donutRadius = 30;
-  const donutCircumference = 2 * Math.PI * donutRadius;
+  // 5. Earnings Line Graph State
+  const [graphData, setGraphData] = useState<any>(null);
+  const [loadingGraph, setLoadingGraph] = useState<boolean>(true);
+  const [errorGraph, setErrorGraph] = useState<string | null>(null);
 
+  // 6. Orders Bar Chart State
+  const [ordersBarData, setOrdersBarData] = useState<any>(null);
+  const [loadingOrdersBar, setLoadingOrdersBar] = useState<boolean>(true);
+  const [errorOrdersBar, setErrorOrdersBar] = useState<string | null>(null);
+
+  // Load Dropdown Options (Vendors & Categories)
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
+    const fetchOptions = async () => {
+      try {
+        const [vRes, cRes] = await Promise.allSettled([
+          superAdminPayoutsApi.getVendors({ limit: 100 }),
+          categoryApi.getCategories(),
+        ]);
+        if (vRes.status === 'fulfilled' && vRes.value?.data) {
+          const vList = vRes.value.data.vendors || vRes.value.data.items || [];
+          setVendorOptions(vList);
+        }
+        if (cRes.status === 'fulfilled' && cRes.value?.data) {
+          const cList = Array.isArray(cRes.value.data) ? cRes.value.data : cRes.value.data.categories || [];
+          setCategoryOptions(cList);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard filter options', err);
+      }
+    };
+    void fetchOptions();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'SUCCESSFUL': return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-      case 'PENDING': return 'bg-amber-50 text-amber-600 border-amber-200';
-      case 'FAILED': return 'bg-rose-50 text-rose-600 border-rose-200';
-      default: return 'bg-gray-50 text-gray-600 border-gray-200';
+  // Search Debounce (300ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(tableSearch);
+      setTablePage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [tableSearch]);
+
+  // Fetch 1: KPI Overview
+  const fetchKpiOverview = useCallback(async () => {
+    setLoadingKpi(true);
+    setErrorKpi(null);
+    try {
+      const res = await superAdminDashboardApi.getKpiOverview({
+        period: selectedPeriod,
+        vendorId: selectedVendorId || undefined,
+      });
+      if (res?.success) {
+        setKpiData(res.data);
+      } else {
+        setErrorKpi(res?.message || 'Failed to load KPI metrics');
+      }
+    } catch (err: any) {
+      setErrorKpi(err?.message || 'Failed to load KPI metrics');
+    } finally {
+      setLoadingKpi(false);
     }
-  };
+  }, [selectedPeriod, selectedVendorId]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'SUCCESSFUL': return <CheckCircle2 size={12} />;
-      case 'PENDING': return <Clock size={12} />;
-      case 'FAILED': return <AlertCircle size={12} />;
-      default: return null;
+  // Fetch 2: Vendor Lifetime Earnings Table
+  const fetchVendorEarnings = useCallback(async () => {
+    setLoadingVendorEarnings(true);
+    setErrorVendorEarnings(null);
+    try {
+      const res = await superAdminDashboardApi.getVendorEarnings({
+        search: debouncedSearch || undefined,
+        vendorId: selectedVendorId || undefined,
+        page: tablePage,
+        limit: 10,
+      });
+      if (res?.success) {
+        setVendorEarningsData(res.data);
+      } else {
+        setErrorVendorEarnings(res?.message || 'Failed to load vendor earnings table');
+      }
+    } catch (err: any) {
+      setErrorVendorEarnings(err?.message || 'Failed to load vendor earnings table');
+    } finally {
+      setLoadingVendorEarnings(false);
     }
-  };
+  }, [debouncedSearch, selectedVendorId, tablePage]);
 
-  const maxRevenue = Math.max(...performanceData.map(d => d.revenue));
-  const maxOrders = Math.max(...performanceData.map(d => d.orders));
+  // Fetch 3: Recent Activities
+  const fetchRecentActivities = useCallback(async () => {
+    setLoadingActivities(true);
+    setErrorActivities(null);
+    try {
+      const res = await superAdminDashboardApi.getRecentActivities({ limit: 10 });
+      if (res?.success) {
+        setActivitiesData(res.data);
+      } else {
+        setErrorActivities(res?.message || 'Failed to load recent activities');
+      }
+    } catch (err: any) {
+      setErrorActivities(err?.message || 'Failed to load recent activities');
+    } finally {
+      setLoadingActivities(false);
+    }
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-12 h-12 rounded-full border-4 border-fuchsia-200 border-t-fuchsia-600 animate-spin" />
-        <p className="text-sm font-medium text-slate-600 mt-4">Loading dashboard insights...</p>
-      </div>
-    );
-  }
+  // Fetch 4: Top Products Pie Chart
+  const fetchPieChart = useCallback(async () => {
+    setLoadingPieChart(true);
+    setErrorPieChart(null);
+    try {
+      const res = await superAdminDashboardApi.getPieChart({
+        period: selectedPeriod,
+        categoryId: selectedCategoryId || undefined,
+      });
+      if (res?.success) {
+        setPieChartData(res.data);
+      } else {
+        setErrorPieChart(res?.message || 'Failed to load top products chart');
+      }
+    } catch (err: any) {
+      setErrorPieChart(err?.message || 'Failed to load top products chart');
+    } finally {
+      setLoadingPieChart(false);
+    }
+  }, [selectedPeriod, selectedCategoryId]);
 
-  // Calculate donut cumulative rotations
-  let accumulatedPercent = 0;
+  // Fetch 5: Earnings Line Graph
+  const fetchEarningsGraph = useCallback(async () => {
+    setLoadingGraph(true);
+    setErrorGraph(null);
+    try {
+      const res = await superAdminDashboardApi.getEarningsGraph({
+        interval: selectedInterval,
+        vendorId: selectedVendorId || undefined,
+      });
+      if (res?.success) {
+        setGraphData(res.data);
+      } else {
+        setErrorGraph(res?.message || 'Failed to load earnings graph');
+      }
+    } catch (err: any) {
+      setErrorGraph(err?.message || 'Failed to load earnings graph');
+    } finally {
+      setLoadingGraph(false);
+    }
+  }, [selectedInterval, selectedVendorId]);
+
+  // Fetch 6: Orders Bar Chart
+  const fetchOrdersBarChart = useCallback(async () => {
+    setLoadingOrdersBar(true);
+    setErrorOrdersBar(null);
+    try {
+      const res = await superAdminDashboardApi.getOrdersBarChart({
+        period: selectedPeriod,
+        vendorId: selectedVendorId || undefined,
+      });
+      if (res?.success) {
+        setOrdersBarData(res.data);
+      } else {
+        setErrorOrdersBar(res?.message || 'Failed to load orders breakdown chart');
+      }
+    } catch (err: any) {
+      setErrorOrdersBar(err?.message || 'Failed to load orders breakdown chart');
+    } finally {
+      setLoadingOrdersBar(false);
+    }
+  }, [selectedPeriod, selectedVendorId]);
+
+  // Effect triggers per widget independent dependencies
+  useEffect(() => { void fetchKpiOverview(); }, [fetchKpiOverview]);
+  useEffect(() => { void fetchVendorEarnings(); }, [fetchVendorEarnings]);
+  useEffect(() => { void fetchRecentActivities(); }, [fetchRecentActivities]);
+  useEffect(() => { void fetchPieChart(); }, [fetchPieChart]);
+  useEffect(() => { void fetchEarningsGraph(); }, [fetchEarningsGraph]);
+  useEffect(() => { void fetchOrdersBarChart(); }, [fetchOrdersBarChart]);
+
+  // Process Continuous Dates for Earnings Line Graph
+  const processedGraphPoints = useMemo(() => {
+    const rawPoints: any[] = graphData?.dataPoints || [];
+    if (rawPoints.length === 0) return [];
+    // Ensure points are sorted by date
+    return [...rawPoints].sort((a, b) => a.date.localeCompare(b.date));
+  }, [graphData]);
+
+  // Max value in graph for scaling
+  const maxGraphValue = useMemo(() => {
+    if (processedGraphPoints.length === 0) return 1;
+    return Math.max(...processedGraphPoints.map((p) => Math.max(p.grossRevenue || 0, p.platformCommission || 0, p.vendorNetEarnings || 0)));
+  }, [processedGraphPoints]);
 
   return (
-    <div className="space-y-8">
-      {/* Top Welcome Header Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-fuchsia-600 to-purple-600 rounded-2xl p-6 text-white relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight">
-              Welcome back, {authUser?.firstName || 'Admin'}!
-            </h2>
-            <p className="text-white/80 text-sm mt-1 font-medium">
-              Here's what is happening with your store {stats.timeframeLabel}.
-            </p>
+    <div className="space-y-8 pb-16">
+      {/* ── Dashboard Header & Shared Filter Toolbar ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl shadow-xs">
+              <Zap size={18} />
+            </span>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight">Super Admin Platform Analytics</h1>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Dynamic timeframe filters */}
-            <div className="flex bg-white/10 p-1 rounded-xl items-center border border-white/10">
-              {(['daily', 'weekly', 'monthly'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTimeframe(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                    timeframe === t
-                      ? 'bg-white text-fuchsia-600 shadow'
-                      : 'text-white/85 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => onNavigate?.('orders')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition flex items-center gap-2"
-            >
-              View Orders <ChevronRight size={16} />
-            </button>
-          </div>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Real-time financial metrics, GMV breakdown, commissions, payout feeds, and store performance.
+          </p>
         </div>
-      </motion.div>
 
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-        <StatCard 
-          title="Total Revenue" 
-          value={stats.totalRevenue} 
-          change={stats.revenueChange} 
-          icon={NairaIcon} 
-          trend="up"
-          subtext={`Compared to previous ${timeframe === 'daily' ? 'day' : timeframe === 'weekly' ? 'week' : 'month'}`}
-        />
-        <StatCard 
-          title="Total Orders" 
-          value={stats.totalOrders} 
-          change={stats.ordersChange} 
-          icon={ShoppingBag} 
-          trend="up"
-          suffix=""
-          subtext={`${stats.pendingOrders} pending execution`}
-        />
-        <StatCard 
-          title="Revenue Today" 
-          value={stats.revenueToday} 
-          change={6} 
-          icon={TrendingUp} 
-          trend="up"
-          subtext="Last 24 hours"
-        />
-        <StatCard 
-          title="Products" 
-          value={stats.totalProducts} 
-          change={stats.productsChange} 
-          icon={Package} 
-          trend="up"
-          suffix=""
-          subtext={`${stats.activeVendors} active vendors`}
-        />
-        <StatCard 
-          title="Total Users" 
-          value={stats.totalUsers} 
-          change={stats.usersChange} 
-          icon={Users} 
-          trend="up"
-          suffix=""
-          subtext={
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                Active: {stats.activeUsers}
-              </span>
-              <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                Blocked: {stats.blockedUsers}
-              </span>
-            </div>
-          }
-        />
+        {/* Global Toolbar Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Vendor Filter Dropdown */}
+          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs">
+            <Filter size={13} className="text-slate-400" />
+            <span className="font-bold text-slate-500">Store:</span>
+            <select
+              value={selectedVendorId}
+              onChange={(e) => setSelectedVendorId(e.target.value)}
+              className="bg-transparent font-bold text-slate-800 outline-none text-xs cursor-pointer max-w-[140px]"
+            >
+              <option value="">All Vendors</option>
+              {vendorOptions.map((v) => (
+                <option key={v.vendorId || v.id} value={v.vendorId || v.id}>
+                  {v.storeName || v.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Period Selector Tabs */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
+            {(
+              [
+                { label: 'All Time', value: 'all_time' },
+                { label: 'Today', value: 'day' },
+                { label: 'Week', value: 'week' },
+                { label: 'Month', value: 'month' },
+              ] as const
+            ).map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setSelectedPeriod(p.value)}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  selectedPeriod === p.value
+                    ? 'bg-white text-[#9d4ae3] shadow-xs font-black'
+                    : 'hover:text-slate-900'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Global Refresh Button */}
+          <button
+            onClick={() => {
+              void fetchKpiOverview();
+              void fetchVendorEarnings();
+              void fetchRecentActivities();
+              void fetchPieChart();
+              void fetchEarningsGraph();
+              void fetchOrdersBarChart();
+              toast.success('Analytics metrics refreshed');
+            }}
+            className="p-2 bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-[#9d4ae3] rounded-xl transition"
+            title="Refresh All Widgets"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
       </div>
 
-      {/* Balanced Dashboard Grid Layout: Zero vertical overlap whitespace */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* ROW 1 LEFT: Performance Chart */}
-        <div className="lg:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-full flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-                <div>
-                  <h3 className="font-bold text-slate-800 capitalize">{timeframe} Performance</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Revenue vs Orders trend</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-fuchsia-500" />
-                    <span className="text-xs font-medium text-gray-600">Revenue (₦)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                    <span className="text-xs font-medium text-gray-600">Orders</span>
-                  </div>
-                </div>
-              </div>
-              <div className="relative h-60">
-                <div className="absolute inset-0 flex items-end justify-between gap-2">
-                  {performanceData.map((day, idx) => (
-                    <div key={day.label} className="flex-1 flex flex-col items-center gap-2">
-                      <div className="relative w-full flex justify-center gap-1.5 h-44 items-end">
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${(day.revenue / maxRevenue) * 100}%` }}
-                          transition={{ delay: idx * 0.05, duration: 0.5 }}
-                          className="w-full max-w-[24px] bg-fuchsia-500 rounded-t hover:bg-fuchsia-600 cursor-pointer group relative"
-                        >
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow">
-                            ₦{day.revenue.toLocaleString()}
-                          </div>
-                        </motion.div>
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${(day.orders / maxOrders) * 100}%` }}
-                          transition={{ delay: idx * 0.05 + 0.1, duration: 0.5 }}
-                          className="w-full max-w-[24px] bg-emerald-400 rounded-t hover:bg-emerald-500 cursor-pointer group relative"
-                        >
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow">
-                            {day.orders} orders
-                          </div>
-                        </motion.div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-500 whitespace-nowrap">{day.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-400 font-medium">
-              {timeframe === 'daily' && <span>Real-time hourly insights</span>}
-              {timeframe === 'weekly' && <span>Week of May 17 - May 23, 2026</span>}
-              {timeframe === 'monthly' && <span>Month of May 2026</span>}
-              <span className="flex items-center gap-2">
-                <span>Total Revenue: ₦{stats.totalRevenue.toLocaleString()}</span>
-                <span className="w-px h-3 bg-gray-300" />
-                <span>Total Orders: {stats.totalOrders}</span>
-              </span>
-            </div>
-          </motion.div>
+      {/* ── 1. KPI OVERVIEW CARDS WIDGET ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <Activity size={16} className="text-[#9d4ae3]" />
+            KPI Overview Metrics ({selectedPeriod.replace('_', ' ')})
+          </h2>
         </div>
 
-        {/* ROW 1 RIGHT: Sales Distribution Donut Chart */}
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-full flex flex-col justify-between"
-          >
-            <div>
-              <h3 className="font-bold text-slate-800">Sales Distribution</h3>
-              <p className="text-xs text-gray-500 mt-0.5 mb-6">Top performing categories</p>
-              
-              <div className="flex flex-col items-center justify-center gap-6">
-                {/* Increased wrapper size from w-36 h-36 to w-48 h-48 */}
-                <div className="relative w-48 h-48 flex items-center justify-center">
-                  <svg className="w-full h-full" viewBox="0 0 100 100">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r={donutRadius}
-                      fill="transparent"
-                      stroke="#f1f5f9"
-                      strokeWidth="9"
-                    />
-                    {categoryBreakdown.map((item, idx) => {
-                      const strokeOffset = donutCircumference - (item.value / 100) * donutCircumference;
-                      const rotation = (accumulatedPercent / 100) * 360 - 90;
-                      accumulatedPercent += item.value;
-                      return (
-                        <motion.circle
-                          key={item.name}
-                          cx="50"
-                          cy="50"
-                          r={donutRadius}
-                          fill="transparent"
-                          stroke={item.color}
-                          strokeWidth="9"
-                          strokeDasharray={donutCircumference}
-                          initial={{ strokeDashoffset: donutCircumference }}
-                          animate={{ strokeDashoffset: strokeOffset }}
-                          transition={{ duration: 0.8, delay: idx * 0.1, ease: 'easeOut' }}
-                          transform={`rotate(${rotation} 50 50)`}
-                          onMouseEnter={() => setHoveredCategory(item)}
-                          onMouseLeave={() => setHoveredCategory(null)}
-                          className="transition-all duration-300 hover:stroke-[11px] cursor-pointer"
-                        />
-                      );
-                    })}
-                  </svg>
-                  {/* Dynamic Hover display of Sales numbers per category */}
-                  <div className="absolute flex flex-col items-center justify-center text-center px-4 pointer-events-none select-none">
-                    {hoveredCategory ? (
-                      <>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate max-w-[120px]">{hoveredCategory.name}</span>
-                        <span className="text-sm font-black text-slate-800 mt-1">₦{hoveredCategory.amount.toLocaleString()}</span>
-                        <span className="text-[10px] font-bold text-fuchsia-600 mt-0.5">{hoveredCategory.percentage} share</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-lg font-black text-slate-800">Faflora</span>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Top Sellers</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+        {loadingKpi ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-32 bg-white rounded-2xl border border-slate-100 p-5 animate-pulse" />
+            ))}
+          </div>
+        ) : errorKpi ? (
+          <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between">
+            <span>{errorKpi}</span>
+            <button onClick={() => fetchKpiOverview()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">
+              Retry
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Platform GMV */}
+            <div className="bg-gradient-to-br from-purple-700 to-indigo-800 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute right-[-10px] bottom-[-10px] w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
+              <div>
+                <p className="text-[10px] font-bold text-purple-200 uppercase tracking-wider">Platform GMV (Sales)</p>
+                <p className="text-2xl font-black mt-2 tracking-tight">
+                  {fmtNGN(kpiData?.platformGmv?.filtered)}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-[11px] text-purple-100 font-medium">
+                <span>All-Time GMV</span>
+                <span className="font-extrabold text-white">{fmtNGN(kpiData?.platformGmv?.totalAllTime)}</span>
               </div>
             </div>
 
-            {/* Chart Legend */}
-            <div className="grid grid-cols-2 gap-4 w-full pt-4 border-t border-gray-50 mt-4">
-              {categoryBreakdown.map((item) => (
-                <div 
-                  key={item.name} 
-                  className="flex items-center gap-2 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors"
-                  onMouseEnter={() => setHoveredCategory(item)}
-                  onMouseLeave={() => setHoveredCategory(null)}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-700 truncate">{item.name}</p>
-                    <p className="text-[10px] text-gray-400 font-semibold">{item.percentage} share</p>
+            {/* Card 2: Platform Commission Earned */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-purple-200 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Platform Commission</span>
+                  <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-[#9d4ae3]">
+                    <NairaIcon size={16} />
                   </div>
                 </div>
+                <p className="text-2xl font-black text-slate-800 mt-2 tracking-tight">
+                  {fmtNGN(kpiData?.platformCommissionEarned?.filtered)}
+                </p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <span>All-Time Commission</span>
+                <span className="font-bold text-slate-800">{fmtNGN(kpiData?.platformCommissionEarned?.totalAllTime)}</span>
+              </div>
+            </div>
+
+            {/* Card 3: Vendor Net Earnings */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-emerald-200 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vendor Net Earnings</span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <TrendingUp size={16} />
+                  </div>
+                </div>
+                <p className="text-2xl font-black text-slate-800 mt-2 tracking-tight">
+                  {fmtNGN(kpiData?.vendorEarningsTotal?.filtered)}
+                </p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <span>All-Time Net</span>
+                <span className="font-bold text-slate-800">{fmtNGN(kpiData?.vendorEarningsTotal?.totalAllTime)}</span>
+              </div>
+            </div>
+
+            {/* Card 4: Pending Vendor Escrow & Withdrawn */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-amber-200 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Vendor Escrow</span>
+                  <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                    <Clock size={16} />
+                  </div>
+                </div>
+                <p className="text-2xl font-black text-slate-800 mt-2 tracking-tight">
+                  {fmtNGN(kpiData?.pendingVendorEscrow?.filtered)}
+                </p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <span>Total Withdrawn</span>
+                <span className="font-bold text-slate-800">{fmtNGN(kpiData?.withdrawnTotal?.filtered)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Secondary Counts Bar */}
+        {kpiData && (
+          <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/60 text-xs">
+            <div className="flex items-center gap-2">
+              <Users size={15} className="text-purple-600" />
+              <span className="text-slate-500 font-medium">Active Vendors:</span>
+              <span className="font-extrabold text-slate-800">{kpiData.activeVendorsCount ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShoppingBag size={15} className="text-purple-600" />
+              <span className="text-slate-500 font-medium">Total Orders:</span>
+              <span className="font-extrabold text-slate-800">{kpiData.totalOrdersCount ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CreditCard size={15} className="text-purple-600" />
+              <span className="text-slate-500 font-medium">All-Time Withdrawn:</span>
+              <span className="font-extrabold text-slate-800">{fmtNGN(kpiData.withdrawnTotal?.totalAllTime)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock size={15} className="text-purple-600" />
+              <span className="text-slate-500 font-medium">All-Time Escrow:</span>
+              <span className="font-extrabold text-slate-800">{fmtNGN(kpiData.pendingVendorEscrow?.totalAllTime)}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── 5. EARNINGS TIME-SERIES LINE GRAPH & 6. ORDERS BAR CHART ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Earnings Line Graph (2 cols) */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                <TrendingUp size={18} className="text-[#9d4ae3]" />
+                Financial Time-Series Ledger
+              </h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Gross sales, platform commission, and vendor net earnings per bucket.
+              </p>
+            </div>
+
+            {/* Interval Toggle: Daily / Weekly / Monthly */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600 self-start sm:self-auto">
+              {(
+                [
+                  { label: 'Daily (7d)', value: 'daily' },
+                  { label: 'Weekly (60d)', value: 'weekly' },
+                  { label: 'Monthly (365d)', value: 'monthly' },
+                ] as const
+              ).map((int) => (
+                <button
+                  key={int.value}
+                  onClick={() => setSelectedInterval(int.value)}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    selectedInterval === int.value
+                      ? 'bg-white text-[#9d4ae3] shadow-xs font-black'
+                      : 'hover:text-slate-900'
+                  }`}
+                >
+                  {int.label}
+                </button>
               ))}
             </div>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* ROW 2 LEFT: Recent Transactions (Expanded 2/3 Width) */}
-        <div className="lg:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col justify-between"
-          >
+          {loadingGraph ? (
+            <div className="h-64 flex items-center justify-center text-xs text-slate-400 font-bold gap-2">
+              <RefreshCw className="animate-spin" size={16} /> Loading time-series graph…
+            </div>
+          ) : errorGraph ? (
+            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center justify-between">
+              <span>{errorGraph}</span>
+              <button onClick={() => fetchEarningsGraph()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
+            </div>
+          ) : processedGraphPoints.length === 0 ? (
+            <div className="h-64 flex items-center justify-center text-xs text-slate-400 font-medium">
+              No financial data points found for this interval.
+            </div>
+          ) : (
             <div>
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-slate-800">Recent Transactions</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Latest customer payments</p>
-                </div>
-                <button className="text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 transition">
-                  View All
-                </button>
+              {/* Visual Bar Chart Comparison per bucket */}
+              <div className="h-56 flex items-end gap-3 pt-6 pb-2 px-2 overflow-x-auto border-b border-slate-100">
+                {processedGraphPoints.map((point: any, idx: number) => {
+                  const grossHeight = Math.max(8, (point.grossRevenue / maxGraphValue) * 100);
+                  const commHeight = Math.max(8, (point.platformCommission / maxGraphValue) * 100);
+                  const netHeight = Math.max(8, (point.vendorNetEarnings / maxGraphValue) * 100);
+
+                  return (
+                    <div key={point.date || idx} className="flex-1 min-w-[48px] flex flex-col items-center gap-1 group relative">
+                      {/* Tooltip on hover */}
+                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-xl z-20 whitespace-nowrap gap-1 pointer-events-none">
+                        <span className="font-bold border-b border-slate-700 pb-1">{formatDateString(point.date)}</span>
+                        <span>Gross: {fmtNGN(point.grossRevenue)}</span>
+                        <span className="text-purple-300">Commission: {fmtNGN(point.platformCommission)}</span>
+                        <span className="text-emerald-300">Vendor Net: {fmtNGN(point.vendorNetEarnings)}</span>
+                      </div>
+
+                      <div className="w-full flex items-end justify-center gap-1 h-44">
+                        {/* Gross Bar */}
+                        <div
+                          style={{ height: `${grossHeight}%` }}
+                          className="w-2.5 bg-purple-700 rounded-t-md transition-all group-hover:bg-purple-800"
+                        />
+                        {/* Commission Bar */}
+                        <div
+                          style={{ height: `${commHeight}%` }}
+                          className="w-2.5 bg-amber-400 rounded-t-md transition-all group-hover:bg-amber-500"
+                        />
+                        {/* Net Bar */}
+                        <div
+                          style={{ height: `${netHeight}%` }}
+                          className="w-2.5 bg-emerald-500 rounded-t-md transition-all group-hover:bg-emerald-600"
+                        />
+                      </div>
+
+                      <span className="text-[10px] font-bold text-slate-400 truncate w-full text-center">
+                        {formatDateString(point.date).split(' ').slice(0, 2).join(' ')}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50/50 border-b border-gray-100">
+              {/* Legend */}
+              <div className="mt-4 flex items-center justify-center gap-6 text-xs font-bold text-slate-600">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-purple-700 rounded-xs" />
+                  <span>Gross Revenue</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-amber-400 rounded-xs" />
+                  <span>Platform Commission</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-emerald-500 rounded-xs" />
+                  <span>Vendor Net Earnings</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Orders Bar Chart (1 col) */}
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                <ShoppingBag size={18} className="text-[#9d4ae3]" />
+                Orders Status Distribution
+              </h3>
+              <span className="text-[10px] font-extrabold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full uppercase">
+                {ordersBarData?.period || selectedPeriod}
+              </span>
+            </div>
+
+            {loadingOrdersBar ? (
+              <div className="h-56 flex items-center justify-center text-xs text-slate-400 font-bold gap-2">
+                <RefreshCw className="animate-spin" size={16} /> Loading order status...
+              </div>
+            ) : errorOrdersBar ? (
+              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl flex items-center justify-between">
+                <span>{errorOrdersBar}</span>
+                <button onClick={() => fetchOrdersBarChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Orders</span>
+                    <p className="text-xl font-black text-slate-800">{ordersBarData?.totalOrdersCount ?? 0}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Value</span>
+                    <p className="text-base font-black text-purple-700">{fmtNGN(ordersBarData?.totalOrdersRevenue)}</p>
+                  </div>
+                </div>
+
+                {/* Status Segments */}
+                <div className="space-y-3 pt-1">
+                  {/* Delivered */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 size={13} /> Delivered
+                      </span>
+                      <span className="text-slate-600">
+                        {ordersBarData?.delivered?.count ?? 0} ({ordersBarData?.delivered?.percentage ?? 0}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        style={{ width: `${Math.min(100, ordersBarData?.delivered?.percentage ?? 0)}%` }}
+                        className="h-full bg-emerald-500 rounded-full"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.delivered?.revenue)}</p>
+                  </div>
+
+                  {/* Processing */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-blue-700 flex items-center gap-1">
+                        <Clock size={13} /> Processing & In-Transit
+                      </span>
+                      <span className="text-slate-600">
+                        {ordersBarData?.processing?.count ?? 0} ({ordersBarData?.processing?.percentage ?? 0}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        style={{ width: `${Math.min(100, ordersBarData?.processing?.percentage ?? 0)}%` }}
+                        className="h-full bg-blue-500 rounded-full"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.processing?.revenue)}</p>
+                  </div>
+
+                  {/* Ordered */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-amber-700 flex items-center gap-1">
+                        <ShoppingBag size={13} /> Pending Payment / Confirmed
+                      </span>
+                      <span className="text-slate-600">
+                        {ordersBarData?.ordered?.count ?? 0} ({ordersBarData?.ordered?.percentage ?? 0}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        style={{ width: `${Math.min(100, ordersBarData?.ordered?.percentage ?? 0)}%` }}
+                        className="h-full bg-amber-500 rounded-full"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.ordered?.revenue)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── 4. TOP PRODUCTS & 3. RECENT ACTIVITIES FEEDS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top 5 Products Chart/Cards (1 col) */}
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                  <Award size={18} className="text-[#9d4ae3]" />
+                  Top Products
+                </h3>
+                <span className="text-[10px] font-bold text-slate-400">Ranked by units sold (Share of Top 5)</span>
+              </div>
+
+              {/* Category Filter Dropdown */}
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-xl font-bold text-slate-700 outline-none text-xs"
+              >
+                <option value="">All Categories</option>
+                {categoryOptions.map((c) => (
+                  <option key={c.id || c.categoryId} value={c.id || c.categoryId}>
+                    {c.name || c.categoryName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {loadingPieChart ? (
+              <div className="h-56 flex items-center justify-center text-xs text-slate-400 font-bold gap-2">
+                <RefreshCw className="animate-spin" size={16} /> Loading top products...
+              </div>
+            ) : errorPieChart ? (
+              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl flex items-center justify-between">
+                <span>{errorPieChart}</span>
+                <button onClick={() => fetchPieChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
+              </div>
+            ) : (pieChartData?.products || []).length === 0 ? (
+              <div className="h-56 flex items-center justify-center text-xs text-slate-400 font-medium">
+                No product sales recorded for this period.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pieChartData.products.map((item: any, idx: number) => (
+                  <div key={item.productId || idx} className="p-3 rounded-2xl border border-slate-100 hover:border-purple-200 transition-colors bg-slate-50/40 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-purple-100 overflow-hidden shrink-0 flex items-center justify-center font-bold text-purple-700 text-xs">
+                        {item.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        ) : (
+                          `#${idx + 1}`
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-extrabold text-xs text-slate-800 truncate">{item.name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium truncate">
+                          {item.vendorName ? `${item.vendorName} • ` : ''}{item.categoryName || 'General'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-black text-slate-800 text-xs">{item.unitsSold} sold</p>
+                      <p className="text-[10px] text-purple-600 font-bold">{item.percentageShare}% share</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{fmtNGN(item.revenue)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Activity Feeds (2 cols) */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                  <Activity size={18} className="text-[#9d4ae3]" />
+                  Real-time Activity Feeds
+                </h3>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">Live customer payments, vendor payout requests, and order placements.</p>
+              </div>
+
+              {/* Feed Tabs */}
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
+                <button
+                  onClick={() => setActivityTab('payments')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    activityTab === 'payments' ? 'bg-white text-[#9d4ae3] shadow-xs font-black' : 'hover:text-slate-900'
+                  }`}
+                >
+                  Payments
+                </button>
+                <button
+                  onClick={() => setActivityTab('payouts')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    activityTab === 'payouts' ? 'bg-white text-[#9d4ae3] shadow-xs font-black' : 'hover:text-slate-900'
+                  }`}
+                >
+                  Vendor Payouts
+                </button>
+                <button
+                  onClick={() => setActivityTab('orders')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    activityTab === 'orders' ? 'bg-white text-[#9d4ae3] shadow-xs font-black' : 'hover:text-slate-900'
+                  }`}
+                >
+                  Recent Orders
+                </button>
+              </div>
+            </div>
+
+            {loadingActivities ? (
+              <div className="h-56 flex items-center justify-center text-xs text-slate-400 font-bold gap-2">
+                <RefreshCw className="animate-spin" size={16} /> Loading activity feed...
+              </div>
+            ) : errorActivities ? (
+              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl flex items-center justify-between">
+                <span>{errorActivities}</span>
+                <button onClick={() => fetchRecentActivities()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
+              </div>
+            ) : activityTab === 'payments' ? (
+              /* Customer Payments Feed */
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
                     <tr>
-                      <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Customer</th>
-                      <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Product</th>
-                      <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Date</th>
-                      <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-right">Amount</th>
-                      <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">Status</th>
+                      <th className="p-2.5">Order Ref</th>
+                      <th className="p-2.5">Customer</th>
+                      <th className="p-2.5 text-right">Amount</th>
+                      <th className="p-2.5 text-center">Status</th>
+                      <th className="p-2.5">Date</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {recentTransactions.map((tx) => (
-                      <tr key={tx.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
-                        <td className="p-4 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                            {tx.customer.name[0].toUpperCase()}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-slate-800 text-sm">{tx.customer.name}</span>
-                            <span className="text-[10px] text-gray-400">{tx.customer.email}</span>
-                          </div>
-                        </td>
-                        <td className="p-4 text-sm font-medium text-slate-600">{tx.product}</td>
-                        <td className="p-4 text-xs font-medium text-gray-400">{tx.date}</td>
-                        <td className="p-4 text-right text-sm font-bold text-slate-800">₦{tx.amount.toLocaleString()}</td>
-                        <td className="p-4 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${getStatusColor(tx.status)}`}>
-                            {getStatusIcon(tx.status)}
-                            {tx.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                  <tbody className="divide-y divide-slate-100">
+                    {(activitiesData?.recentCustomerTransactions || []).length > 0 ? (
+                      activitiesData.recentCustomerTransactions.map((trx: any, idx: number) => (
+                        <tr key={trx.orderId || idx} className="hover:bg-slate-50/50">
+                          <td className="p-2.5 font-bold font-mono text-slate-800">{trx.orderNumber}</td>
+                          <td className="p-2.5 font-medium text-slate-600">{trx.customerName || 'Guest Customer'}</td>
+                          <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(trx.amount)}</td>
+                          <td className="p-2.5 text-center">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              {trx.paymentStatus}
+                            </span>
+                          </td>
+                          <td className="p-2.5 text-slate-400 font-medium">{formatDateString(trx.createdAt)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan={5} className="py-8 text-center text-slate-400">No recent transactions recorded.</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>
-
-              {/* Mobile Card View */}
-              <div className="md:hidden divide-y divide-gray-100 max-h-[350px] overflow-y-auto">
-                {recentTransactions.map((tx) => (
-                  <div key={tx.id} className="px-6 py-4 hover:bg-slate-50/50 transition">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                          {tx.customer.name[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-slate-800 text-sm">{tx.customer.name}</p>
-                          <p className="text-xs text-gray-500">{tx.product}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-slate-800 text-sm">₦{tx.amount.toLocaleString()}</p>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${getStatusColor(tx.status)}`}>
-                          {getStatusIcon(tx.status)}
-                          {tx.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] text-gray-400 ml-11 font-medium">
-                      <Clock size={10} />
-                      <span>{tx.date}</span>
-                      <span>•</span>
-                      <span>{tx.customer.email}</span>
-                    </div>
-                  </div>
-                ))}
+            ) : activityTab === 'payouts' ? (
+              /* Vendor Payout Requests Feed */
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
+                    <tr>
+                      <th className="p-2.5">Reference</th>
+                      <th className="p-2.5">Store</th>
+                      <th className="p-2.5 text-right">Amount</th>
+                      <th className="p-2.5">Bank Details</th>
+                      <th className="p-2.5 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(activitiesData?.recentVendorPayouts || []).length > 0 ? (
+                      activitiesData.recentVendorPayouts.map((po: any, idx: number) => (
+                        <tr key={po.withdrawalId || idx} className="hover:bg-slate-50/50">
+                          <td className="p-2.5 font-bold font-mono text-slate-800">{po.reference || 'WDR'}</td>
+                          <td className="p-2.5 font-medium text-slate-600">{po.storeName}</td>
+                          <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(po.amount)}</td>
+                          <td className="p-2.5 text-slate-500 font-medium">
+                            {po.bankName ? `${po.bankName} • ${po.accountNumber}` : '—'}
+                          </td>
+                          <td className="p-2.5 text-center">
+                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                              po.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                              po.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                              'bg-rose-50 text-rose-700 border-rose-200'
+                            }`}>
+                              {po.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan={5} className="py-8 text-center text-slate-400">No recent payout requests.</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </motion.div>
+            ) : (
+              /* Recent Orders Feed */
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
+                    <tr>
+                      <th className="p-2.5">Order Ref</th>
+                      <th className="p-2.5">Customer</th>
+                      <th className="p-2.5">Selling Stores</th>
+                      <th className="p-2.5 text-right">Total</th>
+                      <th className="p-2.5 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(activitiesData?.recentOrders || []).length > 0 ? (
+                      activitiesData.recentOrders.map((ord: any, idx: number) => (
+                        <tr key={ord.orderId || idx} className="hover:bg-slate-50/50">
+                          <td className="p-2.5 font-bold font-mono text-slate-800">{ord.orderNumber}</td>
+                          <td className="p-2.5 font-medium text-slate-600">{ord.customerName || 'Guest Customer'}</td>
+                          <td className="p-2.5 text-purple-700 font-medium">
+                            {Array.isArray(ord.vendors) ? ord.vendors.join(', ') : 'Store'}
+                          </td>
+                          <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(ord.totalAmount)}</td>
+                          <td className="p-2.5 text-center">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              {ord.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan={5} className="py-8 text-center text-slate-400">No recent orders found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
+      </div>
 
-        {/* ROW 2 RIGHT: Today's Target Card (height split in half) + Conversion Rate Card (new!) */}
-        <div>
-          <div className="flex flex-col gap-6 h-full justify-between">
-            {/* Sales Target Card (half height) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="bg-gradient-to-br from-fuchsia-600 to-purple-600 rounded-2xl p-5 text-white flex-1 flex flex-col justify-between shadow-sm min-h-[188px]"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles size={16} className="text-white/80" />
-                  <span className="text-xs font-bold">Sales Target</span>
-                </div>
-                <span className="text-[9px] font-bold bg-white/20 px-2 py-0.5 rounded-full">LIVE</span>
-              </div>
-              <div className="my-1">
-                <p className="text-2xl font-black tracking-tight">₦124,500</p>
-                <p className="text-[10px] text-white/80 font-medium">₦180,000 daily goal</p>
-              </div>
-              <div>
-                <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: '68%' }}
-                    className="h-full bg-white rounded-full"
-                  />
-                </div>
-                <p className="text-[10px] text-white/70 mt-2 flex items-center justify-between font-semibold">
-                  <span>68% completed</span>
-                  <span>₦55,500 left</span>
-                </p>
-              </div>
-            </motion.div>
+      {/* ── 2. VENDOR LIFETIME EARNINGS TABLE WIDGET ── */}
+      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+              <Shield size={18} className="text-[#9d4ae3]" />
+              Lifetime Vendor Earnings & Commission Ledger
+            </h3>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">
+              Comprehensive list of approved store profiles, lifetime earnings, platform commission generated, and payout banks.
+            </p>
+          </div>
 
-            {/* Conversion Rate Card (half height) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.28 }}
-              className="bg-white rounded-2xl p-5 border border-gray-100 flex-1 flex flex-col justify-between shadow-sm min-h-[188px]"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <TrendingUp size={16} className="text-emerald-500" />
-                  <span className="text-xs font-bold text-gray-500">Conversion Rate</span>
-                </div>
-                <span className="text-[9px] font-bold bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full">+1.2%</span>
-              </div>
-              <div className="my-1">
-                <p className="text-2xl font-black tracking-tight text-slate-800">3.84%</p>
-                <p className="text-[10px] text-gray-400 font-medium">Industry average: 2.5%</p>
-              </div>
-              <div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: '76%' }}
-                    className="h-full bg-emerald-500 rounded-full"
-                  />
-                </div>
-                <p className="text-[10px] text-gray-400 mt-2 flex items-center justify-between font-semibold">
-                  <span>Performance: Good</span>
-                  <span>Target: 5.0%</span>
-                </p>
-              </div>
-            </motion.div>
+          {/* Search Box */}
+          <div className="relative min-w-[240px]">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={tableSearch}
+              onChange={(e) => setTableSearch(e.target.value)}
+              placeholder="Search store name or email..."
+              className="w-full pl-9 pr-4 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#9d4ae3]"
+            />
           </div>
         </div>
 
-        {/* ROW 3 LEFT: Top Performing Products */}
-        <div className="lg:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col justify-between"
-          >
-            <div>
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-slate-800">Top Performing Products</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Best selling items this month</p>
-                </div>
-                <button
-                  onClick={() => onNavigate?.('products')}
-                  className="text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 flex items-center gap-1 transition"
-                >
-                  View All <ChevronRight size={14} />
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {topProducts.map((product, idx) => (
-                  <div key={product.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition group">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                        idx === 0 ? 'bg-amber-100 text-amber-700' :
-                        idx === 1 ? 'bg-gray-100 text-gray-600' :
-                        idx === 2 ? 'bg-orange-100 text-orange-700' :
-                        'bg-slate-100 text-slate-500'
-                      }`}>
-                        #{idx + 1}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-800 text-sm group-hover:text-fuchsia-600 transition">
-                          {product.name}
-                        </p>
-                        <p className="text-xs text-gray-500">{product.sales} units sold</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-800 text-sm">₦{product.revenue.toLocaleString()}</p>
-                      <p className={`text-xs font-medium flex items-center gap-1 justify-end ${
-                        product.growth > 0 ? 'text-emerald-600' : 'text-rose-600'
-                      }`}>
-                        {product.growth > 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                        {Math.abs(product.growth)}%
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {/* Global Lifetime Sums Header Banner */}
+        {vendorEarningsData && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-purple-50/60 rounded-2xl border border-purple-100 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-purple-900">Total Platform Vendor Earnings Sum:</span>
+              <span className="font-black text-purple-900 text-sm">{fmtNGN(vendorEarningsData.totalVendorEarningsSum)}</span>
             </div>
-          </motion.div>
-        </div>
-
-        {/* ROW 3 RIGHT: Recent Activity */}
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col justify-between"
-          >
-            <div>
-              <div className="px-6 py-5 border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                  <Activity size={18} className="text-fuchsia-500" />
-                  <h3 className="font-bold text-slate-800">Recent Activity</h3>
-                </div>
-                <p className="text-xs text-gray-500 mt-0.5">Latest store updates</p>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {activities.map((activity) => (
-                  <div key={activity.id} className="px-6 py-3 flex items-center gap-3 hover:bg-slate-50/50 transition">
-                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-                      {activity.icon}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-slate-700">{activity.message}</p>
-                      <p className="text-[10px] text-gray-400 font-medium">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-purple-900">Total Platform Commission Sum:</span>
+              <span className="font-black text-purple-900 text-sm">{fmtNGN(vendorEarningsData.totalPlatformCommissionSum)}</span>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        )}
 
+        {/* Table Body */}
+        {loadingVendorEarnings ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3">
+            <RefreshCw className="animate-spin text-[#9d4ae3]" size={20} />
+            <p className="text-xs font-bold text-slate-400">Loading vendor lifetime earnings...</p>
+          </div>
+        ) : errorVendorEarnings ? (
+          <div className="p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl flex items-center justify-between">
+            <span>{errorVendorEarnings}</span>
+            <button onClick={() => fetchVendorEarnings()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
+          </div>
+        ) : (vendorEarningsData?.items || []).length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Store & Contact</th>
+                  <th className="px-4 py-3 text-right">Comm % / Fee %</th>
+                  <th className="px-4 py-3 text-right">Pending Escrow</th>
+                  <th className="px-4 py-3 text-right">Available Balance</th>
+                  <th className="px-4 py-3 text-right">Lifetime Earnings</th>
+                  <th className="px-4 py-3 text-right">Total Withdrawn</th>
+                  <th className="px-4 py-3 text-right">GMV Generated</th>
+                  <th className="px-4 py-3 text-right">Platform Comm</th>
+                  <th className="px-4 py-3">Primary Bank</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {vendorEarningsData.items.map((row: any, idx: number) => (
+                  <tr key={row.vendorId || idx} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3.5">
+                      <p className="font-extrabold text-slate-800 text-xs">{row.storeName}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{row.ownerEmail}</p>
+                    </td>
+                    <td className="px-4 py-3.5 text-right font-medium text-slate-600">
+                      {row.commissionRate}% / {row.processingFeeRate}%
+                    </td>
+                    <td className="px-4 py-3.5 text-right text-amber-600 font-bold">{fmtNGN(row.pendingEscrow)}</td>
+                    <td className="px-4 py-3.5 text-right text-emerald-700 font-bold">{fmtNGN(row.availableBalance)}</td>
+                    <td className="px-4 py-3.5 text-right text-purple-900 font-black text-sm">{fmtNGN(row.lifetimeEarnings)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-700 font-semibold">{fmtNGN(row.totalWithdrawn)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-800 font-extrabold">{fmtNGN(row.totalGmvGenerated)}</td>
+                    <td className="px-4 py-3.5 text-right text-rose-600 font-bold">{fmtNGN(row.platformCommissionGenerated)}</td>
+                    <td className="px-4 py-3.5 text-slate-600 font-medium">
+                      {row.bankAccount ? (
+                        <span>{row.bankAccount.bankName} ••••{(row.bankAccount.accountNumber || '').slice(-4)}</span>
+                      ) : (
+                        <span className="text-slate-400 italic">No bank</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="py-16 text-center text-slate-400 text-xs font-medium">
+            No vendor earnings records found matching &quot;{debouncedSearch}&quot;.
+          </div>
+        )}
+
+        {/* Pagination Footer */}
+        {vendorEarningsData?.totalPages > 1 && (
+          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs">
+            <button
+              disabled={tablePage <= 1}
+              onClick={() => setTablePage((p) => Math.max(1, p - 1))}
+              className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1"
+            >
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <span className="font-bold text-slate-500">
+              Page {tablePage} of {vendorEarningsData.totalPages}
+            </span>
+            <button
+              disabled={tablePage >= vendorEarningsData.totalPages}
+              onClick={() => setTablePage((p) => Math.min(vendorEarningsData.totalPages, p + 1))}
+              className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1"
+            >
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Quick Actions Row */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-wrap items-center justify-between gap-4"
-      >
-        <div className="flex items-center gap-2">
-          <Zap size={18} className="text-amber-500" />
-          <span className="text-sm font-bold text-slate-700">Quick Actions</span>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => onNavigate?.('products')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold text-slate-700 transition flex items-center gap-2"
-          >
-            <Package size={16} /> Add Product
-          </button>
-          <button
-            onClick={() => onNavigate?.('vendors')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold text-slate-700 transition flex items-center gap-2"
-          >
-            <Users size={16} /> Invite Vendor
-          </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold transition shadow-md shadow-fuchsia-100 flex items-center gap-2 hover:shadow-lg">
-            <FileText size={16} /> Generate Report
-          </button>
-        </div>
-      </motion.div>
     </div>
   );
 }
