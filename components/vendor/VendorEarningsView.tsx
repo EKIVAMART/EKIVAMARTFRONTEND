@@ -342,7 +342,8 @@ export default function VendorEarningsView() {
                   const orderRef = item.orderNumber || item.orderReference || (item.orderId ? `#${String(item.orderId).slice(-8)}` : 'N/A');
                   const gross = item.grossAmount ?? item.amount ?? 0;
                   const commRate = item.commissionRate ?? 0;
-                  const commAmt = item.commissionAmount ?? (gross * commRate) / 100 ?? 0;
+                  const commissionFallback = (gross * commRate) / 100;
+                  const commAmt = item.commissionAmount ?? commissionFallback;
                   const fee = item.gatewayFeeAmount ?? 0;
                   const net = item.netAmount ?? item.netEarning ?? (gross - commAmt - fee);
 
