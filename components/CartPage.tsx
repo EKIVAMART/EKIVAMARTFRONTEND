@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Trash2,
@@ -19,6 +19,8 @@ import {
   AlertTriangle,
   CreditCard,
   ShieldCheck,
+  Loader2,
+  Check,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -35,7 +37,7 @@ import {
   moveSavedCartItemToCartApi,
   clearCartApi,
 } from '@/lib/features/cart/cartSlice';
-import { cartApi, orderApi } from '@/lib/api';
+import { cartApi, orderApi, userAddressApi, taxRulesApi, SavedAddressItem } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
@@ -60,6 +62,16 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'kora_pay' | 'mock'>('paystack');
+
+  // Saved Addresses & Regional Tax state
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddressItem[]>([]);
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null);
+  const [useSavedAddress, setUseSavedAddress] = useState<boolean>(true);
+  const [saveAddressToProfile, setSaveAddressToProfile] = useState<boolean>(false);
+  const [loadingAddresses, setLoadingAddresses] = useState<boolean>(false);
+  // Tracks whether addresses have been fetched at least once (avoids double-fetch on mount)
+  const addressesFetchedRef = useRef<boolean>(false);
+
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine1: '',
@@ -80,12 +92,52 @@ export default function CartPage() {
     setMounted(true);
   }, []);
 
+  const loadSavedAddresses = async (silent = false) => {
+    if (!silent) setLoadingAddresses(true);
+    try {
+      const res = await userAddressApi.list();
+      if (res?.success) {
+        let list: SavedAddressItem[] = [];
+        if (Array.isArray(res.data)) {
+          list = res.data;
+        } else if (res.data && Array.isArray((res.data as any).items)) {
+          list = (res.data as any).items;
+        } else if (res.data && Array.isArray((res.data as any).data)) {
+          list = (res.data as any).data;
+        } else if (Array.isArray((res as any).items)) {
+          list = (res as any).items;
+        }
+
+        setSavedAddresses(list);
+        addressesFetchedRef.current = true;
+        if (list.length > 0) {
+          // Preserve currently selected address if still valid, else pick default
+          const stillValid = list.find((a) => a.id === selectedSavedAddressId);
+          const defaultAddr = stillValid || list.find((a) => a.isDefault) || list[0];
+          setSelectedSavedAddressId(defaultAddr.id);
+          setUseSavedAddress(true);
+          // Recalculate regional tax for selected saved address
+          dispatch(fetchCartSummary({ country: defaultAddr.country || 'NG', state: defaultAddr.state }));
+        } else {
+          setUseSavedAddress(false);
+          setSelectedSavedAddressId(null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load saved addresses', err);
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
   // Fetch cart details on mount / auth state change
   useEffect(() => {
     if (mounted && isAuthenticated) {
       dispatch(fetchCart());
       dispatch(fetchCartSummary());
+      void loadSavedAddresses(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isAuthenticated, dispatch]);
 
   if (!mounted) {
@@ -242,12 +294,9 @@ export default function CartPage() {
 
     try {
       const res = await cartApi.validateCart();
-      setIsProcessing(false);
 
-      if (res?.success && res.data?.isValid) {
-        toast.success('Stock verified successfully!', { id: validateToast });
-        setIsCheckingOut(true);
-      } else {
+      if (!res?.success || !res.data?.isValid) {
+        setIsProcessing(false);
         const errorMsg = res?.message || 'Some items have insufficient stock.';
         toast.error(errorMsg, { id: validateToast });
         if (res?.data?.errors && res.data.errors.length > 0) {
@@ -255,7 +304,50 @@ export default function CartPage() {
             toast.error(`${err.productName}: Only ${err.availableStock} available (requested ${err.requestedQuantity})`, { duration: 5000 });
           });
         }
+        return;
       }
+
+      toast.loading('Fetching applicable tax rate...', { id: validateToast });
+
+      // Determine country/state from the selected saved address or default
+      let taxCountry = 'NG';
+      let taxState: string | undefined;
+      if (useSavedAddress && selectedSavedAddressId) {
+        const sel = savedAddresses.find((a) => a.id === selectedSavedAddressId);
+        if (sel) {
+          taxCountry = sel.country || 'NG';
+          taxState = sel.state || undefined;
+        }
+      } else if (!useSavedAddress && shippingAddress.state) {
+        taxCountry = shippingAddress.country || 'NG';
+        taxState = shippingAddress.state || undefined;
+      }
+
+      // Explicitly query the official tax rate from the backend (GET /tax-rules/applicable)
+      // No client-supplied tax is ever accepted — this always reflects what Super Admins configured.
+      const cartSubtotal = summary?.subtotal;
+      const taxRes = await taxRulesApi.getApplicable({
+        country: taxCountry,
+        state: taxState,
+        subtotal: cartSubtotal,
+      });
+
+      // Re-fetch cart summary with the resolved region to reflect correct tax in the UI
+      dispatch(fetchCartSummary({ country: taxCountry, state: taxState }));
+
+      if (taxRes?.data) {
+        const source = taxRes.data.source ?? 'unknown';
+        const rate = taxRes.data.formattedRate ?? `${taxRes.data.percentage ?? 7.5}%`;
+        const sourceLabel = source === 'state_rule' ? 'state rule' : source === 'country_default' ? 'country default' : 'platform default';
+        toast.success(`Tax verified: ${rate} (${sourceLabel})`, { id: validateToast });
+      } else {
+        toast.success('Stock verified successfully!', { id: validateToast });
+      }
+
+      setIsProcessing(false);
+      // Always re-fetch saved addresses fresh when entering checkout
+      void loadSavedAddresses(false);
+      setIsCheckingOut(true);
     } catch (err: any) {
       setIsProcessing(false);
       toast.error(err?.message || 'Cart validation failed. Please try again.', { id: validateToast });
@@ -264,20 +356,57 @@ export default function CartPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!shippingAddress.fullName || !shippingAddress.addressLine1 || !shippingAddress.city || !shippingAddress.state || !shippingAddress.postalCode || !shippingAddress.phoneNumber) {
-      toast.error('Please fill in all required shipping address fields.');
-      return;
-    }
+
     if (!paymentMethod) {
       toast.error('Please select a payment method.');
       return;
+    }
+
+    let checkoutPayload: any;
+
+    if (useSavedAddress && selectedSavedAddressId) {
+      // Option 2: Use saved address ID — preferred path when a saved address is selected
+      checkoutPayload = {
+        savedAddressId: selectedSavedAddressId,
+        notes: checkoutNotes,
+      };
+    } else if (useSavedAddress && !selectedSavedAddressId) {
+      // User selected "use saved address" but none is actually selected
+      toast.error('Please select a saved address or switch to entering a new address.');
+      return;
+    } else {
+      // Option 1: Custom shipping address
+      if (
+        !shippingAddress.fullName ||
+        !shippingAddress.addressLine1 ||
+        !shippingAddress.city ||
+        !shippingAddress.state ||
+        !shippingAddress.postalCode ||
+        !shippingAddress.phoneNumber
+      ) {
+        toast.error('Please fill in all required shipping address fields.');
+        return;
+      }
+
+      if (saveAddressToProfile) {
+        try {
+          await userAddressApi.create(shippingAddress);
+        } catch (err) {
+          console.error('Failed to save address to profile:', err);
+        }
+      }
+
+      checkoutPayload = {
+        shippingAddress,
+        notes: checkoutNotes,
+      };
     }
 
     setIsProcessing(true);
     const checkoutToast = toast.loading('Creating order & connecting to payment gateway...');
 
     try {
-      const res = await cartApi.checkout(shippingAddress, checkoutNotes);
+      const res = await cartApi.checkout(checkoutPayload);
 
       if (!res?.success || !res?.data) {
         setIsProcessing(false);
@@ -626,7 +755,9 @@ export default function CartPage() {
                         </span>
                       </div>
                       <div className="flex justify-between text-gray-600 text-sm font-medium">
-                        <span>Estimate Tax (10%)</span>
+                        <span>
+                          Tax {summary?.formattedRate ? `(${summary.formattedRate})` : (summary?.taxPercentage !== undefined ? `(${summary.taxPercentage}%)` : '(7.5%)')}
+                        </span>
                         <span className="font-bold text-slate-800">
                           ₦{summary.tax.toLocaleString()}
                         </span>
@@ -665,7 +796,7 @@ export default function CartPage() {
                   className="bg-white rounded-3xl p-6 shadow-xs border border-gray-100"
                 >
                   <div className="flex items-center justify-between border-b pb-4 mb-6">
-                    <h3 className="text-xl font-bold text-slate-800">Shipping Details</h3>
+                    <h3 className="text-xl font-bold text-slate-800">Shipping & Payment</h3>
                     <button
                       onClick={() => setIsCheckingOut(false)}
                       className="text-xs font-bold text-[#9d4ae3] hover:underline"
@@ -675,101 +806,242 @@ export default function CartPage() {
                   </div>
 
                   <form onSubmit={handlePlaceOrder} className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 block mb-1">Full Name *</label>
+                    {/* ── Address Section ── */}
+                    {loadingAddresses ? (
+                      /* Loading spinner while fetching saved addresses */
+                      <div className="mb-4 bg-purple-50/40 border border-purple-100 rounded-2xl p-4 flex items-center gap-3">
+                        <Loader2 size={18} className="animate-spin text-purple-500 shrink-0" />
+                        <span className="text-xs text-purple-700 font-semibold">Fetching your saved addresses…</span>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Saved Address / New Address Toggle — only shown when addresses exist */}
+                        {savedAddresses.length > 0 && (
+                          <div className="mb-4 bg-purple-50/60 p-3 rounded-2xl border border-purple-100">
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="text-xs font-bold text-purple-900 flex items-center gap-1.5">
+                                <MapPin size={14} className="text-purple-600" /> Choose Shipping Destination
+                              </label>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setUseSavedAddress(true);
+                                  const sel = savedAddresses.find((a) => a.id === selectedSavedAddressId) || savedAddresses[0];
+                                  setSelectedSavedAddressId(sel.id);
+                                  dispatch(fetchCartSummary({ country: sel.country || 'NG', state: sel.state }));
+                                }}
+                                className={`py-2 px-3 text-xs font-bold rounded-xl transition border text-center flex items-center justify-center gap-1.5 ${
+                                  useSavedAddress
+                                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
+                                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                                }`}
+                              >
+                                {useSavedAddress && <Check size={12} />}
+                                Saved Address ({savedAddresses.length})
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setUseSavedAddress(false)}
+                                className={`py-2 px-3 text-xs font-bold rounded-xl transition border text-center ${
+                                  !useSavedAddress
+                                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
+                                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                                }`}
+                              >
+                                + Enter New Address
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Saved Addresses Cards List — address fields hidden when a saved address is selected */}
+                        {useSavedAddress && savedAddresses.length > 0 ? (
+                          <div className="space-y-2 mb-4">
+                            <label className="text-xs font-bold text-slate-600 block mb-1">Select Saved Address *</label>
+                            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                              {savedAddresses.map((addr) => {
+                                const isSelected = selectedSavedAddressId === addr.id;
+                                const name = addr.fullName || (addr as any).name || 'Address';
+                                const line1 = addr.addressLine1 || (addr as any).street || (addr as any).address || [addr.city, addr.state].filter(Boolean).join(', ');
+                                const phone = addr.phoneNumber || (addr as any).phone || (addr as any).phoneNumber;
+                                return (
+                                  <div
+                                    key={addr.id}
+                                    onClick={() => {
+                                      setSelectedSavedAddressId(addr.id);
+                                      dispatch(fetchCartSummary({ country: addr.country || 'NG', state: addr.state }));
+                                    }}
+                                    className={`p-3 rounded-2xl border cursor-pointer transition-all ${
+                                      isSelected
+                                        ? 'border-[#9d4ae3] bg-purple-50/80 ring-1 ring-[#9d4ae3]/30 shadow-xs'
+                                        : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className="font-bold text-xs text-slate-800">{name}</span>
+                                          {addr.isDefault && (
+                                            <span className="text-[9px] bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded font-bold">Default</span>
+                                          )}
+                                        </div>
+                                        <p className="text-[11px] text-gray-600 mt-0.5 break-words font-medium">
+                                          {line1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
+                                        </p>
+                                        <p className="text-[11px] text-gray-500">
+                                          {addr.city}{addr.city && addr.state ? ', ' : ''}{addr.state}
+                                          {addr.country ? ` • ${addr.country}` : ''}
+                                          {phone ? ` • ${phone}` : ''}
+                                        </p>
+                                      </div>
+                                      <div className={`mt-1 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
+                                        isSelected ? 'border-[#9d4ae3] bg-[#9d4ae3]' : 'border-gray-300 bg-white'
+                                      }`}>
+                                        {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : (
+                          /* Custom Address Form — shown when no saved addresses, or user chose "Enter New Address" */
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs font-bold text-slate-600 block mb-1">Full Name *</label>
+                              <input
+                                type="text"
+                                required
+                                value={shippingAddress.fullName}
+                                onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
+                                placeholder="Jane Doe"
+                                className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold text-slate-600 block mb-1">Phone Number *</label>
+                              <input
+                                type="tel"
+                                required
+                                value={shippingAddress.phoneNumber}
+                                onChange={(e) => setShippingAddress({ ...shippingAddress, phoneNumber: e.target.value })}
+                                placeholder="+2348012345678"
+                                className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 1 *</label>
+                              <input
+                                type="text"
+                                required
+                                value={shippingAddress.addressLine1}
+                                onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
+                                placeholder="123 Flower Street"
+                                className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 2 (Optional)</label>
+                              <input
+                                type="text"
+                                value={shippingAddress.addressLine2}
+                                onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
+                                placeholder="Apartment 4B"
+                                className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs font-bold text-slate-600 block mb-1">City *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={shippingAddress.city}
+                                  onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                                  placeholder="Lekki"
+                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-slate-600 block mb-1">State *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={shippingAddress.state}
+                                  onChange={(e) => {
+                                    const newState = e.target.value;
+                                    setShippingAddress({ ...shippingAddress, state: newState });
+                                    if (newState.length >= 3) {
+                                      dispatch(fetchCartSummary({ country: shippingAddress.country, state: newState }));
+                                    }
+                                  }}
+                                  onBlur={() => {
+                                    if (shippingAddress.state) {
+                                      dispatch(fetchCartSummary({ country: shippingAddress.country, state: shippingAddress.state }));
+                                    }
+                                  }}
+                                  placeholder="Lagos"
+                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs font-bold text-slate-600 block mb-1">Postal Code *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={shippingAddress.postalCode}
+                                  onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
+                                  placeholder="105102"
+                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-slate-600 block mb-1">Country *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={shippingAddress.country}
+                                  onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-100 text-gray-500 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Checkbox: Save Address to Profile */}
+                            <label className="flex items-center gap-2 pt-1 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={saveAddressToProfile}
+                                onChange={(e) => setSaveAddressToProfile(e.target.checked)}
+                                className="w-4 h-4 text-[#9d4ae3] rounded border-gray-300 focus:ring-[#9d4ae3]"
+                              />
+                              <span className="text-xs text-gray-700 font-medium">Save this address to my profile for future checkouts</span>
+                            </label>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Order Notes Field */}
+                    <div className="pt-2">
+                      <label className="text-xs font-bold text-slate-600 block mb-1">Order Notes (Optional)</label>
                       <input
                         type="text"
-                        required
-                        value={shippingAddress.fullName}
-                        onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
-                        placeholder="Jane Doe"
+                        value={checkoutNotes}
+                        onChange={(e) => setCheckoutNotes(e.target.value)}
+                        placeholder="e.g. Leave with reception or call upon arrival"
                         className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
                       />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 block mb-1">Phone Number *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={shippingAddress.phoneNumber}
-                        onChange={(e) => setShippingAddress({ ...shippingAddress, phoneNumber: e.target.value })}
-                        placeholder="+2348012345678"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 1 *</label>
-                      <input
-                        type="text"
-                        required
-                        value={shippingAddress.addressLine1}
-                        onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
-                        placeholder="123 Flower Street"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 2 (Optional)</label>
-                      <input
-                        type="text"
-                        value={shippingAddress.addressLine2}
-                        onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
-                        placeholder="Apartment 4B"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-slate-600 block mb-1">City *</label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                          placeholder="Lagos"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-slate-600 block mb-1">State *</label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingAddress.state}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
-                          placeholder="Lagos"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-slate-600 block mb-1">Postal Code *</label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingAddress.postalCode}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
-                          placeholder="100001"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-slate-600 block mb-1">Country *</label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingAddress.country}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
-                          className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-100 text-gray-500 focus:outline-none"
-                          disabled
-                        />
-                      </div>
                     </div>
 
                     {/* Payment Method Selector */}

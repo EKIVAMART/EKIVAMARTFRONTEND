@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen, Truck } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type AdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog';
+export type AdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'specialists';
 
 interface AdminSidebarProps {
   activeTab: AdminTab | string;
@@ -123,6 +123,12 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             label="Notifications"
             active={activeTab === 'notifications'}
             onClick={() => { setActiveTab('notifications'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<Truck size={20} />}
+            label="Vendor Specialists"
+            active={activeTab === 'specialists'}
+            onClick={() => { setActiveTab('specialists'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Settings size={20} />}

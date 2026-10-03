@@ -25,6 +25,8 @@ import VendorSidebar from '@/components/vendor/VendorSidebar';
 import type { VendorTab } from '@/components/vendor/VendorSidebar';
 import VendorDashboardOverview from '@/components/vendor/VendorDashboardOverview';
 import VendorStoreSettings from '@/components/vendor/VendorStoreSettings';
+import VendorOrdersView from '@/components/vendor/VendorOrdersView';
+import VendorEarningsView from '@/components/vendor/VendorEarningsView';
 import NotificationsView from '@/components/notifications/NotificationsView';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import OrderTable from '@/components/super-admin/OrderTable';
@@ -1249,35 +1251,10 @@ function VendorDashboardContent() {
         </>) /* end products tab */}
 
         {/* Store Orders Tab */}
-        {activeTab === 'orders' && (
-          <div>
-            <header className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">Store Orders</h2>
-                <p className="text-sm text-gray-500 font-medium">Track and manage orders containing your products</p>
-              </div>
-              <button
-                onClick={fetchVendorOrders}
-                disabled={isLoadingOrders}
-                className="flex items-center gap-2 px-5 py-2.5 bg-fuchsia-50 hover:bg-fuchsia-100 border border-fuchsia-200 text-fuchsia-700 rounded-xl font-bold text-sm transition"
-              >
-                {isLoadingOrders ? 'Refreshing…' : '↻ Refresh'}
-              </button>
-            </header>
-            {isLoadingOrders ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="w-10 h-10 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin" />
-              </div>
-            ) : vendorOrders.length === 0 ? (
-              <div className="text-center py-20 text-gray-400">
-                <ShoppingCart size={48} className="mx-auto mb-4 opacity-30" />
-                <p className="font-semibold">No orders found for your store yet.</p>
-              </div>
-            ) : (
-              <OrderTable data={vendorOrders} searchQuery="" onViewDetails={openOrderModal} />
-            )}
-          </div>
-        )}
+        {activeTab === 'orders' && <VendorOrdersView />}
+
+        {/* Earnings & Financial Payouts Tab */}
+        {activeTab === 'earnings' && <VendorEarningsView />}
 
       </main>
 

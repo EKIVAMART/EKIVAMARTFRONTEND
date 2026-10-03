@@ -2809,7 +2809,7 @@ export const adminVendorApi = {
     return res.data;
   },
 
-  // F18: All Withdrawal Requests
+  // F18: All Withdrawal Requests (Super Admin uses /super-admin/payouts/withdrawals, Admin uses /admin/vendors/withdrawals)
   async getAllWithdrawalRequests(
     params: {
       status?: string;
@@ -2818,6 +2818,7 @@ export const adminVendorApi = {
       endDate?: string;
       page?: number;
       limit?: number;
+      isSuperAdmin?: boolean;
     } = {}
   ): Promise<ApiResponse<{ withdrawals: AdminWithdrawal[]; total: number }>> {
     if (USE_MOCK_VENDOR_API) {
@@ -2838,20 +2839,26 @@ export const adminVendorApi = {
     }
 
     const query = new URLSearchParams();
-    Object.entries(params).forEach(([k, v]) => {
+    const { isSuperAdmin, ...queryParams } = params;
+    Object.entries(queryParams).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {
         query.append(k, String(v));
       }
     });
 
-    const res = await axiosInstance.get<ApiResponse<any>>(`/admin/vendors/withdrawals?${query.toString()}`);
+    const endpoint = isSuperAdmin
+      ? `/super-admin/payouts/withdrawals?${query.toString()}`
+      : `/admin/vendors/withdrawals?${query.toString()}`;
+
+    const res = await axiosInstance.get<ApiResponse<any>>(endpoint);
     return res.data;
   },
 
-  // F19: Process a Withdrawal
+  // F19: Process a Withdrawal (Super Admin uses /super-admin/payouts/withdrawals/:id/process, Admin uses /admin/vendors/withdrawals/:id/process)
   async processWithdrawal(
     withdrawalId: string,
-    data: { action: 'complete' | 'fail'; reason?: string }
+    data: { action: 'complete' | 'fail'; reason?: string },
+    isSuperAdmin?: boolean
   ): Promise<ApiResponse<{ message: string; status: string }>> {
     if (USE_MOCK_VENDOR_API) {
       const { withdrawals } = getInitialAdminMockData();
@@ -2871,10 +2878,86 @@ export const adminVendorApi = {
       throw new Error('Withdrawal request not found.');
     }
 
-    const res = await axiosInstance.patch<ApiResponse<any>>(
-      `/admin/vendors/withdrawals/${withdrawalId}/process`,
-      data
-    );
+    const endpoint = isSuperAdmin
+      ? `/super-admin/payouts/withdrawals/${withdrawalId}/process`
+      : `/admin/vendors/withdrawals/${withdrawalId}/process`;
+
+    const res = await axiosInstance.patch<ApiResponse<any>>(endpoint, data);
+    return res.data;
+  },
+
+  // G8-A: Super Admin Payout Summary (GET /super-admin/payouts/summary)
+  async getPayoutSummary(): Promise<ApiResponse<any>> {
+    if (USE_MOCK_VENDOR_API) {
+      return {
+        success: true,
+        data: {
+          storePendingEarnings: 120000,
+          storeActualEarnings: 784000,
+          storeTotalCommission: 904000,
+          escrowGrossBalance: 1500000,
+          totalGrossSales: 11300000,
+          vendorPendingBalance: 1100000,
+          vendorAvailableBalance: 2300000,
+          vendorProcessingBalance: 0,
+          vendorTotalWithdrawn: 6100000,
+          pendingWithdrawalsCount: 4,
+        },
+      };
+    }
+    const res = await axiosInstance.get<ApiResponse<any>>('/super-admin/payouts/summary');
+    return res.data;
+  },
+
+  // G8-B: Super Admin Per-Vendor Payout Balances (GET /super-admin/payouts/vendors)
+  async getPayoutVendors(params: { search?: string; status?: string; page?: number; limit?: number } = {}): Promise<ApiResponse<any>> {
+    if (USE_MOCK_VENDOR_API) {
+      const { vendors } = getInitialAdminMockData();
+      return {
+        success: true,
+        data: {
+          vendors: vendors.map((v) => ({
+            vendorId: v.id,
+            storeName: v.storeName,
+            storeSlug: v.storeSlug,
+            ownerName: v.ownerName,
+            email: v.email,
+            phone: v.phone,
+            applicationStatus: v.status,
+            pendingEarnings: 50000,
+            availableEarnings: 120000,
+            totalEarnings: 900000,
+            totalWithdrawn: 700000,
+            processingWithdrawals: 0,
+            pendingWithdrawals: 25000,
+            orderCount: 84,
+            bankAccount: null,
+          })),
+          pagination: { total: vendors.length, page: params.page || 1, limit: params.limit || 20, totalPages: 1 },
+        },
+      };
+    }
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') query.append(k, String(v));
+    });
+    const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/payouts/vendors?${query.toString()}`);
+    return res.data;
+  },
+
+  // G8-C: Super Admin Itemised Earnings Breakdown (GET /super-admin/payouts/breakdown)
+  async getPayoutBreakdown(params: { vendorId?: string; orderId?: string; status?: string; startDate?: string; endDate?: string; page?: number; limit?: number } = {}): Promise<ApiResponse<any>> {
+    if (USE_MOCK_VENDOR_API) {
+      return {
+        success: true,
+        data: { items: [], pagination: { total: 0, page: 1, limit: 20, totalPages: 1 } },
+      };
+    }
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') query.append(k, String(v));
+    });
+    const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/payouts/breakdown?${query.toString()}`);
     return res.data;
   },
 

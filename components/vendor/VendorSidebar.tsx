@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart, Bell, DollarSign } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type VendorTab = 'dashboard' | 'products' | 'store-settings' | 'orders' | 'notifications';
+export type VendorTab = 'dashboard' | 'products' | 'store-settings' | 'orders' | 'earnings' | 'notifications';
 
 interface VendorSidebarProps {
   activeTab: VendorTab;
@@ -48,10 +48,27 @@ export default function VendorSidebar({ activeTab, setActiveTab, isOpen, onClose
     }
   };
 
+const NairaIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    width={size}
+    height={size}
+  >
+    <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
+  </svg>
+);
+
   const navItems: { icon: React.ReactNode; label: string; tab: VendorTab }[] = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', tab: 'dashboard' },
     { icon: <Package size={20} />, label: 'My Products', tab: 'products' },
     { icon: <ShoppingCart size={20} />, label: 'Store Orders', tab: 'orders' },
+    { icon: <NairaIcon size={20} />, label: 'Earnings & Payouts', tab: 'earnings' },
     { icon: <Bell size={20} />, label: 'Notifications', tab: 'notifications' },
     { icon: <Store size={20} />, label: 'Store Settings', tab: 'store-settings' },
   ];

@@ -67,10 +67,17 @@ export default function CategoryPage() {
   const [productsLoading, setProductsLoading] = useState(false);
   const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(null);
 
-  // In-memory filters
+  // In-memory & Enhanced Search filters
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(100000);
   const [selectedRating, setSelectedRating] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<string>('relevance');
+  const [sortOrder, setSortOrder] = useState<string>('desc');
+  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(20);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -241,24 +248,35 @@ export default function CategoryPage() {
     const loadProducts = async () => {
       setProductsLoading(true);
       try {
-        const searchQuery = searchParams.get('search') || undefined;
+        const qParam = searchParams.get('q') || searchParams.get('search') || undefined;
         const locationQuery = searchParams.get('location') || undefined;
-        const fetchParams: any = {
-          status: 'active',
-          limit: 100,
-        };
 
-        if (activeSubcategoryId !== 'ALL_PRODUCTS') {
-          fetchParams.categoryId = activeSubcategoryId;
+        let res: any;
+        if (qParam) {
+          res = await productApi.search({
+            searchQuery: qParam,
+            categoryId: activeSubcategoryId !== 'ALL_PRODUCTS' ? activeSubcategoryId : undefined,
+            minPrice: minPrice > 0 ? minPrice : undefined,
+            maxPrice: maxPrice < 100000 ? maxPrice : undefined,
+            inStock: inStockOnly ? true : undefined,
+            sortBy: sortBy as any,
+            sortOrder: sortOrder as any,
+            page: 1,
+            limit: 100,
+          });
+        } else {
+          const fetchParams: any = {
+            status: 'active',
+            limit: 100,
+          };
+          if (activeSubcategoryId !== 'ALL_PRODUCTS') {
+            fetchParams.categoryId = activeSubcategoryId;
+          }
+          if (locationQuery && locationQuery !== 'All' && locationQuery !== 'Location') {
+            fetchParams.state = locationQuery;
+          }
+          res = await productApi.getAllProducts(fetchParams);
         }
-        if (searchQuery) {
-          fetchParams.searchQuery = searchQuery;
-        }
-        if (locationQuery && locationQuery !== 'All' && locationQuery !== 'Location') {
-          fetchParams.state = locationQuery;
-        }
-
-        const res = await productApi.getAllProducts(fetchParams);
 
         let productList: Product[] = [];
         if (res?.data && Array.isArray(res.data)) {
@@ -272,7 +290,7 @@ export default function CategoryPage() {
         if (isMounted) {
           setProducts(productList);
 
-          // Reset price filters based on fetched products
+          // Reset price filters range based on fetched products
           if (productList.length > 0) {
             const prices = productList.map((p) => {
               if (typeof p.price === 'object' && p.price !== null) {
@@ -282,11 +300,10 @@ export default function CategoryPage() {
             });
             const min = Math.min(...prices);
             const max = Math.max(...prices);
-            setMinPrice(Number.isNaN(min) ? 0 : min);
-            setMaxPrice(Number.isNaN(max) ? 100000 : max);
-          } else {
-            setMinPrice(0);
-            setMaxPrice(100000);
+            if (minPrice === 0 && maxPrice === 100000) {
+              setMinPrice(Number.isNaN(min) ? 0 : min);
+              setMaxPrice(Number.isNaN(max) ? 100000 : max);
+            }
           }
         }
       } catch (err) {
@@ -299,7 +316,7 @@ export default function CategoryPage() {
     return () => {
       isMounted = false;
     };
-  }, [activeSubcategoryId, searchParams]);
+  }, [activeSubcategoryId, searchParams, sortBy, sortOrder, inStockOnly]);
 
   const calculateAverageRating = (ratings: Rating[] | number | undefined) => {
     if (!ratings) return 4.2;
@@ -334,19 +351,24 @@ export default function CategoryPage() {
     return Number.isNaN(max) ? 100000 : max;
   }, [products]);
 
-  // Apply price, rating, and location in-memory filters
+  // Apply price, rating, inStockOnly, location, and sorting filters
   const filteredProducts = useMemo(() => {
     const locationQuery = searchParams.get('location') || 'All';
-    return products.filter((p) => {
+    let result = products.filter((p) => {
       const price = getProductPrice(p);
       if (price < minPrice || price > maxPrice) return false;
+
+      if (inStockOnly) {
+        const stockVal = (p as any).stock ?? ((p as any).inStock ? 1 : 0);
+        if (stockVal <= 0) return false;
+      }
 
       if (selectedRating > 0) {
         const ratingVal = calculateAverageRating(p.rating);
         if (ratingVal < selectedRating) return false;
       }
 
-      // Robust location matching
+      // Location matching
       const productLoc = typeof p.location === 'object' && p.location
         ? p.location.state || p.location.town || 'Lagos'
         : (p.location || 'Lagos');
@@ -361,7 +383,38 @@ export default function CategoryPage() {
 
       return true;
     });
-  }, [products, minPrice, maxPrice, selectedRating, searchParams]);
+
+    // Sorting logic (relevance, price, name, stock) - created_at NOT added to dropdown!
+    if (sortBy === 'price') {
+      result.sort((a, b) => {
+        const pA = getProductPrice(a);
+        const pB = getProductPrice(b);
+        return sortOrder === 'asc' ? pA - pB : pB - pA;
+      });
+    } else if (sortBy === 'name') {
+      result.sort((a, b) => {
+        const nA = (a.name || '').toLowerCase();
+        const nB = (b.name || '').toLowerCase();
+        return sortOrder === 'asc' ? nA.localeCompare(nB) : nB.localeCompare(nA);
+      });
+    } else if (sortBy === 'stock') {
+      result.sort((a, b) => {
+        const sA = (a as any).stock ?? 0;
+        const sB = (b as any).stock ?? 0;
+        return sortOrder === 'asc' ? sA - sB : sB - sA;
+      });
+    }
+
+    return result;
+  }, [products, minPrice, maxPrice, selectedRating, inStockOnly, sortBy, sortOrder, searchParams]);
+
+  // Paginated items
+  const totalCount = filteredProducts.length;
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredProducts.slice(startIndex, startIndex + pageSize);
+  }, [filteredProducts, page, pageSize]);
 
   // Change chip category filter
   const selectSubcategory = (subSlug: string | null) => {
@@ -497,18 +550,34 @@ export default function CategoryPage() {
               <CategoriesGrid />
             </div>
 
-            {/* Price and Rating filters */}
+            {/* Price, Rating, Sort & In-Stock filters */}
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
               <ProductFilters
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 globalMin={globalMin}
                 globalMax={globalMax}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                inStockOnly={inStockOnly}
                 onPriceChange={(min, max) => {
                   setMinPrice(min);
                   setMaxPrice(max);
+                  setPage(1);
                 }}
-                onRatingChange={(rating) => setSelectedRating(rating)}
+                onRatingChange={(rating) => {
+                  setSelectedRating(rating);
+                  setPage(1);
+                }}
+                onSortChange={(sBy, sOrder) => {
+                  setSortBy(sBy);
+                  setSortOrder(sOrder);
+                  setPage(1);
+                }}
+                onInStockOnlyChange={(val) => {
+                  setInStockOnly(val);
+                  setPage(1);
+                }}
               />
             </div>
 
@@ -521,8 +590,8 @@ export default function CategoryPage() {
           {/* Products List Area */}
           <section className="lg:col-span-3">
 
-            {/* Results status header */}
-            <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            {/* Results status header with UX pagination text */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
               <div className="text-sm font-semibold text-gray-600">
                 We found{' '}
                 <span className="text-[#9d4ae3] text-base font-extrabold px-1">
@@ -530,6 +599,11 @@ export default function CategoryPage() {
                 </span>{' '}
                 items matching your selection
               </div>
+              {filteredProducts.length > 0 && (
+                <div className="text-xs font-bold text-gray-500 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg border border-purple-100">
+                  Showing {filteredProducts.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, filteredProducts.length)} of {filteredProducts.length} results (Page {page} of {totalPages})
+                </div>
+              )}
             </div>
 
             {/* Products Grid or Empty/Loading States */}
@@ -544,47 +618,91 @@ export default function CategoryPage() {
                   </div>
                 ))}
               </div>
-            ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-[fadeIn_0.4s_ease-out]">
-                {filteredProducts.map((p: Product) => {
-                  const ratingVal = calculateAverageRating(p.rating);
-                  const storeName = p.storeName || p.store?.name || p.storeId || 'Faflora Store';
-                  const coverImage = p.images && p.images.length > 0
-                    ? p.images.find(img => img.isPrimary)?.url || p.images[0].url
-                    : '/placeholder.png';
+            ) : paginatedProducts.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-[fadeIn_0.4s_ease-out]">
+                  {paginatedProducts.map((p: Product) => {
+                    const ratingVal = calculateAverageRating(p.rating);
+                    const storeName = p.storeName || p.store?.name || p.storeId || 'Faflora Store';
+                    const coverImage = p.images && p.images.length > 0
+                      ? p.images.find(img => img.isPrimary)?.url || p.images[0].url
+                      : '/placeholder.png';
 
-                  const priceVal = typeof p.price === 'object' && p.price !== null ? (p.price as any).amount : (p.price ?? 0);
-                  const compareAt = p.compareAtPrice ?? p.mrp;
-                  const discountPct = p.discount ?? (compareAt && compareAt > priceVal ? Math.round(((compareAt - priceVal) / compareAt) * 100) : undefined);
+                    const priceVal = typeof p.price === 'object' && p.price !== null ? (p.price as any).amount : (p.price ?? 0);
+                    const compareAt = p.compareAtPrice ?? p.mrp;
+                    const discountPct = p.discount ?? (compareAt && compareAt > priceVal ? Math.round(((compareAt - priceVal) / compareAt) * 100) : undefined);
 
-                  const locObj = p.location;
-                  const locationStr =
-                    typeof locObj === 'object' && locObj !== null
-                      ? [locObj.town, locObj.lga, locObj.state].filter(Boolean).join(', ') || 'Nigeria'
-                      : (typeof locObj === 'string' ? locObj : 'Nigeria');
+                    const locObj = p.location;
+                    const locationStr =
+                      typeof locObj === 'object' && locObj !== null
+                        ? [locObj.town, locObj.lga, locObj.state].filter(Boolean).join(', ') || 'Nigeria'
+                        : (typeof locObj === 'string' ? locObj : 'Nigeria');
 
-                  const mapped = {
-                    id: p.id,
-                    name: p.name,
-                    image: coverImage,
-                    price: priceVal,
-                    compareAtPrice: compareAt,
-                    discountPercent: discountPct,
-                    rating: ratingVal,
-                    reviewCount: Array.isArray(p.rating) ? p.rating.length : 0,
-                    location: locationStr,
-                    vendor: storeName,
-                    storeName: storeName,
-                    href: `/products/${p.id}`,
-                  };
+                    const mapped = {
+                      id: p.id,
+                      name: p.name,
+                      image: coverImage,
+                      price: priceVal,
+                      compareAtPrice: compareAt,
+                      discountPercent: discountPct,
+                      rating: ratingVal,
+                      reviewCount: Array.isArray(p.rating) ? p.rating.length : 0,
+                      location: locationStr,
+                      vendor: storeName,
+                      storeName: storeName,
+                      href: `/products/${p.id}`,
+                    };
 
-                  return (
-                    <div key={p.id} className="w-full flex">
-                      <ProductCard product={mapped} />
-                    </div>
-                  );
-                })}
-              </div>
+                    return (
+                      <div key={p.id} className="w-full flex">
+                        <ProductCard product={mapped} />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                  <div className="text-xs font-semibold text-gray-500">
+                    Page {page} of {totalPages} ({filteredProducts.length} total results)
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700"
+                    >
+                      Previous
+                    </button>
+
+                    {Array.from({ length: totalPages }).map((_, idx) => {
+                      const pageNum = idx + 1;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setPage(pageNum)}
+                          className={`w-8 h-8 text-xs font-extrabold rounded-xl transition border ${
+                            page === pageNum
+                              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
+                              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center max-w-lg mx-auto mt-8">
                 <div className="inline-flex p-4 rounded-full bg-purple-50 text-[#9d4ae3] mb-4">

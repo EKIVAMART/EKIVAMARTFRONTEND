@@ -154,7 +154,70 @@ export default function VendorStatusPage() {
       
       const draftRes = await vendorApi.getApplicationDraft();
       if (draftRes.success && draftRes.data) {
-        setAppDraft(draftRes.data);
+        const rawDraft = draftRes.data as any;
+
+        const rawCategories = rawDraft.sellingCategories ?? rawDraft.step2?.categories ?? rawDraft.step2?.categoryIds ?? [];
+        const rawDocs = rawDraft.documents ?? rawDraft.step6?.documents ?? [];
+        const rawBankAccounts = rawDraft.bankAccounts ?? rawDraft.step7?.bankAccounts ?? (rawDraft.step7?.accountNumber ? [{
+          id: rawDraft.step7.id || '1',
+          bankName: rawDraft.step7.bankName || '',
+          bankCode: rawDraft.step7.bankCode || '',
+          accountNumber: rawDraft.step7.accountNumber || rawDraft.step7.maskedAccountNumber || '',
+          accountName: rawDraft.step7.accountName || '',
+          accountType: rawDraft.step7.accountType || 'current',
+          isPrimary: rawDraft.step7.isPrimary ?? true,
+          isVerified: rawDraft.step7.isVerified ?? false,
+        }] : []);
+
+        const normalizedDraft: VendorApplicationDraft = {
+          ...rawDraft,
+          storeName: rawDraft.step1?.storeName ?? rawDraft.storeName ?? '',
+          vendorType: rawDraft.step1?.vendorType ?? rawDraft.vendorType ?? '',
+          storePhone: rawDraft.step1?.storePhone ?? rawDraft.storePhone ?? '',
+          storeEmail: rawDraft.step1?.storeEmail ?? rawDraft.storeEmail ?? '',
+          sellingCategories: rawCategories,
+          personalInfo: rawDraft.personalInfo ?? (rawDraft.step3 ? {
+            fullName: rawDraft.step3.fullName || '',
+            dateOfBirth: rawDraft.step3.dateOfBirth || '',
+            gender: rawDraft.step3.gender || '',
+            homeAddress: rawDraft.step3.homeAddress || {
+              street: rawDraft.step3.homeStreet || rawDraft.step3.street || '',
+              city: rawDraft.step3.homeCity || rawDraft.step3.city || '',
+              state: rawDraft.step3.homeState || rawDraft.step3.state || '',
+              lga: rawDraft.step3.homeLga || rawDraft.step3.lga || '',
+            },
+            nin: rawDraft.step3.nin || '',
+            ninProvided: rawDraft.step3.ninProvided ?? !!rawDraft.step3.nin,
+          } : null),
+          businessInfo: rawDraft.businessInfo ?? (rawDraft.step4 ? {
+            businessName: rawDraft.step4.businessName || '',
+            businessType: rawDraft.step4.businessType || '',
+            cacNumber: rawDraft.step4.cacNumber || '',
+            tinNumber: rawDraft.step4.tinNumber || '',
+            vatNumber: rawDraft.step4.vatNumber || '',
+            dateOfIncorporation: rawDraft.step4.dateOfIncorporation || '',
+          } : null),
+          storeInfo: rawDraft.storeInfo ?? (rawDraft.step5 ? {
+            storeDescription: rawDraft.step5.storeDescription || '',
+            yearsInBusiness: rawDraft.step5.yearsInBusiness || '',
+            businessAddress: rawDraft.step5.businessAddress || {
+              street: rawDraft.step5.busStreet || rawDraft.step5.street || '',
+              city: rawDraft.step5.busCity || rawDraft.step5.city || '',
+              state: rawDraft.step5.busState || rawDraft.step5.state || '',
+              lga: rawDraft.step5.busLga || rawDraft.step5.lga || '',
+              postalCode: rawDraft.step5.busPostal || rawDraft.step5.postalCode || '',
+            },
+            socialLinks: rawDraft.step5.socialLinks || {
+              instagram: rawDraft.step5.linkInstagram || '',
+              facebook: rawDraft.step5.linkFacebook || '',
+              twitter: rawDraft.step5.linkTwitter || '',
+              tiktok: rawDraft.step5.linkTiktok || '',
+            },
+          } : null),
+          documents: rawDocs,
+          bankAccounts: rawBankAccounts,
+        };
+        setAppDraft(normalizedDraft);
       }
 
       const catRes = await vendorApi.getAllCategories();
@@ -399,18 +462,16 @@ export default function VendorStatusPage() {
                 </button>
               )}
               
-              {/* SUBMITTED, IN_REVIEW, APPROVED - Purple View Submission button */}
-              {(status === 'submitted' || status === 'in_review' || status === 'approved') && (
+              {/* View Submission button whenever draft data exists */}
+              {appDraft && (
                 <button
                   onClick={() => setShowViewSubmissionModal(true)}
                   className="bg-[#9d4ae3] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2"
                 >
-                  View Submission
+                  View Submission Details
                   <Eye size={14} />
                 </button>
               )}
-              
-              {/* REJECTED, SUSPENDED, BANNED - NO BUTTON HERE */}
             </div>
           </div>
 
@@ -827,19 +888,21 @@ export default function VendorStatusPage() {
                   </h4>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {(() => {
-                      // Prefer resolved categories from appStatus, fall back to sellingCategories flat array, then step2.categories from real API draft
-                      const cats = (appStatus?.sellingCategories && appStatus.sellingCategories.length > 0)
-                        ? appStatus.sellingCategories
-                        : (appDraft.sellingCategories && appDraft.sellingCategories.length > 0)
-                          ? appDraft.sellingCategories
-                          : (appDraft.step2?.categories ?? []);
+                      const cats = (appDraft.sellingCategories && appDraft.sellingCategories.length > 0)
+                        ? appDraft.sellingCategories
+                        : (appDraft.step2?.categories && appDraft.step2.categories.length > 0)
+                          ? appDraft.step2.categories
+                          : (appDraft.step2?.categoryIds ?? []);
 
                       return cats.length > 0 ? (
-                        cats.map(c => {
-                          const foundCat = categoriesList.find(item => item.id === c.id);
-                          const displayName = foundCat?.name || c.name || c.id;
+                        cats.map((c: any, idx: number) => {
+                          const catId = typeof c === 'string' ? c : (c.id || c.categoryId);
+                          const foundCat = categoriesList.find(item => item.id === catId || (item as any)._id === catId);
+                          const displayName = typeof c === 'object'
+                            ? (c.name || c.categoryName || c.title || foundCat?.name || c.id || c.categoryId)
+                            : (foundCat?.name || c);
                           return (
-                            <span key={c.id} className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                            <span key={catId || idx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-full font-bold">
                               {displayName}
                             </span>
                           );
@@ -1033,19 +1096,30 @@ export default function VendorStatusPage() {
                     Linked Accounts
                   </h4>
                   <div className="space-y-2.5 pt-2">
-                    {appDraft.bankAccounts && appDraft.bankAccounts.length > 0 ? (
-                      appDraft.bankAccounts.map((acc) => (
-                        <div key={acc.id} className="flex justify-between items-center text-xs border-b border-slate-50 last:border-0 pb-2 last:pb-0">
-                          <div>
-                            <p className="font-bold text-slate-700">{acc.bankName} ({acc.accountType})</p>
-                            <p className="text-[10px] text-slate-400">{acc.accountName} • {acc.accountNumber}</p>
+                    {(() => {
+                      const bankAccs = (appDraft.bankAccounts && appDraft.bankAccounts.length > 0)
+                        ? appDraft.bankAccounts
+                        : (appDraft.step7?.bankAccounts && appDraft.step7.bankAccounts.length > 0)
+                          ? appDraft.step7.bankAccounts
+                          : [];
+
+                      return bankAccs.length > 0 ? (
+                        bankAccs.map((acc: any, idx: number) => (
+                          <div key={acc.id || acc.accountNumber || idx} className="flex justify-between items-center text-xs border-b border-slate-50 last:border-0 pb-2 last:pb-0">
+                            <div>
+                              <p className="font-bold text-slate-700">{acc.bankName || 'Bank Account'} ({acc.accountType || 'current'})</p>
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">{acc.accountName} • {acc.accountNumber || acc.maskedAccountNumber}</p>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              {acc.isVerified && <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold">Verified</span>}
+                              {acc.isPrimary && <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded text-[9px] font-bold">Primary</span>}
+                            </div>
                           </div>
-                          {acc.isPrimary && <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded text-[9px] font-bold">Primary</span>}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-xs text-slate-400 italic">No bank accounts linked</p>
-                    )}
+                        ))
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">No bank accounts linked</p>
+                      );
+                    })()}
                   </div>
                 </div>
 

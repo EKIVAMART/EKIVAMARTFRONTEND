@@ -29,6 +29,8 @@ import ViewUserModal from '@/components/super-admin/ViewUserModal';
 import WaitlistView from '@/components/admin/WaitlistView';
 import TaxRulesManagement from '@/components/admin/TaxRulesManagement';
 import BlogManagementView from '@/components/admin/BlogManagementView';
+import EngagementSettingsView from '@/components/super-admin/EngagementSettingsView';
+import VendorSpecialistsView from '@/components/super-admin/VendorSpecialistsView';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -672,7 +674,7 @@ function AdminPageContent() {
   const paramOrderId = searchParams ? searchParams.get('orderId') : null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists'>('dashboard');
 
   const handleTabChange = (t: string) => {
     setActiveTab(t as any);
@@ -2026,6 +2028,10 @@ function AdminPageContent() {
           <DashboardView onNavigate={(tab: string) => handleTabChange(tab)} />
         ) : activeTab === 'notifications' ? (
           <NotificationsView />
+        ) : activeTab === 'engagement' ? (
+          <EngagementSettingsView />
+        ) : activeTab === 'specialists' ? (
+          <VendorSpecialistsView />
         ) : activeTab === 'waitlist' ? (
           <WaitlistView />
 
@@ -2152,23 +2158,25 @@ function AdminPageContent() {
               )}
             </header>
 
-            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition-all">
-              <Search size={18} className="text-gray-400" />
-              <input
-                type="text"
-                placeholder={
-                  activeTab === 'blog'
-                    ? 'Search blog articles by title, excerpt or author…'
-                    : `Search across ${activeTab}...`
-                }
-                className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setProductPage(1);
-                }}
-              />
-            </div>
+            {activeTab !== 'orders' && (
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition-all">
+                <Search size={18} className="text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={
+                    activeTab === 'blog'
+                      ? 'Search blog articles by title, excerpt or author…'
+                      : `Search across ${activeTab}...`
+                  }
+                  className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setProductPage(1);
+                  }}
+                />
+              </div>
+            )}
 
             {activeTab === 'products' && (
               <div className="flex flex-col sm:flex-row gap-4 mb-6">

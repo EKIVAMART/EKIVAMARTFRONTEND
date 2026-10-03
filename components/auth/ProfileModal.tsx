@@ -8,6 +8,7 @@ import {
   LogOut,
   CheckCircle2,
   AlertCircle,
+  MapPin,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { logout } from '../../lib/features/auth/authSlice';
@@ -16,6 +17,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ProfileTab } from './ProfileTab';
 import { SecurityTab } from './SecurityTab';
 import { SessionsTab } from './SessionsTab';
+import { AddressesTab } from './AddressesTab';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProfileModalProps {
@@ -23,7 +25,7 @@ interface ProfileModalProps {
   onClose: () => void;
 }
 
-type TabType = 'profile' | 'security' | 'sessions';
+type TabType = 'profile' | 'addresses' | 'security' | 'sessions';
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
@@ -52,13 +54,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       id: 'profile' as TabType,
       label: 'Profile',
       icon: User,
-      description: 'Personal information',
+      description: 'Personal info',
+    },
+    {
+      id: 'addresses' as TabType,
+      label: 'Addresses',
+      icon: MapPin,
+      description: 'Saved addresses',
     },
     {
       id: 'security' as TabType,
       label: 'Security',
       icon: Shield,
-      description: 'Password & authentication',
+      description: 'Password',
     },
     {
       id: 'sessions' as TabType,
@@ -121,7 +129,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 px-0.5">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2 px-0.5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -132,15 +140,15 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 onClick={() => setActiveTab(tab.id)}
                 whileHover={{ y: -2 }}
                 whileTap={{ y: 0 }}
-                className={`relative flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2.5 px-2 sm:px-3 md:px-4 py-3 sm:py-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 group ${
+                className={`relative flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 px-2 sm:px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-300 group ${
                   isActive
-                    ? 'bg-purple-50 text-purple-700 shadow-md'
+                    ? 'bg-purple-50 text-purple-700 shadow-sm'
                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
                 {/* Tab Icon */}
                 <Icon
-                  className={`w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 shrink-0 transition-colors ${
+                  className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 transition-colors ${
                     isActive
                       ? 'text-purple-600'
                       : 'text-gray-600 group-hover:text-purple-500'
@@ -149,11 +157,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                 {/* Tab Labels */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-center sm:text-left">
-                  <span className="text-xs sm:text-sm font-semibold">
+                  <span className="text-[11px] sm:text-xs font-semibold">
                     {tab.label}
-                  </span>
-                  <span className="hidden md:inline text-xs text-gray-500">
-                    {tab.description}
                   </span>
                 </div>
 
@@ -179,10 +184,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
-            className="bg-linear-to-br from-gray-50 via-white to-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 min-h-105 sm:min-h-120 md:min-h-130 border border-gray-100 shadow-sm"
+            className="bg-linear-to-br from-gray-50 via-white to-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 min-h-105 sm:min-h-120 border border-gray-100 shadow-sm"
           >
             <div className="space-y-4 sm:space-y-6">
               {activeTab === 'profile' && <ProfileTab onClose={onClose} />}
+              {activeTab === 'addresses' && <AddressesTab />}
               {activeTab === 'security' && <SecurityTab />}
               {activeTab === 'sessions' && <SessionsTab />}
             </div>

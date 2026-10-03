@@ -209,7 +209,7 @@ const Subnavbar = (): JSX.Element => {
   const [mainSearchQuery, setMainSearchQuery] = useState('');
   const handleSearch = (query: string) => {
     if (!query.trim()) return;
-    router.push(`/categories/shop?search=${encodeURIComponent(query.trim())}`);
+    router.push(`/categories/shop?q=${encodeURIComponent(query.trim())}`);
   };
 
   const [mounted, setMounted] = useState(false);

@@ -1995,12 +1995,12 @@ export default function VendorApplyPage() {
                         <input
                           type="email"
                           readOnly
-                          value={storeEmail}
+                          value={storeEmail || user?.email || ''}
                           className="w-full bg-slate-50 border-2 border-slate-200 text-slate-500 rounded-xl px-4 py-3 text-sm outline-none cursor-not-allowed font-medium"
                         />
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                        {/* <p className="text-[10px] text-slate-400 mt-1 font-medium">
                           Linked to your main authenticated Faflora account.
-                        </p>
+                        </p> */}
                       </div>
                     </div>
                   </div>
