@@ -1357,6 +1357,9 @@ export interface AdminVendorProfile {
   id: string;
   userId: string;
   ownerName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  status?: string | null;
   storeName: string;
   storeSlug: string;
   storeDescription: string | null;
