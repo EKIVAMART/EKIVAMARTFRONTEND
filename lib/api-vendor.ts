@@ -1356,6 +1356,7 @@ export const vendorApi = {
 export interface AdminVendorProfile {
   id: string;
   userId: string;
+  ownerName?: string | null;
   storeName: string;
   storeSlug: string;
   storeDescription: string | null;
