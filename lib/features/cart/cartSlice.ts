@@ -54,9 +54,12 @@ export const fetchCartCount = createAsyncThunk(
 
 export const fetchCartSummary = createAsyncThunk(
   'cart/fetchCartSummary',
-  async (params: { country?: string; state?: string } | undefined, { rejectWithValue }) => {
+  async (params: { country?: string; state?: string } | undefined, { getState, rejectWithValue }) => {
     try {
-      const res = await cartApi.getCartSummary(params);
+      const currentSummary = (getState() as any)?.cart?.summary;
+      const effectiveState = params?.state !== undefined ? params.state : (currentSummary?.deliveryState || undefined);
+      const effectiveCountry = params?.country !== undefined ? params.country : (currentSummary?.country || undefined);
+      const res = await cartApi.getCartSummary({ country: effectiveCountry, state: effectiveState });
       if (res?.success) {
         return res.data;
       }

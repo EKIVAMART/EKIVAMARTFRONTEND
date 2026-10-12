@@ -1,12 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import { setTokens, logout } from '@/lib/features/auth/authSlice';
 import { notificationApi } from '@/lib/api/notifications';
 import { useNotificationStream, ConnectionStatus } from '@/lib/hooks/useNotificationStream';
 import { playNotificationSound } from '@/lib/utils/audio';
+import { getNotificationRoute } from '@/lib/utils/notification-routes';
 import type { AppNotification, Pagination } from '@/types/notification';
 import axios from 'axios';
 
@@ -28,6 +30,7 @@ interface NotificationContextValue {
 const NotificationContext = createContext<NotificationContextValue | null>(null);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -36,6 +39,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const user = useAppSelector((state) => state.auth.user);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const refreshToken = useAppSelector((state) => state.auth.refreshToken);
 
@@ -129,13 +133,20 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         playNotificationSound();
       }
 
-      // Show real-time notification toast popover
+      // Show real-time notification toast popover with click-to-route
       toast.custom(
         (t) => (
           <div
+            onClick={() => {
+              toast.dismiss(t.id);
+              const route = getNotificationRoute(item.data, user?.role, item.type);
+              router.push(route);
+            }}
             className={`${
               t.visible ? 'animate-enter' : 'animate-leave'
-            } max-w-sm w-full bg-white shadow-2xl rounded-2xl border border-brand-100 p-4 flex items-start gap-3 pointer-events-auto transition-all`}
+            } max-w-sm w-full bg-white shadow-2xl rounded-2xl border border-brand-100 p-4 flex items-start gap-3 pointer-events-auto transition-all cursor-pointer hover:bg-brand-50/50 hover:shadow-brand-100`}
+            role="button"
+            tabIndex={0}
           >
             <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shrink-0">
               🔔
@@ -150,10 +161,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             </div>
           </div>
         ),
-        { duration: 4500, position: 'top-right' }
+        { duration: 5500, position: 'top-right' }
       );
     },
-    [soundEnabled]
+    [soundEnabled, user, router]
   );
 
   // SSE Stream Engine Hook

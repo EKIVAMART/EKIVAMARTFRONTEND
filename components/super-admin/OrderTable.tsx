@@ -231,10 +231,13 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
           order.address ||
           'N/A';
 
+        const orderNum = order.orderNumber || order.orderNo || (order.id && !order.id.startsWith('order-') ? order.id : '') || (order.orderId ? `#${String(order.orderId).slice(-8).toUpperCase()}` : '');
+        const orderIdVal = order.orderId || order.id || order._id || '';
+
         return {
-          id: String(order.orderNumber || order.id || order._id || ''),
-          orderNumber: String(order.orderNumber || order.id || order._id || ''),
-          orderId: String(order.id || order._id || ''),
+          id: String(orderNum || orderIdVal),
+          orderNumber: String(orderNum || orderIdVal),
+          orderId: String(orderIdVal),
           user: {
             name: customerName,
             avatar: order.customer?.avatar || order.customer?.profilePicture || order.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}`,
@@ -467,6 +470,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="bg-gray-50/50 border-b">
               <tr>
+                <th className="p-4 text-xs font-semibold text-gray-400 capitalize text-center w-12">#</th>
                 <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Order Number</th>
                 <th className="p-4 text-xs font-semibold text-gray-400 capitalize">User</th>
                 <th className="p-4 text-xs font-semibold text-gray-400 capitalize">Items</th>
@@ -480,8 +484,11 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
             </thead>
             <tbody>
               {paginatedData.length > 0 ? (
-                paginatedData.map(order => (
+                paginatedData.map((order, idx) => (
                   <tr key={order.id} className="border-b last:border-0 hover:bg-gray-50/50 transition">
+                    <td className="p-4 text-xs font-bold text-slate-400 text-center">
+                      {(currentPage - 1) * itemsPerPage + idx + 1}
+                    </td>
                     <td className="p-4 font-bold text-slate-700 text-sm">{order.id}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -538,7 +545,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="p-12 text-center text-gray-500 font-medium">
+                  <td colSpan={10} className="p-12 text-center text-gray-500 font-medium">
                     No orders match your filter criteria.
                   </td>
                 </tr>
@@ -610,7 +617,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
         {totalPages > 1 && (
           <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
             <span className="text-sm text-gray-500 font-medium hidden sm:block">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries (Page {currentPage} of {totalPages})
             </span>
             <div className="flex items-center gap-1 mx-auto sm:mx-0">
               <button
@@ -621,19 +628,53 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                 <ChevronLeft size={18} />
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                    currentPage === page
-                      ? 'bg-purple-100 text-[#9d4ae3] font-bold'
-                      : 'hover:bg-gray-50 text-gray-500'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {(() => {
+                const pages: (number | string)[] = [];
+                if (totalPages <= 7) {
+                  for (let i = 1; i <= totalPages; i++) pages.push(i);
+                } else {
+                  if (currentPage <= 4) {
+                    for (let i = 1; i <= 5; i++) pages.push(i);
+                    pages.push('...');
+                    pages.push(totalPages);
+                  } else if (currentPage >= totalPages - 3) {
+                    pages.push(1);
+                    pages.push('...');
+                    for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+                  } else {
+                    pages.push(1);
+                    pages.push('...');
+                    pages.push(currentPage - 1);
+                    pages.push(currentPage);
+                    pages.push(currentPage + 1);
+                    pages.push('...');
+                    pages.push(totalPages);
+                  }
+                }
+
+                return pages.map((page, idx) => {
+                  if (typeof page === 'string') {
+                    return (
+                      <span key={`el-${idx}`} className="w-8 h-8 flex items-center justify-center text-gray-400 font-bold select-none text-sm">
+                        …
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
+                        currentPage === page
+                          ? 'bg-[#9d4ae3] text-white font-bold shadow-xs'
+                          : 'hover:bg-gray-50 text-gray-500'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                });
+              })()}
 
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}

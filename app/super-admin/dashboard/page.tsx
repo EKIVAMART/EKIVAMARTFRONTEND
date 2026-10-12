@@ -31,6 +31,7 @@ import TaxRulesManagement from '@/components/admin/TaxRulesManagement';
 import BlogManagementView from '@/components/admin/BlogManagementView';
 import EngagementSettingsView from '@/components/super-admin/EngagementSettingsView';
 import VendorSpecialistsView from '@/components/super-admin/VendorSpecialistsView';
+import DeliveryRoutesManagement from '@/components/super-admin/DeliveryRoutesManagement';
 import { Plus, Search, Menu } from 'lucide-react';
 import {
   ApiError,
@@ -674,7 +675,10 @@ function AdminPageContent() {
   const paramOrderId = searchParams ? searchParams.get('orderId') : null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists' | 'deliveryRoutes'>('dashboard');
+
+  // Delivery routes hero search (shared with DeliveryRoutesManagement)
+  const [deliveryRoutesSearch, setDeliveryRoutesSearch] = useState('');
 
   const handleTabChange = (t: string) => {
     setActiveTab(t as any);
@@ -2024,6 +2028,68 @@ function AdminPageContent() {
           </div>
         </div>
 
+        {/* ── Delivery Routes Hero Search Bar ── */}
+        {activeTab === 'deliveryRoutes' && (
+          <div className="w-full mb-8">
+            <div
+              className="relative w-full rounded-2xl overflow-hidden shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, #6d28d9 0%, #9d4ae3 50%, #a855f7 100%)',
+              }}
+            >
+              {/* Decorative blobs */}
+              <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="relative z-10 px-6 py-5">
+                <p className="text-white/70 text-xs font-bold uppercase tracking-[0.15em] mb-1">
+                  Delivery Routes &amp; Fee Management
+                </p>
+                <h2 className="text-white text-xl font-black mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h8zm0 0l1.5-4.5A2 2 0 0116.4 10H19a2 2 0 012 2v1a1 1 0 01-1 1h-1" />
+                  </svg>
+                  Search Delivery Routes
+                </h2>
+
+                <div className="flex items-center bg-white/15 backdrop-blur-sm border border-white/25 rounded-xl px-4 py-3 gap-3 focus-within:bg-white/20 focus-within:border-white/50 transition-all shadow-inner">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <circle cx="11" cy="11" r="8" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
+                  </svg>
+                  <input
+                    type="text"
+                    id="delivery-routes-hero-search"
+                    placeholder="Search by origin state, destination state, or fee amount…"
+                    value={deliveryRoutesSearch}
+                    onChange={(e) => setDeliveryRoutesSearch(e.target.value)}
+                    className="flex-1 bg-transparent text-white placeholder-white/50 font-semibold text-sm outline-none"
+                  />
+                  {deliveryRoutesSearch && (
+                    <button
+                      onClick={() => setDeliveryRoutesSearch('')}
+                      className="text-white/60 hover:text-white transition p-0.5 rounded-full"
+                      aria-label="Clear search"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {deliveryRoutesSearch && (
+                  <p className="text-white/60 text-[11px] font-medium mt-2 ml-1">
+                    Showing results for &ldquo;<span className="text-white font-bold">{deliveryRoutesSearch}</span>&rdquo;
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'dashboard' ? (
           <DashboardView onNavigate={(tab: string) => handleTabChange(tab)} />
         ) : activeTab === 'notifications' ? (
@@ -2135,30 +2201,32 @@ function AdminPageContent() {
           </>
         ) : (
           <>
-            <header className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
-                <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
-              </div>
-              {activeTab === 'products' && (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <button
-                    onClick={() => setIsCategoriesModalOpen(true)}
-                    className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
-                  >
-                    All Categories
-                  </button>
-                  <button
-                    onClick={() => openModal()}
-                    className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
-                  >
-                    <Plus size={18} /> Add Product
-                  </button>
+            {activeTab !== 'deliveryRoutes' && (
+              <header className="flex justify-between items-center mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
+                  <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
                 </div>
-              )}
-            </header>
+                {activeTab === 'products' && (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button
+                      onClick={() => setIsCategoriesModalOpen(true)}
+                      className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      All Categories
+                    </button>
+                    <button
+                      onClick={() => openModal()}
+                      className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+                    >
+                      <Plus size={18} /> Add Product
+                    </button>
+                  </div>
+                )}
+              </header>
+            )}
 
-            {activeTab !== 'orders' && (
+            {activeTab !== 'orders' && activeTab !== 'deliveryRoutes' && (
               <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
@@ -2276,6 +2344,9 @@ function AdminPageContent() {
             )}
             {activeTab === 'taxes' && (
               <TaxRulesManagement />
+            )}
+            {activeTab === 'deliveryRoutes' && (
+              <DeliveryRoutesManagement externalSearchQuery={deliveryRoutesSearch} />
             )}
             {activeTab === 'blog' && (
               <BlogManagementView globalSearchQuery={searchQuery} />

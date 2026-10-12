@@ -1304,6 +1304,32 @@ export interface CartCountResponse {
   totalCount: number;
 }
 
+export interface ExpectedDelivery {
+  processingStartDate: string; // "2026-10-05" YYYY-MM-DD, day processing starts
+  expectedDeliveryDate: string; // "2026-10-12" YYYY-MM-DD, latest delivery day
+  maxWorkingDays: number; // 2 (local) or 5 (inter-state)
+  isInterState: boolean; // true if any item ships from another state
+  expectedDeliveryLabel: string; // "Mon, 12 Oct 2026" ready to display
+}
+
+export interface DeliveryOriginCharge {
+  state: string;
+  quantity: number;
+  routeFee: number;
+  quantityCharge: number;
+  fee: number;
+}
+
+export interface DeliveryBreakdown {
+  customerState: string;
+  originStates: string[];
+  baseLastMileFee: number;
+  primaryOrigin: DeliveryOriginCharge | null;
+  secondaryOrigins: DeliveryOriginCharge[];
+  localQuantity: number;
+  totalDeliveryFee: number;
+}
+
 export interface CartSummaryResponse {
   subtotal: number;
   shipping: number;
@@ -1315,6 +1341,65 @@ export interface CartSummaryResponse {
   total: number;
   currency: string;
   formattedRate?: string;
+  deliveryFee?: number;
+  deliveryFeeCalculated?: boolean;
+  deliveryState?: string;
+  deliveryError?: string;
+  deliveryBreakdown?: DeliveryBreakdown;
+  expectedDelivery?: ExpectedDelivery;
+}
+
+export type CartSummary = CartSummaryResponse;
+
+export interface OrderQuote {
+  currency: string;
+  subtotal: number;
+  shippingCost: number;
+  deliveryFee: number;
+  deliveryState: string;
+  deliveryBreakdown: DeliveryBreakdown;
+  taxRate: number;
+  taxAmount: number;
+  commissionAmount: number;
+  discountAmount: number;
+  total: number;
+  items: {
+    productId: string;
+    productName: string;
+    productImage?: string;
+    unitPrice: number;
+    quantity: number;
+    subtotal: number;
+    commissionAmount: number;
+  }[];
+  expectedDelivery?: ExpectedDelivery;
+}
+
+export interface DeliveryRoute {
+  id: string;
+  originState: string;
+  destinationState: string;
+  isInternal: boolean;
+  fee: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AvailableState {
+  state: string;
+  internalFee: number | null;
+}
+
+export interface CreateRouteDto {
+  originState: string;
+  destinationState: string;
+  fee: number;
+}
+
+export interface PatchRouteDto {
+  fee?: number;
+  isActive?: boolean;
 }
 
 export interface CartValidationResponse {
@@ -2172,6 +2257,85 @@ export const ordersApi = {
       handleApiError(error);
     }
   },
+
+  async verifyPayment(id: string) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(`/orders/${id}/payment/verify`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+};
+
+export const deliveryRoutesApi = {
+  async getAvailableStates(): Promise<ApiResponse<AvailableState[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<AvailableState[]>>(
+        '/delivery-routes/available',
+        { skipAuth: true } as any
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getRoutes(params?: {
+    originState?: string;
+    destinationState?: string;
+    activeOnly?: boolean;
+  }): Promise<ApiResponse<DeliveryRoute[]>> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.originState) queryParams.set('originState', params.originState);
+      if (params?.destinationState) queryParams.set('destinationState', params.destinationState);
+      if (params?.activeOnly !== undefined) queryParams.set('activeOnly', String(params.activeOnly));
+      const qs = queryParams.toString();
+      const response = await axiosInstance.get<ApiResponse<DeliveryRoute[]>>(
+        `/delivery-routes${qs ? `?${qs}` : ''}`
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async getRouteById(id: string): Promise<ApiResponse<DeliveryRoute>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<DeliveryRoute>>(`/delivery-routes/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async createRoute(dto: CreateRouteDto): Promise<ApiResponse<DeliveryRoute>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<DeliveryRoute>>('/delivery-routes', dto);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async updateRoute(id: string, dto: PatchRouteDto): Promise<ApiResponse<DeliveryRoute>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<DeliveryRoute>>(`/delivery-routes/${id}`, dto);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  async deleteRoute(id: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/delivery-routes/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 export const taxRulesApi = {
@@ -2422,6 +2586,9 @@ export interface OrderData {
   paymentMethod?: string;
   paymentStatus: string;
   notes?: string;
+  expectedDelivery?: ExpectedDelivery;
+  deliveredAt?: string;
+  deliveryBreakdown?: DeliveryBreakdown;
   createdAt: string;
   updatedAt: string;
 }
@@ -2465,6 +2632,8 @@ export const orderApi = {
   getOrderStatistics: () => ordersApi.getStatistics(),
   updateOrderStatus: (id: string, status: string, reason?: string) => ordersApi.updateStatus(id, status),
   cancelOrder: (id: string, reason: string) => ordersApi.cancel(id, reason),
+  getQuote: (body: any) => ordersApi.getQuote(body),
+  verifyPayment: (id: string) => ordersApi.verifyPayment(id),
 };
 
 /** Backward-compat alias — TaxRulesView.tsx uses taxRuleApi */

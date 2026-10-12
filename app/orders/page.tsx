@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   ShoppingBag, Calendar, ArrowRight, Star, MessageSquare, Edit3, 
-  Trash2, RefreshCw, AlertCircle, CheckCircle2, Truck, Check, HelpCircle
+  Trash2, RefreshCw, AlertCircle, CheckCircle2, Truck, Check, HelpCircle,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { ordersApi, reviewsApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
@@ -90,6 +91,9 @@ export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'history' | 'eligible'>('history');
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalOrders, setTotalOrders] = useState<number>(0);
 
   // Eligible products
   const [eligibleProducts, setEligibleProducts] = useState<any[]>([]);
@@ -110,17 +114,17 @@ export default function CustomerOrdersPage() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    if (authResolved && isAuthenticated) {
-      void fetchOrders();
-    }
-  }, [authResolved, isAuthenticated]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = async (targetPage = page) => {
     setOrdersLoading(true);
     try {
-      const res = await ordersApi.getMyOrders({ limit: 100 });
-      setOrders(normalizeOrdersPayload(res));
+      const res = await ordersApi.getMyOrders({ page: targetPage, limit: 10 });
+      const list = normalizeOrdersPayload(res);
+      setOrders(list);
+      const resData = (res as any)?.data ?? res;
+      const total = resData?.total ?? (res as any)?.total ?? list.length;
+      const pages = resData?.totalPages ?? (res as any)?.totalPages ?? Math.ceil(total / 10) ?? 1;
+      setTotalOrders(total);
+      setTotalPages(pages);
     } catch {
       setOrders([]);
       toast.error('Could not retrieve orders');
@@ -128,6 +132,12 @@ export default function CustomerOrdersPage() {
       setOrdersLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (authResolved && isAuthenticated) {
+      void fetchOrders(page);
+    }
+  }, [authResolved, isAuthenticated, page]);
 
   const fetchEligibleProducts = async () => {
     setEligibleLoading(true);
@@ -298,22 +308,24 @@ export default function CustomerOrdersPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {orders.map(order => {
+                {orders.map((order, i) => {
+                  const orderId = order.orderId || order.id || order._id;
+                  const orderNumber = order.orderNumber || order.orderNo || (orderId ? `#${String(orderId).slice(-8).toUpperCase()}` : `ORD-${i + 1}`);
                   const status = orderStatusStyles[order.status] || { label: order.status, bg: 'bg-gray-100', text: 'text-gray-600' };
-                  const dateStr = new Date(order.createdAt).toLocaleDateString('en-NG', {
+                  const dateStr = new Date(order.createdAt || order.orderDate || order.date).toLocaleDateString('en-NG', {
                     year: 'numeric', month: 'short', day: 'numeric'
                   });
 
                   return (
                     <div 
-                      key={order.id} 
+                      key={orderId || i} 
                       className="bg-white border hover:border-purple-200 hover:shadow-md transition rounded-2xl overflow-hidden shadow-sm flex flex-col"
                     >
                       {/* Order Summary Header */}
                       <div className="bg-gray-50/50 p-5 border-b flex flex-wrap justify-between items-center gap-4">
                         <div className="space-y-1">
                           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Order Reference</p>
-                          <p className="font-bold text-slate-800 text-sm">{order.orderNumber || order.id}</p>
+                          <p className="font-bold text-slate-800 text-sm">{orderNumber}</p>
                         </div>
                         <div className="flex gap-4">
                           <div className="space-y-1">
@@ -367,11 +379,36 @@ export default function CustomerOrdersPage() {
                         ))}
                       </div>
 
-                      {/* Actions Footer */}
-                      <div className="bg-gray-50/20 px-5 py-4 border-t flex justify-end items-center gap-2">
+                      {/* Actions Footer with Delivery Status */}
+                      <div className="bg-gray-50/40 px-5 py-3.5 border-t flex flex-wrap justify-between items-center gap-3">
+                        <div>
+                          {['confirmed', 'processing', 'shipped'].includes(order.status) && order.expectedDelivery ? (
+                            <div className="flex items-center gap-2 text-xs font-semibold text-purple-900">
+                              <div className="w-6 h-6 rounded-lg bg-purple-100 text-[#9d4ae3] flex items-center justify-center shrink-0">
+                                <Truck size={13} />
+                              </div>
+                              <span>
+                                Expected by <strong className="text-purple-950 font-bold">{order.expectedDelivery.expectedDeliveryLabel}</strong>
+                              </span>
+                              {order.expectedDelivery.isInterState && (
+                                <span className="text-[10px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-bold">
+                                  Inter-state
+                                </span>
+                              )}
+                            </div>
+                          ) : order.status === 'delivered' && order.deliveredAt ? (
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800">
+                              <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                              <span>
+                                Delivered on {new Date(order.deliveredAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+
                         <Link 
-                          href={`/orders/${order.id}`}
-                          className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-90 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition"
+                          href={`/orders/${order.orderId || order.id || order.orderNumber}`}
+                          className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-90 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition ml-auto"
                         >
                           Manage Order <ArrowRight size={13} />
                         </Link>
@@ -379,6 +416,90 @@ export default function CustomerOrdersPage() {
                     </div>
                   );
                 })}
+
+                {/* Customer Orders Pagination */}
+                {(totalPages > 1 || page > 1) && (
+                  <div className="p-4 border border-gray-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-white shadow-sm mt-4">
+                    <span className="font-semibold text-slate-500">
+                      Showing {totalOrders === 0 ? 0 : (page - 1) * 10 + 1} to {Math.min(page * 10, totalOrders)} of {totalOrders} orders (Page {page} of {totalPages})
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        disabled={page <= 1 || ordersLoading}
+                        onClick={() => {
+                          setPage(p => Math.max(1, p - 1));
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1 hover:bg-slate-50 transition"
+                      >
+                        <ChevronLeft size={14} /> Previous
+                      </button>
+
+                      {(() => {
+                        const pages: (number | string)[] = [];
+                        if (totalPages <= 7) {
+                          for (let i = 1; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          if (page <= 4) {
+                            for (let i = 1; i <= 5; i++) pages.push(i);
+                            pages.push('...');
+                            pages.push(totalPages);
+                          } else if (page >= totalPages - 3) {
+                            pages.push(1);
+                            pages.push('...');
+                            for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+                          } else {
+                            pages.push(1);
+                            pages.push('...');
+                            pages.push(page - 1);
+                            pages.push(page);
+                            pages.push(page + 1);
+                            pages.push('...');
+                            pages.push(totalPages);
+                          }
+                        }
+
+                        return pages.map((p, idx) => {
+                          if (typeof p === 'string') {
+                            return (
+                              <span key={`el-${idx}`} className="w-8 h-8 flex items-center justify-center text-slate-400 font-bold select-none text-xs">
+                                …
+                              </span>
+                            );
+                          }
+                          return (
+                            <button
+                              key={p}
+                              onClick={() => {
+                                setPage(p);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              disabled={ordersLoading}
+                              className={`w-8 h-8 rounded-lg font-bold text-xs transition ${
+                                page === p
+                                  ? 'bg-[#9d4ae3] text-white shadow-xs'
+                                  : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          );
+                        });
+                      })()}
+
+                      <button
+                        disabled={page >= totalPages || ordersLoading}
+                        onClick={() => {
+                          setPage(p => Math.min(totalPages, p + 1));
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1 hover:bg-slate-50 transition"
+                      >
+                        Next <ChevronRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

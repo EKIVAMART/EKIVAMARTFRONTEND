@@ -9,7 +9,7 @@ import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists';
+export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists' | 'deliveryRoutes';
 
 interface SidebarProps {
   activeTab: SuperAdminTab | string;
@@ -141,6 +141,12 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             label="Vendor Specialists"
             active={activeTab === 'specialists'}
             onClick={() => { setActiveTab('specialists'); onClose?.(); }}
+          />
+          <SidebarLink
+            icon={<Truck size={20} />}
+            label="Delivery Routes"
+            active={activeTab === 'deliveryRoutes'}
+            onClick={() => { setActiveTab('deliveryRoutes'); onClose?.(); }}
           />
           <SidebarLink
             icon={<Percent size={20} />}

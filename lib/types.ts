@@ -80,18 +80,7 @@ export interface CartState {
   activeCount: number
   savedCount: number
   total: number // totalCount
-  summary: {
-    subtotal: number;
-    shipping: number;
-    tax: number;
-    taxRate?: number;
-    taxPercentage?: number;
-    region?: string | null;
-    country?: string;
-    total: number;
-    currency: string;
-    formattedRate?: string;
-  } | null
+  summary: import('./api').CartSummaryResponse | null
   loading: boolean
   noteModal: {
     isOpen: boolean

@@ -8,7 +8,8 @@ import {
   XCircle, RotateCcw, AlertTriangle, Truck, DollarSign, Clock, HelpCircle,
   AlertCircle, ShieldCheck, FileText, ChevronDown, CheckCircle2, MessageCircle
 } from 'lucide-react';
-import { ordersApi } from '@/lib/api';
+import { ordersApi, ExpectedDelivery } from '@/lib/api';
+import { deliveryCopy, daysUntil } from '@/lib/utils/delivery';
 import toast from 'react-hot-toast';
 
 interface OrderDetailsPageProps {
@@ -275,31 +276,135 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           </div>
         </div>
 
-        {/* Progress Tracker */}
+        {/* Delivery Lifecycle & Progress Tracker */}
         {!isCancelled && !isFailed && (
-          <div className="bg-white rounded-3xl border p-6 sm:p-8 shadow-sm mb-8">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Delivery Progress</h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-4 relative">
-              {statusSteps.map((step, idx) => {
-                const Icon = step.icon;
-                const done = idx <= activeStatusIndex;
-                const active = idx === activeStatusIndex;
-                
-                return (
-                  <div key={idx} className="flex flex-col items-center text-center relative z-10">
-                    <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
-                      active ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100' :
-                      done ? 'bg-emerald-500 border-emerald-500 text-white' :
-                      'bg-gray-50 border-gray-200 text-gray-400'
-                    }`}>
-                      <Icon size={18} />
-                    </div>
-                    <p className={`text-xs font-bold mt-2.5 ${active ? 'text-purple-700 font-extrabold' : done ? 'text-gray-700' : 'text-gray-400'}`}>
-                      {step.label}
+          <div className="bg-white rounded-3xl border border-gray-150 p-6 sm:p-8 shadow-sm mb-8 space-y-6">
+            {/* Delivery Date / Status Callout */}
+            {order.status === 'delivered' ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-100">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
+                      Delivered
+                    </span>
+                    <h3 className="text-lg font-black text-slate-800">
+                      {order.deliveredAt
+                        ? `Delivered on ${new Date(order.deliveredAt).toLocaleDateString('en-NG', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}`
+                        : 'Package successfully delivered'}
+                    </h3>
+                    <p className="text-xs text-emerald-800 font-semibold mt-0.5">
+                      Your items have arrived safely. Thank you for shopping with Faflories!
                     </p>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+            ) : order.expectedDelivery ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-50 via-purple-50/70 to-indigo-50 border border-purple-200 shadow-xs">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-200 animate-pulse">
+                    <Truck size={24} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                        {order.paymentStatus === 'completed' ? 'Delivery Promised' : 'Estimated Delivery'}
+                      </span>
+                      {order.expectedDelivery.isInterState && (
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900 bg-purple-200 px-2 py-0.5 rounded-full">
+                          Inter-State
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-black text-purple-950 mt-0.5">
+                      {deliveryCopy(
+                        order.expectedDelivery,
+                        order.paymentStatus === 'completed' ? 'paid' : 'unpaid'
+                      )}
+                    </h3>
+                    <p className="text-xs text-purple-800 font-semibold mt-0.5">
+                      Within {order.expectedDelivery.maxWorkingDays} working days of processing.
+                      {order.paymentStatus !== 'completed' && (
+                        <span className="ml-1 text-gray-500 font-medium">
+                          (Calculated as if paid today. Pay before 3:00 PM on a working day for earliest dispatch)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {order.expectedDelivery.expectedDeliveryDate && (
+                  <div className="sm:text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-purple-200/60">
+                    <span className="text-[11px] font-bold text-purple-700 block">
+                      Target Window
+                    </span>
+                    <span className="text-sm font-extrabold text-slate-800">
+                      {order.expectedDelivery.expectedDeliveryLabel}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {/* Timeline Header */}
+            <div className="pt-2">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Truck size={14} className="text-[#9d4ae3]" />
+                  Delivery Lifecycle Tracker
+                </h3>
+                <span className="text-xs font-bold text-purple-700 capitalize">
+                  Current Status: {order.status?.replace('_', ' ')}
+                </span>
+              </div>
+
+              {/* Steps Timeline with rich icons */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-4 relative">
+                {statusSteps.map((step, idx) => {
+                  const Icon = step.icon;
+                  const done = idx <= activeStatusIndex;
+                  const active = idx === activeStatusIndex;
+
+                  return (
+                    <div key={idx} className="flex flex-col items-center text-center relative z-10">
+                      <div
+                        className={`w-12 h-12 rounded-2xl border-2 flex items-center justify-center transition-all ${
+                          active
+                            ? 'bg-gradient-to-br from-[#9d4ae3] to-[#8236be] border-[#9d4ae3] text-white shadow-lg shadow-purple-200 scale-105'
+                            : done
+                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                            : 'bg-gray-50 border-gray-200 text-gray-400'
+                        }`}
+                      >
+                        <Icon size={20} className={active ? 'animate-bounce' : ''} />
+                      </div>
+                      <p
+                        className={`text-xs font-bold mt-2.5 ${
+                          active
+                            ? 'text-[#9d4ae3] font-black'
+                            : done
+                            ? 'text-slate-800'
+                            : 'text-gray-400'
+                        }`}
+                      >
+                        {step.label}
+                      </p>
+                      {active && (
+                        <span className="text-[10px] text-purple-600 font-extrabold uppercase mt-0.5 tracking-wider">
+                          In Progress
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

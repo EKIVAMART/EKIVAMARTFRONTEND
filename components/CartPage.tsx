@@ -21,6 +21,10 @@ import {
   ShieldCheck,
   Loader2,
   Check,
+  Truck,
+  Info,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -37,7 +41,19 @@ import {
   moveSavedCartItemToCartApi,
   clearCartApi,
 } from '@/lib/features/cart/cartSlice';
-import { cartApi, orderApi, userAddressApi, taxRulesApi, SavedAddressItem } from '@/lib/api';
+import {
+  cartApi,
+  orderApi,
+  ordersApi,
+  userAddressApi,
+  taxRulesApi,
+  deliveryRoutesApi,
+  SavedAddressItem,
+  AvailableState,
+  OrderQuote,
+  ExpectedDelivery,
+} from '@/lib/api';
+import { deliveryCopy, daysUntil, formatNaira } from '@/lib/utils/delivery';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
@@ -58,10 +74,19 @@ export default function CartPage() {
   const [showClearAllModal, setShowClearAllModal] = useState(false);
   const [showClearSelectedModal, setShowClearSelectedModal] = useState(false);
 
-  // Checkout flow state
+  // Deliverable states from GET /api/v1/delivery-routes/available
+  const [availableStates, setAvailableStates] = useState<AvailableState[]>([]);
+  const [loadingStates, setLoadingStates] = useState<boolean>(false);
+  const [cartSelectedState, setCartSelectedState] = useState<string>('');
+  const [isBreakdownExpanded, setIsBreakdownExpanded] = useState<boolean>(false);
+
+  // Checkout flow state & Live Quote
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'kora_pay' | 'mock'>('paystack');
+  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'kora_pay' | 'mock'>('kora_pay');
+  const [quoteData, setQuoteData] = useState<OrderQuote | null>(null);
+  const [loadingQuote, setLoadingQuote] = useState<boolean>(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
 
   // Saved Addresses & Regional Tax state
   const [savedAddresses, setSavedAddresses] = useState<SavedAddressItem[]>([]);
@@ -84,9 +109,10 @@ export default function CartPage() {
   });
   const [checkoutNotes, setCheckoutNotes] = useState('');
 
-  // Order success modal state
+  // Order success modal state with recalculated delivery date
   const [showOrderSuccessModal, setShowOrderSuccessModal] = useState(false);
   const [placedOrderNumber, setPlacedOrderNumber] = useState<string | null>(null);
+  const [placedOrderExpectedDelivery, setPlacedOrderExpectedDelivery] = useState<ExpectedDelivery | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -130,6 +156,29 @@ export default function CartPage() {
     }
   };
 
+  // Fetch deliverable states and cart details on mount / auth state change
+  useEffect(() => {
+    let isSubscribed = true;
+    const loadAvailableStates = async () => {
+      setLoadingStates(true);
+      try {
+        const res = await deliveryRoutesApi.getAvailableStates();
+        if (isSubscribed && res?.success && Array.isArray(res.data)) {
+          setAvailableStates(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load deliverable states', err);
+      } finally {
+        if (isSubscribed) setLoadingStates(false);
+      }
+    };
+
+    loadAvailableStates();
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
+
   // Fetch cart details on mount / auth state change
   useEffect(() => {
     if (mounted && isAuthenticated) {
@@ -139,6 +188,86 @@ export default function CartPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isAuthenticated, dispatch]);
+
+  // Live order quote fetcher
+  const fetchOrderQuote = async () => {
+    const selected = activeItems.filter((item) => item.isSelected);
+    if (selected.length === 0) {
+      setQuoteData(null);
+      return;
+    }
+
+    let destState = '';
+    let savedAddrId: string | undefined;
+    let customAddr: any;
+
+    if (useSavedAddress && selectedSavedAddressId) {
+      const addr = savedAddresses.find((a) => a.id === selectedSavedAddressId);
+      if (addr) {
+        destState = addr.state || '';
+        savedAddrId = addr.id;
+      }
+    } else if (shippingAddress.state) {
+      destState = shippingAddress.state;
+      customAddr = {
+        fullName: shippingAddress.fullName,
+        addressLine1: shippingAddress.addressLine1,
+        addressLine2: shippingAddress.addressLine2,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country || 'Nigeria',
+        phoneNumber: shippingAddress.phoneNumber,
+      };
+    }
+
+    if (!destState) {
+      setQuoteData(null);
+      return;
+    }
+
+    setLoadingQuote(true);
+    setQuoteError(null);
+
+    try {
+      const res = await ordersApi.getQuote({
+        items: selected.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        shippingAddress: savedAddrId ? undefined : customAddr,
+        savedAddressId: savedAddrId,
+      });
+
+      if (res?.success && res.data) {
+        setQuoteData(res.data);
+        setQuoteError(null);
+      } else {
+        const errorMsg = res?.message || 'Failed to calculate quote for selected delivery state';
+        setQuoteError(errorMsg);
+      }
+    } catch (err: any) {
+      const backendMsg =
+        err?.response?.data?.message || err?.message || 'Delivery route is not configured for this state';
+      setQuoteError(backendMsg);
+    } finally {
+      setLoadingQuote(false);
+    }
+  };
+
+  // Re-quote whenever checkout is active and address or items change
+  useEffect(() => {
+    if (isCheckingOut) {
+      const timer = setTimeout(() => {
+        void fetchOrderQuote();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isCheckingOut,
+    useSavedAddress,
+    selectedSavedAddressId,
+    shippingAddress.state,
+    activeItems,
+  ]);
 
   if (!mounted) {
     return (
@@ -417,6 +546,15 @@ export default function CartPage() {
       const createdOrder = res.data;
       const orderId = createdOrder.id || createdOrder.orderId || createdOrder.order?.id;
       const orderNo = createdOrder.orderNumber || createdOrder.orderId || 'N/A';
+      const orderExpDelivery =
+        createdOrder.expectedDelivery ||
+        createdOrder.order?.expectedDelivery ||
+        quoteData?.expectedDelivery ||
+        null;
+
+      if (orderExpDelivery) {
+        setPlacedOrderExpectedDelivery(orderExpDelivery);
+      }
 
       if (!orderId) {
         setIsProcessing(false);
@@ -738,22 +876,143 @@ export default function CartPage() {
               {!isCheckingOut ? (
                 // 1. ORDER SUMMARY CARD
                 <div className="bg-white rounded-3xl p-6 shadow-xs border border-gray-100">
-                  <h3 className="text-xl font-bold text-slate-800 border-b pb-4 mb-6">Order Summary</h3>
+                  <h3 className="text-xl font-bold text-slate-800 border-b pb-4 mb-5">Order Summary</h3>
+
+                  {/* Destination State Picker */}
+                  <div className="mb-5 bg-purple-50/50 p-3.5 rounded-2xl border border-purple-100">
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <MapPin size={14} className="text-[#9d4ae3]" />
+                        Delivery State *
+                      </span>
+                      {loadingStates && <Loader2 size={12} className="animate-spin text-purple-600" />}
+                    </label>
+                    <select
+                      value={cartSelectedState || summary?.deliveryState || ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCartSelectedState(val);
+                        if (val) {
+                          dispatch(fetchCartSummary({ state: val }));
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 text-xs font-semibold border border-purple-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 bg-white text-slate-800 transition shadow-xs"
+                    >
+                      <option value="">Select your delivery state</option>
+                      {availableStates.map((s) => (
+                        <option key={s.state} value={s.state}>
+                          {s.state}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Delivery Route Error Banner */}
+                    {summary?.deliveryError && (
+                      <div className="mt-2.5 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+                        <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold">{summary.deliveryError}</p>
+                          <p className="text-[11px] text-amber-700 mt-0.5">
+                            Some items in your cart cannot be delivered to this state. Please select a different state or adjust items.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {summary ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3.5">
                       <div className="flex justify-between text-gray-600 text-sm font-medium">
                         <span>Subtotal</span>
                         <span className="font-bold text-slate-800">
                           ₦{summary.subtotal.toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex justify-between text-gray-600 text-sm font-medium">
-                        <span>Shipping</span>
+
+                      {/* Dynamic Delivery Row */}
+                      <div className="flex justify-between text-gray-600 text-sm font-medium items-center">
+                        <span className="flex items-center gap-1.5">
+                          <Truck size={15} className="text-[#9d4ae3]" />
+                          Delivery
+                        </span>
                         <span className="font-bold text-slate-800">
-                          {summary.shipping === 0 ? 'Free' : `₦${summary.shipping}`}
+                          {summary.deliveryFeeCalculated ? (
+                            `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
+                          ) : (
+                            <span className="text-purple-600 text-xs font-semibold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+                              Select your state
+                            </span>
+                          )}
                         </span>
                       </div>
+
+                      {/* Expandable Breakdown Accordion */}
+                      {summary.deliveryFeeCalculated && summary.deliveryBreakdown && (
+                        <div className="border border-purple-100 bg-purple-50/40 rounded-xl overflow-hidden text-xs transition">
+                          <button
+                            type="button"
+                            onClick={() => setIsBreakdownExpanded(!isBreakdownExpanded)}
+                            className="w-full px-3 py-2 flex items-center justify-between text-purple-800 font-bold hover:bg-purple-100/60 transition text-left"
+                          >
+                            <span className="flex items-center gap-1.5 text-[11px]">
+                              <Info size={13} className="text-purple-600" />
+                              How is this calculated?
+                            </span>
+                            {isBreakdownExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </button>
+                          {isBreakdownExpanded && (
+                            <div className="px-3 pb-3 pt-1 space-y-1.5 text-slate-600 border-t border-purple-100 text-[11px]">
+                              <div className="flex justify-between">
+                                <span className="text-gray-500">Destination:</span>
+                                <span className="font-bold text-slate-800">{summary.deliveryBreakdown.customerState}</span>
+                              </div>
+                              {summary.deliveryBreakdown.originStates?.length > 0 && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Ships from:</span>
+                                  <span className="font-semibold text-slate-700">
+                                    {summary.deliveryBreakdown.originStates.join(', ')}
+                                  </span>
+                                </div>
+                              )}
+                              {summary.deliveryBreakdown.primaryOrigin && (
+                                <div className="bg-white/80 p-2 rounded-lg border border-purple-100/70 space-y-0.5">
+                                  <div className="font-bold text-purple-900 flex justify-between">
+                                    <span>Primary leg: {summary.deliveryBreakdown.primaryOrigin.state}</span>
+                                    <span>₦{summary.deliveryBreakdown.primaryOrigin.fee.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex justify-between text-[10px] text-gray-500">
+                                    <span>Route fee: ₦{summary.deliveryBreakdown.primaryOrigin.routeFee.toLocaleString()}</span>
+                                    <span>Qty charge: ₦{summary.deliveryBreakdown.primaryOrigin.quantityCharge.toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              )}
+                              {summary.deliveryBreakdown.secondaryOrigins?.map((sec, idx) => (
+                                <div key={idx} className="bg-white/80 p-2 rounded-lg border border-purple-100/70 flex justify-between text-[10px]">
+                                  <span className="font-medium text-slate-700">
+                                    Additional pickup: {sec.state} ({sec.quantity} items)
+                                  </span>
+                                  <span className="font-bold text-slate-800">₦{sec.fee.toLocaleString()}</span>
+                                </div>
+                              ))}
+                              {summary.deliveryBreakdown.baseLastMileFee > 0 && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Within-state fee:</span>
+                                  <span className="font-semibold text-slate-800">
+                                    ₦{summary.deliveryBreakdown.baseLastMileFee.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {summary.deliveryBreakdown.localQuantity > 0 && (
+                                <p className="text-[10px] text-gray-500 italic">
+                                  {summary.deliveryBreakdown.localQuantity} local items added no extra fee.
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Tax line */}
                       <div className="flex justify-between text-gray-600 text-sm font-medium">
                         <span>
                           Tax {summary?.formattedRate ? `(${summary.formattedRate})` : (summary?.taxPercentage !== undefined ? `(${summary.taxPercentage}%)` : '(7.5%)')}
@@ -762,12 +1021,39 @@ export default function CartPage() {
                           ₦{summary.tax.toLocaleString()}
                         </span>
                       </div>
-                      <div className="border-t border-dashed pt-4 flex justify-between items-center">
+
+                      {/* Total */}
+                      <div className="border-t border-dashed pt-3.5 flex justify-between items-center">
                         <span className="font-bold text-slate-800">Total Amount</span>
                         <span className="text-2xl font-extrabold text-[#9d4ae3]">
                           ₦{summary.total.toLocaleString()}
                         </span>
                       </div>
+
+                      {/* Expected Delivery Estimate Callout */}
+                      {summary.expectedDelivery && (
+                        <div className="mt-3 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/80 rounded-2xl p-3 flex items-start gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#9d4ae3] flex items-center justify-center shrink-0">
+                            <Truck size={16} />
+                          </div>
+                          <div className="flex-1 text-xs">
+                            <p className="font-bold text-purple-950">
+                              {deliveryCopy(summary.expectedDelivery, 'quote')}
+                            </p>
+                            <p className="text-[11px] text-purple-700 mt-0.5">
+                              Within {summary.expectedDelivery.maxWorkingDays} working days of processing.
+                              {summary.expectedDelivery.isInterState && (
+                                <span className="ml-1.5 inline-block px-1.5 py-0.2 bg-purple-200 text-purple-900 font-bold rounded text-[10px]">
+                                  Inter-state
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-[10px] text-gray-500 mt-1 italic">
+                              💡 Order before 3:00 PM on a working day for fastest dispatch.
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="py-6 text-center text-sm text-gray-400 italic">
@@ -777,7 +1063,7 @@ export default function CartPage() {
 
                   <button
                     onClick={handleProceedToCheckout}
-                    disabled={selectedCount === 0 || isProcessing}
+                    disabled={selectedCount === 0 || isProcessing || Boolean(summary?.deliveryError)}
                     className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold py-4 rounded-xl mt-6 hover:from-[#8236be] hover:to-[#692a99] transition shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed group active:scale-95"
                   >
                     <span>Proceed To Checkout</span>
@@ -971,25 +1257,25 @@ export default function CartPage() {
                               </div>
                               <div>
                                 <label className="text-xs font-bold text-slate-600 block mb-1">State *</label>
-                                <input
-                                  type="text"
+                                <select
                                   required
                                   value={shippingAddress.state}
                                   onChange={(e) => {
                                     const newState = e.target.value;
                                     setShippingAddress({ ...shippingAddress, state: newState });
-                                    if (newState.length >= 3) {
+                                    if (newState) {
                                       dispatch(fetchCartSummary({ country: shippingAddress.country, state: newState }));
                                     }
                                   }}
-                                  onBlur={() => {
-                                    if (shippingAddress.state) {
-                                      dispatch(fetchCartSummary({ country: shippingAddress.country, state: shippingAddress.state }));
-                                    }
-                                  }}
-                                  placeholder="Lagos"
-                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50"
-                                />
+                                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition-all bg-slate-50/50 text-slate-800"
+                                >
+                                  <option value="">Select State</option>
+                                  {availableStates.map((s) => (
+                                    <option key={s.state} value={s.state}>
+                                      {s.state}
+                                    </option>
+                                  ))}
+                                </select>
                               </div>
                             </div>
 
@@ -1172,22 +1458,101 @@ export default function CartPage() {
                       />
                     </div>
 
-                    {summary && (
-                      <div className="border-t pt-4 mt-2">
-                        <div className="flex justify-between items-center text-sm font-bold text-slate-800">
-                          <span>Total due:</span>
-                          <span className="text-lg text-[#9d4ae3]">₦{summary.total.toLocaleString()}</span>
+                    {/* Quote Loading Indicator */}
+                    {loadingQuote && (
+                      <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 flex items-center gap-2 text-xs text-purple-700 font-semibold">
+                        <Loader2 size={14} className="animate-spin text-purple-600" />
+                        Calculating live delivery fee & taxes...
+                      </div>
+                    )}
+
+                    {/* Route or Quote Error Alert */}
+                    {quoteError && (
+                      <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 flex items-start gap-2.5">
+                        <AlertTriangle size={16} className="text-red-500 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold">Delivery Unavailable</p>
+                          <p className="mt-0.5 leading-relaxed">{quoteError}</p>
+                          <p className="text-[11px] text-red-600 mt-1 font-semibold">
+                            Please choose a different delivery address or adjust items in your cart.
+                          </p>
                         </div>
                       </div>
                     )}
 
+                    {/* Expected Delivery Promise Box */}
+                    {quoteData?.expectedDelivery && !quoteError && (
+                      <div className="bg-gradient-to-r from-purple-50 via-indigo-50/60 to-purple-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-3 shadow-xs">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                          <Truck size={20} />
+                        </div>
+                        <div className="flex-1 text-xs">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-extrabold text-purple-950 text-sm">
+                              {deliveryCopy(quoteData.expectedDelivery, 'quote')}
+                            </span>
+                            {quoteData.expectedDelivery.isInterState && (
+                              <span className="px-2 py-0.5 bg-purple-200 text-purple-900 rounded-full font-bold text-[10px]">
+                                Inter-state
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-gray-600 font-medium mt-1">
+                            Within {quoteData.expectedDelivery.maxWorkingDays} working days of payment confirmation.
+                          </p>
+                          <p className="text-[11px] text-[#9d4ae3] mt-1 font-semibold">
+                            💡 Order before 3:00 PM on a working day for the fastest delivery.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Order Quote Review Totals */}
+                    <div className="border-t pt-4 space-y-2 text-xs">
+                      <div className="flex justify-between text-gray-600 font-medium">
+                        <span>Items Subtotal:</span>
+                        <span className="font-bold text-slate-800">
+                          ₦{(quoteData?.subtotal ?? summary?.subtotal ?? 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-gray-600 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Truck size={13} className="text-[#9d4ae3]" />
+                          Delivery Fee:
+                        </span>
+                        <span className="font-bold text-slate-800">
+                          {quoteData ? (
+                            `₦${quoteData.shippingCost.toLocaleString()}`
+                          ) : summary?.deliveryFeeCalculated ? (
+                            `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
+                          ) : (
+                            <span className="text-purple-600">Calculated from state</span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-gray-600 font-medium">
+                        <span>
+                          Tax ({quoteData?.taxRate ? `${(quoteData.taxRate * 100).toFixed(1)}%` : summary?.formattedRate || '7.5%'}):
+                        </span>
+                        <span className="font-bold text-slate-800">
+                          ₦{(quoteData?.taxAmount ?? summary?.tax ?? 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="border-t border-dashed pt-3 flex justify-between items-center text-sm font-bold text-slate-800">
+                        <span>Total Due:</span>
+                        <span className="text-xl font-extrabold text-[#9d4ae3]">
+                          ₦{(quoteData?.total ?? summary?.total ?? 0).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
                     <button
                       type="submit"
-                      disabled={isProcessing}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-4 rounded-xl mt-6 hover:from-emerald-600 hover:to-green-700 transition shadow-lg shadow-emerald-50 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                      disabled={isProcessing || Boolean(quoteError) || (Boolean(quoteData) === false && Boolean(summary?.deliveryError))}
+                      className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-4 rounded-xl mt-6 hover:from-emerald-600 hover:to-green-700 transition shadow-lg shadow-emerald-50 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingBag size={18} />
-                      <span>Place Order</span>
+                      <span>Place Order & Pay</span>
                     </button>
                   </form>
                 </motion.div>
@@ -1422,9 +1787,33 @@ export default function CartPage() {
                 </p>
 
                 {placedOrderNumber && placedOrderNumber !== 'N/A' && (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3.5 mb-6 inline-block w-full">
-                    <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Order ID</p>
-                    <p className="text-base font-extrabold text-slate-800 break-all">{placedOrderNumber}</p>
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3 mb-4 inline-block w-full">
+                    <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-0.5">Order ID</p>
+                    <p className="text-sm font-extrabold text-slate-800 break-all">{placedOrderNumber}</p>
+                  </div>
+                )}
+
+                {placedOrderExpectedDelivery && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-6 text-left flex items-start gap-3 shadow-xs">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <Truck size={18} />
+                    </div>
+                    <div className="flex-1 text-xs">
+                      <p className="text-[10px] uppercase font-bold text-purple-700 tracking-wider">
+                        Delivery Promise
+                      </p>
+                      <p className="font-extrabold text-purple-950 text-sm mt-0.5">
+                        {deliveryCopy(placedOrderExpectedDelivery, 'paid')}
+                      </p>
+                      <p className="text-purple-800 mt-1 font-medium">
+                        Within {placedOrderExpectedDelivery.maxWorkingDays} working days of payment confirmation.
+                        {placedOrderExpectedDelivery.isInterState && (
+                          <span className="ml-1.5 px-1.5 py-0.2 bg-purple-200 text-purple-900 rounded font-bold text-[10px]">
+                            Inter-state
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 )}
 
