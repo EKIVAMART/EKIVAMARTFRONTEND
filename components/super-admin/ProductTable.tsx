@@ -339,6 +339,9 @@ export default function ProductTable({
         <table className="w-full text-left border-collapse min-w-200">
           <thead className="bg-gray-50/50 border-b">
             <tr>
+              <th className="p-4 text-xs font-semibold text-gray-400 uppercase w-12 text-center">
+                #
+              </th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase">
                 Product
               </th>
@@ -361,13 +364,18 @@ export default function ProductTable({
           </thead>
           <tbody>
             {paginatedData.length > 0 ? (
-              paginatedData.map((p) => (
-                <React.Fragment key={p.id}>
-                  <tr
-                    onClick={() => onView?.(p)}
-                    className="border-b last:border-0 hover:bg-gray-50/50 transition cursor-pointer"
-                  >
-                  <td className="p-4 flex items-center gap-3">
+              paginatedData.map((p, idx) => {
+                const rowNumber = (currentPage - 1) * itemsPerPage + idx + 1;
+                return (
+                  <React.Fragment key={p.id}>
+                    <tr
+                      onClick={() => onView?.(p)}
+                      className="border-b last:border-0 hover:bg-gray-50/50 transition cursor-pointer"
+                    >
+                      <td className="p-4 text-xs font-bold text-slate-400 text-center">
+                        {rowNumber}
+                      </td>
+                      <td className="p-4 flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border p-1 shrink-0 relative">
                       {p.image ? (
                         <Image
@@ -509,7 +517,7 @@ export default function ProductTable({
                 </tr>
                 {expandedProductId === p.id && (
                   <tr>
-                    <td colSpan={6} className="px-4 pb-4">
+                    <td colSpan={7} className="px-4 pb-4">
                       <div className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
                           <div>
@@ -640,11 +648,12 @@ export default function ProductTable({
                   </tr>
                 )}
                 </React.Fragment>
-              ))
-            ) : (
+              );
+            })
+          ) : (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="p-8 text-center text-gray-500 font-medium"
                 >
                   No products found.
@@ -658,7 +667,9 @@ export default function ProductTable({
       {/* Mobile Card View */}
       <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
         {paginatedData.length > 0 ? (
-          paginatedData.map((p) => (
+          paginatedData.map((p, idx) => {
+            const rowNumber = (currentPage - 1) * itemsPerPage + idx + 1;
+            return (
             <div
               key={p.id}
               onClick={() => onView?.(p)}
@@ -682,9 +693,12 @@ export default function ProductTable({
                 </div>
                 <div className="flex-1 min-w-0 pt-1">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">
-                      {p.name}
-                    </h3>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs font-black text-slate-400 shrink-0">#{rowNumber}</span>
+                      <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2">
+                        {p.name}
+                      </h3>
+                    </div>
                     {getStatusBadge(p.status)}
                   </div>
                   {(p.category || p.subCategory) && (
@@ -917,7 +931,8 @@ export default function ProductTable({
                 </div>
               )}
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
             No products found.
@@ -929,7 +944,7 @@ export default function ProductTable({
       {(totalPages > 1 || currentPage > 1) && (
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
           <span className="text-sm text-gray-500 font-medium hidden sm:block">
-            Showing {showingFrom} to {showingTo} of {displayTotal} entries
+            Showing {showingFrom} to {showingTo} of {displayTotal} products (Page {currentPage} of {totalPages})
           </span>
           <div className="flex items-center gap-1 mx-auto sm:mx-0">
             <button
@@ -941,35 +956,56 @@ export default function ProductTable({
             </button>
 
             {(() => {
-              const pages: number[] = [];
-              const maxVisible = 5;
-              let start = Math.max(1, currentPage - 2);
-              let end = Math.min(totalPages, currentPage + 2);
-
-              if (start === 1) {
-                end = Math.min(totalPages, maxVisible);
-              } else if (end === totalPages) {
-                start = Math.max(1, totalPages - maxVisible + 1);
+              const pages: (number | string)[] = [];
+              if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+              } else {
+                if (currentPage <= 4) {
+                  for (let i = 1; i <= 5; i++) pages.push(i);
+                  pages.push('...');
+                  pages.push(totalPages);
+                } else if (currentPage >= totalPages - 3) {
+                  pages.push(1);
+                  pages.push('...');
+                  for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+                } else {
+                  pages.push(1);
+                  pages.push('...');
+                  pages.push(currentPage - 1);
+                  pages.push(currentPage);
+                  pages.push(currentPage + 1);
+                  pages.push('...');
+                  pages.push(totalPages);
+                }
               }
 
-              for (let i = start; i <= end; i++) {
-                pages.push(i);
-              }
+              return pages.map((page, index) => {
+                if (typeof page === 'string') {
+                  return (
+                    <span
+                      key={`ellipsis-${index}`}
+                      className="w-8 h-8 flex items-center justify-center text-gray-400 font-bold select-none text-sm"
+                    >
+                      …
+                    </span>
+                  );
+                }
 
-              return pages.map((page) => (
-                <button
-                  key={page}
-                  onClick={() => goToPage(page)}
-                  disabled={isLoading}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                    currentPage === page
-                      ? 'bg-gray-100 text-slate-800 font-bold'
-                      : 'hover:bg-gray-50 text-gray-500'
-                  }`}
-                >
-                  {page}
-                </button>
-              ));
+                return (
+                  <button
+                    key={page}
+                    onClick={() => goToPage(page)}
+                    disabled={isLoading}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
+                      currentPage === page
+                        ? 'bg-[#9d4ae3] text-white font-bold shadow-xs'
+                        : 'hover:bg-gray-50 text-gray-500'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              });
             })()}
 
             <button

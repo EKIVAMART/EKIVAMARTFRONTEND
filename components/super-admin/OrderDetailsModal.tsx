@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store, 
-  MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText
+  MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText, Truck
 } from 'lucide-react';
 import { ordersApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
@@ -420,8 +420,32 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                   </div>
 
                   {/* Right Side: Customer, Notes & Actions */}
-                  <div className="space-y-8">
-                    
+                  <div className="space-y-6">
+                    {/* Expected Delivery Promise */}
+                    {order.expectedDelivery && (
+                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-5 shadow-xs flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                          <Truck size={20} />
+                        </div>
+                        <div className="flex-1 text-xs">
+                          <span className="text-[10px] font-black uppercase text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                            Expected Delivery
+                          </span>
+                          <p className="font-extrabold text-purple-950 text-sm mt-1">
+                            {order.expectedDelivery.expectedDeliveryLabel}
+                          </p>
+                          <p className="text-purple-800 font-medium mt-0.5">
+                            Within {order.expectedDelivery.maxWorkingDays} working days of processing.
+                            {order.expectedDelivery.isInterState && (
+                              <span className="ml-1.5 px-1.5 py-0.2 bg-purple-200 text-purple-900 rounded font-bold text-[10px]">
+                                Inter-state
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Customer & Address */}
                     <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
                       <div>

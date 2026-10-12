@@ -38,14 +38,15 @@ export default function VendorOrdersView() {
 
   // Modal state
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
 
-  const loadOrders = async () => {
+  const loadOrders = async (targetPage = page) => {
     setLoading(true);
     try {
       const res = await vendorOrdersApi.getOrders({
-        page,
+        page: targetPage,
         limit: 10,
         status: statusFilter,
       });
@@ -54,8 +55,10 @@ export default function VendorOrdersView() {
         const d = res.data;
         const list = Array.isArray(d.data) ? d.data : Array.isArray(d) ? d : [];
         setOrders(list);
-        setTotalPages(d.totalPages || 1);
-        setTotalOrders(d.total || list.length);
+        const resolvedTotal = typeof d.total === 'number' ? d.total : list.length;
+        const resolvedPages = typeof d.totalPages === 'number' ? d.totalPages : Math.ceil(resolvedTotal / (d.limit || 10)) || 1;
+        setTotalPages(resolvedPages);
+        setTotalOrders(resolvedTotal);
       }
     } catch (err) {
       toast.error('Failed to load store orders');
@@ -65,11 +68,15 @@ export default function VendorOrdersView() {
   };
 
   useEffect(() => {
-    void loadOrders();
+    void loadOrders(page);
   }, [page, statusFilter]);
 
-  const handleOpenOrder = async (orderId: string) => {
+  const handleOpenOrder = async (orderId: string, orderNumber?: string, initialData?: any) => {
     setSelectedOrderId(orderId);
+    setSelectedOrderNumber(orderNumber || initialData?.orderNumber || orderId);
+    if (initialData) {
+      setOrderDetails(initialData);
+    }
     setModalLoading(true);
     try {
       const res = await vendorOrdersApi.getOrderById(orderId);
@@ -77,12 +84,12 @@ export default function VendorOrdersView() {
         setOrderDetails(res.data);
       } else {
         // Fallback to finding in local list
-        const found = orders.find(o => (o.id || o._id) === orderId);
-        setOrderDetails(found || null);
+        const found = orders.find(o => (o.orderId || o.id || o._id) === orderId || o.orderNumber === orderNumber);
+        setOrderDetails(found || initialData || null);
       }
     } catch (err) {
-      const found = orders.find(o => (o.id || o._id) === orderId);
-      setOrderDetails(found || null);
+      const found = orders.find(o => (o.orderId || o.id || o._id) === orderId || o.orderNumber === orderNumber);
+      setOrderDetails(found || initialData || null);
     } finally {
       setModalLoading(false);
     }
@@ -91,9 +98,10 @@ export default function VendorOrdersView() {
   const filteredOrders = orders.filter(o => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
-    const id = String(o.id || o._id || '').toLowerCase();
+    const id = String(o.orderId || o.id || o._id || '').toLowerCase();
+    const orderNum = String(o.orderNumber || o.orderNo || '').toLowerCase();
     const customer = String(o.customer?.name || o.customerName || '').toLowerCase();
-    return id.includes(q) || customer.includes(q);
+    return id.includes(q) || orderNum.includes(q) || customer.includes(q);
   });
 
   return (
@@ -165,10 +173,12 @@ export default function VendorOrdersView() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
                 <tr>
+                  <th className="px-4 py-3.5 text-center w-12 text-slate-400 font-bold uppercase tracking-wider">#</th>
                   <th className="px-6 py-3.5">Order Ref</th>
                   <th className="px-6 py-3.5">Date</th>
                   <th className="px-6 py-3.5">Customer</th>
                   <th className="px-6 py-3.5">Items</th>
+                  <th className="px-6 py-3.5">Expected Delivery</th>
                   <th className="px-6 py-3.5">Status</th>
                   <th className="px-6 py-3.5 text-right">Total</th>
                   <th className="px-6 py-3.5 text-center">Action</th>
@@ -176,19 +186,25 @@ export default function VendorOrdersView() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredOrders.map((ord, i) => {
-                  const id = ord.id || ord._id || `order-${i}`;
+                  const rowNumber = (page - 1) * 10 + i + 1;
+                  const orderId = ord.orderId || ord.id || ord._id;
+                  const orderNumber = ord.orderNumber || ord.orderNo || (orderId ? String(orderId).slice(-8).toUpperCase() : `ORD-${i + 1}`);
                   const customerName = ord.customer?.name || ord.customerName || 'Customer';
                   const status = (ord.status || 'pending').toLowerCase();
                   const itemCount = ord.items?.length || ord.totalItems || 1;
                   const total = ord.totalAmount ?? ord.amount ?? 0;
+                  const orderDate = ord.orderDate || ord.createdAt || ord.date;
 
                   return (
-                    <tr key={id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr key={orderId || orderNumber || i} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="px-4 py-4 text-xs font-bold text-slate-400 text-center">
+                        {rowNumber}
+                      </td>
                       <td className="px-6 py-4 font-black text-slate-800 font-mono text-xs">
-                        #{String(id).slice(-8).toUpperCase()}
+                        {orderNumber}
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-500 whitespace-nowrap">
-                        {formatDate(ord.createdAt || ord.date)}
+                        {formatDate(orderDate)}
                       </td>
                       <td className="px-6 py-4 font-bold text-slate-800">
                         {customerName}
@@ -196,11 +212,22 @@ export default function VendorOrdersView() {
                       <td className="px-6 py-4 text-slate-600 font-medium">
                         {itemCount} item{itemCount !== 1 ? 's' : ''}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {ord.expectedDelivery ? (
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-900 bg-purple-50/70 border border-purple-100 px-2.5 py-1 rounded-lg w-fit">
+                            <Truck size={13} className="text-[#9d4ae3]" />
+                            <span>{ord.expectedDelivery.expectedDeliveryLabel}</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 font-medium">—</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4">
                         <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
                           status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                           status === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                           status === 'processing' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                          status === 'confirmed' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
                           status === 'cancelled' ? 'bg-rose-50 text-rose-700 border-rose-200' :
                           'bg-amber-50 text-amber-700 border-amber-200'
                         }`}>
@@ -212,7 +239,7 @@ export default function VendorOrdersView() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <button
-                          onClick={() => handleOpenOrder(id)}
+                          onClick={() => handleOpenOrder(orderId || orderNumber, orderNumber, ord)}
                           className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-[#9d4ae3] rounded-lg font-bold text-xs transition-colors inline-flex items-center gap-1"
                         >
                           <Eye size={13} />
@@ -234,25 +261,77 @@ export default function VendorOrdersView() {
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1"
-            >
-              <ChevronLeft size={14} /> Previous
-            </button>
-            <span className="font-bold text-slate-500">
-              Page {page} of {totalPages}
+        {(totalPages > 1 || page > 1) && (
+          <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-white">
+            <span className="font-semibold text-slate-500">
+              Showing {totalOrders === 0 ? 0 : (page - 1) * 10 + 1} to {Math.min(page * 10, totalOrders)} of {totalOrders} orders (Page {page} of {totalPages})
             </span>
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 disabled:opacity-40 font-bold flex items-center gap-1"
-            >
-              Next <ChevronRight size={14} />
-            </button>
+            <div className="flex items-center gap-1 mx-auto sm:mx-0">
+              <button
+                disabled={page <= 1 || loading}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50 text-slate-500 disabled:opacity-50 transition cursor-pointer"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              {(() => {
+                const pages: (number | string)[] = [];
+                if (totalPages <= 7) {
+                  for (let i = 1; i <= totalPages; i++) pages.push(i);
+                } else {
+                  if (page <= 4) {
+                    for (let i = 1; i <= 5; i++) pages.push(i);
+                    pages.push('...');
+                    pages.push(totalPages);
+                  } else if (page >= totalPages - 3) {
+                    pages.push(1);
+                    pages.push('...');
+                    for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+                  } else {
+                    pages.push(1);
+                    pages.push('...');
+                    pages.push(page - 1);
+                    pages.push(page);
+                    pages.push(page + 1);
+                    pages.push('...');
+                    pages.push(totalPages);
+                  }
+                }
+
+                return pages.map((p, idx) => {
+                  if (typeof p === 'string') {
+                    return (
+                      <span key={`el-${idx}`} className="w-8 h-8 flex items-center justify-center text-slate-400 font-bold select-none text-sm">
+                        …
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setPage(Number(p))}
+                      disabled={loading}
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium cursor-pointer ${
+                        page === p
+                          ? 'bg-[#9d4ae3] text-white font-bold shadow-xs'
+                          : 'hover:bg-slate-50 text-slate-500'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+                });
+              })()}
+
+              <button
+                disabled={page >= totalPages || loading}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50 text-slate-500 disabled:opacity-50 transition cursor-pointer"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -272,17 +351,18 @@ export default function VendorOrdersView() {
                 <div>
                   <h3 className="font-extrabold text-lg text-slate-800 flex items-center gap-2">
                     <Package size={20} className="text-[#9d4ae3]" />
-                    Order #{String(selectedOrderId).slice(-8).toUpperCase()}
+                    Order {orderDetails?.orderNumber || selectedOrderNumber || (selectedOrderId && !selectedOrderId.startsWith('order-') ? `#${String(selectedOrderId).slice(-8).toUpperCase()}` : '')}
                   </h3>
-                  {orderDetails?.createdAt && (
+                  {(orderDetails?.orderDate || orderDetails?.createdAt) && (
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Placed on {formatDate(orderDetails.createdAt)}
+                      Placed on {formatDate(orderDetails.orderDate || orderDetails.createdAt)}
                     </p>
                   )}
                 </div>
                 <button
                   onClick={() => {
                     setSelectedOrderId(null);
+                    setSelectedOrderNumber(null);
                     setOrderDetails(null);
                   }}
                   className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
@@ -316,15 +396,36 @@ export default function VendorOrdersView() {
                       </div>
                     </div>
 
+                    {/* Customer Promised Delivery Date */}
+                    {orderDetails.expectedDelivery && (
+                      <div className="bg-gradient-to-r from-purple-50 via-purple-50/70 to-indigo-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                          <Truck size={18} />
+                        </div>
+                        <div className="flex-1 text-xs">
+                          <span className="text-[10px] font-extrabold uppercase text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                            Customer Promised Delivery
+                          </span>
+                          <p className="font-extrabold text-purple-950 text-sm mt-1">
+                            {orderDetails.expectedDelivery.expectedDeliveryLabel}
+                          </p>
+                          <p className="text-purple-800 font-medium mt-0.5">
+                            Within {orderDetails.expectedDelivery.maxWorkingDays} working days of processing.
+                            {orderDetails.expectedDelivery.isInterState && ' (Inter-state leg)'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Customer Info */}
                     <div className="border border-slate-100 rounded-2xl p-4 space-y-2">
                       <h4 className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
                         <User size={14} className="text-purple-600" /> Customer Information
                       </h4>
                       <div className="text-xs space-y-1 text-slate-600 pt-1">
-                        <p className="font-bold text-slate-800">{orderDetails.customer?.name || orderDetails.customerName || 'Customer'}</p>
-                        <p>{orderDetails.customer?.email || orderDetails.customerEmail}</p>
-                        <p>{orderDetails.customer?.phone || orderDetails.customerPhone}</p>
+                        <p className="font-bold text-slate-800">{orderDetails.customerName || orderDetails.customer?.name || 'Customer'}</p>
+                        <p>{orderDetails.customerEmail || orderDetails.customer?.email || 'N/A'}</p>
+                        <p>{orderDetails.customerPhone || orderDetails.customer?.phone || 'N/A'}</p>
                       </div>
                     </div>
 
@@ -337,11 +438,11 @@ export default function VendorOrdersView() {
                         {((orderDetails.items as any[]) || []).map((item, idx) => (
                           <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                             <div>
-                              <p className="font-bold text-slate-800">{item.name || item.productName || item.title || 'Product'}</p>
-                              <p className="text-slate-400">Qty: {item.quantity || item.qty || 1} • {fmt(item.price)} each</p>
+                              <p className="font-bold text-slate-800">{item.productName || item.name || item.title || 'Product'}</p>
+                              <p className="text-slate-400">Qty: {item.quantity || item.qty || 1} • {fmt(item.unitPrice ?? item.price ?? 0)} each</p>
                             </div>
                             <p className="font-black text-slate-800">
-                              {fmt((item.price || 0) * (item.quantity || item.qty || 1))}
+                              {fmt(item.subtotal ?? ((item.unitPrice ?? item.price ?? 0) * (item.quantity || item.qty || 1)))}
                             </p>
                           </div>
                         ))}

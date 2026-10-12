@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { MapPin, Plus, Trash2, Edit3, Check, Loader2, Home } from 'lucide-react';
-import { userAddressApi, SavedAddressItem, SavedAddressPayload } from '@/lib/api';
+import { userAddressApi, deliveryRoutesApi, SavedAddressItem, SavedAddressPayload, AvailableState } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export const AddressesTab: React.FC = () => {
   const [addresses, setAddresses] = useState<SavedAddressItem[]>([]);
+  const [availableStates, setAvailableStates] = useState<AvailableState[]>([]);
+  const [loadingStates, setLoadingStates] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [editingAddress, setEditingAddress] = useState<SavedAddressItem | null>(null);
@@ -22,6 +24,20 @@ export const AddressesTab: React.FC = () => {
     country: 'Nigeria',
     phoneNumber: '',
   });
+
+  const loadDeliverableStates = async () => {
+    setLoadingStates(true);
+    try {
+      const res = await deliveryRoutesApi.getAvailableStates();
+      if (res?.success && Array.isArray(res.data)) {
+        setAvailableStates(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load available states', err);
+    } finally {
+      setLoadingStates(false);
+    }
+  };
 
   const loadAddresses = async () => {
     setLoading(true);
@@ -49,6 +65,7 @@ export const AddressesTab: React.FC = () => {
 
   useEffect(() => {
     void loadAddresses();
+    void loadDeliverableStates();
   }, []);
 
   const handleOpenAdd = () => {
@@ -230,15 +247,25 @@ export const AddressesTab: React.FC = () => {
               />
             </div>
             <div>
-              <label className="text-[11px] font-bold text-gray-600 block mb-1">State *</label>
-              <input
-                type="text"
+              <label className="text-[11px] font-bold text-gray-600 block mb-1">
+                State * {loadingStates && <span className="text-[10px] text-purple-500 font-normal">(loading...)</span>}
+              </label>
+              <select
                 required
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                placeholder="Lagos"
-                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500"
-              />
+                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white"
+              >
+                <option value="">Select deliverable state</option>
+                {availableStates.map((st) => (
+                  <option key={st.state} value={st.state}>
+                    {st.state}
+                  </option>
+                ))}
+                {formData.state && !availableStates.some((st) => st.state.toLowerCase() === formData.state.toLowerCase()) && (
+                  <option value={formData.state}>{formData.state}</option>
+                )}
+              </select>
             </div>
             <div>
               <label className="text-[11px] font-bold text-gray-600 block mb-1">Postal Code *</label>

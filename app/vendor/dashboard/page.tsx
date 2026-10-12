@@ -984,7 +984,7 @@ function VendorDashboardContent() {
     if (paramOrderId) {
       const cleanId = String(paramOrderId).replace('#', '');
       const matched = vendorOrders.find(
-        (o) => String(o.id).replace('#', '') === cleanId ||
+        (o) => String(o.orderId || o.id || o._id || '').replace('#', '') === cleanId ||
                String(o.orderNumber || '').replace('#', '') === cleanId
       );
       if (matched) {

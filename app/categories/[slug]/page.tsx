@@ -65,7 +65,10 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(false);
-  const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(null);
+  const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(() => {
+    if (slug === 'all' || slug === 'shop') return 'ALL_PRODUCTS';
+    return null;
+  });
 
   // In-memory & Enhanced Search filters
   const [minPrice, setMinPrice] = useState<number>(0);
@@ -75,9 +78,18 @@ export default function CategoryPage() {
   const [sortOrder, setSortOrder] = useState<string>('desc');
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
 
-  // Pagination state
-  const [page, setPage] = useState<number>(1);
+  // Pagination state synced with URL search query param
+  const pageParam = parseInt(searchParams.get('page') || '1', 10);
+  const currentPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+  const [page, setPage] = useState<number>(currentPage);
   const [pageSize, setPageSize] = useState<number>(20);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [serverTotalPages, setServerTotalPages] = useState<number>(1);
+
+  // Keep internal page in sync with query param
+  useEffect(() => {
+    setPage(currentPage);
+  }, [currentPage]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -144,6 +156,13 @@ export default function CategoryPage() {
 
   // 2. Identify the active main category based on slug
   useEffect(() => {
+    if (slug === 'all' || slug === 'shop') {
+      setActiveCategory(null);
+      setActiveSubcategoryId('ALL_PRODUCTS');
+      setSubcategories([]);
+      return;
+    }
+
     if (categories.length === 0) return;
 
     // Normalize slug helper
@@ -210,9 +229,15 @@ export default function CategoryPage() {
 
   // 4. Determine which subcategory or parent category is selected from query parameters
   useEffect(() => {
+    if (slug === 'all' || slug === 'shop') {
+      setActiveCategory(null);
+      setActiveSubcategoryId('ALL_PRODUCTS');
+      return;
+    }
+
     if (!activeCategory) {
       const searchQuery = searchParams.get('search');
-      if (searchQuery || slug === 'shop' || slug === 'all') {
+      if (searchQuery) {
         setActiveSubcategoryId('ALL_PRODUCTS');
       }
       return;
@@ -240,7 +265,28 @@ export default function CategoryPage() {
     }
   }, [subcategoryQuery, subcategories, activeCategory, slug, searchParams]);
 
-  // 5. Fetch products whenever activeSubcategoryId changes or search query changes
+  // Reset page in URL when filters change
+  const prevFilterRef = useRef({ activeSubcategoryId, sortBy, sortOrder, inStockOnly, subcategoryQuery });
+  useEffect(() => {
+    const prev = prevFilterRef.current;
+    if (
+      prev.activeSubcategoryId !== activeSubcategoryId ||
+      prev.sortBy !== sortBy ||
+      prev.sortOrder !== sortOrder ||
+      prev.inStockOnly !== inStockOnly ||
+      prev.subcategoryQuery !== subcategoryQuery
+    ) {
+      prevFilterRef.current = { activeSubcategoryId, sortBy, sortOrder, inStockOnly, subcategoryQuery };
+      if (searchParams.get('page') && searchParams.get('page') !== '1') {
+        const nextParams = new URLSearchParams(searchParams.toString());
+        nextParams.delete('page');
+        const queryStr = nextParams.toString();
+        router.push(`/categories/${slug}${queryStr ? `?${queryStr}` : ''}`);
+      }
+    }
+  }, [activeSubcategoryId, sortBy, sortOrder, inStockOnly, subcategoryQuery, searchParams, slug, router]);
+
+  // 5. Fetch products whenever activeSubcategoryId changes, search query changes, or page changes
   useEffect(() => {
     if (!activeSubcategoryId) return;
 
@@ -261,13 +307,14 @@ export default function CategoryPage() {
             inStock: inStockOnly ? true : undefined,
             sortBy: sortBy as any,
             sortOrder: sortOrder as any,
-            page: 1,
-            limit: 100,
+            page: currentPage,
+            limit: 20,
           });
         } else {
           const fetchParams: any = {
             status: 'active',
-            limit: 100,
+            page: currentPage,
+            limit: 20,
           };
           if (activeSubcategoryId !== 'ALL_PRODUCTS') {
             fetchParams.categoryId = activeSubcategoryId;
@@ -279,16 +326,39 @@ export default function CategoryPage() {
         }
 
         let productList: Product[] = [];
-        if (res?.data && Array.isArray(res.data)) {
-          productList = res.data;
-        } else if (res?.data?.data && Array.isArray(res.data.data)) {
-          productList = res.data.data;
-        } else if (res?.data?.products && Array.isArray(res.data.products)) {
-          productList = res.data.products;
+        let total = 0;
+        let totalP = 1;
+
+        if (res?.data) {
+          if (Array.isArray(res.data)) {
+            productList = res.data;
+            total = res.total ?? res.data.length;
+            totalP = res.totalPages ?? Math.ceil(total / 20) ?? 1;
+          } else if (Array.isArray(res.data.data)) {
+            productList = res.data.data;
+            total = res.data.total ?? res.total ?? res.data.data.length;
+            totalP = res.data.totalPages ?? res.totalPages ?? Math.ceil(total / 20) ?? 1;
+          } else if (Array.isArray(res.data.products)) {
+            productList = res.data.products;
+            total = res.data.total ?? res.total ?? res.data.products.length;
+            totalP = res.data.totalPages ?? res.totalPages ?? Math.ceil(total / 20) ?? 1;
+          }
+        }
+
+        // Each call should display only 20 products for the specified page
+        if (productList.length > 20) {
+          const startIndex = (currentPage - 1) * 20;
+          if (startIndex < productList.length) {
+            productList = productList.slice(startIndex, startIndex + 20);
+          } else {
+            productList = productList.slice(0, 20);
+          }
         }
 
         if (isMounted) {
           setProducts(productList);
+          setTotalProducts(total);
+          setServerTotalPages(totalP);
 
           // Reset price filters range based on fetched products
           if (productList.length > 0) {
@@ -316,7 +386,7 @@ export default function CategoryPage() {
     return () => {
       isMounted = false;
     };
-  }, [activeSubcategoryId, searchParams, sortBy, sortOrder, inStockOnly]);
+  }, [activeSubcategoryId, currentPage, searchParams, sortBy, sortOrder, inStockOnly]);
 
   const calculateAverageRating = (ratings: Rating[] | number | undefined) => {
     if (!ratings) return 4.2;
@@ -409,20 +479,30 @@ export default function CategoryPage() {
   }, [products, minPrice, maxPrice, selectedRating, inStockOnly, sortBy, sortOrder, searchParams]);
 
   // Paginated items
-  const totalCount = filteredProducts.length;
-  const totalPages = Math.ceil(totalCount / pageSize) || 1;
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredProducts.slice(startIndex, startIndex + pageSize);
-  }, [filteredProducts, page, pageSize]);
+  const totalCount = totalProducts || filteredProducts.length;
+  const totalPages = serverTotalPages || Math.max(1, Math.ceil(totalCount / pageSize));
+  const paginatedProducts = filteredProducts;
 
   // Change chip category filter
   const selectSubcategory = (subSlug: string | null) => {
-    if (!subSlug) {
-      router.push(`/categories/${slug}`);
-    } else {
-      router.push(`/categories/${slug}?subcategory=${subSlug}`);
+    const nextParams = new URLSearchParams();
+    if (subSlug) {
+      nextParams.set('subcategory', subSlug);
     }
+    const search = searchParams.get('search') || searchParams.get('q');
+    if (search) nextParams.set('search', search);
+    const loc = searchParams.get('location');
+    if (loc) nextParams.set('location', loc);
+    const queryStr = nextParams.toString();
+    router.push(`/categories/${slug}${queryStr ? `?${queryStr}` : ''}`);
+  };
+
+  // Change page via URL query parameter (triggers new API call)
+  const handlePageChange = (newPage: number) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set('page', String(newPage));
+    router.push(`/categories/${slug}?${nextParams.toString()}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -595,13 +675,13 @@ export default function CategoryPage() {
               <div className="text-sm font-semibold text-gray-600">
                 We found{' '}
                 <span className="text-[#9d4ae3] text-base font-extrabold px-1">
-                  {productsLoading ? '...' : filteredProducts.length}
+                  {productsLoading ? '...' : totalCount}
                 </span>{' '}
                 items matching your selection
               </div>
-              {filteredProducts.length > 0 && (
+              {totalCount > 0 && (
                 <div className="text-xs font-bold text-gray-500 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg border border-purple-100">
-                  Showing {filteredProducts.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, filteredProducts.length)} of {filteredProducts.length} results (Page {page} of {totalPages})
+                  Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} results (Page {currentPage} of {totalPages})
                 </div>
               )}
             </div>
@@ -664,39 +744,70 @@ export default function CategoryPage() {
                 {/* Pagination Controls */}
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                   <div className="text-xs font-semibold text-gray-500">
-                    Page {page} of {totalPages} ({filteredProducts.length} total results)
+                    Page {currentPage} of {totalPages} ({totalCount} total products)
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700"
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage <= 1}
+                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700 cursor-pointer"
                     >
                       Previous
                     </button>
 
-                    {Array.from({ length: totalPages }).map((_, idx) => {
-                      const pageNum = idx + 1;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-8 h-8 text-xs font-extrabold rounded-xl transition border ${
-                            page === pageNum
-                              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
-                              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
+                    {(() => {
+                      const pages: (number | string)[] = [];
+                      if (totalPages <= 7) {
+                        for (let i = 1; i <= totalPages; i++) pages.push(i);
+                      } else {
+                        if (currentPage <= 4) {
+                          for (let i = 1; i <= 5; i++) pages.push(i);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        } else if (currentPage >= totalPages - 3) {
+                          pages.push(1);
+                          pages.push('...');
+                          for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          pages.push(1);
+                          pages.push('...');
+                          pages.push(currentPage - 1);
+                          pages.push(currentPage);
+                          pages.push(currentPage + 1);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        }
+                      }
+
+                      return pages.map((p, idx) => {
+                        if (typeof p === 'string') {
+                          return (
+                            <span key={`el-${idx}`} className="w-8 h-8 flex items-center justify-center text-gray-400 font-bold select-none text-xs">
+                              …
+                            </span>
+                          );
+                        }
+                        return (
+                          <button
+                            key={p}
+                            onClick={() => handlePageChange(Number(p))}
+                            className={`w-8 h-8 text-xs font-extrabold rounded-xl transition border cursor-pointer ${
+                              currentPage === p
+                                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        );
+                      });
+                    })()}
 
                     <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700"
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage >= totalPages}
+                      className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-700 cursor-pointer"
                     >
                       Next
                     </button>
