@@ -10,7 +10,7 @@ import {
   ShoppingBag, Shirt, Smartphone, Monitor, Car, BookOpen,
   Coffee, Utensils, Package, Gift, Camera, Headphones
 } from 'lucide-react';
-import indBanner from '../assets/industries-banner.webp';
+import aptImg from '../assets/imgapt.jpg';
 
 // --- Shared Components ---
 const TealButton = ({ text }: { text: string }) => (
@@ -35,10 +35,20 @@ export default function AboutUs() {
   };
 
   return (
-      <div className=" relative h-screen overflow-hidden w-full">
-          <Image 
-             src=""
-            />
+    <div className="relative w-full h-[70svh] min-h-[420px] md:h-[85svh] lg:h-screen overflow-hidden mb-6">
+      <Image
+        src={aptImg}
+        alt="About Us Image"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center z-0"
+      />
+      <div className="absolute inset-0 z-10 bg-gradient-to-t md:bg-gradient-to-r from-[#9d4ae3]/80 via-[#8236be]/50 to-transparent" />
+      <div>
+          <h1>The Easy Way to Do Business.</h1>
+          <p>Our mission is to make doing business easy and democratize business opportunities for all!</p>
       </div>
+    </div>
   );
 }
