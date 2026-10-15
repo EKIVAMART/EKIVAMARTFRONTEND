@@ -8,8 +8,8 @@ type TeamMember = {
 };
 
 const team: TeamMember[] = [
-  { id: 1, name: "Oghenefego Oghenekohworo", role: "Found", image: "/team/founder.jpg" },
-  { id: 2, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 1, name: "Oghenefego Oghenekohworo", role: "CO-Founder", image: "/team/founder.jpg" },
+  { id: 2, name: "Ebikebuna Rufus", role: "CO-Founder", image: "/team/founder.jpg" },
   { id: 3, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
   { id: 4, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
   { id: 5, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
@@ -38,8 +38,8 @@ function TeamCard({ member }: { member: TeamMember }) {
 
 export default function MeetTheTeam() {
   return (
-    <section className="bg-[#fafafa] px-6 py-12 md:px-12 lg:px-[85px]">
-      <div className="mx-auto flex max-w-[1272px] flex-col gap-10 lg:flex-row lg:gap-[52px]">
+    <section className="w-full bg-[#fafafa] py-12">
+      <div className="mx-auto flex w-[90%] flex-col gap-10 lg:flex-row lg:gap-[52px]">
         {/* Intro */}
         <div className="shrink-0 lg:w-[262px]">
           <h2 className="text-[40px] font-extrabold leading-[0.95] tracking-tight text-[#2b2929]">
