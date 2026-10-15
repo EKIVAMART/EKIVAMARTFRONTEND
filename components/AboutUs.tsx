@@ -13,6 +13,7 @@ import {
 import aptImg from '../assets/imgapt.jpg';
 import CoreValues from './CoreValues';
 import StoreStats from './StoreStats';
+import MeetTheTeam from './MeetTheTeam';
 
 // --- Shared Components ---
 const TealButton = ({ text }: { text: string }) => (
@@ -90,6 +91,7 @@ export default function AboutUs() {
     </section>
     <CoreValues />
     <StoreStats />
+    <MeetTheTeam />
     </div>
   );
 }
