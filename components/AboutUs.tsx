@@ -11,6 +11,8 @@ import {
   Coffee, Utensils, Package, Gift, Camera, Headphones
 } from 'lucide-react';
 import aptImg from '../assets/imgapt.jpg';
+import CoreValues from './CoreValues';
+import StoreStats from './StoreStats';
 
 // --- Shared Components ---
 const TealButton = ({ text }: { text: string }) => (
@@ -86,6 +88,8 @@ export default function AboutUs() {
         </div>
       </div>
     </section>
+    <CoreValues />
+    <StoreStats />
     </div>
   );
 }
