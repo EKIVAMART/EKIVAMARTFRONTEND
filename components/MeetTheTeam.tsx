@@ -10,9 +10,14 @@ type TeamMember = {
 const team: TeamMember[] = [
   { id: 1, name: "Oghenefego Oghenekohworo", role: "CO-Founder", image: "/team/founder.jpg" },
   { id: 2, name: "Ebikebuna Rufus", role: "CO-Founder", image: "/team/founder.jpg" },
-  { id: 3, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
-  { id: 4, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 3, name: "Seigha Rufus", role: "CTO", image: "/team/founder.jpg" },
+  { id: 4, name: "Mustapha Adekunle", role: "Backend Developer", image: "/team/founder.jpg" },
   { id: 5, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 6, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 7, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 8, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+  { id: 9, name: "Oghenefego Oghenekohworo", role: "Founder", image: "/team/founder.jpg" },
+
 ];
 
 function TeamCard({ member }: { member: TeamMember }) {

@@ -1,4 +1,3 @@
-
 import {
   Heart,
   ChartNoAxesColumnIncreasing,
@@ -36,14 +35,12 @@ const coreValues: CoreValue[] = [
   },
   {
     title: "Honour & Integrity",
-    description:
-      "We are open, honest and trustworthy in all our dealings.",
+    description: "We are open, honest and trustworthy in all our dealings.",
     icon: GitCompareArrows,
   },
   {
     title: "Passion",
-    description:
-      "We are passionate about our brand and our mission.",
+    description: "We are passionate about our brand and our mission.",
     icon: Sun,
   },
   {
@@ -56,8 +53,8 @@ const coreValues: CoreValue[] = [
 
 export default function CoreValues() {
   return (
-    <section className="bg-[#FAF8FA] px-5 py-14 md:px-10 md:py-16 lg:px-16 lg:py-12">
-      <div className="mx-auto max-w-7xl">
+    <section className="w-full bg-[#FAF8FA] py-14 md:py-16 lg:py-12">
+      <div className="mx-auto w-[90%]">
         {/* Section Heading */}
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-[#302C30] md:text-4xl lg:text-[42px]">
