@@ -35,7 +35,8 @@ export default function AboutUs() {
   };
 
   return (
-    <div className="relative w-full h-[70svh] min-h-[420px] md:h-[85svh] lg:h-screen overflow-hidden mb-6">
+     <div >
+       <div className="relative w-full h-[70svh] min-h-[420px] md:h-[85svh] lg:h-screen overflow-hidden ">
       <Image
         src={aptImg}
         alt="About Us Image"
@@ -45,10 +46,13 @@ export default function AboutUs() {
         className="object-cover object-center z-0"
       />
       <div className="absolute inset-0 z-10 bg-gradient-to-t md:bg-gradient-to-r from-[#9d4ae3]/80 via-[#8236be]/50 to-transparent" />
-      <div>
-          <h1>The Easy Way to Do Business.</h1>
-          <p>Our mission is to make doing business easy and democratize business opportunities for all!</p>
+      <div className="absolute inset-0 z-20 flex flex-col items-left justify-center text-left p-4  ml-10">
+        <h1 className="text-5xl md:text-5xl font-bold text-white mb-4 text-yellow-400">The Easy Way to Do Business.</h1>
+        <p className="text-lg text-white max-w-2xl">
+           Everything you need to sell online in one place  build your store, manage orders, and reach buyers across Nigeria and beyond.
+        </p>
       </div>
+    </div>
     </div>
   );
 }
