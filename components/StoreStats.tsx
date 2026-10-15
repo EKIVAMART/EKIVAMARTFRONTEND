@@ -1,4 +1,3 @@
-
 type StoreStat = {
   value: string;
   highlight: string;
@@ -30,8 +29,8 @@ const storeStats: StoreStat[] = [
 
 export default function StoreStats() {
   return (
-    <section className="bg-[#9D4AE3] px-5 py-10 text-white sm:px-8 md:py-12">
-      <div className="mx-auto grid max-w-5xl grid-cols-2 items-center gap-x-4 gap-y-8 md:grid-cols-4 md:gap-8">
+    <section className="w-full bg-[#9D4AE3] py-10 text-white md:py-12">
+      <div className="mx-auto grid w-[90%] grid-cols-2 items-center gap-x-4 gap-y-8 md:grid-cols-4 md:gap-8">
         {storeStats.map((stat) => (
           <div
             key={stat.label}
@@ -39,9 +38,7 @@ export default function StoreStats() {
           >
             <p className="text-3xl font-bold leading-none tracking-tight md:text-4xl">
               <span>{stat.value}</span>
-              <span className="text-[#FFE500]">
-                {stat.highlight}
-              </span>
+              <span className="text-[#FFE500]">{stat.highlight}</span>
             </p>
 
             <p className="mt-2 text-xs leading-snug text-white md:text-sm">
