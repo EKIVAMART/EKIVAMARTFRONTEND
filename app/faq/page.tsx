@@ -50,7 +50,7 @@ const faqCategories: FAQCategory[] = [
     faqs: [
       {
         q: 'What payment methods do you accept?',
-        a: 'We accept secure payments via major Debit/Credit Cards (Mastercard, Visa, Verve), Direct Bank Transfers, and integrated payment gateways (Paystack/Flutterwave). Cash on delivery is available for select Lagos and Asaba shipping zones.'
+        a: 'We accept secure payments via major Debit/Credit Cards (Mastercard, Visa, Verve), Direct Bank Transfers, and Korapay secure gateway. Cash on delivery is available for select Lagos and Asaba shipping zones.'
       },
       {
         q: 'How long do refund processes take?',

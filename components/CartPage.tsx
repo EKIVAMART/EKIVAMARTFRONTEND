@@ -83,7 +83,7 @@ export default function CartPage() {
   // Checkout flow state & Live Quote
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'flutterwave' | 'kora_pay' | 'mock'>('kora_pay');
+  const [paymentMethod, setPaymentMethod] = useState<'kora_pay'>('kora_pay');
   const [quoteData, setQuoteData] = useState<OrderQuote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState<boolean>(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
@@ -562,7 +562,7 @@ export default function CartPage() {
         return;
       }
 
-      // Initialize payment collection with chosen gateway (paystack, flutterwave, or mock)
+      // Initialize payment collection with Korapay gateway
       toast.loading('Redirecting to secure payment...', { id: checkoutToast });
       const paymentRes = await orderApi.processPayment(orderId, paymentMethod);
 
@@ -940,7 +940,7 @@ export default function CartPage() {
                             `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
                           ) : (
                             <span className="text-purple-600 text-xs font-semibold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
-                              Select your state
+                              Calculated at checkout
                             </span>
                           )}
                         </span>
@@ -1022,9 +1022,24 @@ export default function CartPage() {
                         </span>
                       </div>
 
+                      {/* Service fee */}
+                      {(summary.commissionAmount !== undefined && summary.commissionAmount > 0) && (
+                        <div className="flex justify-between text-gray-600 text-sm font-medium items-center">
+                          <span className="flex items-center gap-1.5" title="Platform fee added to your order">
+                            <ShieldCheck size={15} className="text-[#9d4ae3]" />
+                            Service fee
+                          </span>
+                          <span className="font-bold text-slate-800">
+                            ₦{summary.commissionAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+
                       {/* Total */}
                       <div className="border-t border-dashed pt-3.5 flex justify-between items-center">
-                        <span className="font-bold text-slate-800">Total Amount</span>
+                        <span className="font-bold text-slate-800">
+                          {summary.deliveryFeeCalculated === false ? 'Estimated total' : 'Total'}
+                        </span>
                         <span className="text-2xl font-extrabold text-[#9d4ae3]">
                           ₦{summary.total.toLocaleString()}
                         </span>
@@ -1340,65 +1355,8 @@ export default function CartPage() {
                       </label>
                       <div className="space-y-2">
                         <label
-                          onClick={() => setPaymentMethod('paystack')}
-                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                            paymentMethod === 'paystack'
-                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
-                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="paystack"
-                              checked={paymentMethod === 'paystack'}
-                              onChange={() => setPaymentMethod('paystack')}
-                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
-                            />
-                            <div>
-                              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <span>Paystack</span>
-                                <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.2 rounded font-bold">Recommended</span>
-                              </div>
-                              <p className="text-[11px] text-gray-500 font-medium">Card, Bank Transfer, USSD, Apple Pay</p>
-                            </div>
-                          </div>
-                          <CreditCard size={18} className="text-[#9d4ae3] shrink-0" />
-                        </label>
-
-                        <label
-                          onClick={() => setPaymentMethod('flutterwave')}
-                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                            paymentMethod === 'flutterwave'
-                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
-                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="flutterwave"
-                              checked={paymentMethod === 'flutterwave'}
-                              onChange={() => setPaymentMethod('flutterwave')}
-                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
-                            />
-                            <div>
-                              <div className="text-xs font-bold text-slate-800">Flutterwave</div>
-                              <p className="text-[11px] text-gray-500 font-medium">Cards, Mobile Money, Bank Account</p>
-                            </div>
-                          </div>
-                          <CreditCard size={18} className="text-amber-500 shrink-0" />
-                        </label>
-
-                        <label
                           onClick={() => setPaymentMethod('kora_pay')}
-                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                            paymentMethod === 'kora_pay'
-                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
-                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
-                          }`}
+                          className="flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30"
                         >
                           <div className="flex items-center gap-3">
                             <input
@@ -1415,34 +1373,6 @@ export default function CartPage() {
                             </div>
                           </div>
                           <CreditCard size={18} className="text-emerald-500 shrink-0" />
-                        </label>
-
-                        <label
-                          onClick={() => setPaymentMethod('mock')}
-                          className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                            paymentMethod === 'mock'
-                              ? 'border-[#9d4ae3] bg-purple-50/70 shadow-xs ring-1 ring-[#9d4ae3]/30'
-                              : 'border-gray-200 hover:border-gray-300 bg-slate-50/40'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="mock"
-                              checked={paymentMethod === 'mock'}
-                              onChange={() => setPaymentMethod('mock')}
-                              className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
-                            />
-                            <div>
-                              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <span>Mock Payment Gateway</span>
-                                <span className="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.2 rounded font-bold">Test/Dev</span>
-                              </div>
-                              <p className="text-[11px] text-gray-500 font-medium">Sandbox simulator for test orders</p>
-                            </div>
-                          </div>
-                          <ShieldCheck size={18} className="text-blue-500 shrink-0" />
                         </label>
                       </div>
                     </div>
@@ -1510,7 +1440,7 @@ export default function CartPage() {
                     {/* Order Quote Review Totals */}
                     <div className="border-t pt-4 space-y-2 text-xs">
                       <div className="flex justify-between text-gray-600 font-medium">
-                        <span>Items Subtotal:</span>
+                        <span>Subtotal:</span>
                         <span className="font-bold text-slate-800">
                           ₦{(quoteData?.subtotal ?? summary?.subtotal ?? 0).toLocaleString()}
                         </span>
@@ -1518,7 +1448,7 @@ export default function CartPage() {
                       <div className="flex justify-between text-gray-600 font-medium">
                         <span className="flex items-center gap-1">
                           <Truck size={13} className="text-[#9d4ae3]" />
-                          Delivery Fee:
+                          Delivery fee:
                         </span>
                         <span className="font-bold text-slate-800">
                           {quoteData ? (
@@ -1526,7 +1456,7 @@ export default function CartPage() {
                           ) : summary?.deliveryFeeCalculated ? (
                             `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
                           ) : (
-                            <span className="text-purple-600">Calculated from state</span>
+                            <span className="text-purple-600">Calculated at checkout</span>
                           )}
                         </span>
                       </div>
@@ -1538,8 +1468,25 @@ export default function CartPage() {
                           ₦{(quoteData?.taxAmount ?? summary?.tax ?? 0).toLocaleString()}
                         </span>
                       </div>
+                      {((quoteData?.commissionAmount ?? summary?.commissionAmount ?? 0) > 0) && (
+                        <div className="flex justify-between text-gray-600 font-medium items-center">
+                          <span className="flex items-center gap-1" title="Platform fee added to your order">
+                            <ShieldCheck size={13} className="text-[#9d4ae3]" />
+                            Service fee:
+                          </span>
+                          <span className="font-bold text-slate-800">
+                            ₦{(quoteData?.commissionAmount ?? summary?.commissionAmount ?? 0).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      {((quoteData?.discountAmount ?? 0) > 0) && (
+                        <div className="flex justify-between font-medium text-emerald-600">
+                          <span>Discount:</span>
+                          <span className="font-bold">-₦{quoteData!.discountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
                       <div className="border-t border-dashed pt-3 flex justify-between items-center text-sm font-bold text-slate-800">
-                        <span>Total Due:</span>
+                        <span>Total:</span>
                         <span className="text-xl font-extrabold text-[#9d4ae3]">
                           ₦{(quoteData?.total ?? summary?.total ?? 0).toLocaleString()}
                         </span>

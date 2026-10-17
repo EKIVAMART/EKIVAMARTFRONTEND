@@ -246,12 +246,11 @@ export default function BecomeAVendorPage() {
             <FadeInSection type="fadeUp" delay={0.35}>
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={handleStartSellingClick}
-                  disabled={checkingStatus}
-                  className="inline-flex items-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-2xl font-bold text-base shadow-xl shadow-brand-950/30 active:scale-[0.98] transition-all disabled:opacity-60"
+                  onClick={() => router.push('/contact-us')}
+                  className="inline-flex items-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-2xl font-bold text-base shadow-xl shadow-brand-950/30 active:scale-[0.98] transition-all"
                 >
-                  {checkingStatus ? 'Checking Application...' : 'Start Selling Now'}
-                  <ArrowRight size={18} aria-hidden="true" />
+                  <Mail size={18} aria-hidden="true" />
+                  Contact Vendor Team
                 </button>
                 <a
                   href="#learn-more"
@@ -461,18 +460,10 @@ export default function BecomeAVendorPage() {
                 <p className="text-brand-200 max-w-lg mx-auto text-sm md:text-base font-medium leading-relaxed">
                   Join hundreds of verified vendors already growing their businesses on Nigeria's most diverse multi-category marketplace.
                 </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-                  <button
-                    onClick={handleStartSellingClick}
-                    disabled={checkingStatus}
-                    className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98] text-sm disabled:opacity-60"
-                  >
-                    {checkingStatus ? 'Loading...' : 'Apply as a Vendor'}
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </button>
+                <div className="flex justify-center pt-2">
                   <button
                     onClick={() => router.push('/contact-us')}
-                    className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-2xl transition-all text-sm"
+                    className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98] text-sm"
                   >
                     <Mail size={16} aria-hidden="true" />
                     Contact Vendor Team
@@ -487,7 +478,7 @@ export default function BecomeAVendorPage() {
       {/* ── INLINE AUTH ── */}
       <div id="auth-anchor" />
       <AnimatePresence>
-        {(!isAuthenticated || showAuthSection) && (
+        {false && (
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

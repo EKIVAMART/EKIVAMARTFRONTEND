@@ -1336,6 +1336,7 @@ export interface CartSummaryResponse {
   tax: number;
   taxRate?: number;
   taxPercentage?: number;
+  commissionAmount?: number;
   region?: string | null;
   country?: string;
   total: number;
@@ -2558,6 +2559,7 @@ export interface OrderItem {
   unitPrice: { amount: number; currency: string; formatted?: string };
   quantity: number;
   subtotal: { amount: number; currency: string; formatted?: string };
+  commissionAmount?: { amount: number; currency: string; formatted?: string };
 }
 
 export interface OrderData {
@@ -2580,6 +2582,7 @@ export interface OrderData {
   subtotal: { amount: number; currency: string; formatted?: string };
   shippingCost: { amount: number; currency: string; formatted?: string };
   taxAmount: { amount: number; currency: string; formatted?: string };
+  commissionAmount?: { amount: number; currency: string; formatted?: string };
   discountAmount?: { amount: number; currency: string; formatted?: string };
   totalAmount: { amount: number; currency: string; formatted?: string };
   status: string;

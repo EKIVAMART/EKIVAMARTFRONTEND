@@ -1118,14 +1118,8 @@
   border: 1px solid #e2e8f0;
   text-decoration: none;
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-}
-
-.pd-vendor-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(157, 74, 227, 0.08);
-  border-color: #cbd5e1;
+  cursor: default;
 }
 
 .pd-vendor-header {
@@ -1193,16 +1187,6 @@
   font-weight: 800;
 }
 
-.pd-vendor-chevron {
-  flex-shrink: 0;
-  color: #94a3b8;
-  transition: transform 0.2s ease;
-}
-
-.pd-vendor-card:hover .pd-vendor-chevron {
-  transform: translateX(4px);
-  color: #9d4ae3;
-}
 
 .pd-vendor-footer {
   display: flex;

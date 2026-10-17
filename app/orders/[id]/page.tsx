@@ -50,7 +50,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const [submittingRefund, setSubmittingRefund] = useState(false);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('mock');
+  const [paymentMethod, setPaymentMethod] = useState('kora_pay');
   const [processingPayment, setProcessingPayment] = useState(false);
 
   // Reorder Skipped items modal state
@@ -145,7 +145,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
       if (res?.success && res.data?.payment) {
         const payData = res.data.payment;
         if (payData.paymentUrl) {
-          toast.success('Redirecting to checkout sandbox...');
+          toast.success('Redirecting to payment gateway...');
           router.push(payData.paymentUrl);
         } else {
           toast.success('Payment completed successfully!');
@@ -506,6 +506,14 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   <span>Tax Amount</span>
                   <span className="text-slate-800 font-bold">{order.taxAmount?.formatted || `₦${order.taxAmount?.amount?.toLocaleString()}`}</span>
                 </div>
+                {((typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount) || 0) > 0 && (
+                  <div className="flex justify-between font-medium text-gray-500">
+                    <span>Service fee</span>
+                    <span className="text-slate-800 font-bold">
+                      {order.commissionAmount?.formatted || `₦${(typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount)?.toLocaleString()}`}
+                    </span>
+                  </div>
+                )}
                 {order.discountAmount?.amount > 0 && (
                   <div className="flex justify-between font-medium text-emerald-600">
                     <span>Discount</span>
@@ -675,33 +683,6 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             <p className="text-sm text-gray-500 mb-4 font-semibold">Select your preferred payment gateway provider:</p>
             
             <div className="space-y-2">
-              <button
-                onClick={() => setPaymentMethod('mock')}
-                className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between transition ${
-                  paymentMethod === 'mock' ? 'border-purple-500 bg-purple-50/20 text-purple-950 font-bold' : 'border-gray-150 hover:bg-gray-50 text-gray-600'
-                }`}
-              >
-                <span>Mock Gateway (Local Sandbox)</span>
-                <span className="text-[10px] uppercase bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-black">Free</span>
-              </button>
-              <button
-                onClick={() => setPaymentMethod('paystack')}
-                className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between transition ${
-                  paymentMethod === 'paystack' ? 'border-purple-500 bg-purple-50/20 text-purple-950 font-bold' : 'border-gray-150 hover:bg-gray-50 text-gray-600'
-                }`}
-              >
-                <span>Paystack Gateway</span>
-                <span className="text-[10px] uppercase bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded font-black">Live</span>
-              </button>
-              <button
-                onClick={() => setPaymentMethod('flutterwave')}
-                className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between transition ${
-                  paymentMethod === 'flutterwave' ? 'border-purple-500 bg-purple-50/20 text-purple-950 font-bold' : 'border-gray-150 hover:bg-gray-50 text-gray-600'
-                }`}
-              >
-                <span>Flutterwave Gateway</span>
-                <span className="text-[10px] uppercase bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-black">Live</span>
-              </button>
               <button
                 onClick={() => setPaymentMethod('kora_pay')}
                 className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between transition ${
