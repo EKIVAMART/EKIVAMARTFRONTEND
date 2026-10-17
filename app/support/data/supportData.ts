@@ -390,7 +390,7 @@ export const fafloraSupportData: SupportTopic[] = [
         id: "48",
         slug: "what-payment-options-are-available",
         title: "What payment options are available?",
-        content: `# What payment options are available?\n\nFaflora supports:\n- Card payments (Visa, Mastercard, Verve)\n- Bank transfers\n- Wallet balance\n- Cash on Delivery (available in select cities)\n- Paystack and Flutterwave secure gateways\n\nAll payments are encrypted and secure.`,
+        content: `# What payment options are available?\n\nFaflora supports:\n- Card payments (Visa, Mastercard, Verve)\n- Bank transfers\n- Wallet balance\n- Cash on Delivery (available in select cities)\n- Korapay secure gateway\n\nAll payments are encrypted and secure.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -530,7 +530,7 @@ export const fafloraSupportData: SupportTopic[] = [
         id: "65",
         slug: "what-payment-methods-does-faflora-accept",
         title: "What payment methods does Faflora accept?",
-        content: `# What payment methods does Faflora accept?\n\nFaflora supports secure payments through:\n- Debit/Credit Cards (Visa, Mastercard, Verve)\n- Bank Account transfers via Paystack/Flutterwave\n- Mobile Money / USSD\n- Wallet balance\n- Cash on Delivery (in selected cities)\n\nAll transactions are protected with industry-standard encryption.`,
+        content: `# What payment methods does Faflora accept?\n\nFaflora supports secure payments through:\n- Debit/Credit Cards (Visa, Mastercard, Verve)\n- Bank Account transfers via Korapay\n- Mobile Money / USSD\n- Wallet balance\n- Cash on Delivery (in selected cities)\n\nAll transactions are protected with industry-standard encryption.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -544,7 +544,7 @@ export const fafloraSupportData: SupportTopic[] = [
         id: "67",
         slug: "how-safe-is-my-payment-information",
         title: "How safe is my payment information?",
-        content: `# How safe is my payment information?\n\nFaflora does **not** store your full card details. All payments are processed securely by Paystack and Flutterwave using 256-bit SSL encryption and PCI-DSS compliance.\n\nYou can also enable additional security like PIN or biometric authentication on your bank app.`,
+        content: `# How safe is my payment information?\n\nFaflora does **not** store your full card details. All payments are processed securely by Korapay using 256-bit SSL encryption and PCI-DSS compliance.\n\nYou can also enable additional security like PIN or biometric authentication on your bank app.`,
         lastUpdated: "April 06, 2026"
       },
       {
@@ -911,7 +911,7 @@ export const fafloraSupportData: SupportTopic[] = [
         id: "115",
         slug: "is-my-payment-information-safe",
         title: "Is my payment information safe?",
-        content: `# Is my payment information safe?\n\nYes. Faflora does not store your full card details. Payments are securely processed by licensed partners (Paystack and Flutterwave) using bank-level encryption. We only see confirmation of successful payment.`,
+        content: `# Is my payment information safe?\n\nYes. Faflora does not store your full card details. Payments are securely processed by licensed partner Korapay using bank-level encryption. We only see confirmation of successful payment.`,
         lastUpdated: "April 06, 2026"
       },
       {

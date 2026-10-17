@@ -140,13 +140,7 @@ export default function ProductCard({
 
         <div className="pc-author-section">
           <span className="pc-seller-badge">Sold by</span>
-          {storeSlug ? (
-            <Link href={`/stores/${storeSlug}`} className="pc-author hover:underline font-bold text-[#9d4ae3]">
-              {sellerName}
-            </Link>
-          ) : (
-            <span className="pc-author font-bold text-[#9d4ae3]">{sellerName}</span>
-          )}
+          <span className="pc-author font-bold text-[#9d4ae3]">{sellerName}</span>
         </div>
 
         <div className="pc-price-row">

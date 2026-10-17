@@ -60,7 +60,7 @@ export const faqs = [
   },
   {
     q: 'How do I become a vendor on Faflora?',
-    a: 'Head over to our vendor onboarding page from the main navigation, fill out the vendor application form, and our vendor success team will review your application within 48 hours.',
+    a: 'Please reach out to our vendor team through this contact form or email vendors@faflora.com, and our vendor onboarding team will assist you directly.',
   },
   {
     q: 'Can I request a refund through this form?',
