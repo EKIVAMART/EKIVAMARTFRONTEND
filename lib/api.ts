@@ -446,10 +446,6 @@ export const authApi = {
     redirectToAuthProvider('/auth/google');
   },
 
-  async facebookLogin() {
-    redirectToAuthProvider('/auth/facebook');
-  },
-
   async inviteOrPromoteAdmin(data: {
     email: string;
     phoneNumber: string;
