@@ -12,7 +12,7 @@ export default function CopyButton({ value }: { value: string }) {
     <button
       onClick={copy}
       aria-label={copied ? 'Copied!' : 'Copy to clipboard'}
-      className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#8236be]/70 hover:text-[#9d4ae3] transition-colors px-2 py-1 rounded-lg bg-[#fdf3fc] border border-[#e8b8e4] hover:border-[#8236be]"
+      className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#1c711c]/70 hover:text-[#228b22] transition-colors px-2 py-1 rounded-lg bg-[#f7f9f5] border border-[#bfd4bc] hover:border-[#1c711c]"
     >
       {copied ? <Check size={10} /> : <Copy size={10} />}
       {copied ? 'Copied' : 'Copy'}

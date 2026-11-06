@@ -110,9 +110,9 @@ function mapProduct(raw: any): LandingProduct {
     reviewCount: 0,
     location: locationStr,
     vendor:
-      raw.storeName || raw.store?.name || raw.vendor?.name || 'Faflora Store',
+      raw.storeName || raw.store?.name || raw.vendor?.name || 'EkivaMart Store',
     storeName:
-      raw.storeName || raw.store?.name || raw.vendor?.name || 'Faflora Store',
+      raw.storeName || raw.store?.name || raw.vendor?.name || 'EkivaMart Store',
     href: `/products/${raw.id || raw._id}`,
   };
 }

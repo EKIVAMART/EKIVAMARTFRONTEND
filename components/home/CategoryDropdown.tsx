@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
@@ -14,78 +15,18 @@ interface CategoryDropdownProps {
 const FEATURED_SLUG = '__featured__';
 
 // Popular product chips from Popular Products section to add under Featured
-const FEATURED_CHIPS = [
-  { name: 'All Products', href: '/categories/shop' },
-  { name: 'Smartphones', href: '/categories/mobile-phones--accessories?subcategory=smartphones' },
-  { name: 'Drones', href: '/categories/photography--video?subcategory=drones' },
-  { name: 'Handbags', href: '/categories/bags--luggage?subcategory=handbags' },
-  { name: 'Watches', href: '/categories/jewelry--fashion-accessories?subcategory=watches' },
-  { name: 'Sneakers', href: '/categories/fashion?subcategory=sneakers' },
-  { name: 'Headphones', href: '/categories/electronics?subcategory=headphones' },
-  { name: 'Skincare', href: '/categories/beauty?subcategory=skincare' },
-  { name: 'Laptops', href: '/categories/electronics?subcategory=laptops' },
-  { name: 'Fragrances', href: '/categories/beauty?subcategory=fragrances' },
+export const FEATURED_CHIPS = [
+  { name: 'All products', href: '/categories/shop' },
+  { name: 'Fashion', href: '/categories/fashion' },
+  { name: 'Electronics', href: '/categories/electronics' },
+  { name: 'Footwear', href: '/categories/footwear' },
+  { name: 'Bags & Luggage', href: '/categories/bags-luggage' },
+  { name: 'Home & Kitchen', href: '/categories/home-kitchen' },
+  { name: 'Beauty & Cosmetics', href: '/categories/beauty-cosmetics' },
 ];
 
-// CategoryImage component with proper fallback logic
-export function CategoryImage({ src, alt, size = 36 }: { src: string; alt: string; size?: number }) {
-  const [imgError, setImgError] = useState(false);
-  
-  // Debug: Log what's being passed
-  console.log('CategoryImage - src:', src, 'alt:', alt, 'type:', typeof src);
-  
-  // Check if the src is valid (not null, undefined, or empty string)
-  const hasValidSrc = src && typeof src === 'string' && src.trim().length > 0;
-  
-  // Determine if we should show the image
-  const shouldShowImage = hasValidSrc && !imgError;
-  
-  // Get first letter for fallback
-  const firstLetter = alt?.charAt(0).toUpperCase() || '?';
-
-  // Debug: Log what we're displaying
-  console.log('CategoryImage - hasValidSrc:', hasValidSrc, 'shouldShowImage:', shouldShowImage);
-
-  return (
-    <span
-      className="relative flex items-center justify-center bg-brand-600 shrink-0"
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        clipPath: 'url(#curved-triangle)',
-      }}
-    >
-      <span
-        className="relative flex items-center justify-center bg-white overflow-hidden"
-        style={{
-          width: `${size - 4}px`,
-          height: `${size - 4}px`,
-          clipPath: 'url(#curved-triangle)',
-        }}
-      >
-        {shouldShowImage ? (
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes={`${size}px`}
-            className="object-cover"
-            onError={() => {
-              console.log('Image failed to load:', src);
-              setImgError(true);
-            }}
-            aria-hidden
-            unoptimized={src.startsWith('http')}
-          />
-        ) : (
-          // Fallback: show stylized initial with brand color
-          <span className="text-base font-extrabold text-brand-600 select-none">
-            {firstLetter}
-          </span>
-        )}
-      </span>
-    </span>
-  );
+export function CategoryImage({ src, size = 36 }: { src: string; alt: string; size?: number }) {
+  return <Image src={src} alt="" width={size} height={size} className="shrink-0 rounded object-contain" />;
 }
 
 export default function CategoryDropdown({ categories, onClose, anchorRef }: CategoryDropdownProps) {
@@ -111,7 +52,7 @@ export default function CategoryDropdown({ categories, onClose, anchorRef }: Cat
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-full left-0 z-50 mt-1 flex w-[780px] max-w-[96vw] overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-8px_rgba(157,74,227,0.22)] ring-1 ring-neutral-100"
+      className="absolute top-full left-0 z-50 mt-1 flex w-[780px] max-w-[96vw] overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-8px_rgba(24,28,24,0.12)] ring-1 ring-neutral-100"
       style={{ minHeight: '320px' }}
     >
       {/* Left rail */}
@@ -127,21 +68,11 @@ export default function CategoryDropdown({ categories, onClose, anchorRef }: Cat
               : 'border-l-[3px] border-transparent text-neutral-800 hover:bg-neutral-100 font-medium'
           }`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 shrink-0">
-            <Image
-              src="/icons/solar_star-fall-bold-duotone.png"
-              alt=""
-              width={18}
-              height={18}
-              aria-hidden
-            />
-          </span>
+          <LayoutGrid size={36} strokeWidth={1.5} className="p-2 text-stone-700" aria-hidden="true" />
           <span className="text-sm font-semibold">Featured</span>
         </button>
 
         {categories.map((category) => {
-          // Debug: Log category data
-          console.log('Category:', category.name, 'imageUrl:', category.imageUrl);
           
           return (
             <button

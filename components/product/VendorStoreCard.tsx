@@ -31,7 +31,7 @@ export default function VendorStoreCard({ product }: VendorStoreCardProps) {
     storeSlug || storeName
       ? {
           slug: storeSlug,
-          name: storeName || 'Faflora Store',
+          name: storeName || 'EkivaMart Store',
         }
       : null
   );
@@ -58,7 +58,7 @@ export default function VendorStoreCard({ product }: VendorStoreCardProps) {
         if (match) {
           setStoreData({
             slug: match.slug || match.username || storeSlug,
-            name: match.name || match.storeName || storeName || 'Faflora Store',
+            name: match.name || match.storeName || storeName || 'EkivaMart Store',
             logoUrl: match.logo || match.logoUrl || undefined,
             description: match.description || undefined,
             trustLevel: match.trustLevel || undefined,
@@ -93,7 +93,7 @@ export default function VendorStoreCard({ product }: VendorStoreCardProps) {
         if (profile) {
           setStoreData((prev) => ({
             slug: profile.storeSlug || storeSlug,
-            name: profile.storeName || prev?.name || storeName || 'Faflora Store',
+            name: profile.storeName || prev?.name || storeName || 'EkivaMart Store',
             logoUrl: profile.storeLogoUrl || undefined,
             description: profile.storeDescription || undefined,
             trustLevel: profile.trustLevel || undefined,
@@ -199,7 +199,7 @@ export default function VendorStoreCard({ product }: VendorStoreCardProps) {
         </div>
         <div className="pd-vendor-joined flex items-center gap-1.5 text-xs text-gray-500 font-medium">
           <Calendar size={14} className="text-gray-400" />
-          <span>Selling on Faflora</span>
+          <span>Selling on EkivaMart</span>
         </div>
       </div>
     </Link>

@@ -70,7 +70,7 @@ export default function CartNoteModal() {
           {!showInput ? (
             <div className="text-center py-4 relative">
               <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mx-auto mb-5 shadow-inner">
-                <MessageSquare className="text-[#9d4ae3]" size={28} />
+                <MessageSquare className="text-[#228b22]" size={28} />
               </div>
               <h3 className="text-xl font-bold text-slate-800 mb-2">Add a Note?</h3>
               <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
@@ -85,7 +85,7 @@ export default function CartNoteModal() {
                 </button>
                 <button
                   onClick={() => setShowInput(true)}
-                  className="flex-1 py-3.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-xl hover:from-[#8236be] hover:to-[#692a99] transition shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3.5 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-bold rounded-xl hover:from-[#1c711c] hover:to-[#185b1a] transition shadow-md active:scale-95 flex items-center justify-center gap-1.5"
                 >
                   Yes, add note
                 </button>
@@ -94,7 +94,7 @@ export default function CartNoteModal() {
           ) : (
             <form onSubmit={handleSubmit} className="relative">
               <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <MessageSquare className="text-[#9d4ae3]" size={20} />
+                <MessageSquare className="text-[#228b22]" size={20} />
                 Item Note
               </h3>
               <p className="text-gray-500 text-sm mb-4">
@@ -107,7 +107,7 @@ export default function CartNoteModal() {
                 rows={4}
                 required
                 autoFocus
-                className="w-full px-4 py-3 text-slate-800 border border-gray-200 rounded-xl focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 bg-gray-50 resize-none transition-all text-sm mb-6"
+                className="w-full px-4 py-3 text-slate-800 border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 bg-gray-50 resize-none transition-all text-sm mb-6"
               />
               <div className="flex gap-4">
                 <button
@@ -119,7 +119,7 @@ export default function CartNoteModal() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-xl hover:from-[#8236be] hover:to-[#692a99] transition shadow-md flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3.5 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-bold rounded-xl hover:from-[#1c711c] hover:to-[#185b1a] transition shadow-md flex items-center justify-center gap-1.5"
                 >
                   <Check size={16} />
                   Submit Note

@@ -36,7 +36,7 @@ export default function Home() {
       <Navbar />
 
       {/* Zone 1: Ads + Category Scroller */}
-      <div className="bg-[#8236be] w-full">
+      <div className="bg-[#1c711c] w-full">
         <section className="px-4 md:px-12 py-3 md:py-4">
           <div className="grid md:gap-3 gap-2 sm:grid-cols-2">
             <AdCarousel images={leftAdSlides} className="h-20 md:h-36" />
@@ -48,15 +48,15 @@ export default function Home() {
 
       {/* Flash Sale bridge split */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 bottom-1/2 bg-[#8236be]" />
-        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#f3ecfc]" />
+        <div className="absolute inset-x-0 top-0 bottom-1/2 bg-[#1c711c]" />
+        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#eff4e9]" />
         <div className="relative z-10 px-4 md:px-12 pt-4 pb-6">
           <FlashSaleSection />
         </div>
       </div>
 
       {/* Zone 2: Featured Products */}
-      <div className="bg-[#f3ecfc] w-full pt-0 pb-6">
+      <div className="bg-[#eff4e9] w-full pt-0 pb-6">
         <div className="px-4 md:px-12 w-full">
           <div className="bg-brand-600 overflow-hidden shadow-lg">
             <ProductCarousel
@@ -72,8 +72,8 @@ export default function Home() {
 
       {/* Fashion bridge split */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 bottom-1/2 bg-[#f3ecfc]" />
-        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#8236be]" />
+        <div className="absolute inset-x-0 top-0 bottom-1/2 bg-[#eff4e9]" />
+        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#1c711c]" />
         <div className="relative z-10 px-4 md:px-12 py-6">
           <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
             <ProductCarousel
@@ -86,7 +86,7 @@ export default function Home() {
       </div>
 
       {/* Zone 3: Footwear, Bags, Jewellery & Mobile Accessories */}
-      <div className="bg-[#8236be] w-full pt-0 pb-6">
+      <div className="bg-[#1c711c] w-full pt-0 pb-6">
         <div className="px-4 md:px-12 mb-6 w-full">
           <div className="bg-brand-50 border border-brand-100 overflow-hidden shadow-sm">
             <ProductCarousel

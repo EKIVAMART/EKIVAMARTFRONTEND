@@ -214,30 +214,30 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
 
   const barColor =
     secondsLeft > 10
-      ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be]'
+      ? 'bg-[#228b22]'
       : secondsLeft > 5
-      ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-      : 'bg-gradient-to-r from-red-500 to-rose-600';
+      ? 'bg-amber-400'
+      : 'bg-red-500';
 
   const timerColor =
     secondsLeft > 10
-      ? 'text-[#9d4ae3]'
+      ? 'text-[#228b22]'
       : secondsLeft > 5
       ? 'text-amber-600'
       : 'text-rose-600';
 
-  const pulseClass = secondsLeft <= 5 ? 'animate-pulse' : '';
+  const pulseClass = secondsLeft <= 5 ? '' : '';
 
   return (
     <AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 ">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden"
+            className="bg-white w-full max-w-md rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden"
           >
             {/* ── Progress bar ── */}
             <div className="h-1.5 bg-slate-100 w-full">
@@ -249,12 +249,12 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
 
             {/* ── Header ── */}
             <div className="px-8 pt-8 pb-0 flex flex-col items-center text-center gap-3">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+              <div className={`w-16 h-16 rounded-md flex items-center justify-center ${
                 secondsLeft <= 5
                   ? 'bg-rose-50 text-rose-600 border border-rose-100'
                   : secondsLeft <= 10
                   ? 'bg-amber-50 text-amber-600 border border-amber-100'
-                  : 'bg-fuchsia-50 text-[#9d4ae3] border border-fuchsia-100'
+                  : 'bg-brand-50 text-[#228b22] border border-brand-100'
               } ${pulseClass}`}>
                 <ShieldAlert size={32} strokeWidth={1.75} />
               </div>
@@ -274,12 +274,12 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
 
             {/* ── Countdown ring ── */}
             <div className="flex items-center justify-center py-6">
-              <div className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner ${
+              <div className={`relative w-24 h-24 rounded-md border-4 flex items-center justify-center shadow-inner ${
                 secondsLeft <= 5
                   ? 'border-rose-200 bg-rose-50'
                   : secondsLeft <= 10
                   ? 'border-amber-200 bg-amber-50'
-                  : 'border-fuchsia-100 bg-fuchsia-50/60'
+                  : 'border-brand-100 bg-brand-50/60'
               } ${pulseClass}`}>
                 <Clock
                   size={18}
@@ -298,7 +298,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
                 type="button"
                 onClick={extendSession}
                 disabled={isExtending || isLoggingOut}
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white rounded-2xl font-black text-sm shadow-lg shadow-fuchsia-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md font-black text-sm shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isExtending ? (
                   <>
@@ -317,7 +317,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
                 type="button"
                 onClick={performLogout}
                 disabled={isExtending || isLoggingOut}
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 rounded-md font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoggingOut ? (
                   <>

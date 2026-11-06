@@ -60,7 +60,7 @@ const ArticleCard = ({
     <FadeInSection type="fadeUp" delay={0.1 + index * 0.09}>
       <Link
         href={`/support/topics/${topicSlug}/${article.slug}`}
-        className="group relative flex flex-col bg-white border border-[#e8b8e4] hover:border-[#8236be] rounded-3xl p-8 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden"
+        className="group relative flex flex-col bg-white border border-[#e8b8e4] hover:border-[#1c711c] rounded-3xl p-8 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden"
       >
         {/* Hover bloom */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-[#fdf3fc]/60 to-transparent" />
@@ -75,11 +75,11 @@ const ArticleCard = ({
         </span>
 
         {/* Icon dot */}
-        <div className="relative flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-md shadow-[#9d4ae330] mb-5">
+        <div className="relative flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-md shadow-[#9d4ae330] mb-5">
           <BookOpen size={16} />
         </div>
 
-        <h3 className="relative text-[17px] font-extrabold text-[#1a0018] group-hover:text-[#9d4ae3] transition-colors leading-snug line-clamp-2 mb-3">
+        <h3 className="relative text-[17px] font-extrabold text-[#1a0018] group-hover:text-[#228b22] transition-colors leading-snug line-clamp-2 mb-3">
           {article.title}
         </h3>
 
@@ -92,7 +92,7 @@ const ArticleCard = ({
             <Clock size={12} />
             Updated {article.lastUpdated}
           </div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8236be] opacity-0 group-hover:opacity-100 transition-all">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1c711c] opacity-0 group-hover:opacity-100 transition-all">
             Read <ArrowRight size={13} />
           </div>
         </div>
@@ -129,15 +129,15 @@ export default async function TopicPage({
             <circle cx="240" cy="48" r="240" stroke="#f0c8ec" strokeWidth="0.5" />
             <line x1="0" y1="140" x2="288" y2="0" stroke="#e8b8e4" strokeWidth="0.6" />
             <line x1="0" y1="190" x2="288" y2="50" stroke="#f0c8ec" strokeWidth="0.4" />
-            <circle cx="270" cy="8" r="3.5" fill="#8236be" opacity="0.4" />
-            <circle cx="260" cy="18" r="2" fill="#9d4ae3" opacity="0.3" />
+            <circle cx="270" cy="8" r="3.5" fill="#1c711c" opacity="0.4" />
+            <circle cx="260" cy="18" r="2" fill="#228b22" opacity="0.3" />
           </svg>
         </div>
 
         {/* Dot grid */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.022]"
-          style={{ backgroundImage: 'radial-gradient(circle, #9d4ae3 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+          style={{ backgroundImage: 'radial-gradient(circle, #228b22 1px, transparent 1px)', backgroundSize: '28px 28px' }}
         />
 
         <div className="relative max-w-6xl mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-14">
@@ -145,25 +145,25 @@ export default async function TopicPage({
           {/* Breadcrumb */}
           <FadeInSection type="fadeDown" delay={0.05}>
             <nav className="flex items-center gap-2 text-xs font-semibold text-gray-400 mb-8 flex-wrap">
-              <Link href="/support" className="hover:text-[#9d4ae3] flex items-center gap-1.5 transition-colors">
+              <Link href="/support" className="hover:text-[#228b22] flex items-center gap-1.5 transition-colors">
                 <Home size={13} /> Support
               </Link>
               <ChevronRight size={12} className="text-gray-500" />
-              <span className="text-[#9d4ae3]">{topic.title}</span>
+              <span className="text-[#228b22]">{topic.title}</span>
             </nav>
           </FadeInSection>
 
           <div className="flex items-start gap-6">
             {/* Large topic icon */}
             <FadeInSection type="zoom" delay={0.1}>
-              <div className="flex-shrink-0 lg:w-16 lg:h-16 w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-xl shadow-[#9d4ae340] mt-1">
+              <div className="flex-shrink-0 lg:w-16 lg:h-16 w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-xl shadow-[#9d4ae340] mt-1">
                 {icon}
               </div>
             </FadeInSection>
 
             <div className="flex-1">
               <FadeInSection type="fadeUp" delay={0.15}>
-                <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-2">
+                <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-2">
                   Support Topic
                 </span>
                 <h1
@@ -176,7 +176,7 @@ export default async function TopicPage({
 
               <FadeInSection type="fadeUp" delay={0.28}>
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be]" />
+                  <div className="h-[3px] w-10 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c]" />
                   <div className="h-[3px] w-6 rounded-full bg-[#e8b8e4]" />
                   <div className="h-[3px] w-3 rounded-full bg-[#f0c8ec]" />
                 </div>
@@ -186,7 +186,7 @@ export default async function TopicPage({
               </FadeInSection>
 
               <FadeInSection type="fadeUp" delay={0.38}>
-                <div className="mt-5 inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] text-xs font-bold px-4 py-2 rounded-full">
+                <div className="mt-5 inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] text-xs font-bold px-4 py-2 rounded-full">
                   <BookOpen size={12} />
                   {topic.articles.length} article{topic.articles.length !== 1 ? 's' : ''} in this topic
                 </div>
@@ -202,7 +202,7 @@ export default async function TopicPage({
         <FadeInSection type="slideLeft" delay={0.05}>
           <div className="flex items-center gap-3 mb-10">
             <div className="h-px flex-1 bg-gradient-to-r from-[#e8b8e4] to-transparent" />
-            <span className="text-[10px] font-black uppercase tracking-[4px] text-[#8236be]">
+            <span className="text-[10px] font-black uppercase tracking-[4px] text-[#1c711c]">
               All Articles
             </span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#e8b8e4]" />
@@ -225,7 +225,7 @@ export default async function TopicPage({
           <div className="mt-16 flex justify-center">
             <Link
               href="/support"
-              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white border border-[#e8b8e4] hover:border-[#9d4ae3] rounded-full text-sm font-extrabold text-[#9d4ae3] hover:bg-[#fdf3fc] transition-all shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white border border-[#e8b8e4] hover:border-[#228b22] rounded-full text-sm font-extrabold text-[#228b22] hover:bg-[#fdf3fc] transition-all shadow-sm hover:shadow-md"
             >
               <ArrowLeft size={16} />
               Back to All Topics

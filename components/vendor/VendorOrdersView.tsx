@@ -119,7 +119,7 @@ export default function VendorOrdersView() {
 
         <button
           onClick={() => loadOrders()}
-          className="self-start sm:self-auto p-2.5 text-slate-600 hover:text-[#9d4ae3] hover:bg-purple-50 border border-slate-200 rounded-xl transition-all flex items-center gap-2 text-xs font-bold"
+          className="self-start sm:self-auto p-2.5 text-slate-600 hover:text-[#228b22] hover:bg-brand-50 border border-slate-200 rounded-xl transition-all flex items-center gap-2 text-xs font-bold"
         >
           <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
           Refresh Orders
@@ -136,7 +136,7 @@ export default function VendorOrdersView() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by order ID..."
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 font-medium"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 font-medium"
           />
         </div>
 
@@ -151,7 +151,7 @@ export default function VendorOrdersView() {
               }}
               className={`px-3 py-1.5 rounded-lg capitalize transition-all whitespace-nowrap ${
                 statusFilter === st
-                  ? 'bg-white text-[#9d4ae3] shadow-xs font-black'
+                  ? 'bg-white text-[#228b22] shadow-xs font-black'
                   : 'hover:text-slate-900'
               }`}
             >
@@ -165,7 +165,7 @@ export default function VendorOrdersView() {
       <div className="bg-white border border-slate-200/70 rounded-2xl shadow-xs overflow-hidden">
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-3">
-            <div className="w-10 h-10 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-brand-200 border-t-[#228b22] rounded-full animate-spin" />
             <p className="text-xs font-bold text-slate-500">Loading store orders...</p>
           </div>
         ) : filteredOrders.length > 0 ? (
@@ -214,8 +214,8 @@ export default function VendorOrdersView() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {ord.expectedDelivery ? (
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-900 bg-purple-50/70 border border-purple-100 px-2.5 py-1 rounded-lg w-fit">
-                            <Truck size={13} className="text-[#9d4ae3]" />
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-brand-900 bg-brand-50/70 border border-brand-100 px-2.5 py-1 rounded-lg w-fit">
+                            <Truck size={13} className="text-[#228b22]" />
                             <span>{ord.expectedDelivery.expectedDeliveryLabel}</span>
                           </div>
                         ) : (
@@ -226,8 +226,8 @@ export default function VendorOrdersView() {
                         <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
                           status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                           status === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                          status === 'processing' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                          status === 'confirmed' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+                          status === 'processing' ? 'bg-brand-50 text-brand-700 border-brand-200' :
+                          status === 'confirmed' ? 'bg-brand-50 text-brand-700 border-brand-200' :
                           status === 'cancelled' ? 'bg-rose-50 text-rose-700 border-rose-200' :
                           'bg-amber-50 text-amber-700 border-amber-200'
                         }`}>
@@ -240,7 +240,7 @@ export default function VendorOrdersView() {
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => handleOpenOrder(orderId || orderNumber, orderNumber, ord)}
-                          className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-[#9d4ae3] rounded-lg font-bold text-xs transition-colors inline-flex items-center gap-1"
+                          className="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-[#228b22] rounded-lg font-bold text-xs transition-colors inline-flex items-center gap-1"
                         >
                           <Eye size={13} />
                           Details
@@ -314,7 +314,7 @@ export default function VendorOrdersView() {
                       disabled={loading}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium cursor-pointer ${
                         page === p
-                          ? 'bg-[#9d4ae3] text-white font-bold shadow-xs'
+                          ? 'bg-[#228b22] text-white font-bold shadow-xs'
                           : 'hover:bg-slate-50 text-slate-500'
                       }`}
                     >
@@ -350,7 +350,7 @@ export default function VendorOrdersView() {
               <div className="p-6 border-b border-slate-100 flex items-start justify-between flex-shrink-0">
                 <div>
                   <h3 className="font-extrabold text-lg text-slate-800 flex items-center gap-2">
-                    <Package size={20} className="text-[#9d4ae3]" />
+                    <Package size={20} className="text-[#228b22]" />
                     Order {orderDetails?.orderNumber || selectedOrderNumber || (selectedOrderId && !selectedOrderId.startsWith('order-') ? `#${String(selectedOrderId).slice(-8).toUpperCase()}` : '')}
                   </h3>
                   {(orderDetails?.orderDate || orderDetails?.createdAt) && (
@@ -375,7 +375,7 @@ export default function VendorOrdersView() {
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {modalLoading ? (
                   <div className="py-16 flex flex-col items-center justify-center gap-3">
-                    <div className="w-8 h-8 border-3 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-3 border-brand-200 border-t-[#228b22] rounded-full animate-spin" />
                     <p className="text-xs font-bold text-slate-400">Loading order details...</p>
                   </div>
                 ) : orderDetails ? (
@@ -390,7 +390,7 @@ export default function VendorOrdersView() {
                       </div>
                       <div className="text-right">
                         <span className="text-[10px] font-black uppercase text-slate-400">Total Amount</span>
-                        <p className="text-lg font-black text-[#9d4ae3]">
+                        <p className="text-lg font-black text-[#228b22]">
                           {fmt(orderDetails.totalAmount ?? orderDetails.amount ?? 0)}
                         </p>
                       </div>
@@ -398,18 +398,18 @@ export default function VendorOrdersView() {
 
                     {/* Customer Promised Delivery Date */}
                     {orderDetails.expectedDelivery && (
-                      <div className="bg-gradient-to-r from-purple-50 via-purple-50/70 to-indigo-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="bg-gradient-to-r from-brand-50 via-brand-50/70 to-brand-50 border border-brand-200 rounded-2xl p-4 flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] text-white flex items-center justify-center shrink-0 shadow-sm">
                           <Truck size={18} />
                         </div>
                         <div className="flex-1 text-xs">
-                          <span className="text-[10px] font-extrabold uppercase text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-extrabold uppercase text-[#228b22] bg-brand-100 px-2 py-0.5 rounded-full">
                             Customer Promised Delivery
                           </span>
-                          <p className="font-extrabold text-purple-950 text-sm mt-1">
+                          <p className="font-extrabold text-brand-950 text-sm mt-1">
                             {orderDetails.expectedDelivery.expectedDeliveryLabel}
                           </p>
-                          <p className="text-purple-800 font-medium mt-0.5">
+                          <p className="text-brand-800 font-medium mt-0.5">
                             Within {orderDetails.expectedDelivery.maxWorkingDays} working days of processing.
                             {orderDetails.expectedDelivery.isInterState && ' (Inter-state leg)'}
                           </p>
@@ -420,7 +420,7 @@ export default function VendorOrdersView() {
                     {/* Customer Info */}
                     <div className="border border-slate-100 rounded-2xl p-4 space-y-2">
                       <h4 className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
-                        <User size={14} className="text-purple-600" /> Customer Information
+                        <User size={14} className="text-brand-600" /> Customer Information
                       </h4>
                       <div className="text-xs space-y-1 text-slate-600 pt-1">
                         <p className="font-bold text-slate-800">{orderDetails.customerName || orderDetails.customer?.name || 'Customer'}</p>
@@ -432,7 +432,7 @@ export default function VendorOrdersView() {
                     {/* Items List */}
                     <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
                       <h4 className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
-                        <Package size={14} className="text-purple-600" /> Purchased Items
+                        <Package size={14} className="text-brand-600" /> Purchased Items
                       </h4>
                       <div className="divide-y divide-slate-100">
                         {((orderDetails.items as any[]) || []).map((item, idx) => (

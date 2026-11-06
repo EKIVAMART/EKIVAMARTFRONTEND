@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useNotifications } from '@/context/NotificationContext';
 import { NotificationItem } from './NotificationItem';
@@ -15,7 +15,12 @@ interface DropdownPos {
   left?: number;
 }
 
+const subscribeToHydration = () => () => {};
+
 export function NotificationBell() {
+  // The provider can receive unread counts before this navbar hydrates.
+  const mounted = useSyncExternalStore(subscribeToHydration, () => true, () => false);
+
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null);
 
@@ -28,7 +33,6 @@ export function NotificationBell() {
   const {
     notifications,
     unreadCount,
-    connectionStatus,
     loading,
     soundEnabled,
     setSoundEnabled,
@@ -115,7 +119,7 @@ export function NotificationBell() {
   }, [isOpen]);
 
   // Strictly render only for logged-in authenticated users
-  if (!isAuthenticated || !user) {
+  if (!mounted || !isAuthenticated || !user) {
     return null;
   }
 
@@ -129,15 +133,15 @@ export function NotificationBell() {
         ref={buttonRef}
         type="button"
         onClick={handleToggle}
-        className="relative flex items-center justify-center p-2 rounded-full text-neutral-600 hover:text-brand-600 hover:bg-neutral-100/80 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/30"
-        aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
+        className="relative flex items-center justify-center p-2 rounded-md text-neutral-600 hover:text-brand-600 hover:bg-neutral-100/80 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+        aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
         aria-expanded={isOpen}
       >
         <Bell className="w-5 h-5" />
 
         {/* Unread Badge Counter (Capped at 99+) */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-brand-600 text-[11px] font-extrabold text-white shadow-md animate-pulse">
+          <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-md bg-brand-600 text-[11px] font-extrabold text-white shadow-sm ">
             {displayBadge}
           </span>
         )}
@@ -147,7 +151,7 @@ export function NotificationBell() {
       {isOpen && dropdownPos && (
         <div
           ref={dropdownRef}
-          className="fixed bg-white rounded-3xl shadow-2xl border border-neutral-100 z-[9999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+          className="fixed bg-white rounded-md shadow-sm border border-neutral-100 z-[9999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
           style={
             dropdownPos.left !== undefined
               ? {
@@ -168,29 +172,12 @@ export function NotificationBell() {
               <h3 className="font-extrabold text-sm text-neutral-900">Notifications</h3>
 
               {unreadCount > 0 && (
-                <span className="bg-brand-100 text-brand-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-brand-100 text-brand-700 text-xs font-bold px-2 py-0.5 rounded-md">
                   {unreadCount} new
                 </span>
               )}
 
-              {/* Real-time SSE Connection Indicator */}
-              <div
-                className="flex items-center gap-1 text-[10px] font-semibold ml-1 px-2 py-0.5 rounded-full bg-white border border-neutral-200"
-                title={`Realtime Stream: ${connectionStatus}`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    connectionStatus === 'connected'
-                      ? 'bg-emerald-500 animate-pulse'
-                      : connectionStatus === 'reconnecting'
-                      ? 'bg-amber-500 animate-ping'
-                      : 'bg-neutral-300'
-                  }`}
-                />
-                <span className="text-neutral-500 uppercase tracking-tighter">
-                  {connectionStatus === 'connected' ? 'Live' : 'Polling'}
-                </span>
-              </div>
+
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -238,7 +225,7 @@ export function NotificationBell() {
               ))
             ) : (
               <div className="py-10 text-center">
-                <div className="w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-2">
+                <div className="w-12 h-12 rounded-md bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-2">
                   <Bell className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-bold text-neutral-700">No notifications yet</p>

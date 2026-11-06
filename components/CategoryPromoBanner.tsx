@@ -1,36 +1,35 @@
-'use client';
-
 import Image from 'next/image';
-import { assets } from '@/assets/assets';
+import Link from 'next/link';
+
+const collections = [
+  { title: 'The desk setup', link: 'Shop computers', slug: 'computers-accessories', image: 'workspace' },
+  { title: 'The weekly shop', link: 'Shop groceries', slug: 'groceries-food', image: 'pantry' },
+];
 
 export default function CategoryPromoBanner() {
   return (
-    <div className="w-[70%] flex flex-col gap-4">
-      {/* First Promo Image */}
-      <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 group cursor-pointer w-full h-56 sm:h-64">
-        <Image
-          src={assets.ctp_1}
-          alt="Sale Up To 50% Off"
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-        />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-      </div>
-
-      {/* Second Promo Image */}
-      <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 group cursor-pointer w-full h-56 sm:h-64">
-        <Image
-          src={assets.ctp_2}
-          alt="Super Grocery Sale"
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-        />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-      </div>
-    </div>
+    <nav aria-label="Featured collections" className="grid gap-5">
+      {collections.map(({ title, link, slug, image }) => (
+        <Link
+          key={slug}
+          href={`/categories/${slug}`}
+          className="group block overflow-hidden rounded-md border border-stone-200 bg-white text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4"
+        >
+          <div className="relative aspect-[3/2] overflow-hidden">
+            <Image
+              src={`/images/collections/${image}.webp`}
+              alt=""
+              fill
+              sizes="(min-width:1024px) 24vw, 100vw"
+              className="object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.025]"
+            />
+          </div>
+          <div className="px-4 py-4">
+            <h3 className="text-xl font-semibold leading-tight tracking-tight">{title}</h3>
+            <span className="mt-2 inline-block text-sm text-stone-700 underline decoration-stone-400 underline-offset-4">{link}</span>
+          </div>
+        </Link>
+      ))}
+    </nav>
   );
 }

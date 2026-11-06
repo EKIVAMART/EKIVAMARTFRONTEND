@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { CategoryImage, FEATURED_CHIPS } from './CategoryDropdown';
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/features/auth/authSlice';
 import { authApi } from '@/lib/api';
-import { LogOut, User } from 'lucide-react';
+import { LayoutGrid, LogOut, User } from 'lucide-react';
 
 interface MobileCategorySidebarProps {
   categories: any[];
@@ -16,63 +16,6 @@ interface MobileCategorySidebarProps {
 }
 
 const FEATURED_SLUG = '__featured__';
-
-const FEATURED_CHIPS = [
-  { name: 'All Products', href: '/categories/shop' },
-  { name: 'Smartphones', href: '/categories/mobile-phones--accessories?subcategory=smartphones' },
-  { name: 'Drones', href: '/categories/photography--video?subcategory=drones' },
-  { name: 'Handbags', href: '/categories/bags--luggage?subcategory=handbags' },
-  { name: 'Watches', href: '/categories/jewelry--fashion-accessories?subcategory=watches' },
-  { name: 'Sneakers', href: '/categories/fashion?subcategory=sneakers' },
-  { name: 'Headphones', href: '/categories/electronics?subcategory=headphones' },
-  { name: 'Skincare', href: '/categories/beauty?subcategory=skincare' },
-  { name: 'Laptops', href: '/categories/electronics?subcategory=laptops' },
-  { name: 'Fragrances', href: '/categories/beauty?subcategory=fragrances' },
-];
-
-// CategoryImage component with proper fallback logic
-function CategoryImage({ src, alt, size = 32 }: { src: string; alt: string; size?: number }) {
-  const [imgError, setImgError] = useState(false);
-
-  // Check if the src is valid
-  const isValidSrc = src && typeof src === 'string' && src.length > 0;
-
-  // Determine what to display
-  const showImage = isValidSrc && !imgError;
-
-  // Get first letter for fallback
-  const firstLetter = alt?.charAt(0).toUpperCase() || '?';
-
-  return (
-    <span
-      className="relative flex items-center justify-center bg-brand-600 shrink-0"
-      style={{ width: `${size}px`, height: `${size}px`, clipPath: 'url(#curved-triangle)' }}
-    >
-      <span
-        className="relative flex items-center justify-center bg-white overflow-hidden"
-        style={{ width: `${size - 4}px`, height: `${size - 4}px`, clipPath: 'url(#curved-triangle)' }}
-      >
-        {showImage ? (
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes={`${size}px`}
-            className="object-cover"
-            onError={() => setImgError(true)}
-            unoptimized={src.startsWith('http')}
-            aria-hidden
-          />
-        ) : (
-          // Fallback: show stylized initial
-          <span className="text-base font-extrabold text-brand-600 select-none">
-            {firstLetter}
-          </span>
-        )}
-      </span>
-    </span>
-  );
-}
 
 export default function MobileCategorySidebar({
   categories,
@@ -141,20 +84,7 @@ export default function MobileCategorySidebar({
                   : 'border-l-[3px] border-transparent text-neutral-700 font-semibold hover:bg-neutral-100'
                 }`}
             >
-              {/* Star icon using same curved border shape */}
-              <span
-                className="flex items-center justify-center bg-brand-600 shrink-0"
-                style={{ width: 32, height: 32, clipPath: 'url(#curved-triangle)' }}
-              >
-                <span
-                  className="flex items-center justify-center bg-brand-100"
-                  style={{ width: 28, height: 28, clipPath: 'url(#curved-triangle)' }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-                    <path d="M8 1l1.8 3.6L14 5.5l-3 2.9.7 4.1L8 10.4l-3.7 2.1.7-4.1-3-2.9 4.2-.9z" fill="#9d4ae3" />
-                  </svg>
-                </span>
-              </span>
+              <LayoutGrid size={32} strokeWidth={1.5} className="p-1.5 text-stone-700" aria-hidden="true" />
               <span className="text-xs leading-tight">Featured</span>
             </button>
 

@@ -32,7 +32,7 @@ interface ClauseData {
 /* ─── SHARED PRIMITIVES ─── */
 
 const Pill = ({ text }: { text: string }) => (
-  <span className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#8236be] text-[11px] font-semibold px-4 py-2 rounded-full">
+  <span className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#1c711c] text-[11px] font-semibold px-4 py-2 rounded-full">
     {text}
   </span>
 );
@@ -40,7 +40,7 @@ const Pill = ({ text }: { text: string }) => (
 const Divider = () => (
   <div className="flex items-center gap-3 my-12">
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-    <div className="w-1.5 h-1.5 rounded-full bg-[#8236be]" />
+    <div className="w-1.5 h-1.5 rounded-full bg-[#1c711c]" />
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
   </div>
 );
@@ -54,7 +54,7 @@ const Prose = ({ children }: { children: React.ReactNode }) => (
 );
 
 const NoteBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative mt-6 pl-5 border-l-4 border-[#8236be] bg-gradient-to-r from-[#fdf3fc] to-transparent py-4 pr-4 rounded-r-xl">
+  <div className="relative mt-6 pl-5 border-l-4 border-[#1c711c] bg-gradient-to-r from-[#fdf3fc] to-transparent py-4 pr-4 rounded-r-xl">
     <p className="text-sm md:text-base text-[#6b0f6b] leading-relaxed font-medium">{children}</p>
   </div>
 );
@@ -62,7 +62,7 @@ const NoteBox = ({ children }: { children: React.ReactNode }) => (
 /** Purple check-style row, used for things the customer/vendor should or may do. */
 const CheckRow = ({ text }: { text: string }) => (
   <li className="flex items-start gap-3 text-gray-600 text-[15px] md:text-[16px] leading-relaxed">
-    <span className="flex-shrink-0 mt-[3px] w-5 h-5 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center">
+    <span className="flex-shrink-0 mt-[3px] w-5 h-5 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center">
       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
         <path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -96,7 +96,7 @@ const CautionGrid = ({ items }: { items: string[] }) => (
 /** Shipping-label styled checklist — a returns-specific motif for "what condition should this come back in". */
 const TagChecklist = ({ items }: { items: string[] }) => (
   <div className="mt-6 relative rounded-2xl border-2 border-dashed border-[#d8b8e0] bg-[#fdf9ff] p-6 md:p-7">
-    <div className="absolute -top-3.5 left-6 inline-flex items-center gap-1.5 bg-white border border-[#e8b8e4] text-[#8236be] text-[10px] font-black uppercase tracking-[2px] px-3 py-1.5 rounded-full">
+    <div className="absolute -top-3.5 left-6 inline-flex items-center gap-1.5 bg-white border border-[#e8b8e4] text-[#1c711c] text-[10px] font-black uppercase tracking-[2px] px-3 py-1.5 rounded-full">
       <Tag size={10} /> Return Condition
     </div>
     <ul className="space-y-3 mt-2">
@@ -136,11 +136,11 @@ const ClauseHeading = ({
     <div className="relative pb-4 mb-8">
       <ClauseNumber n={number} />
       <div className="relative flex items-center gap-3 pt-8">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
           <Icon size={18} />
         </div>
         <div>
-          <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-0.5">
+          <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-0.5">
             Section {number.padStart(2, '0')}
           </span>
           <h2
@@ -151,7 +151,7 @@ const ClauseHeading = ({
           </h2>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#8236be]/40 via-[#e8b8e4]/60 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#1c711c]/40 via-[#e8b8e4]/60 to-transparent" />
     </div>
   </FadeInSection>
 );
@@ -159,16 +159,16 @@ const ClauseHeading = ({
 const TableOfContents = () => (
   <aside className="hidden xl:block sticky top-28 self-start w-60 flex-shrink-0">
     <div className="rounded-2xl border border-[#e8b8e4] bg-white/70 backdrop-blur-sm p-5 shadow-sm">
-      <p className="text-[10px] font-black uppercase tracking-[3px] text-[#8236be] mb-4">Contents</p>
+      <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c] mb-4">Contents</p>
       <nav>
         <ul className="space-y-1">
           {clauses.map((c) => (
             <li key={c.id}>
               <a
                 href={`#${c.id}`}
-                className="flex items-center gap-2.5 text-sm text-gray-500 hover:text-[#9d4ae3] transition-colors py-1 group"
+                className="flex items-center gap-2.5 text-sm text-gray-500 hover:text-[#228b22] transition-colors py-1 group"
               >
-                <span className="text-[11px] font-bold text-[#8236be]/45 group-hover:text-[#8236be]/80 w-6 flex-shrink-0">
+                <span className="text-[11px] font-bold text-[#1c711c]/45 group-hover:text-[#1c711c]/80 w-6 flex-shrink-0">
                   {c.number.padStart(2, '0')}
                 </span>
                 <span className="leading-tight">{c.title}</span>
@@ -194,7 +194,7 @@ const JourneyStrip = () => {
       {steps.map((s, i) => (
         <React.Fragment key={s.label}>
           <div className="flex flex-col items-center gap-2.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
               <s.icon size={18} />
             </div>
             <span className="text-[11px] font-bold text-[#6b0f6b] uppercase tracking-wider">{s.label}</span>
@@ -211,11 +211,11 @@ const JourneyStrip = () => {
 /* ─── RETURN PROCESS TIMELINE (Section 4's dedicated device) ─── */
 const ProcessTimeline = ({ steps }: { steps: string[] }) => (
   <div className="mt-6 relative pl-2">
-    <div className="absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-[#9d4ae3] via-[#e8b8e4] to-transparent" />
+    <div className="absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-[#228b22] via-[#e8b8e4] to-transparent" />
     <ol className="space-y-6">
       {steps.map((step, i) => (
         <li key={step} className="relative flex items-start gap-4">
-          <span className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-white border-2 border-[#9d4ae3] text-[#8236be] font-black text-sm flex items-center justify-center">
+          <span className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-white border-2 border-[#228b22] text-[#1c711c] font-black text-sm flex items-center justify-center">
             {i + 1}
           </span>
           <span className="text-gray-600 text-[15px] md:text-[16px] leading-relaxed pt-2">{step}</span>
@@ -229,13 +229,13 @@ const ProcessTimeline = ({ steps }: { steps: string[] }) => (
 const ResponsibilityPanel = () => (
   <div className="mt-6 grid md:grid-cols-2 gap-4">
     <div className="rounded-2xl border border-[#e8b8e4] bg-[#fdf3fc]/60 p-6">
-      <p className="text-xs font-black uppercase tracking-[3px] text-[#8236be] mb-3">When the vendor is responsible</p>
+      <p className="text-xs font-black uppercase tracking-[3px] text-[#1c711c] mb-3">When the vendor is responsible</p>
       <p className="text-sm md:text-[15.5px] text-gray-600 leading-relaxed">
         If the vendor is responsible, such as when the wrong, defective, damaged, or incorrectly described product was supplied, the vendor may be responsible for the applicable return costs.
       </p>
     </div>
     <div className="rounded-2xl border border-[#e8b8e4] bg-[#fdf3fc]/60 p-6">
-      <p className="text-xs font-black uppercase tracking-[3px] text-[#8236be] mb-3">When the customer changes their mind</p>
+      <p className="text-xs font-black uppercase tracking-[3px] text-[#1c711c] mb-3">When the customer changes their mind</p>
       <p className="text-sm md:text-[15.5px] text-gray-600 leading-relaxed">
         If the customer changes their mind, where such returns are permitted, the customer may be responsible for the applicable return or delivery costs.
       </p>
@@ -305,7 +305,7 @@ const clauses: ClauseData[] = [
             'Not show signs of damage caused by the customer.',
           ]}
         />
-        <Prose>Faflora reserves the right to reject a return if the product does not meet the applicable return requirements.</Prose>
+        <Prose>EkivaMart reserves the right to reject a return if the product does not meet the applicable return requirements.</Prose>
       </>
     ),
   },
@@ -319,15 +319,15 @@ const clauses: ClauseData[] = [
         <Lede>To request a return, the customer should:</Lede>
         <ProcessTimeline
           steps={[
-            'Contact Faflora through the platform within the applicable return period.',
+            'Contact EkivaMart through the platform within the applicable return period.',
             'Provide the order number and reason for the return.',
             'Provide photographs or videos where requested.',
             'Wait for the return request to be reviewed and approved.',
-            'Follow the return instructions provided by Faflora.',
+            'Follow the return instructions provided by EkivaMart.',
           ]}
         />
         <NoteBox>
-          Customers should not send products directly to a vendor without receiving return instructions from Faflora.
+          Customers should not send products directly to a vendor without receiving return instructions from EkivaMart.
         </NoteBox>
       </>
     ),
@@ -340,10 +340,10 @@ const clauses: ClauseData[] = [
     content: (
       <>
         <Lede>
-          When a return is approved, Faflora may arrange for the product to be returned to the vendor. Depending on the reason for the return:
+          When a return is approved, EkivaMart may arrange for the product to be returned to the vendor. Depending on the reason for the return:
         </Lede>
         <ResponsibilityPanel />
-        <Prose>Faflora will communicate the applicable arrangements to both parties before the return is completed.</Prose>
+        <Prose>EkivaMart will communicate the applicable arrangements to both parties before the return is completed.</Prose>
       </>
     ),
   },
@@ -363,12 +363,12 @@ const clauses: ClauseData[] = [
             'Send the correct product and quantity ordered.',
             'Respond promptly to approved return requests.',
             'Accept legitimate returns that fall within this policy.',
-            'Provide any information reasonably required by Faflora to resolve a return dispute.',
+            'Provide any information reasonably required by EkivaMart to resolve a return dispute.',
             'Upload clear pictures for the user to see.',
           ]}
         />
         <NoteBox>
-          A vendor must not refuse an eligible return solely because the customer contacted Faflora instead of the vendor directly.
+          A vendor must not refuse an eligible return solely because the customer contacted EkivaMart instead of the vendor directly.
         </NoteBox>
       </>
     ),
@@ -381,7 +381,7 @@ const clauses: ClauseData[] = [
     content: (
       <>
         <Lede>
-          When a product is returned, Faflora or the vendor may inspect the item to determine whether the return meets the requirements of this policy.
+          When a product is returned, EkivaMart or the vendor may inspect the item to determine whether the return meets the requirements of this policy.
         </Lede>
         <Prose>
           If the returned product is found to be damaged through customer misuse, the refund or exchange may be denied or adjusted accordingly.
@@ -399,13 +399,13 @@ const clauses: ClauseData[] = [
         <div className="absolute inset-0 bg-gradient-to-br from-[#fdf3fc] to-white" />
         <div className="relative p-6 md:p-8 space-y-4">
           <p className="text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
-            Once an approved return has been received and, where necessary, inspected, Faflora will process the applicable refund.
+            Once an approved return has been received and, where necessary, inspected, EkivaMart will process the applicable refund.
           </p>
           <p className="text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
             Refunds may be issued to the customer&apos;s original payment method or through another approved method available on the platform.
           </p>
           <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-[#e8b8e4] shadow-sm">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow">
               <Wallet size={18} />
             </div>
             <p className="text-sm md:text-base text-gray-500 leading-relaxed">
@@ -424,7 +424,7 @@ const clauses: ClauseData[] = [
     content: (
       <>
         <Lede>Where available, customers may request an exchange instead of a refund.</Lede>
-        <Prose>An exchange is subject to product availability. If the replacement product is unavailable, Faflora may process a refund instead.</Prose>
+        <Prose>An exchange is subject to product availability. If the replacement product is unavailable, EkivaMart may process a refund instead.</Prose>
       </>
     ),
   },
@@ -438,7 +438,7 @@ const clauses: ClauseData[] = [
         <NoteBox>
           Customers should report products damaged during delivery as soon as possible, preferably within 48 hours of delivery, and provide clear photographs or videos of the product and packaging.
         </NoteBox>
-        <Prose>Faflora will review the circumstances and determine the appropriate resolution.</Prose>
+        <Prose>EkivaMart will review the circumstances and determine the appropriate resolution.</Prose>
       </>
     ),
   },
@@ -449,7 +449,7 @@ const clauses: ClauseData[] = [
     icon: ShieldAlert,
     content: (
       <>
-        <Lede>Faflora reserves the right to restrict or refuse returns where there is evidence of:</Lede>
+        <Lede>EkivaMart reserves the right to restrict or refuse returns where there is evidence of:</Lede>
         <CautionGrid
           items={[
             'Fraudulent activity',
@@ -468,9 +468,9 @@ const clauses: ClauseData[] = [
     title: 'Changes to This Policy',
     icon: RefreshCw,
     content: (
-      <div className="rounded-2xl border-2 border-[#8236be]/20 bg-gradient-to-br from-[#fdf3fc] to-white p-6 md:p-8">
+      <div className="rounded-2xl border-2 border-[#1c711c]/20 bg-gradient-to-br from-[#fdf3fc] to-white p-6 md:p-8">
         <p className="text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
-          Faflora may update this Return, Refund &amp; Exchange Policy from time to time. Any changes will be published on the platform and will apply from the stated effective date.
+          EkivaMart may update this Return, Refund &amp; Exchange Policy from time to time. Any changes will be published on the platform and will apply from the stated effective date.
         </p>
       </div>
     ),
@@ -483,18 +483,18 @@ const clauses: ClauseData[] = [
     content: (
       <>
         <Lede>
-          For questions about returns, refunds, exchanges, or vendor disputes, customers and vendors can contact Faflora through the support channels provided on the platform.
+          For questions about returns, refunds, exchanges, or vendor disputes, customers and vendors can contact EkivaMart through the support channels provided on the platform.
         </Lede>
         <a
           href="/contact-us"
           className="mt-6 inline-flex items-center gap-3 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330] group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330] group-hover:scale-110 transition-transform">
             <Mail size={20} />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[3px] text-[#8236be]">Support</p>
-            <p className="text-[#9d4ae3] font-bold text-base group-hover:underline">Contact Faflora Support</p>
+            <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c]">Support</p>
+            <p className="text-[#228b22] font-bold text-base group-hover:underline">Contact EkivaMart Support</p>
           </div>
         </a>
       </>
@@ -516,19 +516,19 @@ export default function ReturnRefundExchangePolicy() {
         <div className="absolute top-1/2 -left-20 w-[35vw] h-[35vw] max-w-xl max-h-xl rounded-full bg-gradient-to-r from-brand-200 to-brand-300 opacity-10 blur-[90px] pointer-events-none" />
 
         <div className="absolute top-20 right-[6%] hidden md:flex flex-col gap-2">
-          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
             <RotateCcw size={10} /> 48-Hour Report Window
           </div>
-          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
             <Store size={10} /> Fair for Buyers &amp; Vendors
           </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full pt-28 pb-16">
           <FadeInSection type="fadeDown" delay={0.1}>
-            <div className="inline-flex items-center gap-2 border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-8 bg-[#fdf3fc]">
+            <div className="inline-flex items-center gap-2 border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-8 bg-[#fdf3fc]">
               <RotateCcw size={11} />
-              <span>Faflora · Support</span>
+              <span>EkivaMart · Support</span>
             </div>
           </FadeInSection>
 
@@ -537,23 +537,23 @@ export default function ReturnRefundExchangePolicy() {
               className="text-5xl md:text-6xl lg:text-[5.2rem] lg:-skew-x-6 -skew-x-4 font-black text-[#1a0018] leading-[0.95] tracking-tight"
               style={{ fontFamily: "'Georgia', serif" }}
             >
-              <TypingText text="Returns, Refunds" delay={350} typingSpeed={55} colorClass="text-[#8236be]" hideCursorOnComplete />
+              <TypingText text="Returns, Refunds" delay={350} typingSpeed={55} colorClass="text-[#1c711c]" hideCursorOnComplete />
               <br />
-              <span className="text-[#9d4ae3]">
-                <TypingText text="& Exchanges" delay={1200} typingSpeed={55} colorClass="text-[#8236be]" />
+              <span className="text-[#228b22]">
+                <TypingText text="& Exchanges" delay={1200} typingSpeed={55} colorClass="text-[#1c711c]" />
               </span>
             </h1>
           </FadeInSection>
 
           <FadeInSection type="fadeUp" delay={0.5}>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <div className="h-px w-16 bg-gradient-to-r from-[#9d4ae3] to-[#8236be]" />
+              <div className="h-px w-16 bg-gradient-to-r from-[#228b22] to-[#1c711c]" />
               <p className="text-gray-400 text-sm font-medium">
-                Effective Date: <span className="text-[#9d4ae3] font-bold">&mdash;</span> <span className='text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full shadow-sm'>September 01, 2026</span>
+                Effective Date: <span className="text-[#228b22] font-bold">&mdash;</span> <span className='text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full shadow-sm'>September 01, 2026</span>
               </p>
             </div>
             <p className="mt-6 text-gray-500 text-base md:text-lg max-w-2xl leading-relaxed">
-              At Faflora we want every customer to have a positive shopping experience while ensuring that vendors are treated fairly. This policy explains when a customer can return a product, when a vendor may receive a returned product, and how refunds or exchanges are handled.
+              At EkivaMart we want every customer to have a positive shopping experience while ensuring that vendors are treated fairly. This policy explains when a customer can return a product, when a vendor may receive a returned product, and how refunds or exchanges are handled.
             </p>
           </FadeInSection>
 
@@ -604,12 +604,12 @@ export default function ReturnRefundExchangePolicy() {
         <FadeInSection type="zoom" delay={0.1}>
           <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
             <div className="absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-brand-100" />
-            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#8236be] opacity-10 blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] opacity-10 blur-[60px] pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#1c711c] opacity-10 blur-[80px] pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c] opacity-10 blur-[60px] pointer-events-none" />
 
             <div className="relative px-8 md:px-16 py-12 md:py-16 flex flex-col md:flex-row items-center gap-10">
               <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 bg-[#f0c8ec] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-5">
+                <div className="inline-flex items-center gap-2 bg-[#f0c8ec] text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-5">
                   <RotateCcw size={11} /> Shop with confidence
                 </div>
                 <h3
@@ -617,23 +617,23 @@ export default function ReturnRefundExchangePolicy() {
                   style={{ fontFamily: "'Georgia', serif" }}
                 >
                   Fair returns.<br />
-                  <span className="text-[#9d4ae3]">Every time.</span>
+                  <span className="text-[#228b22]">Every time.</span>
                 </h3>
                 <p className="text-gray-500 text-sm md:text-base lg:text-[17px] leading-relaxed max-w-md">
-                  Read this policy alongside our Terms and Conditions, Privacy Policy, and Acceptable Use Policy for the full picture of how Faflora works.
+                  Read this policy alongside our Terms and Conditions, Privacy Policy, and Acceptable Use Policy for the full picture of how EkivaMart works.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 flex-shrink-0 w-full md:w-auto">
                 <a
                   href="/terms-and-conditions"
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-8 py-3.5 rounded-full font-extrabold text-sm shadow-lg shadow-[#9d4ae330] hover:scale-105 active:scale-95 transition-transform"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white px-8 py-3.5 rounded-full font-extrabold text-sm shadow-lg shadow-[#9d4ae330] hover:scale-105 active:scale-95 transition-transform"
                 >
                   Read Terms of Service <ArrowRight size={16} />
                 </a>
                 <a
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-[#9d4ae3] text-[#9d4ae3] px-8 py-3.5 rounded-full font-extrabold text-sm hover:bg-[#fdf3fc] transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-[#228b22] text-[#228b22] px-8 py-3.5 rounded-full font-extrabold text-sm hover:bg-[#fdf3fc] transition-colors"
                 >
                   Return to Homepage
                 </a>

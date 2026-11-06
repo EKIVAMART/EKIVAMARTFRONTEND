@@ -331,7 +331,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             <div className="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between">
               <div>
                 <Link href="/" className="flex flex-col items-start gap-1">
-                  <Image src="/fa_logo_brand.png" alt="Faflora" width={120} height={32} className="object-contain" />
+                  <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={120} height={32} className="object-contain" />
                 </Link>
               </div>
               <button
@@ -349,10 +349,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             >
               <button
                 onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm hover:border-[#f3ecfc]0 transition"
+                className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm hover:border-[#eff4e9]0 transition"
               >
                 <div className="flex items-center gap-2">
-                  <MapPin size={18} className="text-[#9d4ae3]" />
+                  <MapPin size={18} className="text-[#228b22]" />
                   <span className="font-semibold text-gray-700">
                     {selectedLocation}
                   </span>
@@ -397,7 +397,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             key={location}
                             onClick={() => handleLocationSelect(location)}
                             className={`w-full text-left px-4 py-3 text-sm transition ${selectedLocation === location
-                              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-semibold'
+                              ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-semibold'
                               : 'text-gray-700 hover:bg-gray-50'
                               }`}
                           >
@@ -421,7 +421,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <Link
                 href="/"
                 onClick={onClose}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-[#f3ecfc] hover:text-[#9d4ae3] transition"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-[#eff4e9] hover:text-[#228b22] transition"
               >
                 <Home size={20} />
                 <span className="font-semibold text-sm">Home</span>
@@ -440,7 +440,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition group"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="text-gray-500 group-hover:text-[#9d4ae3] transition">
+                            <div className="text-gray-500 group-hover:text-[#228b22] transition">
                               {iconNode}
                             </div>
                             <span className="font-semibold text-sm text-gray-800">
@@ -472,7 +472,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                   key={sub.id}
                                   href={`/categories/${category.slug}?subcategory=${sub.slug}`}
                                   onClick={onClose}
-                                  className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#9d4ae3] hover:bg-white transition font-medium"
+                                  className="block px-4 py-2.5 pl-12 text-sm text-gray-600 hover:text-[#228b22] hover:bg-white transition font-medium"
                                 >
                                   {sub.name}
                                 </Link>
@@ -497,9 +497,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     onClick={() => {
                       onClose();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#f3ecfc] hover:border-[#f3ecfc] border border-gray-100 transition group"
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#eff4e9] hover:border-[#eff4e9] border border-gray-100 transition group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white flex items-center justify-center text-sm font-semibold shrink-0 group-hover:scale-105 transition">
                       {user.firstName?.[0]}
                       {user.lastName?.[0]}
                     </div>
@@ -525,7 +525,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   onClick={() => {
                     onClose();
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white font-semibold py-2.5 rounded-lg transition"
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#185b1a] text-white font-semibold py-2.5 rounded-lg transition"
                 >
                   <User size={18} />
                   Sign In

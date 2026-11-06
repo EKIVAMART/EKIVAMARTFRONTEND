@@ -38,9 +38,9 @@ export const CONTACT_REASONS = [
 ] as const;
 
 export const SOCIALS = [
-  { label: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/faflora?igsh=N3dld2VpMzNycDQy', handle: '@faflora' },
-  { label: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@faflora?_r=1&_t=ZS-92NK2t2CIlB', handle: '@faflora' },
-  { label: 'LinkedIn', icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/108237871/admin/dashboard/', handle: 'Faflora' },
+  { label: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/faflora_ng', handle: '@faflora_ng' },
+  { label: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@faflora_ng', handle: '@faflora_ng' },
+  { label: 'LinkedIn', icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/faflora', handle: 'EkivaMart' },
 ];
 
 export const RESPONSE_TIMES = [

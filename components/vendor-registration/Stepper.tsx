@@ -22,7 +22,7 @@ export default function Stepper({ currentStep }: StepperProps) {
         {steps.map((step, index) => {
           const isCompleted = currentStep > step.id;
           const isActive = currentStep === step.id;
-          
+
           return (
             <React.Fragment key={step.id}>
               {/* Step Circle & Label */}
@@ -30,8 +30,8 @@ export default function Stepper({ currentStep }: StepperProps) {
                 <div
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10
-                    ${isCompleted ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] border-[#9d4ae3] text-white' : ''}
-                    ${isActive ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] border-[#9d4ae3] text-white shadow-lg shadow-[#f5d2f0]' : ''}
+                    ${isCompleted ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] border-[#228b22] text-white' : ''}
+                    ${isActive ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] border-[#228b22] text-white shadow-lg shadow-[#f5d2f0]' : ''}
                     ${!isCompleted && !isActive ? 'bg-white border-gray-200 text-gray-400' : ''}
                   `}
                 >
@@ -46,7 +46,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                 <span
                   className={`
                     absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors duration-300
-                    ${isActive || isCompleted ? 'text-[#9d4ae3]' : 'text-gray-400'}
+                    ${isActive || isCompleted ? 'text-[#228b22]' : 'text-gray-400'}
                   `}
                 >
                   {step.label}
@@ -59,7 +59,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                   <div className="h-[2px] w-full bg-gray-100 relative">
                     <div
                       className={`
-                        absolute top-0 left-0 h-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] transition-all duration-500 ease-in-out
+                        absolute top-0 left-0 h-full bg-gradient-to-r from-[#228b22] to-[#1c711c] transition-all duration-500 ease-in-out
                         ${isCompleted ? 'w-full' : 'w-0'}
                       `}
                     />

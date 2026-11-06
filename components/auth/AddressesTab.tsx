@@ -164,7 +164,7 @@ export const AddressesTab: React.FC = () => {
         {!isAdding && (
           <button
             onClick={handleOpenAdd}
-            className="px-3 py-1.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-90 transition shadow-xs"
+            className="px-3 py-1.5 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-90 transition shadow-xs"
           >
             <Plus size={14} /> Add New Address
           </button>
@@ -291,7 +291,7 @@ export const AddressesTab: React.FC = () => {
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-1.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
             >
               {saving ? 'Saving...' : editingAddress ? 'Update Address' : 'Save Address'}
             </button>
@@ -308,7 +308,7 @@ export const AddressesTab: React.FC = () => {
           <p className="text-xs text-gray-500 font-medium">No saved addresses yet.</p>
           <button
             onClick={handleOpenAdd}
-            className="mt-3 text-xs font-bold text-[#9d4ae3] hover:underline"
+            className="mt-3 text-xs font-bold text-[#228b22] hover:underline"
           >
             + Add your first address
           </button>

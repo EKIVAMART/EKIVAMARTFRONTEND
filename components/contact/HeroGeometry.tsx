@@ -34,8 +34,8 @@ export default function HeroGeometry() {
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
             <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#ff69e0" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#8236be" stopOpacity="0" />
+              <stop offset="0%" stopColor="#bfd4bc" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#1c711c" stopOpacity="0" />
             </radialGradient>
           </defs>
           {/* Spokes */}
@@ -125,7 +125,7 @@ export default function HeroGeometry() {
           <defs>
             <linearGradient id="ringStroke" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="white" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#ff69e0" stopOpacity="0.1" />
+              <stop offset="100%" stopColor="#bfd4bc" stopOpacity="0.1" />
             </linearGradient>
           </defs>
           <circle cx="130" cy="130" r="118" stroke="url(#ringStroke)" strokeWidth="1.2" fill="none" />

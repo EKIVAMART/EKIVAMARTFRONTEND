@@ -4,9 +4,9 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import ProductCard from '@/components/home/ProductCard';
+import { departmentSlug } from '@/lib/data/departments';
 import CategoriesGrid from '@/components/CategoriesGrid';
 import ProductFilters from '@/components/ProductFilters';
-import CategoryPromoBanner from '@/components/CategoryPromoBanner';
 import { categoryApi, productApi } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
@@ -107,6 +107,14 @@ export default function CategoryPage() {
     }
   };
 
+  useEffect(() => {
+    const row = scrollContainerRef.current;
+    if (!row) return;
+    const observer = new ResizeObserver(handleScroll);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [subcategories]);
+
   const scroll = (direction: 'left' | 'right') => {
     const container = scrollContainerRef.current;
     if (container) {
@@ -165,29 +173,14 @@ export default function CategoryPage() {
 
     if (categories.length === 0) return;
 
-    // Normalize slug helper
-    const getSlug = (name: string) =>
-      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-
-    // Find main parent category matching the slug
-    const matched = categories.find((cat: any) => {
-      if (cat.parentId) return false; // Main category only
-      const catSlug = getSlug(cat.name || '');
-      return catSlug === slug || cat.name.toLowerCase() === slug;
-    });
-
-    if (matched) {
-      setActiveCategory(matched);
-    } else {
-      // Fallback: search anywhere in published parent categories
-      const fallback = categories.find((cat: any) => {
-        if (cat.parentId) return false;
-        const nameLower = cat.name.toLowerCase();
-        return nameLower.includes(slug) || slug.includes(nameLower);
-      });
-      if (fallback) {
-        setActiveCategory(fallback);
-      }
+    const requestedSlug = departmentSlug(slug);
+    const matched = categories.find(cat => !cat.parentId && [cat.slug, cat.name].some(
+      value => typeof value === 'string' && departmentSlug(value) === requestedSlug
+    ));
+    setActiveCategory(matched ?? null);
+    if (!matched) {
+      setSubcategories([]);
+      setActiveSubcategoryId(null);
     }
   }, [categories, slug]);
 
@@ -509,7 +502,7 @@ export default function CategoryPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
           <p className="text-gray-500 font-medium">Loading category page...</p>
         </div>
       </div>
@@ -539,33 +532,25 @@ export default function CategoryPage() {
     <main className="py-8 sm:py-6 bg-gray-50 min-h-screen">
       <div className="mx-auto w-[90%] max-w-7xl">
 
-        {/* Banner Section */}
-        <div className="rounded-2xl bg-gradient-to-r from-[#f3ecfc] via-[#f5eeff] to-[#f3ecfc] p-6 sm:p-8 mb-6 shadow-md border border-[#e8d5f5]/30 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#9d4ae3]/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-[#8236be]/5 rounded-full blur-3xl pointer-events-none" />
-
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#8236be] tracking-tight mb-2">
-            {categoryName}
-          </h1>
-          <div className="text-sm text-gray-600 flex items-center gap-2">
-            <Link href="/" className="hover:text-[#9d4ae3] font-medium transition-colors">
-              Home
-            </Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-500 capitalize">{categoryName}</span>
-          </div>
+        <header className="mb-4 border-b border-stone-200 pb-5">
+          <nav aria-label="Breadcrumb" className="mb-3 flex gap-2 text-sm text-stone-600">
+            <Link href="/" className="hover:underline">Home</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{categoryName}</span>
+          </nav>
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">{categoryName}</h1>
           {activeCategory?.description && (
             <p className="mt-3 text-sm text-gray-600 max-w-3xl leading-relaxed">
               {activeCategory.description}
             </p>
           )}
-        </div>
+        </header>
 
         {/* Categories Chips Carousel (Subcategories Row) */}
         {subcategories.length > 0 && (
-          <div className="flex items-center gap-2 mb-8 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative">
+          <div className="flex items-center gap-2 mb-6 border-b border-stone-200">
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollLeft ? 'text-[#9d4ae3] hover:bg-purple-50' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollLeft ? 'text-[#228b22] hover:bg-stone-50' : 'text-gray-300'}`}
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
               aria-label="Scroll left"
@@ -581,10 +566,11 @@ export default function CategoryPage() {
             >
               {/* "All" chip */}
               <button
+                aria-pressed={!subcategoryQuery}
                 onClick={() => selectSubcategory(null)}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${!subcategoryQuery
-                    ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
-                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
+                className={`flex-shrink-0 px-2 py-2 text-sm font-medium border-b-2 ${!subcategoryQuery
+                    ? 'border-stone-900 text-stone-900'
+                    : 'border-transparent text-stone-600 hover:text-stone-900'
                   }`}
               >
                 All {categoryName}
@@ -597,10 +583,11 @@ export default function CategoryPage() {
                 return (
                   <button
                     key={sub.id || sub._id}
+                    aria-pressed={isSelected}
                     onClick={() => selectSubcategory(subSlug)}
-                    className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 border ${isSelected
-                        ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/20'
-                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
+                    className={`flex-shrink-0 px-2 py-2 text-sm font-medium border-b-2 ${isSelected
+                        ? 'border-stone-900 text-stone-900'
+                        : 'border-transparent text-stone-600 hover:text-stone-900'
                       }`}
                   >
                     {sub.name}
@@ -610,7 +597,7 @@ export default function CategoryPage() {
             </div>
 
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollRight ? 'text-[#9d4ae3] hover:bg-purple-50' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors ${canScrollRight ? 'text-[#228b22] hover:bg-stone-50' : 'text-gray-300'}`}
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
               aria-label="Scroll right"
@@ -626,7 +613,7 @@ export default function CategoryPage() {
           {/* Sidebar Filters */}
           <aside className="hidden lg:flex lg:flex-col gap-6 lg:col-span-1">
             {/* Categories sidebar navigation list */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 max-h-[360px] overflow-y-auto">
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
               <CategoriesGrid />
             </div>
 
@@ -660,11 +647,6 @@ export default function CategoryPage() {
                 }}
               />
             </div>
-
-            {/* Category Promo Banner */}
-            <div className="w-full">
-              <CategoryPromoBanner />
-            </div>
           </aside>
 
           {/* Products List Area */}
@@ -674,13 +656,13 @@ export default function CategoryPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
               <div className="text-sm font-semibold text-gray-600">
                 We found{' '}
-                <span className="text-[#9d4ae3] text-base font-extrabold px-1">
+                <span className="text-[#228b22] text-base font-extrabold px-1">
                   {productsLoading ? '...' : totalCount}
                 </span>{' '}
                 items matching your selection
               </div>
               {totalCount > 0 && (
-                <div className="text-xs font-bold text-gray-500 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg border border-purple-100">
+                <div className="text-xs font-bold text-gray-500 bg-stone-50 text-stone-700 px-3 py-1.5 rounded-lg border border-stone-100">
                   Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} results (Page {currentPage} of {totalPages})
                 </div>
               )}
@@ -703,7 +685,7 @@ export default function CategoryPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-[fadeIn_0.4s_ease-out]">
                   {paginatedProducts.map((p: Product) => {
                     const ratingVal = calculateAverageRating(p.rating);
-                    const storeName = p.storeName || p.store?.name || p.storeId || 'Faflora Store';
+                    const storeName = p.storeName || p.store?.name || p.storeId || 'EkivaMart Store';
                     const coverImage = p.images && p.images.length > 0
                       ? p.images.find(img => img.isPrimary)?.url || p.images[0].url
                       : '/placeholder.png';
@@ -794,7 +776,7 @@ export default function CategoryPage() {
                             onClick={() => handlePageChange(Number(p))}
                             className={`w-8 h-8 text-xs font-extrabold rounded-xl transition border cursor-pointer ${
                               currentPage === p
-                                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-xs'
+                                ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white border-transparent shadow-xs'
                                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                             }`}
                           >
@@ -816,7 +798,7 @@ export default function CategoryPage() {
               </>
             ) : (
               <div className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center max-w-lg mx-auto mt-8">
-                <div className="inline-flex p-4 rounded-full bg-purple-50 text-[#9d4ae3] mb-4">
+                <div className="inline-flex p-4 rounded-full bg-stone-50 text-[#228b22] mb-4">
                   <Package size={48} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">No Products Found</h3>
@@ -824,8 +806,8 @@ export default function CategoryPage() {
                   We couldn&apos;t find any published products matching this selection in our category catalog.
                 </p>
                 <div className="flex justify-center gap-2">
-                  <Sparkles size={16} className="text-purple-400 animate-pulse" />
-                  <span className="text-xs font-semibold text-purple-600 uppercase tracking-widest">New Arrivals Soon!</span>
+                  <Sparkles size={16} className="text-stone-400 animate-pulse" />
+                  <span className="text-xs font-semibold text-stone-600 uppercase tracking-widest">New Arrivals Soon!</span>
                 </div>
               </div>
             )}

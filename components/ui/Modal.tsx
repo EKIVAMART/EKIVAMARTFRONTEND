@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,29 +35,42 @@ export const Modal: React.FC<ModalProps> = ({
     return false;
   })[0];
 
-  // Close on Escape key
+  const dialog = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const close = useRef(onClose);
+  useEffect(() => { close.current = onClose; }, [onClose]);
+
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
+    if (!isOpen) return;
+    const trigger = document.activeElement;
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = 'hidden';
+    dialog.current?.focus({ preventScroll: true });
 
-    if (isOpen) {
-      // Prevent body scroll when modal is open
-      document.addEventListener('keydown', handleEscape);
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') close.current();
+      if (event.key !== 'Tab' || !dialog.current) return;
+      const controls = Array.from(dialog.current.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+      )).filter(element => element.getClientRects().length);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
     }
-
+    document.addEventListener('keydown', handleKey);
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.removeEventListener('keydown', handleKey);
+      root.style.overflow = previousOverflow;
+      if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true });
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // Mobile-first sizing with very wide constraints
   const sizes = {
@@ -113,6 +126,11 @@ export const Modal: React.FC<ModalProps> = ({
             {/* Modal Content - Will be above backdrop */}
             <motion.div
               key="modal-content"
+              ref={dialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={title ? titleId : undefined}
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.85, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.85, y: 40 }}
@@ -133,7 +151,7 @@ export const Modal: React.FC<ModalProps> = ({
                 <div className="flex items-start justify-between gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-5 border-b border-gray-100 shrink-0">
                   <div className="flex-1 min-w-0 pr-2">
                     {title && (
-                      <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 break-all">
+                      <h2 id={titleId} className="text-base sm:text-lg md:text-xl font-bold text-gray-900 break-all">
                         {title}
                       </h2>
                     )}

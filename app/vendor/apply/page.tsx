@@ -1125,7 +1125,7 @@ export default function VendorApplyPage() {
 
     setUploadingDocType(docType);
     try {
-      // 1. Request signed upload credentials and authenticated delivery URL from Faflora Backend
+      // 1. Request signed upload credentials and authenticated delivery URL from EkivaMart Backend
       const signedRes = await vendorApi.getDocumentUploadUrl({
         documentType: docType,
         fileName: file.name,
@@ -1155,7 +1155,7 @@ export default function VendorApplyPage() {
           }
         }
 
-        // 3. Confirm upload with Faflora Backend passing exact signed URL returned by Step 1
+        // 3. Confirm upload with EkivaMart Backend passing exact signed URL returned by Step 1
         const confirmRes = await vendorApi.confirmDocumentUpload({
           documentType: docType,
           cloudinaryPublicId: sig.publicId,
@@ -1382,7 +1382,7 @@ export default function VendorApplyPage() {
             disabled
               ? 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
               : isFocused || isOpen
-                ? 'bg-white border-[#9d4ae3] ring-2 ring-purple-500/10'
+                ? 'bg-white border-[#228b22] ring-2 ring-brand-500/10'
                 : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
@@ -1414,9 +1414,9 @@ export default function VendorApplyPage() {
                   setIsOpen(false);
                   setIsFocused(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-purple-50 transition-colors ${
+                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-brand-50 transition-colors ${
                   value === option.value
-                    ? 'bg-purple-50 text-[#9d4ae3] font-bold'
+                    ? 'bg-brand-50 text-[#228b22] font-bold'
                     : 'text-slate-700'
                 } border-b border-slate-50 last:border-0`}
               >
@@ -1433,7 +1433,7 @@ export default function VendorApplyPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-4 border-brand-200 border-t-[#228b22] rounded-full animate-spin mx-auto" />
           <p className="text-slate-600 font-bold">
             Verifying authentication & loading application state...
           </p>
@@ -1497,8 +1497,8 @@ export default function VendorApplyPage() {
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src="/fa_logo_brand.png"
-              alt="Faflora Logo"
+              src="/brand/ekivamart-logo.svg"
+              alt="EkivaMart Logo"
               width={110}
               height={36}
               className="h-8 w-auto object-contain"
@@ -1520,7 +1520,7 @@ export default function VendorApplyPage() {
             )}
             <Link
               href="/become-a-vendor"
-              className="text-xs font-bold text-slate-500 hover:text-[#9d4ae3] transition-colors"
+              className="text-xs font-bold text-slate-500 hover:text-[#228b22] transition-colors"
             >
               Exit Application
             </Link>
@@ -1564,9 +1564,9 @@ export default function VendorApplyPage() {
                       isSkipped
                         ? 'bg-slate-200  border-slate-300 text-slate-400'
                         : isCompleted
-                          ? 'bg-[#9d4ae3] border-[#9d4ae3] text-white'
+                          ? 'bg-[#228b22] border-[#228b22] text-white'
                           : isActive
-                            ? 'bg-[#f3ecfc] border-[#9d4ae3] text-[#9d4ae3] ring-2 ring-purple-100'
+                            ? 'bg-[#eff4e9] border-[#228b22] text-[#228b22] ring-2 ring-brand-100'
                             : 'bg-white border-slate-200 text-slate-400'
                     }`}
                   >
@@ -1582,7 +1582,7 @@ export default function VendorApplyPage() {
                       isSkipped
                         ? 'text-slate-300'
                         : isActive || isCompleted
-                          ? 'text-[#9d4ae3]'
+                          ? 'text-[#228b22]'
                           : 'text-slate-400'
                     }`}
                   >
@@ -1599,7 +1599,7 @@ export default function VendorApplyPage() {
       <div className="max-w-6xl mx-auto px-4 lg:px-6 lg:flex lg:gap-8 lg:items-start">
         {/* Sidebar */}
         <div className="hidden lg:block w-64 shrink-0 sticky top-8">
-          <div className="bg-gradient-to-br from-purple-900 to-[#8236be] text-white rounded-2xl p-5 shadow-lg mb-4 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-brand-900 to-[#1c711c] text-white rounded-2xl p-5 shadow-lg mb-4 relative overflow-hidden">
             <div className="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
@@ -1607,12 +1607,12 @@ export default function VendorApplyPage() {
               </div>
               <div>
                 <h3 className="font-extrabold text-sm">Vendor Application</h3>
-                <p className="text-[10px] text-purple-200">
+                <p className="text-[10px] text-brand-200">
                   Progress saved automatically
                 </p>
               </div>
             </div>
-            <p className="text-[11px] text-purple-100 leading-relaxed">
+            <p className="text-[11px] text-brand-100 leading-relaxed">
               Typically takes 5–10 minutes. You may return to continue at any
               step.
             </p>
@@ -1638,7 +1638,7 @@ export default function VendorApplyPage() {
                     isSkipped
                       ? 'opacity-50 cursor-not-allowed bg-slate-50'
                       : isActive
-                        ? 'bg-purple-50'
+                        ? 'bg-brand-50'
                         : isClickable
                           ? 'hover:bg-slate-50 cursor-pointer'
                           : 'opacity-50 cursor-not-allowed'
@@ -1649,9 +1649,9 @@ export default function VendorApplyPage() {
                       isSkipped
                         ? 'bg-slate-100 border-slate-200 text-slate-400'
                         : isCompleted
-                          ? 'bg-[#9d4ae3] border-[#9d4ae3] text-white'
+                          ? 'bg-[#228b22] border-[#228b22] text-white'
                           : isActive
-                            ? 'bg-[#f3ecfc] border-[#9d4ae3] text-[#9d4ae3]'
+                            ? 'bg-[#eff4e9] border-[#228b22] text-[#228b22]'
                             : 'bg-white border-slate-200 text-slate-400'
                     }`}
                   >
@@ -1667,7 +1667,7 @@ export default function VendorApplyPage() {
                         isSkipped
                           ? 'text-slate-400'
                           : isActive
-                            ? 'text-[#9d4ae3]'
+                            ? 'text-[#228b22]'
                             : isCompleted
                               ? 'text-slate-700'
                               : 'text-slate-400'
@@ -1762,7 +1762,7 @@ export default function VendorApplyPage() {
                     {appStatus.status === 'approved' && (
                       <p className="text-xs text-green-600 mt-1">
                         Congratulations! Your vendor application has been
-                        approved. You can now start selling on Faflora.
+                        approved. You can now start selling on EkivaMart.
                       </p>
                     )}
                     {appStatus.status === 'rejected' &&
@@ -1806,8 +1806,8 @@ export default function VendorApplyPage() {
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-2xl font-black text-[#9d4ae3] flex items-center gap-2">
-                            <Store className="w-6 h-6 text-[#9d4ae3]" />
+                          <h2 className="text-2xl font-black text-[#228b22] flex items-center gap-2">
+                            <Store className="w-6 h-6 text-[#228b22]" />
                             Store Basics
                           </h2>
                           <p className="text-sm text-slate-500">
@@ -1829,7 +1829,7 @@ export default function VendorApplyPage() {
                         <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                           Store Name (unique)
                           <span
-                            className="text-[#9d4ae3] ml-1 font-bold"
+                            className="text-[#228b22] ml-1 font-bold"
                             aria-hidden="true"
                           >
                             *
@@ -1850,12 +1850,12 @@ export default function VendorApplyPage() {
                                   ? 'bg-white border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/10 text-slate-800'
                                   : storeNameStatus === 'available'
                                     ? 'bg-white border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-500/10 text-slate-800'
-                                    : 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 text-slate-800'
+                                    : 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 text-slate-800'
                             }`}
                           />
                           {!isStep1Completed &&
                             storeNameStatus === 'checking' && (
-                              <span className="absolute right-3.5 top-3.5 w-4.5 h-4.5 border-2 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin inline-block" />
+                              <span className="absolute right-3.5 top-3.5 w-4.5 h-4.5 border-2 border-brand-200 border-t-[#228b22] rounded-full animate-spin inline-block" />
                             )}
                           {!isStep1Completed &&
                             storeNameStatus === 'available' && (
@@ -1872,8 +1872,8 @@ export default function VendorApplyPage() {
                         {/* Status indicator text - using span instead of div inside p */}
                         {!isStep1Completed &&
                           storeNameStatus === 'checking' && (
-                            <p className="text-xs text-purple-600 mt-1.5 flex items-center gap-1 font-medium">
-                              <span className="w-3 h-3 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin inline-block flex-shrink-0" />
+                            <p className="text-xs text-brand-600 mt-1.5 flex items-center gap-1 font-medium">
+                              <span className="w-3 h-3 border-2 border-brand-300 border-t-purple-600 rounded-full animate-spin inline-block flex-shrink-0" />
                               Checking availability...
                             </p>
                           )}
@@ -1933,7 +1933,7 @@ export default function VendorApplyPage() {
                         <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                           Vendor Type
                           <span
-                            className="text-[#9d4ae3] ml-1 font-bold"
+                            className="text-[#228b22] ml-1 font-bold"
                             aria-hidden="true"
                           >
                             *
@@ -1950,7 +1950,7 @@ export default function VendorApplyPage() {
                           disabled={isStep1Completed}
                         />
                         {vendorType && (
-                          <p className="text-xs text-[#9d4ae3] mt-1.5 font-bold">
+                          <p className="text-xs text-[#228b22] mt-1.5 font-bold">
                             {
                               VENDOR_TYPES.find((t) => t.value === vendorType)
                                 ?.desc
@@ -1980,7 +1980,7 @@ export default function VendorApplyPage() {
                           className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none font-medium placeholder:text-slate-400 ${
                             isStep1Completed
                               ? 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
-                              : 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 text-slate-800'
+                              : 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 text-slate-800'
                           }`}
                         />
                       </div>
@@ -1999,7 +1999,7 @@ export default function VendorApplyPage() {
                           className="w-full bg-slate-50 border-2 border-slate-200 text-slate-500 rounded-xl px-4 py-3 text-sm outline-none cursor-not-allowed font-medium"
                         />
                         {/* <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                          Linked to your main authenticated Faflora account.
+                          Linked to your main authenticated EkivaMart account.
                         </p> */}
                       </div>
                     </div>
@@ -2010,14 +2010,14 @@ export default function VendorApplyPage() {
                 {currentStep === 2 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-black text-[#9d4ae3] flex items-center gap-2">
-                        <Tag className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-black text-[#228b22] flex items-center gap-2">
+                        <Tag className="w-6 h-6 text-[#228b22]" />
                         Selling Categories
                       </h2>
                       <p className="text-sm text-slate-500">
                         Select the categories you plan to sell under. You can
                         select multiple categories.
-                        <span className="text-[#9d4ae3] font-semibold">
+                        <span className="text-[#228b22] font-semibold">
                           {' '}
                           Minimum 1, maximum {MAX_CATEGORIES}.
                         </span>
@@ -2026,7 +2026,7 @@ export default function VendorApplyPage() {
 
                     {categoriesList.length === 0 ? (
                       <div className="text-center py-8 text-slate-400">
-                        <div className="w-12 h-12 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin mx-auto mb-4" />
+                        <div className="w-12 h-12 border-4 border-brand-200 border-t-[#228b22] rounded-full animate-spin mx-auto mb-4" />
                         <p className="text-sm font-medium">
                           Loading categories...
                         </p>
@@ -2065,8 +2065,8 @@ export default function VendorApplyPage() {
                                 }}
                                 className={`group p-4 rounded-xl border-2 transition-all text-center hover:shadow-md ${
                                   isSelected
-                                    ? 'border-[#9d4ae3] bg-purple-50 ring-2 ring-purple-500/20 shadow-md'
-                                    : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
+                                    ? 'border-[#228b22] bg-brand-50 ring-2 ring-brand-500/20 shadow-md'
+                                    : 'border-slate-200 hover:border-brand-300 hover:bg-brand-50/50'
                                 }`}
                               >
                                 <div className="flex flex-col items-center gap-3">
@@ -2074,9 +2074,9 @@ export default function VendorApplyPage() {
                                   <div
                                     className={`w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 transition-all ${
                                       isSelected
-                                        ? 'ring-2 ring-[#9d4ae3] ring-offset-2'
+                                        ? 'ring-2 ring-[#228b22] ring-offset-2'
                                         : ''
-                                    } ${hasRealImage ? 'bg-white' : 'bg-gradient-to-br from-purple-50 to-purple-100'}`}
+                                    } ${hasRealImage ? 'bg-white' : 'bg-gradient-to-br from-brand-50 to-brand-100'}`}
                                   >
                                     {hasRealImage ? (
                                       <img
@@ -2094,7 +2094,7 @@ export default function VendorApplyPage() {
                                       />
                                     ) : (
                                       <div className="w-full h-full flex items-center justify-center">
-                                        <span className="text-3xl font-bold text-[#9d4ae3]">
+                                        <span className="text-3xl font-bold text-[#228b22]">
                                           {category.name
                                             .charAt(0)
                                             .toUpperCase()}
@@ -2107,8 +2107,8 @@ export default function VendorApplyPage() {
                                   <p
                                     className={`text-sm font-medium ${
                                       isSelected
-                                        ? 'text-[#9d4ae3]'
-                                        : 'text-slate-700 group-hover:text-[#9d4ae3]'
+                                        ? 'text-[#228b22]'
+                                        : 'text-slate-700 group-hover:text-[#228b22]'
                                     }`}
                                   >
                                     {category.name}
@@ -2118,8 +2118,8 @@ export default function VendorApplyPage() {
                                   <div
                                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                                       isSelected
-                                        ? 'border-[#9d4ae3] bg-[#9d4ae3]'
-                                        : 'border-slate-300 group-hover:border-purple-300'
+                                        ? 'border-[#228b22] bg-[#228b22]'
+                                        : 'border-slate-300 group-hover:border-brand-300'
                                     }`}
                                   >
                                     {isSelected && (
@@ -2135,7 +2135,7 @@ export default function VendorApplyPage() {
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-slate-100">
                           <p className="text-xs text-slate-500">
                             Selected:{' '}
-                            <span className="font-bold text-[#9d4ae3]">
+                            <span className="font-bold text-[#228b22]">
                               {selectedCategories.length}
                             </span>{' '}
                             of {categoriesList.length} categories (max{' '}
@@ -2160,8 +2160,8 @@ export default function VendorApplyPage() {
                 {currentStep === 3 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-black text-[#9d4ae3] flex items-center gap-2">
-                        <User className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-black text-[#228b22] flex items-center gap-2">
+                        <User className="w-6 h-6 text-[#228b22]" />
                         Personal Information
                       </h2>
                       <p className="text-sm text-slate-500 font-medium">
@@ -2175,7 +2175,7 @@ export default function VendorApplyPage() {
                         <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                           Full Legal Name
                           <span
-                            className="text-[#9d4ae3] ml-1 font-bold"
+                            className="text-[#228b22] ml-1 font-bold"
                             aria-hidden="true"
                           >
                             *
@@ -2187,7 +2187,7 @@ export default function VendorApplyPage() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Chisom Ada Okafor"
-                          className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                          className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">
                           Must match the legal name on bank account & government
@@ -2200,7 +2200,7 @@ export default function VendorApplyPage() {
                           <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                             Date of Birth
                             <span
-                              className="text-[#9d4ae3] ml-1 font-bold"
+                              className="text-[#228b22] ml-1 font-bold"
                               aria-hidden="true"
                             >
                               *
@@ -2211,14 +2211,14 @@ export default function VendorApplyPage() {
                             required
                             value={dateOfBirth}
                             onChange={(e) => setDateOfBirth(e.target.value)}
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium"
                           />
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                             Gender
                             <span
-                              className="text-[#9d4ae3] ml-1 font-bold"
+                              className="text-[#228b22] ml-1 font-bold"
                               aria-hidden="true"
                             >
                               *
@@ -2243,7 +2243,7 @@ export default function VendorApplyPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="font-extrabold text-sm text-purple-800 border-b border-slate-100 pb-2">
+                      <h3 className="font-extrabold text-sm text-brand-800 border-b border-slate-100 pb-2">
                         Current Location
                       </h3>
                       <div className="grid md:grid-cols-2 gap-6">
@@ -2251,7 +2251,7 @@ export default function VendorApplyPage() {
                           <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                             Street Address
                             <span
-                              className="text-[#9d4ae3] ml-1 font-bold"
+                              className="text-[#228b22] ml-1 font-bold"
                               aria-hidden="true"
                             >
                               *
@@ -2263,7 +2263,7 @@ export default function VendorApplyPage() {
                             value={homeStreet}
                             onChange={(e) => setHomeStreet(e.target.value)}
                             placeholder="12 Bode Thomas Street"
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                           />
                         </div>
                         <div className="grid grid-cols-3 gap-3">
@@ -2271,7 +2271,7 @@ export default function VendorApplyPage() {
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               City
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2283,14 +2283,14 @@ export default function VendorApplyPage() {
                               value={homeCity}
                               onChange={(e) => setHomeCity(e.target.value)}
                               placeholder="Surulere"
-                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                             />
                           </div>
                           <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               State
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2310,7 +2310,7 @@ export default function VendorApplyPage() {
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               LGA
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2322,7 +2322,7 @@ export default function VendorApplyPage() {
                               value={homeLga}
                               onChange={(e) => setHomeLga(e.target.value)}
                               placeholder="Surulere"
-                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-2 py-3 text-xs transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-2 py-3 text-xs transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                             />
                           </div>
                         </div>
@@ -2343,7 +2343,7 @@ export default function VendorApplyPage() {
                             <button
                               type="button"
                               onClick={handleNinChange}
-                              className="text-xs font-bold text-[#9d4ae3] hover:text-[#8236be] transition-colors px-3 py-2 border border-[#9d4ae3] rounded-xl hover:bg-purple-50"
+                              className="text-xs font-bold text-[#228b22] hover:text-[#1c711c] transition-colors px-3 py-2 border border-[#228b22] rounded-xl hover:bg-brand-50"
                             >
                               Change
                             </button>
@@ -2357,7 +2357,7 @@ export default function VendorApplyPage() {
                               setNin(e.target.value.replace(/\D/g, ''))
                             }
                             placeholder="11-digit NIN"
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                           />
                         )}
                         <p className="text-[10px] text-slate-400 mt-1">
@@ -2374,8 +2374,8 @@ export default function VendorApplyPage() {
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-2xl font-black text-[#9d4ae3] flex items-center gap-2">
-                            <Building className="w-6 h-6 text-[#9d4ae3]" />
+                          <h2 className="text-2xl font-black text-[#228b22] flex items-center gap-2">
+                            <Building className="w-6 h-6 text-[#228b22]" />
                             Business Information
                           </h2>
                           <p className="text-sm text-slate-500 font-medium">
@@ -2410,7 +2410,7 @@ export default function VendorApplyPage() {
                             Registered Business Name
                             {shouldShowBusinessStep && (
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2425,7 +2425,7 @@ export default function VendorApplyPage() {
                             placeholder="Chisom Flowers Limited"
                             className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400 ${
                               shouldShowBusinessStep
-                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10'
+                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10'
                                 : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
                             }`}
                             disabled={!shouldShowBusinessStep}
@@ -2442,7 +2442,7 @@ export default function VendorApplyPage() {
                             Business Type
                             {shouldShowBusinessStep && (
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2476,7 +2476,7 @@ export default function VendorApplyPage() {
                             CAC Registration Number
                             {shouldShowBusinessStep && (
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2491,7 +2491,7 @@ export default function VendorApplyPage() {
                             placeholder="e.g. RC1234567"
                             className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400 ${
                               shouldShowBusinessStep
-                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10'
+                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10'
                                 : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
                             }`}
                             disabled={!shouldShowBusinessStep}
@@ -2506,7 +2506,7 @@ export default function VendorApplyPage() {
                             Tax Identification Number (TIN)
                             {shouldShowBusinessStep && (
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2522,7 +2522,7 @@ export default function VendorApplyPage() {
                             placeholder="8-15 character TIN"
                             className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400 ${
                               shouldShowBusinessStep
-                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10'
+                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10'
                                 : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
                             }`}
                             disabled={!shouldShowBusinessStep}
@@ -2543,7 +2543,7 @@ export default function VendorApplyPage() {
                             placeholder="VAT Registration Number"
                             className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400 ${
                               shouldShowBusinessStep
-                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10'
+                                ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10'
                                 : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
                             }`}
                             disabled={!shouldShowBusinessStep}
@@ -2563,7 +2563,7 @@ export default function VendorApplyPage() {
                           }
                           className={`w-full border-2 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium ${
                             shouldShowBusinessStep
-                              ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10'
+                              ? 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10'
                               : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
                           }`}
                           disabled={!shouldShowBusinessStep}
@@ -2577,8 +2577,8 @@ export default function VendorApplyPage() {
                 {currentStep === 5 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-black text-[#9d4ae3] flex items-center gap-2">
-                        <Briefcase className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-black text-[#228b22] flex items-center gap-2">
+                        <Briefcase className="w-6 h-6 text-[#228b22]" />
                         Store Details
                       </h2>
                       <p className="text-sm text-slate-500 font-medium">
@@ -2592,14 +2592,14 @@ export default function VendorApplyPage() {
                         <label className="block text-xs font-bold text-slate-700 flex items-center">
                           Store Description (min 100 characters)
                           <span
-                            className="text-[#9d4ae3] ml-1 font-bold"
+                            className="text-[#228b22] ml-1 font-bold"
                             aria-hidden="true"
                           >
                             *
                           </span>
                         </label>
                         <span
-                          className={`text-[10px] font-bold text-[#9d4ae3]`}
+                          className={`text-[10px] font-bold text-[#228b22]`}
                         >
                           {storeDescription.length} / 1000
                         </span>
@@ -2611,11 +2611,11 @@ export default function VendorApplyPage() {
                         value={storeDescription}
                         onChange={(e) => setStoreDescription(e.target.value)}
                         placeholder="Describe what your store sells, your quality focus, and floral arrangement values..."
-                        className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none resize-none text-slate-800 font-medium placeholder:text-slate-400"
+                        className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none resize-none text-slate-800 font-medium placeholder:text-slate-400"
                       />
                       {storeDescription.length > 0 &&
                         storeDescription.length < 100 && (
-                          <p className="text-xs text-[#9d4ae3] mt-1 font-medium">
+                          <p className="text-xs text-[#228b22] mt-1 font-medium">
                             Please enter at least 100 characters (
                             {100 - storeDescription.length} more needed)
                           </p>
@@ -2627,7 +2627,7 @@ export default function VendorApplyPage() {
                         <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                           Years in Business
                           <span
-                            className="text-[#9d4ae3] ml-1 font-bold"
+                            className="text-[#228b22] ml-1 font-bold"
                             aria-hidden="true"
                           >
                             *
@@ -2658,7 +2658,7 @@ export default function VendorApplyPage() {
                             setBusPostal(e.target.value.replace(/\D/g, ''))
                           }
                           placeholder="100001"
-                          className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                          className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">
                           6 digits only
@@ -2667,7 +2667,7 @@ export default function VendorApplyPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="font-extrabold text-sm text-purple-800 border-b border-slate-100 pb-2">
+                      <h3 className="font-extrabold text-sm text-brand-800 border-b border-slate-100 pb-2">
                         Business Operations Address
                       </h3>
                       <div className="grid md:grid-cols-2 gap-6">
@@ -2675,7 +2675,7 @@ export default function VendorApplyPage() {
                           <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                             Street Address
                             <span
-                              className="text-[#9d4ae3] ml-1 font-bold"
+                              className="text-[#228b22] ml-1 font-bold"
                               aria-hidden="true"
                             >
                               *
@@ -2687,7 +2687,7 @@ export default function VendorApplyPage() {
                             value={busStreet}
                             onChange={(e) => setBusStreet(e.target.value)}
                             placeholder="15 Allen Avenue"
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                           />
                         </div>
                         <div className="grid grid-cols-3 gap-3">
@@ -2695,7 +2695,7 @@ export default function VendorApplyPage() {
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               City
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2707,14 +2707,14 @@ export default function VendorApplyPage() {
                               value={busCity}
                               onChange={(e) => setBusCity(e.target.value)}
                               placeholder="Ikeja"
-                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                             />
                           </div>
                           <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               State
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2734,7 +2734,7 @@ export default function VendorApplyPage() {
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
                               LGA
                               <span
-                                className="text-[#9d4ae3] ml-1 font-bold"
+                                className="text-[#228b22] ml-1 font-bold"
                                 aria-hidden="true"
                               >
                                 *
@@ -2746,7 +2746,7 @@ export default function VendorApplyPage() {
                               value={busLga}
                               onChange={(e) => setBusLga(e.target.value)}
                               placeholder="Ikeja"
-                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-2 py-3 text-xs transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                              className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-2 py-3 text-xs transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                             />
                           </div>
                         </div>
@@ -2754,12 +2754,12 @@ export default function VendorApplyPage() {
                     </div>
 
                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                      <h3 className="font-extrabold text-sm text-purple-800 border-b border-slate-100 pb-2">
+                      <h3 className="font-extrabold text-sm text-brand-800 border-b border-slate-100 pb-2">
                         Social Media Links (Optional)
                       </h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9d4ae3]">
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#228b22]">
                             <FaInstagram size={18} />
                           </div>
                           <input
@@ -2767,12 +2767,12 @@ export default function VendorApplyPage() {
                             placeholder="https://instagram.com/yourbrand"
                             value={linkInstagram}
                             onChange={(e) => setLinkInstagram(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
+                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
                           />
                         </div>
 
                         <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9d4ae3]">
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#228b22]">
                             <FaFacebookF size={18} />
                           </div>
                           <input
@@ -2780,12 +2780,12 @@ export default function VendorApplyPage() {
                             placeholder="https://facebook.com/yourbrand"
                             value={linkFacebook}
                             onChange={(e) => setLinkFacebook(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
+                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
                           />
                         </div>
 
                         <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9d4ae3]">
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#228b22]">
                             <FaXTwitter size={18} />
                           </div>
                           <input
@@ -2793,12 +2793,12 @@ export default function VendorApplyPage() {
                             placeholder="https://twitter.com/yourbrand"
                             value={linkTwitter}
                             onChange={(e) => setLinkTwitter(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
+                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
                           />
                         </div>
 
                         <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9d4ae3]">
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#228b22]">
                             <FaTiktok size={18} />
                           </div>
                           <input
@@ -2806,7 +2806,7 @@ export default function VendorApplyPage() {
                             placeholder="https://tiktok.com/@yourbrand"
                             value={linkTiktok}
                             onChange={(e) => setLinkTiktok(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
+                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl text-xs font-medium transition-all outline-none text-slate-800 placeholder:text-slate-400"
                           />
                         </div>
                       </div>
@@ -2818,13 +2818,13 @@ export default function VendorApplyPage() {
                 {currentStep === 6 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-extrabold text-[#9d4ae3] flex items-center gap-2">
-                        <FileText className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-extrabold text-[#228b22] flex items-center gap-2">
+                        <FileText className="w-6 h-6 text-[#228b22]" />
                         Upload Identity Documents
                       </h2>
                       <p className="text-sm text-slate-500">
                         Required files based on your selection:{' '}
-                        <span className="font-extrabold text-purple-600 capitalize">
+                        <span className="font-extrabold text-brand-600 capitalize">
                           {vendorType?.replace('_', ' ')}
                         </span>
                         .
@@ -2918,7 +2918,7 @@ export default function VendorApplyPage() {
                                         onClick={() =>
                                           handleViewDocument(uploadedFile)
                                         }
-                                        className="text-[#9d4ae3] hover:underline font-medium flex items-center gap-1"
+                                        className="text-[#228b22] hover:underline font-medium flex items-center gap-1"
                                       >
                                         <Eye size={12} />
                                         {uploadedFile.originalFilename}
@@ -2970,14 +2970,14 @@ export default function VendorApplyPage() {
 
                               <div className="shrink-0 w-full md:w-auto">
                                 {isUploading ? (
-                                  <div className="flex items-center gap-2 px-6 py-2 bg-purple-50 text-purple-600 rounded-xl font-bold text-xs">
-                                    <div className="w-3.5 h-3.5 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                                  <div className="flex items-center gap-2 px-6 py-2 bg-brand-50 text-brand-600 rounded-xl font-bold text-xs">
+                                    <div className="w-3.5 h-3.5 border-2 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
                                     Uploading...
                                   </div>
                                 ) : uploadedFile ? (
                                   <div className="flex items-center gap-2 flex-wrap">
                                     {canReplace && (
-                                      <label className="inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer transition-all">
+                                      <label className="inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white font-extrabold text-xs px-4 py-2 rounded-xl cursor-pointer transition-all">
                                         <UploadCloud size={14} />
                                         Replace
                                         <input
@@ -3023,7 +3023,7 @@ export default function VendorApplyPage() {
                                     )}
                                   </div>
                                 ) : (
-                                  <label className="inline-flex items-center justify-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white font-extrabold text-xs px-6 py-3 rounded-xl cursor-pointer transition-all w-full md:w-auto">
+                                  <label className="inline-flex items-center justify-center gap-2 bg-[#228b22] hover:opacity-90 text-white font-extrabold text-xs px-6 py-3 rounded-xl cursor-pointer transition-all w-full md:w-auto">
                                     <UploadCloud size={14} />
                                     Choose File
                                     <input
@@ -3065,8 +3065,8 @@ export default function VendorApplyPage() {
                 {currentStep === 7 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-extrabold text-[#9d4ae3] flex items-center gap-2">
-                        <CreditCard className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-extrabold text-[#228b22] flex items-center gap-2">
+                        <CreditCard className="w-6 h-6 text-[#228b22]" />
                         Add Bank Account
                       </h2>
                       <p className="text-sm text-slate-500">
@@ -3107,7 +3107,7 @@ export default function VendorApplyPage() {
                               setIsBankDropdownOpen(true);
                             }}
                             onFocus={() => setIsBankDropdownOpen(true)}
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium"
                             disabled={
                               bankAccountsList.length >= MAX_BANK_ACCOUNTS
                             }
@@ -3128,7 +3128,7 @@ export default function VendorApplyPage() {
                                     setBankSearchText(bank.name);
                                     setIsBankDropdownOpen(false);
                                   }}
-                                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-purple-50 text-slate-700 font-medium border-b border-slate-50 last:border-0"
+                                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-brand-50 text-slate-700 font-medium border-b border-slate-50 last:border-0"
                                 >
                                   {bank.name}
                                 </button>
@@ -3151,7 +3151,7 @@ export default function VendorApplyPage() {
                               )
                             }
                             placeholder="10-digit NUBAN"
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium"
                             disabled={
                               bankAccountsList.length >= MAX_BANK_ACCOUNTS
                             }
@@ -3172,7 +3172,7 @@ export default function VendorApplyPage() {
                               setAccountName(e.target.value.toUpperCase())
                             }
                             placeholder="e.g. JOHN DOE"
-                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium placeholder:text-slate-400 uppercase"
+                            className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm outline-none text-slate-800 font-medium placeholder:text-slate-400 uppercase"
                             disabled={
                               bankAccountsList.length >= MAX_BANK_ACCOUNTS
                             }
@@ -3208,7 +3208,7 @@ export default function VendorApplyPage() {
                           disabled={
                             bankAccountsList.length >= MAX_BANK_ACCOUNTS
                           }
-                          className="bg-[#9d4ae3] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-extrabold text-xs px-6 py-2.5 rounded-xl transition-all"
+                          className="bg-[#228b22] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-extrabold text-xs px-6 py-2.5 rounded-xl transition-all"
                         >
                           Link Account
                         </button>
@@ -3252,7 +3252,7 @@ export default function VendorApplyPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleSetPrimaryBank(acc.id)}
-                                    className="text-[10px] font-bold text-purple-600 hover:text-purple-700 hover:underline mt-2 block"
+                                    className="text-[10px] font-bold text-brand-600 hover:text-brand-700 hover:underline mt-2 block"
                                   >
                                     Make Primary
                                   </button>
@@ -3279,8 +3279,8 @@ export default function VendorApplyPage() {
                 {currentStep === 8 && (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <h2 className="text-2xl font-extrabold text-[#9d4ae3] flex items-center gap-2">
-                        <FileCheck className="w-6 h-6 text-[#9d4ae3]" />
+                      <h2 className="text-2xl font-extrabold text-[#228b22] flex items-center gap-2">
+                        <FileCheck className="w-6 h-6 text-[#228b22]" />
                         Review & Submit
                       </h2>
                       <p className="text-sm text-slate-500">
@@ -3333,7 +3333,7 @@ export default function VendorApplyPage() {
                       <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                         <button
                           onClick={() => setCurrentStep(2)}
-                          className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                          className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                         >
                           Edit
                         </button>
@@ -3347,7 +3347,7 @@ export default function VendorApplyPage() {
                               .map((c) => (
                                 <span
                                   key={c.id}
-                                  className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium"
+                                  className="text-[10px] bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full font-medium"
                                 >
                                   {c.name}
                                 </span>
@@ -3364,7 +3364,7 @@ export default function VendorApplyPage() {
                       <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                         <button
                           onClick={() => setCurrentStep(3)}
-                          className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                          className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                         >
                           Edit
                         </button>
@@ -3414,7 +3414,7 @@ export default function VendorApplyPage() {
                         <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                           <button
                             onClick={() => setCurrentStep(4)}
-                            className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                            className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                           >
                             Edit
                           </button>
@@ -3463,7 +3463,7 @@ export default function VendorApplyPage() {
                       <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                         <button
                           onClick={() => setCurrentStep(5)}
-                          className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                          className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                         >
                           Edit
                         </button>
@@ -3484,7 +3484,7 @@ export default function VendorApplyPage() {
                       <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                         <button
                           onClick={() => setCurrentStep(6)}
-                          className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                          className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                         >
                           Edit
                         </button>
@@ -3522,7 +3522,7 @@ export default function VendorApplyPage() {
                                       )}
                                       <button
                                         onClick={() => handleViewDocument(doc)}
-                                        className="text-[#9d4ae3] hover:underline"
+                                        className="text-[#228b22] hover:underline"
                                       >
                                         <Eye size={12} />
                                       </button>
@@ -3543,7 +3543,7 @@ export default function VendorApplyPage() {
                       <div className="border border-slate-100 rounded-2xl p-5 space-y-2 relative">
                         <button
                           onClick={() => setCurrentStep(7)}
-                          className="absolute right-5 top-5 text-xs font-extrabold text-purple-600 hover:underline"
+                          className="absolute right-5 top-5 text-xs font-extrabold text-brand-600 hover:underline"
                         >
                           Edit
                         </button>
@@ -3587,7 +3587,7 @@ export default function VendorApplyPage() {
                           type="checkbox"
                           checked={confirmAccurate}
                           onChange={(e) => setConfirmAccurate(e.target.checked)}
-                          className="mt-0.5 rounded border-slate-300 text-[#9d4ae3] focus:ring-purple-500"
+                          className="mt-0.5 rounded border-slate-300 text-[#228b22] focus:ring-brand-500"
                         />
                         <span className="text-xs font-semibold text-slate-600 leading-normal">
                           I confirm that all information provided is accurate
@@ -3600,10 +3600,10 @@ export default function VendorApplyPage() {
                           type="checkbox"
                           checked={confirmTerms}
                           onChange={(e) => setConfirmTerms(e.target.checked)}
-                          className="mt-0.5 rounded border-slate-300 text-[#9d4ae3] focus:ring-purple-500"
+                          className="mt-0.5 rounded border-slate-300 text-[#228b22] focus:ring-brand-500"
                         />
                         <span className="text-xs font-semibold text-slate-600 leading-normal">
-                          I agree to Faflora's Vendor Terms and Commission
+                          I agree to EkivaMart's Vendor Terms and Commission
                           Structure.
                         </span>
                       </label>
@@ -3636,7 +3636,7 @@ export default function VendorApplyPage() {
                     <button
                       type="button"
                       onClick={() => handleSaveStep(currentStep)}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-90 text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md transition-all active:scale-[0.98] h-[52px] ml-4 lg:ml-0"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:opacity-90 text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md transition-all active:scale-[0.98] h-[52px] ml-4 lg:ml-0"
                     >
                       {getButtonText(currentStep)}
                       <ArrowRight size={16} />
@@ -3650,7 +3650,7 @@ export default function VendorApplyPage() {
                         submittingApplication
                       }
                       onClick={handleSubmitAll}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-90 text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed h-[52px] ml-4 lg:ml-0"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:opacity-90 text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed h-[52px] ml-4 lg:ml-0"
                     >
                       {submittingApplication
                         ? 'Submitting Application...'
@@ -3685,7 +3685,7 @@ export default function VendorApplyPage() {
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                     You have selected{' '}
-                    <span className="font-extrabold text-purple-600 capitalize">
+                    <span className="font-extrabold text-brand-600 capitalize">
                       {(vendorType || '').replace('_', ' ')}
                     </span>
                     .
@@ -3711,7 +3711,7 @@ export default function VendorApplyPage() {
                 <button
                   type="button"
                   onClick={handleProceedStep1}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
+                  className="px-6 py-2.5 bg-[#228b22] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
                 >
                   Proceed
                 </button>
@@ -3731,8 +3731,8 @@ export default function VendorApplyPage() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4"
             >
-              <div className="flex gap-3 text-purple-600">
-                <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
+              <div className="flex gap-3 text-brand-600">
+                <div className="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
                   <User size={20} />
                 </div>
                 <div>
@@ -3755,7 +3755,7 @@ export default function VendorApplyPage() {
                   value={nin}
                   onChange={(e) => setNin(e.target.value.replace(/\D/g, ''))}
                   placeholder="11-digit NIN"
-                  className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
+                  className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-[#228b22] focus:ring-2 focus:ring-brand-500/10 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-800 font-medium placeholder:text-slate-400"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">
                   Must be exactly 11 digits
@@ -3776,7 +3776,7 @@ export default function VendorApplyPage() {
                 <button
                   type="button"
                   onClick={handleNinModalSubmit}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
+                  className="px-6 py-2.5 bg-[#228b22] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
                 >
                   Update NIN
                 </button>
@@ -3892,7 +3892,7 @@ export default function VendorApplyPage() {
                           href={selectedDocument.documentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-4 inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
+                          className="mt-4 inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
                         >
                           <Eye size={16} />
                           View PDF
@@ -3917,7 +3917,7 @@ export default function VendorApplyPage() {
                       href={selectedDocument.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
+                      className="mt-4 inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
                     >
                       <Eye size={16} />
                       View File
@@ -3944,14 +3944,14 @@ export default function VendorApplyPage() {
                         }
                       }, 300);
                     }}
-                    className="px-4 py-2 border border-[#9d4ae3] text-[#9d4ae3] hover:bg-purple-50 rounded-xl text-xs font-bold transition-all"
+                    className="px-4 py-2 border border-[#228b22] text-[#228b22] hover:bg-brand-50 rounded-xl text-xs font-bold transition-all"
                   >
                     Replace Document
                   </button>
                 )}
                 <button
                   onClick={() => setShowDocumentModal(false)}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
+                  className="px-6 py-2.5 bg-[#228b22] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
                 >
                   Close
                 </button>
@@ -4015,7 +4015,7 @@ export default function VendorApplyPage() {
       {/* Footer */}
       <footer className="max-w-6xl mx-auto px-4 lg:px-6 mt-6 pt-4 border-t border-slate-200">
         <p className="text-center text-xs text-slate-400 font-medium">
-          &copy; {new Date().getFullYear()} Faflora Group. All rights reserved.
+          &copy; {new Date().getFullYear()} EkivaMart Group. All rights reserved.
         </p>
       </footer>
     </div>

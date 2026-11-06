@@ -148,7 +148,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Sort By Dropdown */}
       <div className="bg-white p-3.5 rounded-xl shadow-xs border border-gray-100">
         <h4 className="font-bold text-gray-700 text-xs mb-2 flex items-center gap-1.5">
-          <SlidersHorizontal size={14} className="text-[#9d4ae3]" />
+          <SlidersHorizontal size={14} className="text-[#228b22]" />
           Sort Products
         </h4>
         <select
@@ -162,7 +162,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               : 'relevance'
           }
           onChange={handleSortSelectChange}
-          className="w-full text-xs font-semibold px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d4ae3] text-gray-700 cursor-pointer"
+          className="w-full text-xs font-semibold px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#228b22] text-gray-700 cursor-pointer"
         >
           <option value="relevance">Relevance</option>
           <option value="price-asc">Price: Low to High</option>
@@ -181,7 +181,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             type="checkbox"
             checked={inStockOnly}
             onChange={(e) => onInStockOnlyChange?.(e.target.checked)}
-            className="w-4 h-4 text-[#9d4ae3] rounded border-gray-300 focus:ring-[#9d4ae3] cursor-pointer"
+            className="w-4 h-4 text-[#228b22] rounded border-gray-300 focus:ring-[#228b22] cursor-pointer"
           />
           <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
             <PackageCheck size={15} className="text-emerald-600" />
@@ -201,7 +201,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <div className="relative py-4">
             <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gray-200 rounded-lg pointer-events-none"></div>
             <div
-              className="absolute top-1/2 -translate-y-1/2 h-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg pointer-events-none"
+              className="absolute top-1/2 -translate-y-1/2 h-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] rounded-lg pointer-events-none"
               style={{
                 left: `${minPercentage}%`,
                 right: `${100 - maxPercentage}%`,
@@ -242,7 +242,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="number"
                 value={minInput}
                 onChange={handleMinInputChange}
-                className="w-full text-xs font-semibold px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d4ae3] bg-gray-50"
+                className="w-full text-xs font-semibold px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#228b22] bg-gray-50"
               />
             </div>
             <div>
@@ -251,7 +251,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="number"
                 value={maxInput}
                 onChange={handleMaxInputChange}
-                className="w-full text-xs font-semibold px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d4ae3] bg-gray-50"
+                className="w-full text-xs font-semibold px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#228b22] bg-gray-50"
               />
             </div>
           </div>
@@ -301,7 +301,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #9d4ae3, #8236be) !important;
+          background: linear-gradient(135deg, #228b22, #1c711c) !important;
           cursor: pointer;
           box-shadow: 0 1px 4px rgba(157, 74, 227, 0.4);
           border: 2px solid #fff;
@@ -311,7 +311,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #9d4ae3, #8236be) !important;
+          background: linear-gradient(135deg, #228b22, #1c711c) !important;
           cursor: pointer;
           box-shadow: 0 1px 4px rgba(157, 74, 227, 0.4);
           border: 2px solid #fff;

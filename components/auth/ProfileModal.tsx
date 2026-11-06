@@ -113,8 +113,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </h3>
                   {user?.isEmailVerified && (
                     <div className="flex items-center justify-center sm:justify-start gap-1">
-                      <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#f3ecfc]" />
-                      <span className="text-xs sm:text-sm text-[#f3ecfc] font-medium">
+                      <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#eff4e9]" />
+                      <span className="text-xs sm:text-sm text-[#eff4e9] font-medium">
                         Verified
                       </span>
                     </div>

@@ -117,7 +117,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       }
     >
       <div className="flex flex-col items-center text-center mb-6 pt-2">
-        <div className="w-14 h-14 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
+        <div className="w-14 h-14 bg-gradient-to-r from-[#228b22] to-[#1c711c] rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
           <Mail className="w-7 h-7 text-white stroke-[2.5]" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">

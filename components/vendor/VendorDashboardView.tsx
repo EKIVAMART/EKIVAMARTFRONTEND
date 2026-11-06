@@ -59,7 +59,7 @@ const summaryCards = [
     title: 'Active Listings',
     value: '24',
     icon: Box,
-    accent: 'from-fuchsia-500 to-violet-600',
+    accent: 'from-brand-500 to-brand-600',
     label: 'Live in store',
   },
   {
@@ -165,7 +165,7 @@ export default function VendorDashboardView({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-gray-100 bg-linear-to-r from-fuchsia-50 via-violet-50 to-cyan-50 p-8 shadow-sm">
+      <section className="rounded-3xl border border-gray-100 bg-linear-to-r from-brand-50 via-brand-50 to-cyan-50 p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-slate-500">

@@ -171,7 +171,7 @@ export function NotificationItem({
           handleClick(e as unknown as React.MouseEvent);
         }
       }}
-      className={`group relative flex items-start gap-3 p-3.5 rounded-2xl transition-all cursor-pointer border ${
+      className={`group relative flex items-start gap-3 p-3.5 rounded-md transition-all cursor-pointer border ${
         !isRead
           ? 'bg-brand-50/40 border-brand-100/70 shadow-sm hover:bg-brand-50'
           : 'bg-white border-neutral-100 hover:bg-neutral-50/80 hover:border-neutral-200'
@@ -179,7 +179,7 @@ export function NotificationItem({
     >
       {/* Category Icon */}
       <div
-        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${config.bg}`}
+        className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 border ${config.bg}`}
       >
         {config.icon}
       </div>
@@ -212,7 +212,7 @@ export function NotificationItem({
 
       {/* Unread Indicator Dot */}
       {!isRead && (
-        <span className="absolute top-3.5 right-3 w-2.5 h-2.5 rounded-full bg-brand-600 ring-4 ring-brand-50/60" />
+        <span className="absolute top-3.5 right-3 w-2.5 h-2.5 rounded-full bg-brand-600 " />
       )}
     </div>
   );

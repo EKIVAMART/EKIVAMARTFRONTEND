@@ -86,7 +86,7 @@ export function PaymentCallbackClient() {
     return (
       <section className="min-h-[70vh] flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-4 text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-[#9d4ae3]" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#228b22]" />
           <div>
             <h1 className="text-xl font-bold text-gray-900">Verifying Payment</h1>
             <p className="mt-2 text-sm text-gray-500">Please wait while we confirm your payment...</p>
@@ -116,7 +116,7 @@ export function PaymentCallbackClient() {
           <div className="flex flex-col gap-3">
             <Link
               href="/cart"
-              className="w-full bg-[#9d4ae3] hover:bg-[#8236be] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
+              className="w-full bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
             >
               Return to Cart & Retry
             </Link>
@@ -144,11 +144,11 @@ export function PaymentCallbackClient() {
         {/* Recalculated Promised Delivery Date */}
         {expectedDelivery && (
           <div className="bg-gradient-to-r from-purple-50 via-purple-50/80 to-indigo-50 border border-purple-200 rounded-2xl p-4 mb-6 text-left flex items-start gap-3.5 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm animate-pulse">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] text-white flex items-center justify-center shrink-0 shadow-sm animate-pulse">
               <Truck size={20} />
             </div>
             <div className="flex-1 text-xs">
-              <span className="text-[10px] font-black uppercase text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-black uppercase text-[#228b22] bg-purple-100 px-2 py-0.5 rounded-full">
                 Delivery Promised
               </span>
               <p className="font-extrabold text-purple-950 text-base mt-1">
@@ -177,14 +177,14 @@ export function PaymentCallbackClient() {
           {orderId ? (
             <Link
               href={`/orders/${orderId}`}
-              className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
+              className="w-full bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#185b1a] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
             >
               <Truck size={18} /> View Order & Track Delivery
             </Link>
           ) : (
             <Link
               href="/orders"
-              className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
+              className="w-full bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#185b1a] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm"
             >
               <ShoppingBag size={18} /> View My Orders
             </Link>

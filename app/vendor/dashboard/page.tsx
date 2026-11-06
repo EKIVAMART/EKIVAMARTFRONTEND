@@ -503,19 +503,19 @@ function ProductStatsModal({
         className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden border"
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b bg-gradient-to-r from-fuchsia-50 to-violet-50">
+        <div className="flex items-start justify-between p-6 border-b bg-gradient-to-r from-brand-50 to-brand-50">
           <div className="flex items-center gap-3">
             {product.image ? (
               <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white shadow-md">
                 <Image src={product.image} alt={product.name} width={56} height={56} className="object-cover w-full h-full" />
               </div>
             ) : (
-              <div className="w-14 h-14 rounded-2xl bg-fuchsia-100 flex items-center justify-center">
-                <Package size={24} className="text-fuchsia-500" />
+              <div className="w-14 h-14 rounded-2xl bg-brand-100 flex items-center justify-center">
+                <Package size={24} className="text-brand-500" />
               </div>
             )}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-600 mb-0.5">Product Insights</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-brand-600 mb-0.5">Product Insights</p>
               <h3 className="font-extrabold text-slate-800 text-base leading-tight max-w-[280px] truncate">{product.name}</h3>
               <p className="text-xs text-gray-500 font-medium mt-0.5">{product.category || 'Uncategorised'}</p>
             </div>
@@ -529,7 +529,7 @@ function ProductStatsModal({
         <div className="p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="w-10 h-10 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-brand-200 border-t-fuchsia-600 rounded-full animate-spin" />
             </div>
           ) : !stats ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -542,9 +542,9 @@ function ProductStatsModal({
               {[
                 { label: 'Total Views', value: views.toLocaleString(), icon: <Eye size={18} className="text-blue-500" />, bg: 'bg-blue-50', border: 'border-blue-100' },
                 { label: 'Total Sales', value: sales.toLocaleString(), icon: <ShoppingCart size={18} className="text-emerald-500" />, bg: 'bg-emerald-50', border: 'border-emerald-100' },
-                { label: 'Revenue', value: formatCurrency(revenue), icon: <TrendingUp size={18} className="text-fuchsia-500" />, bg: 'bg-fuchsia-50', border: 'border-fuchsia-100' },
+                { label: 'Revenue', value: formatCurrency(revenue), icon: <TrendingUp size={18} className="text-brand-500" />, bg: 'bg-brand-50', border: 'border-brand-100' },
                 { label: 'Avg Rating', value: rating > 0 ? `${rating.toFixed(1)} ★` : 'N/A', icon: <Star size={18} className="text-amber-500" />, bg: 'bg-amber-50', border: 'border-amber-100' },
-                { label: 'Reviews', value: reviews.toLocaleString(), icon: <BarChart2 size={18} className="text-violet-500" />, bg: 'bg-violet-50', border: 'border-violet-100' },
+                { label: 'Reviews', value: reviews.toLocaleString(), icon: <BarChart2 size={18} className="text-brand-500" />, bg: 'bg-brand-50', border: 'border-brand-100' },
                 { label: 'Cart Adds', value: cartAdds.toLocaleString(), icon: <ShoppingCart size={18} className="text-rose-500" />, bg: 'bg-rose-50', border: 'border-rose-100' },
                 { label: 'Conversion', value: `${conversion.toFixed(1)}%`, icon: <TrendingUp size={18} className="text-teal-500" />, bg: 'bg-teal-50', border: 'border-teal-100' },
               ].map(({ label, value, icon, bg, border }) => (
@@ -1036,10 +1036,10 @@ function VendorDashboardContent() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin" />
-          <p className="text-sm font-semibold text-fuchsia-700">Loading your dashboard…</p>
+          <div className="w-12 h-12 border-4 border-brand-200 border-t-fuchsia-600 rounded-full animate-spin" />
+          <p className="text-sm font-semibold text-brand-700">Loading your dashboard…</p>
         </div>
       </div>
     );
@@ -1054,7 +1054,7 @@ function VendorDashboardContent() {
       ? 'This dashboard is only available to registered vendors.'
       : 'Your session has expired. Please log in again to continue.';
     return (
-      <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-[2rem] shadow-2xl p-10 max-w-sm w-full text-center border">
           <div className="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <AlertCircle size={32} className="text-rose-500" />
@@ -1065,7 +1065,7 @@ function VendorDashboardContent() {
           </p>
           <button
             onClick={() => router.push('/become-a-vendor')}
-            className="w-full mt-8 bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-700 hover:to-violet-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg"
+            className="w-full mt-8 bg-gradient-to-r from-brand-600 to-brand-600 hover:from-brand-700 hover:to-brand-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg"
           >
             Go to Login
           </button>
@@ -1084,8 +1084,8 @@ function VendorDashboardContent() {
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/fa_logo_brand.png" alt="Faflora" width={100} height={28} className="object-contain" />
-            <span className="text-[10px] text-fuchsia-600 font-bold uppercase tracking-wider bg-fuchsia-50 px-2 py-0.5 rounded border border-fuchsia-100">Vendor</span>
+            <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={100} height={28} className="object-contain" />
+            <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider bg-brand-50 px-2 py-0.5 rounded border border-brand-100">Vendor</span>
           </Link>
         </div>
         <div className="flex items-center gap-3">
@@ -1103,18 +1103,18 @@ function VendorDashboardContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
         <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-gray-200/60">
           <div>
-            <span className="text-xs font-bold text-fuchsia-600 bg-fuchsia-50 px-2.5 py-1 rounded-full uppercase tracking-wider border border-fuchsia-100">
+            <span className="text-xs font-bold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-wider border border-brand-100">
               Vendor Portal
             </span>
           </div>
           <div className="flex items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-fuchsia-100 flex items-center justify-center font-bold text-fuchsia-700 text-sm border border-fuchsia-200 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center font-bold text-brand-700 text-sm border border-brand-200 shadow-sm">
                 {authUser?.firstName?.[0] || 'V'}
               </div>
               <div className="text-left">
@@ -1154,14 +1154,14 @@ function VendorDashboardContent() {
           </div>
           <button
             onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
-            className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-700 hover:to-violet-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+            className="bg-gradient-to-r from-brand-600 to-brand-600 hover:from-brand-700 hover:to-brand-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-brand-100 whitespace-nowrap"
           >
             <Plus size={18} /> Add Product
           </button>
         </header>
 
         {/* Search bar */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-fuchsia-400 focus-within:ring-2 focus-within:ring-fuchsia-200 transition-all">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
           <Search size={18} className="text-gray-400" />
           <input
             type="text"
@@ -1177,7 +1177,7 @@ function VendorDashboardContent() {
           <select
             value={filterCategoryId}
             onChange={e => { setFilterCategoryId(e.target.value); setProductPage(1); }}
-            className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-fuchsia-400 focus:ring-1 focus:ring-fuchsia-300 outline-none transition flex-1"
+            className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-brand-400 focus:ring-1 focus:ring-brand-300 outline-none transition flex-1"
           >
             <option value="all">All Categories</option>
             {categories.map(c => (
@@ -1189,7 +1189,7 @@ function VendorDashboardContent() {
             value={filterSubcategoryId}
             onChange={e => { setFilterSubcategoryId(e.target.value); setProductPage(1); }}
             disabled={filterCategoryId === 'all'}
-            className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-fuchsia-400 focus:ring-1 focus:ring-fuchsia-300 outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+            className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-brand-400 focus:ring-1 focus:ring-brand-300 outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
           >
             <option value="all">All Subcategories</option>
             {filterSubcategories.map(c => (
@@ -1234,7 +1234,7 @@ function VendorDashboardContent() {
                 <button
                   key={p.id}
                   onClick={() => openStatsModal(p)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-fuchsia-50 hover:border-fuchsia-200 hover:text-fuchsia-700 transition shadow-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition shadow-sm"
                 >
                   <BarChart2 size={14} />
                   <span className="max-w-[120px] truncate">{p.name}</span>
@@ -1343,8 +1343,8 @@ export default function VendorDashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin" />
+        <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-50 flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-brand-200 border-t-fuchsia-600 rounded-full animate-spin" />
         </div>
       }
     >

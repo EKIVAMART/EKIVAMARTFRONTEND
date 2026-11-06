@@ -146,13 +146,13 @@ export default function ReviewModerationPanel() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border shadow-sm p-6 sm:p-8 space-y-6">
-      
+    <div className="bg-white rounded-md border shadow-sm p-6 sm:p-8 space-y-6">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b">
         <div>
           <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <MessageSquare size={20} className="text-purple-600" /> Review Moderation & Replies
+            <MessageSquare size={20} className="text-brand-600" /> Review Moderation & Replies
           </h2>
           <p className="text-xs text-gray-500 font-semibold mt-0.5">Moderate customer reviews or post official responses.</p>
         </div>
@@ -165,7 +165,7 @@ export default function ReviewModerationPanel() {
             value={productId}
             onChange={e => setProductId(e.target.value)}
             placeholder="Enter Product UUID..."
-            className="px-3 py-1.5 border rounded-xl text-xs focus:outline-none focus:border-purple-400 bg-gray-55 min-w-[220px]"
+            className="px-3 py-1.5 border rounded-md text-xs focus:outline-none focus:border-brand-400 bg-gray-55 min-w-[220px]"
           />
         </div>
       </div>
@@ -173,11 +173,11 @@ export default function ReviewModerationPanel() {
       {/* Reviews List */}
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 gap-3">
-          <div className="w-8 h-8 border-3 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
           <p className="text-gray-400 font-bold text-xs">Fetching product reviews...</p>
         </div>
       ) : reviews.length === 0 ? (
-        <div className="bg-gray-50 border rounded-2xl p-12 text-center flex flex-col items-center">
+        <div className="bg-gray-50 border rounded-md p-12 text-center flex flex-col items-center">
           <MessageSquare size={32} className="text-gray-300 mb-2" />
           <p className="text-xs text-gray-500 font-semibold">No reviews found for this product UUID.</p>
           <p className="text-[10px] text-gray-400 mt-1">Make sure you are querying an active product that has received reviews.</p>
@@ -185,13 +185,13 @@ export default function ReviewModerationPanel() {
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div 
+            <div
               key={review.id}
-              className={`p-5 border rounded-2xl shadow-sm transition flex flex-col gap-4 ${
+              className={`p-5 border rounded-md shadow-sm transition flex flex-col gap-4 ${
                 review.isHidden ? 'bg-gray-50/50 border-dashed border-gray-300' : 'bg-white'
               }`}
             >
-              
+
               {/* Review Header */}
               <div className="flex justify-between items-start gap-4">
                 <div className="space-y-1">
@@ -254,7 +254,7 @@ export default function ReviewModerationPanel() {
               </div>
 
               {/* Review Text */}
-              <div className="space-y-1 bg-gray-50/40 p-3 rounded-xl border border-gray-100">
+              <div className="space-y-1 bg-gray-50/40 p-3 rounded-md border border-gray-100">
                 {review.title && <h4 className="font-bold text-slate-800 text-sm">{review.title}</h4>}
                 {review.comment && <p className="text-xs text-gray-650 leading-relaxed font-semibold">{review.comment}</p>}
                 {review.isFlagged && review.flaggedReason && (
@@ -267,11 +267,11 @@ export default function ReviewModerationPanel() {
 
               {/* Replies List */}
               {review.replies && review.replies.length > 0 && (
-                <div className="pl-4 border-l-2 border-purple-200 space-y-2">
+                <div className="pl-4 border-l-2 border-brand-200 space-y-2">
                   {review.replies.map((reply) => (
-                    <div key={reply.id} className="bg-purple-50/30 border border-purple-100/50 rounded-r-xl p-3 text-xs">
+                    <div key={reply.id} className="bg-brand-50/30 border border-brand-100/50 rounded-r-xl p-3 text-xs">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-purple-900 capitalize">
+                        <span className="font-bold text-brand-900 capitalize">
                           {reply.responderRole === 'admin' ? 'Official Store Response' : 'Seller Response'}
                         </span>
                         <span className="text-[9px] text-gray-400 font-bold">
@@ -288,7 +288,7 @@ export default function ReviewModerationPanel() {
               {!replyingReviewId && (
                 <button
                   onClick={() => setReplyingReviewId(review.id)}
-                  className="self-start text-[11px] font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                  className="self-start text-[11px] font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1"
                 >
                   <Reply size={12} /> Reply to Review
                 </button>
@@ -303,19 +303,19 @@ export default function ReviewModerationPanel() {
                     value={replyMessage}
                     onChange={e => setReplyMessage(e.target.value.substring(0, 3000))}
                     placeholder="Write a response to this customer..."
-                    className="flex-1 px-3 py-2 border rounded-xl text-xs bg-white focus:outline-none focus:border-purple-400"
+                    className="flex-1 px-3 py-2 border rounded-md text-xs bg-white focus:outline-none focus:border-brand-400"
                   />
                   <button
                     type="submit"
                     disabled={submittingReply || !replyMessage.trim()}
-                    className="px-4 py-2 bg-[#9d4ae3] hover:bg-[#8236be] text-white rounded-xl text-xs font-bold transition flex items-center gap-1 disabled:opacity-50 flex-shrink-0"
+                    className="px-4 py-2 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md text-xs font-bold transition flex items-center gap-1 disabled:opacity-50 flex-shrink-0"
                   >
                     <Send size={12} /> Post Reply
                   </button>
                   <button
                     type="button"
                     onClick={() => { setReplyingReviewId(null); setReplyMessage(''); }}
-                    className="p-2 border rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50"
+                    className="p-2 border rounded-md text-xs font-bold text-gray-500 hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -329,11 +329,11 @@ export default function ReviewModerationPanel() {
 
       {/* Flag review dialog box */}
       {flaggingReviewId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white w-full max-w-sm rounded-md shadow-sm p-6">
             <h3 className="font-bold text-base text-slate-800 mb-2">Flag Review</h3>
             <p className="text-xs text-gray-500 mb-4 font-semibold">Flagged reviews are listed for admin investigations. Provide flag reason:</p>
-            
+
             <form onSubmit={handleFlagReview} className="space-y-4">
               <input
                 type="text"
@@ -341,19 +341,19 @@ export default function ReviewModerationPanel() {
                 placeholder="Reason (e.g. offensive, spam, fake review)..."
                 value={flagReason}
                 onChange={e => setFlagReason(e.target.value.substring(0, 500))}
-                className="w-full px-3 py-2 border rounded-xl text-xs focus:outline-none focus:border-purple-400"
+                className="w-full px-3 py-2 border rounded-md text-xs focus:outline-none focus:border-brand-400"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => { setFlaggingReviewId(null); setFlagReason(''); }}
-                  className="px-4 py-2 border rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 border rounded-md text-xs font-bold text-gray-600 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-md text-xs font-bold transition"
                 >
                   Flag Review
                 </button>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
+import {
   ShoppingBag, Calendar, MapPin, CreditCard, ChevronRight, Package, ArrowLeft,
   XCircle, RotateCcw, AlertTriangle, Truck, DollarSign, Clock, HelpCircle,
   AlertCircle, ShieldCheck, FileText, ChevronDown, CheckCircle2, MessageCircle
@@ -71,7 +71,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
     try {
       let res: any;
       const isNumberLike = id.startsWith('ORD-') || id.startsWith('#') || !/^[0-9a-f]{8}-[0-9a-f]{4}/i.test(id);
-      
+
       if (isNumberLike) {
         res = await ordersApi.getByNumber(id).catch(() => null);
       }
@@ -201,7 +201,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-6 p-4">
         <AlertCircle size={48} className="text-red-500" />
         <h2 className="text-2xl font-bold text-slate-800">Order Not Found</h2>
-        <Link href="/orders" className="px-6 py-2.5 bg-[#9d4ae3] text-white rounded-xl font-bold text-sm">
+        <Link href="/orders" className="px-6 py-2.5 bg-[#228b22] text-white rounded-xl font-bold text-sm">
           Back to Orders
         </Link>
       </div>
@@ -216,7 +216,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   return (
     <div className="min-h-screen bg-gray-50/50 py-10">
       <div className="max-w-5xl mx-auto px-4">
-        
+
         {/* Back Link */}
         <Link href="/orders" className="inline-flex items-center gap-1.5 text-gray-500 hover:text-purple-600 font-bold text-sm mb-6 transition-colors">
           <ArrowLeft size={16} /> Back to My Orders
@@ -242,7 +242,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
           <div className="flex flex-wrap gap-2.5">
             {order.status === 'pending_payment' && (
-              <button 
+              <button
                 onClick={() => setShowPaymentModal(true)}
                 className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-purple-100 flex items-center gap-1.5"
               >
@@ -250,7 +250,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
               </button>
             )}
             {order.canBeCancelled && (
-              <button 
+              <button
                 onClick={() => setShowCancelModal(true)}
                 className="px-5 py-2.5 border border-red-200 text-red-600 bg-red-50/20 hover:bg-red-50 rounded-xl font-bold text-sm transition"
               >
@@ -258,15 +258,15 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
               </button>
             )}
             {/* Reorder Button */}
-            <button 
+            <button
               onClick={handleReorder}
-              className="px-5 py-2.5 border border-purple-200 text-[#9d4ae3] bg-purple-50/20 hover:bg-purple-50 rounded-xl font-bold text-sm transition flex items-center gap-1.5"
+              className="px-5 py-2.5 border border-purple-200 text-[#228b22] bg-purple-50/20 hover:bg-purple-50 rounded-xl font-bold text-sm transition flex items-center gap-1.5"
             >
               <RotateCcw size={15} /> Reorder Products
             </button>
             {/* Refund Button */}
             {['confirmed', 'processing', 'shipped', 'delivered'].includes(order.status) && order.refundStatus === 'none' && (
-              <button 
+              <button
                 onClick={() => setShowRefundModal(true)}
                 className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-bold text-sm transition"
               >
@@ -309,12 +309,12 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             ) : order.expectedDelivery ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-50 via-purple-50/70 to-indigo-50 border border-purple-200 shadow-xs">
                 <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-200 animate-pulse">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-200 animate-pulse">
                     <Truck size={24} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#228b22] bg-purple-100 px-2 py-0.5 rounded-full">
                         {order.paymentStatus === 'completed' ? 'Delivery Promised' : 'Estimated Delivery'}
                       </span>
                       {order.expectedDelivery.isInterState && (
@@ -357,7 +357,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             <div className="pt-2">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Truck size={14} className="text-[#9d4ae3]" />
+                  <Truck size={14} className="text-[#228b22]" />
                   Delivery Lifecycle Tracker
                 </h3>
                 <span className="text-xs font-bold text-purple-700 capitalize">
@@ -377,7 +377,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                       <div
                         className={`w-12 h-12 rounded-2xl border-2 flex items-center justify-center transition-all ${
                           active
-                            ? 'bg-gradient-to-br from-[#9d4ae3] to-[#8236be] border-[#9d4ae3] text-white shadow-lg shadow-purple-200 scale-105'
+                            ? 'bg-gradient-to-br from-[#228b22] to-[#1c711c] border-[#228b22] text-white shadow-lg shadow-purple-200 scale-105'
                             : done
                             ? 'bg-emerald-500 border-emerald-500 text-white'
                             : 'bg-gray-50 border-gray-200 text-gray-400'
@@ -388,7 +388,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                       <p
                         className={`text-xs font-bold mt-2.5 ${
                           active
-                            ? 'text-[#9d4ae3] font-black'
+                            ? 'text-[#228b22] font-black'
                             : done
                             ? 'text-slate-800'
                             : 'text-gray-400'
@@ -453,10 +453,10 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
         {/* Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Main Left Columns */}
           <div className="lg:col-span-2 space-y-8">
-            
+
             {/* Products List */}
             <div className="bg-white rounded-3xl border shadow-sm p-6">
               <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -534,7 +534,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
           {/* Sidebar Info */}
           <div className="space-y-8">
-            
+
             {/* Delivery address */}
             <div className="bg-white rounded-3xl border shadow-sm p-6">
               <h3 className="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -566,7 +566,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             <div className="bg-gradient-to-br from-purple-900 to-indigo-950 text-white rounded-3xl p-6 shadow-sm">
               <h3 className="text-base font-bold mb-1.5">Need Help with Order?</h3>
               <p className="text-xs text-purple-100 font-semibold mb-4 leading-relaxed">If there are any issues with returns, defective goods or delays, open a ticket.</p>
-              <Link 
+              <Link
                 href="/support"
                 className="w-full text-center block bg-white text-purple-950 font-black text-xs py-2.5 rounded-xl transition hover:bg-purple-50 shadow-sm"
               >
@@ -586,7 +586,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6">
             <h3 className="font-bold text-lg text-slate-800 mb-2">Cancel Order</h3>
             <p className="text-sm text-gray-500 mb-4 font-semibold">Please provide a brief reason for cancelling your purchase. This helps us audit returns.</p>
-            
+
             <form onSubmit={handleCancelOrder} className="space-y-4">
               <textarea
                 required
@@ -623,7 +623,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6">
             <h3 className="font-bold text-lg text-slate-800 mb-2">Request Refund</h3>
             <p className="text-sm text-gray-500 mb-4 font-semibold">Requests are subjected to verification rules. Enter partial or full refund amount.</p>
-            
+
             <form onSubmit={handleRequestRefund} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">Amount (Optional, leave blank for full)</label>
@@ -681,7 +681,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6">
             <h3 className="font-bold text-lg text-slate-800 mb-2">Process Checkout Payment</h3>
             <p className="text-sm text-gray-500 mb-4 font-semibold">Select your preferred payment gateway provider:</p>
-            
+
             <div className="space-y-2">
               <button
                 onClick={() => setPaymentMethod('kora_pay')}
@@ -722,7 +722,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             </div>
             <h3 className="font-bold text-lg text-slate-800 mb-2">Reordered with Warnings</h3>
             <p className="text-sm text-gray-500 mb-4 font-semibold">The following items from your original order could not be re-ordered:</p>
-            
+
             <div className="space-y-2 max-h-40 overflow-y-auto mb-6 pr-1">
               {reorderResult.skippedItems.map((item, idx) => (
                 <div key={idx} className="p-3 bg-amber-50/40 border border-amber-100 rounded-xl flex items-start gap-2.5">

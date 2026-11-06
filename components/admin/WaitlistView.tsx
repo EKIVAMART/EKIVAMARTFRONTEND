@@ -1,4 +1,5 @@
 'use client';
+import RecordStatus from "@/components/admin/RecordStatus";
 
 import React, { useState, useEffect, useMemo, useRef, ChangeEvent } from 'react';
 import {
@@ -47,7 +48,7 @@ export default function WaitlistView() {
   const [subscribers, setSubscribers] = useState<WaitlistSubscriber[]>([]);
   const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [launchConfig, setLaunchConfig] = useState<LaunchConfig>({
-    launchDate: '2026-10-15T00:00:00.000Z',
+    launchDate: '',
     title: 'Something Amazing is Coming',
     subtitle: "Nigeria's Premier Multi-Vendor Marketplace",
     isLaunched: false,
@@ -399,7 +400,7 @@ export default function WaitlistView() {
     else if (tagType === 'i') formatted = `<i>${selectedText}</i>`;
     else if (tagType === 'h3') formatted = `<h3 style="font-size: 18px; font-weight: bold; color: #1e293b; margin: 16px 0 8px 0;">${selectedText}</h3>`;
     else if (tagType === 'p') formatted = `<p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 12px;">${selectedText}</p>`;
-    else if (tagType === 'cta') formatted = `<a href="https://faflora.com" style="display: inline-block; background-color: #9d4ae3; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
+    else if (tagType === 'cta') formatted = `<a href="https://faflora.com" style="display: inline-block; background-color: #228b22; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
     else if (tagType === 'hr') formatted = `<hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />`;
 
     const updated = current.substring(0, start) + formatted + current.substring(end);
@@ -575,13 +576,12 @@ export default function WaitlistView() {
 
   // Helper date formatting
   const formatDate = (dateStr: string) => {
+    if (!dateStr || Number.isNaN(Date.parse(dateStr))) return 'Not set';
     try {
-      return new Date(dateStr).toLocaleDateString('en-US', {
+      return new Date(dateStr).toLocaleDateString('en-NG', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: 'numeric'
       });
     } catch {
       return 'N/A';
@@ -591,91 +591,43 @@ export default function WaitlistView() {
   const totalPages = Math.ceil(totalSubscribers / limit) || 1;
 
   const statCards = [
-    { label: 'Total Subscribers', value: stats.total, icon: <Users size={20} />, color: 'from-blue-500/10 to-indigo-500/5 text-blue-600 ring-blue-100 border-blue-100/50' },
-    { label: 'Active Subscribers', value: stats.active, icon: <CheckCircle size={20} />, color: 'from-emerald-500/10 to-teal-500/5 text-emerald-600 ring-emerald-100 border-emerald-100/50' },
-    { label: 'Unsubscribed', value: stats.unsubscribed, icon: <XCircle size={20} />, color: 'from-amber-500/10 to-yellow-500/5 text-amber-600 ring-amber-100 border-amber-100/50' },
-    { label: 'Bounced Addresses', value: stats.bounced, icon: <AlertTriangle size={20} />, color: 'from-rose-500/10 to-red-500/5 text-rose-600 ring-rose-100 border-rose-100/50' },
-    { label: 'Today Signups', value: stats.todaySignups, icon: <Calendar size={20} />, color: 'from-violet-500/10 to-fuchsia-500/5 text-violet-600 ring-violet-100 border-violet-100/50' },
-    { label: 'Week Signups', value: stats.weekSignups, icon: <Clock size={20} />, color: 'from-purple-500/10 to-pink-500/5 text-purple-600 ring-purple-100 border-purple-100/50' },
-    { label: 'Customers Interest', value: stats.customers, icon: <User size={20} />, color: 'from-teal-500/10 to-cyan-500/5 text-teal-600 ring-teal-100 border-teal-100/50' },
-    { label: 'Vendors Interest', value: stats.vendors, icon: <Briefcase size={20} />, color: 'from-fuchsia-500/10 to-purple-500/5 text-fuchsia-600 ring-fuchsia-100 border-fuchsia-100/50' },
+    { label: 'Subscribers', value: stats.total },
+    { label: 'Active', value: stats.active },
+    { label: 'Unsubscribed', value: stats.unsubscribed },
+    { label: 'Bounced', value: stats.bounced },
   ];
 
   return (
-    <div className="space-y-8 p-6 max-w-7xl mx-auto animate-in fade-in duration-500">
-
-      {/* ── Dashboard Header ── */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/50 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute top-[-20%] left-[-10%] w-[30%] h-[150%] bg-gradient-to-r from-fuchsia-500/5 to-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[30%] h-[150%] bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="space-y-2 relative z-10">
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Waitlist Manager</h1>
-          {isLoadingLaunchConfig ? (
-            <div className="flex items-center gap-2 text-slate-400 text-sm font-semibold">
-              <Loader2 size={14} className="animate-spin" /> Loading Launch Settings...
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-slate-500 text-sm font-semibold">
-              <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1.5 border border-slate-200">
-                <Calendar size={12} className="text-slate-500" /> Projected Launch Date:
-              </span>
-              <span className="text-slate-800 font-extrabold">{formatDate(launchConfig.launchDate)}</span>
-              <span className="text-slate-300">|</span>
-              <span className="text-xs text-slate-400 font-bold">Config updated: {new Date(launchConfig.updatedAt).toLocaleDateString()}</span>
-            </div>
-          )}
+    <div className="space-y-5 max-w-7xl mx-auto">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Waitlist</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Launch date: {isLoadingLaunchConfig ? 'Loading…' : formatDate(launchConfig.launchDate)}
+          </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3 relative z-10 shrink-0">
-          <button
-            onClick={() => setIsLaunchModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-50 active:scale-98 transition shadow-sm hover:border-slate-300 bg-white"
-          >
-            <Settings size={17} className="text-slate-500" />
-            Launch Date Config
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setIsLaunchModalOpen(true)}
+            className="min-h-10 border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Edit launch date
           </button>
-
-          <button
-            onClick={() => setIsBroadcastModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white font-bold rounded-2xl active:scale-98 transition shadow-lg shadow-fuchsia-100 flex-1 sm:flex-none text-center justify-center"
-          >
-            <Send size={17} />
-            Send Email Broadcast
+          <button type="button" onClick={() => setIsBroadcastModalOpen(true)}
+            className="min-h-10 bg-[#176a35] px-4 text-sm font-medium text-white hover:bg-[#12582b]">
+            Send email
           </button>
         </div>
       </div>
 
-      {/* ── Statistics Summary Grid ── */}
-      <div>
-        <h2 className="text-lg font-black text-slate-700 mb-4 tracking-tight">Waitlist Summary Cards</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {statCards.map((card, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4 hover:shadow-md hover:border-fuchsia-100/50 transition-all group"
-            >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br border ${card.color}`}>
-                {card.icon}
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
-                {isLoadingStats ? (
-                  <div className="h-7 w-16 bg-slate-100 animate-pulse rounded" />
-                ) : (
-                  <p className="text-2xl font-black text-slate-800 tracking-tight leading-none">
-                    {(card.value ?? 0).toLocaleString()}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 border border-slate-200 bg-white">
+        {statCards.map((card) => <div key={card.label} className="min-w-0 border-r last:border-r-0 border-slate-200 px-4 py-4">
+          <p className="text-xs text-slate-600">{card.label}</p>
+          {isLoadingStats ? <div className="mt-2 h-7 w-16 bg-slate-100 " /> :
+            <p className="mt-1 text-xl font-semibold text-slate-900">{(card.value ?? 0).toLocaleString()}</p>}
+        </div>)}
       </div>
 
-      {/* ── Table Actions & Filter Header ── */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            {/* ── Table Actions & Filter Header ── */}
+      <div className="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
 
         {/* Filter Controls Row */}
         <div className="p-5 border-b border-slate-100 bg-slate-50/20 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -689,7 +641,7 @@ export default function WaitlistView() {
                 placeholder="Search subscribers by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-2xl text-sm bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-md text-sm bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
               />
               {searchQuery && (
                 <button
@@ -707,7 +659,7 @@ export default function WaitlistView() {
               <select
                 value={statusFilter}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-md text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
               >
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
@@ -722,7 +674,7 @@ export default function WaitlistView() {
               <select
                 value={roleFilter}
                 onChange={(e) => handleRoleChange(e.target.value)}
-                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-2xl text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                className="w-full sm:w-44 px-3 py-2.5 border border-slate-200/80 rounded-md text-sm font-semibold text-slate-700 bg-white cursor-pointer outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
               >
                 <option value="All">All Roles</option>
                 <option value="Customer">Customer</option>
@@ -735,7 +687,7 @@ export default function WaitlistView() {
           <button
             onClick={handleExportCSV}
             disabled={filteredSubscribers.length === 0}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-300 transition w-full lg:w-auto bg-white"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-300 transition w-full lg:w-auto bg-white"
           >
             <Download size={16} className="text-slate-500" />
             Export CSV
@@ -746,7 +698,7 @@ export default function WaitlistView() {
         <div className="overflow-x-auto">
           {isLoadingSubscribers ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <Loader2 size={32} className="animate-spin text-[#9d4ae3]" />
+              <Loader2 size={32} className="animate-spin text-[#228b22]" />
               <p className="text-sm font-semibold text-slate-500">Loading subscriber records...</p>
             </div>
           ) : filteredSubscribers.length === 0 ? (
@@ -779,12 +731,7 @@ export default function WaitlistView() {
                     <td className="p-4 text-sm text-slate-600 font-semibold">{sub.fullName}</td>
                     <td className="p-4 text-sm text-slate-500">{sub.phoneNumber || '—'}</td>
                     <td className="p-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold capitalize border ${sub.role === 'vendor'
-                          ? 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100'
-                          : 'bg-teal-50 text-teal-700 border-teal-100'
-                        }`}>
-                        {sub.role}
-                      </span>
+                      <RecordStatus value={sub.role} />
                     </td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1">
@@ -800,20 +747,7 @@ export default function WaitlistView() {
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${sub.status === 'active'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                          : sub.status === 'unsubscribed'
-                            ? 'bg-amber-50 text-amber-700 border-amber-100'
-                            : 'bg-rose-50 text-rose-700 border-rose-100'
-                        }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${sub.status === 'active'
-                            ? 'bg-emerald-500'
-                            : sub.status === 'unsubscribed'
-                              ? 'bg-amber-500'
-                              : 'bg-rose-500'
-                          }`} />
-                        {sub.status}
-                      </span>
+                      <RecordStatus value={sub.status} />
                     </td>
                     <td className="p-4 text-sm text-slate-500 font-semibold capitalize">{sub.referralSource || '—'}</td>
                     <td className="p-4 text-sm text-slate-500 font-semibold">
@@ -840,7 +774,7 @@ export default function WaitlistView() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1 || isLoadingSubscribers}
-                className="p-2 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-2 border border-slate-200 rounded-md text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -854,8 +788,8 @@ export default function WaitlistView() {
                       {showEllipsis && <span className="px-2 text-slate-400">...</span>}
                       <button
                         onClick={() => handlePageChange(page)}
-                        className={`w-8 h-8 rounded-xl font-bold text-sm transition flex items-center justify-center ${currentPage === page
-                            ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-sm'
+                        className={`w-8 h-8 rounded-md font-bold text-sm transition flex items-center justify-center ${currentPage === page
+                            ? 'bg-[#228b22] text-white shadow-sm'
                             : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
                           }`}
                       >
@@ -868,7 +802,7 @@ export default function WaitlistView() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || isLoadingSubscribers}
-                className="p-2 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-2 border border-slate-200 rounded-md text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight size={16} />
               </button>
@@ -881,8 +815,8 @@ export default function WaitlistView() {
       {/* ── Modal: Launch Settings Config ── */}
       {isLaunchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsLaunchModalOpen(false)} />
-          <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="absolute inset-0 bg-slate-900/60 " onClick={() => setIsLaunchModalOpen(false)} />
+          <div className="relative w-full max-w-xl bg-white rounded-md shadow-sm flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
@@ -892,7 +826,7 @@ export default function WaitlistView() {
               </div>
               <button
                 onClick={() => setIsLaunchModalOpen(false)}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
               >
                 <X size={20} />
               </button>
@@ -910,7 +844,7 @@ export default function WaitlistView() {
                   value={launchForm.launchDate}
                   onChange={(e) => setLaunchForm({ ...launchForm, launchDate: e.target.value })}
                   min={new Date().toISOString().substring(0, 16)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
                 />
               </div>
 
@@ -928,7 +862,7 @@ export default function WaitlistView() {
                   value={launchForm.title}
                   onChange={(e) => setLaunchForm({ ...launchForm, title: e.target.value.substring(0, 300) })}
                   maxLength={255}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
                 />
               </div>
 
@@ -946,12 +880,12 @@ export default function WaitlistView() {
                   onChange={(e) => setLaunchForm({ ...launchForm, subtitle: e.target.value.substring(0, 600) })}
                   maxLength={500}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition resize-none"
                 />
               </div>
 
               {/* Broadcast Notify Toggle */}
-              <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between gap-4">
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-between gap-4">
                 <div className="space-y-1 flex-1">
                   <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                     Notify Waitlist Members
@@ -965,7 +899,7 @@ export default function WaitlistView() {
                     onChange={(e) => setLaunchForm({ ...launchForm, sendBroadcast: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9d4ae3]" />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-md peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-md after:h-5 after:w-5 after:transition-all peer-checked:bg-[#228b22]" />
                 </label>
               </div>
 
@@ -987,7 +921,7 @@ export default function WaitlistView() {
                     onChange={(e) => setLaunchForm({ ...launchForm, broadcastReason: e.target.value.substring(0, 1100) })}
                     maxLength={1000}
                     rows={4}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition resize-none"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition resize-none"
                   />
                   <p className="text-xs text-slate-400 flex items-center gap-1 font-semibold">
                     <Info size={12} /> Explain why the date shifted; this will be embedded directly in the email broadcast.
@@ -996,13 +930,13 @@ export default function WaitlistView() {
               )}
 
               {/* Preview Box */}
-              <div className="border border-slate-200 border-dashed rounded-3xl p-4 bg-slate-50/30">
+              <div className="border border-slate-200 border-dashed rounded-md p-4 bg-slate-50/30">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Live UI Preview</span>
                 <div className="space-y-2 text-center py-4">
                   <h4 className="text-lg font-black text-slate-800 tracking-tight leading-none">{launchForm.title || 'Something Amazing is Coming'}</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">{launchForm.subtitle || "Nigeria's Premier Multi-Vendor Marketplace"}</p>
                   <div className="inline-flex gap-2 justify-center pt-2">
-                    <span className="bg-[#9d4ae3]/10 text-[#9d4ae3] px-3 py-1 rounded-full text-xs font-black">
+                    <span className="bg-[#228b22]/10 text-[#228b22] px-3 py-1 rounded-md text-xs font-black">
                       {launchForm.launchDate ? formatDate(new Date(launchForm.launchDate).toISOString()) : 'Set a Date'}
                     </span>
                   </div>
@@ -1016,14 +950,14 @@ export default function WaitlistView() {
               <button
                 type="button"
                 onClick={() => setIsLaunchModalOpen(false)}
-                className="px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-100 transition text-sm"
+                className="px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-md hover:bg-slate-100 transition text-sm"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleLaunchSubmit}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100"
+                className="px-5 py-2.5 bg-[#228b22] text-white font-bold rounded-md hover:opacity-90 active:scale-98 transition text-sm shadow-sm "
               >
                 Save Launch Config
               </button>
@@ -1033,11 +967,11 @@ export default function WaitlistView() {
         </div>
       )}
 
-      {/* ── Modal: Send Email Broadcast Composer ── */}
+      {/* ── Modal: Send email Composer ── */}
       {isBroadcastModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeBroadcastModal} />
-          <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="absolute inset-0 bg-slate-900/60 " onClick={closeBroadcastModal} />
+          <div className="relative w-full max-w-5xl bg-white rounded-md shadow-sm flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
@@ -1049,7 +983,7 @@ export default function WaitlistView() {
               </div>
               <button
                 onClick={closeBroadcastModal}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
               >
                 <X size={20} />
               </button>
@@ -1070,9 +1004,9 @@ export default function WaitlistView() {
                     <button
                       type="button"
                       onClick={() => setBroadcastForm(prev => ({ ...prev, targetRole: 'ALL' }))}
-                      className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      className={`px-3 py-2.5 rounded-md border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                         broadcastForm.targetRole === 'ALL'
-                          ? 'bg-[#9d4ae3] text-white border-[#9d4ae3] shadow-sm'
+                          ? 'bg-[#228b22] text-white border-[#228b22] shadow-sm'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
@@ -1081,9 +1015,9 @@ export default function WaitlistView() {
                     <button
                       type="button"
                       onClick={() => setBroadcastForm(prev => ({ ...prev, targetRole: 'VENDOR' }))}
-                      className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      className={`px-3 py-2.5 rounded-md border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                         broadcastForm.targetRole === 'VENDOR'
-                          ? 'bg-[#9d4ae3] text-white border-[#9d4ae3] shadow-sm'
+                          ? 'bg-[#228b22] text-white border-[#228b22] shadow-sm'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
@@ -1092,9 +1026,9 @@ export default function WaitlistView() {
                     <button
                       type="button"
                       onClick={() => setBroadcastForm(prev => ({ ...prev, targetRole: 'CUSTOMER' }))}
-                      className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      className={`px-3 py-2.5 rounded-md border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                         broadcastForm.targetRole === 'CUSTOMER'
-                          ? 'bg-[#9d4ae3] text-white border-[#9d4ae3] shadow-sm'
+                          ? 'bg-[#228b22] text-white border-[#228b22] shadow-sm'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
@@ -1119,7 +1053,7 @@ export default function WaitlistView() {
                     placeholder="e.g. Exciting news for our early waitlist members!"
                     value={broadcastForm.subject}
                     onChange={(e) => setBroadcastForm(prev => ({ ...prev, subject: e.target.value.substring(0, 255) }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
                   />
                 </div>
 
@@ -1138,7 +1072,7 @@ export default function WaitlistView() {
                     placeholder="e.g. Exclusive early access details inside. Open to read more."
                     value={broadcastForm.previewText}
                     onChange={(e) => setBroadcastForm(prev => ({ ...prev, previewText: e.target.value.substring(0, 255) }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
                   />
                   <p className="text-[11px] text-slate-400 font-medium">Displayed in the recipient's inbox preview right after the subject line.</p>
                 </div>
@@ -1155,10 +1089,10 @@ export default function WaitlistView() {
                   {/* Dropzone */}
                   <div
                     onClick={() => !isUploading && uploadedImages.length < 5 && fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-2xl p-4 text-center transition group ${
+                    className={`border-2 border-dashed rounded-md p-4 text-center transition group ${
                       uploadedImages.length >= 5
                         ? 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'
-                        : 'border-slate-200 cursor-pointer hover:border-[#9d4ae3] hover:bg-fuchsia-50/30'
+                        : 'border-slate-200 cursor-pointer hover:border-[#228b22] hover:bg-brand-50/30'
                     }`}
                   >
                     <input
@@ -1169,7 +1103,7 @@ export default function WaitlistView() {
                       onChange={handleImageFileSelected}
                       disabled={isUploading || uploadedImages.length >= 5}
                     />
-                    <div className="w-10 h-10 rounded-full bg-fuchsia-100 text-[#9d4ae3] flex items-center justify-center mx-auto mb-2 group-hover:scale-105 transition">
+                    <div className="w-10 h-10 rounded-md bg-brand-100 text-[#228b22] flex items-center justify-center mx-auto mb-2 group-hover:scale-105 transition">
                       {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
                     </div>
                     <p className="text-xs font-bold text-slate-700">
@@ -1202,7 +1136,7 @@ export default function WaitlistView() {
                           return (
                             <div
                               key={img.imageUrl}
-                              className="flex items-center gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-xl relative group"
+                              className="flex items-center gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-md relative group"
                             >
                               {/* Use the local blob URL for fast thumbnail — no network round-trip */}
                               <img
@@ -1216,7 +1150,7 @@ export default function WaitlistView() {
                                   <button
                                     type="button"
                                     onClick={() => handleSetAsHeroBanner(img.imageUrl)}
-                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition flex items-center gap-1 ${
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition flex items-center gap-1 ${
                                       isHero
                                         ? 'bg-amber-100 text-amber-700 border-amber-300'
                                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
@@ -1229,7 +1163,7 @@ export default function WaitlistView() {
                                   <button
                                     type="button"
                                     onClick={() => handleInsertImageIntoBody(img.imageUrl)}
-                                    className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-fuchsia-50 hover:text-[#9d4ae3] hover:border-fuchsia-200 transition flex items-center gap-1"
+                                    className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-slate-600 border border-slate-200 hover:bg-brand-50 hover:text-[#228b22] hover:border-brand-200 transition flex items-center gap-1"
                                     title="Insert image tag at current cursor position in body"
                                   >
                                     <Plus size={10} /> Insert at Cursor
@@ -1261,7 +1195,7 @@ export default function WaitlistView() {
                     <button
                       type="button"
                       onClick={handleAutoFormatPlainText}
-                      className="text-[11px] font-bold text-[#9d4ae3] hover:text-[#8236be] bg-fuchsia-50 hover:bg-fuchsia-100 px-2.5 py-1 rounded-lg transition flex items-center gap-1"
+                      className="text-[11px] font-bold text-[#228b22] hover:text-[#1c711c] bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-lg transition flex items-center gap-1"
                       title="Convert plain text line breaks into HTML <p> tags"
                     >
                       <Wand2 size={12} /> Format Text to HTML
@@ -1269,7 +1203,7 @@ export default function WaitlistView() {
                   </div>
 
                   {/* Formatting Toolbar */}
-                  <div className="flex flex-wrap items-center gap-1 p-1.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 text-xs font-semibold">
+                  <div className="flex flex-wrap items-center gap-1 p-1.5 bg-slate-100 border border-slate-200 rounded-md text-slate-600 text-xs font-semibold">
                     <button
                       type="button"
                       onClick={() => handleFormatText('b')}
@@ -1305,7 +1239,7 @@ export default function WaitlistView() {
                     <button
                       type="button"
                       onClick={() => handleFormatText('cta')}
-                      className="px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-[#9d4ae3] font-bold transition flex items-center gap-1"
+                      className="px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-[#228b22] font-bold transition flex items-center gap-1"
                       title="Insert CTA Button link"
                     >
                       <Link size={12} /> Button Link
@@ -1327,12 +1261,12 @@ export default function WaitlistView() {
                     rows={8}
                     value={broadcastForm.bodyHtml}
                     onChange={(e) => setBroadcastForm(prev => ({ ...prev, bodyHtml: e.target.value }))}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs font-mono leading-relaxed focus:outline-none focus:ring-4 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-md text-xs font-mono leading-relaxed focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-[#228b22] transition"
                   />
                 </div>
 
                 {/* Collapsible Plain Text Fallback */}
-                <details className="group border border-slate-200 rounded-2xl bg-slate-50/50 p-3">
+                <details className="group border border-slate-200 rounded-md bg-slate-50/50 p-3">
                   <summary className="text-xs font-bold text-slate-600 cursor-pointer flex items-center justify-between select-none">
                     <span>Optional Plain-Text Fallback (`bodyText`)</span>
                     <span className="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
@@ -1343,7 +1277,7 @@ export default function WaitlistView() {
                       rows={3}
                       value={broadcastForm.bodyText}
                       onChange={(e) => setBroadcastForm(prev => ({ ...prev, bodyText: e.target.value }))}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-fuchsia-100 focus:border-[#9d4ae3] transition bg-white"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-md text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-[#228b22] transition bg-white"
                     />
                     <p className="text-[10px] text-slate-400 font-medium">Leave empty to auto-strip HTML tags as plain text fallback.</p>
                   </div>
@@ -1359,19 +1293,19 @@ export default function WaitlistView() {
 
                 {/* Inbox Snippet Preview */}
                 {broadcastForm.previewText && (
-                  <div className="mb-3 p-2.5 bg-white rounded-xl border border-slate-200 shadow-sm text-[11px]">
+                  <div className="mb-3 p-2.5 bg-white rounded-md border border-slate-200 shadow-sm text-[11px]">
                     <span className="font-extrabold text-slate-400 uppercase tracking-wider text-[9px] block">Inbox Snippet</span>
                     <p className="text-slate-600 font-medium truncate mt-0.5">{broadcastForm.previewText}</p>
                   </div>
                 )}
 
                 {/* Email Canvas Container */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[380px]">
+                <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[380px]">
 
                   {/* Header Branding */}
-                  <div className="bg-[#9d4ae3] p-4 text-center">
+                  <div className="bg-[#228b22] p-4 text-center">
                     <h4 className="text-white text-base font-black tracking-widest leading-none">FAFLORA</h4>
-                    <span className="text-[9px] text-fuchsia-100 tracking-wider font-semibold uppercase mt-1 inline-block">Nigeria's Flowers & Marketplace</span>
+                    <span className="text-[9px] text-brand-100 tracking-wider font-semibold uppercase mt-1 inline-block">Nigeria's Flowers & Marketplace</span>
                   </div>
 
                   {/* Optional Hero Banner Image — use localPreview for the live preview panel */}
@@ -1414,9 +1348,9 @@ export default function WaitlistView() {
 
                   {/* Email Footer */}
                   <div className="bg-slate-50 border-t border-slate-100 p-4 text-center text-[10px] text-slate-400 font-semibold space-y-1">
-                    <p>&copy; {new Date().getFullYear()} Faflora Group. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} EkivaMart Group. All rights reserved.</p>
                     <p>You are receiving this email because you signed up on our waitlist.</p>
-                    <a href="#" className="text-[#9d4ae3] font-extrabold hover:underline block mt-1">
+                    <a href="#" className="text-[#228b22] font-extrabold hover:underline block mt-1">
                       Unsubscribe from this list
                     </a>
                   </div>
@@ -1435,14 +1369,14 @@ export default function WaitlistView() {
                 <button
                   type="button"
                   onClick={closeBroadcastModal}
-                  className="px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-100 transition text-sm"
+                  className="px-5 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-md hover:bg-slate-100 transition text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleBroadcastSubmit}
-                  className="px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-2xl hover:opacity-90 active:scale-98 transition text-sm shadow-md shadow-fuchsia-100 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-[#228b22] text-white font-bold rounded-md hover:opacity-90 active:scale-98 transition text-sm shadow-sm flex items-center gap-1.5"
                 >
                   <Send size={15} /> Send Broadcast
                 </button>
@@ -1456,9 +1390,9 @@ export default function WaitlistView() {
       {/* ── Modal: Confirm Launch config save ── */}
       {isLaunchConfirmOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsLaunchConfirmOpen(false)} />
-          <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-full bg-fuchsia-100 flex items-center justify-center mx-auto mb-4 text-[#9d4ae3]">
+          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsLaunchConfirmOpen(false)} />
+          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
+            <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22]">
               <Settings size={22} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Save Launch Configuration?</h4>
@@ -1474,14 +1408,14 @@ export default function WaitlistView() {
             <div className="flex gap-3">
               <button
                 onClick={() => setIsLaunchConfirmOpen(false)}
-                className="flex-1 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition text-sm"
+                className="flex-1 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-md hover:bg-slate-50 transition text-sm"
                 disabled={isSavingLaunch}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmLaunchSave}
-                className="flex-1 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-xl hover:opacity-90 transition text-sm flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-[#228b22] text-white font-bold rounded-md hover:opacity-90 transition text-sm flex items-center justify-center gap-1.5"
                 disabled={isSavingLaunch}
               >
                 {isSavingLaunch ? (
@@ -1498,9 +1432,9 @@ export default function WaitlistView() {
       {/* ── Modal: Confirm Broadcast Send ── */}
       {isBroadcastConfirmOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsBroadcastConfirmOpen(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsBroadcastConfirmOpen(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
+            <div className="w-12 h-12 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <Send size={20} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Send Broadcast Email?</h4>
@@ -1512,14 +1446,14 @@ export default function WaitlistView() {
             <div className="flex gap-3">
               <button
                 onClick={() => setIsBroadcastConfirmOpen(false)}
-                className="flex-1 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition text-sm"
+                className="flex-1 py-2.5 border border-slate-200 text-slate-700 font-bold rounded-md hover:bg-slate-50 transition text-sm"
                 disabled={isSendingBroadcast}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmBroadcastSend}
-                className="flex-1 py-2.5 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 transition text-sm flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-rose-600 text-white font-bold rounded-md hover:bg-rose-700 transition text-sm flex items-center justify-center gap-1.5"
                 disabled={isSendingBroadcast}
               >
                 {isSendingBroadcast ? (

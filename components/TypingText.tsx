@@ -25,7 +25,7 @@ const TypingText = ({
   deleteSpeed = 50,
   delayBetween = 1800,
   className = "",
-  colorClass = "text-[#9d4ae3]",
+  colorClass = "text-[#228b22]",
   onCycleComplete,
   disableCursorOnMobile = true,
   keepCursorFlashing = false,
@@ -39,7 +39,7 @@ const TypingText = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [hasStarted, setHasStarted] = useState(false);
-  
+
   // Use ref to track cursor state without causing re-renders
   const cursorIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef(true);
@@ -89,7 +89,7 @@ const TypingText = ({
   // Typing/deleting animation
   useEffect(() => {
     if (!hasStarted) return;
-    
+
     const timeout = setTimeout(() => {
       animate();
     }, isDeleting ? deleteSpeed : typingSpeed);
@@ -110,11 +110,11 @@ const TypingText = ({
     const isComplete = displayedText.length === currentWord.length && !isDeleting;
     // Determine if cursor should flash
     const shouldFlash = keepCursorFlashing || isCycling || (isComplete && !hideCursorOnComplete);
-    
+
     if (shouldFlash) {
       // Start with cursor visible
       setShowCursor(true);
-      
+
       // Flash every 500ms
       cursorIntervalRef.current = setInterval(() => {
         if (isMountedRef.current) {

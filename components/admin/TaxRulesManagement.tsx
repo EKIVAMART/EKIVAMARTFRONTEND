@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit3, Save, X, ToggleLeft, ToggleRight, Globe, AlertCircle, Percent } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
 import { taxRulesApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -18,6 +18,7 @@ interface TaxRule {
 export default function TaxRulesManagement() {
   const [rules, setRules] = useState<TaxRule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -31,23 +32,29 @@ export default function TaxRulesManagement() {
   const [editRate, setEditRate] = useState(7.5);
   const [savingEdit, setSavingEdit] = useState(false);
 
-  useEffect(() => {
-    void fetchRules();
-  }, []);
-
-  const fetchRules = async () => {
+  const fetchRules = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await taxRulesApi.list();
       if (res?.success) {
         setRules(res.data || []);
+      } else {
+        setRules([]);
+        setLoadError(res?.message || 'Could not load tax rules.');
       }
     } catch {
-      toast.error('Could not load tax rules');
+      setRules([]);
+      setLoadError('Could not load tax rules.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => void fetchRules(), 0);
+    return () => clearTimeout(timer);
+  }, [fetchRules]);
 
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,8 +75,8 @@ export default function TaxRulesManagement() {
       } else {
         toast.error(res?.message || 'Failed to create tax rule');
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to create tax rule');
+    } catch {
+      toast.error('Failed to create tax rule');
     } finally {
       setSubmitting(false);
     }
@@ -132,52 +139,52 @@ export default function TaxRulesManagement() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border shadow-sm p-6 sm:p-8 space-y-6">
-      
+    <div className="space-y-5">
+
       {/* Header Panel */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <Percent size={20} className="text-purple-600" /> Regional Tax Rules
-          </h2>
-          <p className="text-xs text-gray-500 font-semibold mt-0.5">Manage tax rate percentages for checkout calculations by region or country.</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Tax rules</h1>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="self-start sm:self-center px-4 py-2 bg-[#9d4ae3] hover:bg-[#8236be] text-white rounded-xl text-xs font-bold transition shadow-md shadow-fuchsia-100 flex items-center gap-1.5"
+          className="self-start sm:self-center min-h-10 px-4 bg-[#176a35] hover:bg-[#12582b] text-white text-sm font-medium flex items-center gap-1.5"
         >
           {showAddForm ? <X size={15} /> : <Plus size={15} />}
-          {showAddForm ? 'Close Drawer' : 'Add New Rule'}
+          {showAddForm ? 'Close form' : 'Add rule'}
         </button>
       </div>
 
       {/* Add Tax Rule Drawer Form */}
       {showAddForm && (
-        <form onSubmit={handleCreateRule} className="bg-gray-50 p-6 rounded-2xl border border-gray-150 grid grid-cols-1 md:grid-cols-4 gap-4 items-end animate-[slideDown_0.2s_ease-out]">
+        <form onSubmit={handleCreateRule} className="bg-white p-5 border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Country</label>
+            <label htmlFor="tax-country" className="text-xs font-medium text-slate-700">Country</label>
             <input
+              id="tax-country"
               type="text"
               required
               value={country}
               onChange={e => setCountry(e.target.value)}
-              className="w-full px-3 py-2 border rounded-xl text-xs bg-white focus:outline-none"
+              className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Region / State (Optional)</label>
+            <label htmlFor="tax-region" className="text-xs font-medium text-slate-700">Region or state (optional)</label>
             <input
+              id="tax-region"
               type="text"
               placeholder="e.g. Lagos (leave blank for country default)"
               value={region}
               onChange={e => setRegion(e.target.value)}
-              className="w-full px-3 py-2 border rounded-xl text-xs bg-white focus:outline-none"
+              className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Tax Rate (%)</label>
+            <label htmlFor="tax-rate" className="text-xs font-medium text-slate-700">Tax rate (%)</label>
             <div className="relative">
               <input
+                id="tax-rate"
                 type="number"
                 step="0.01"
                 min="0"
@@ -185,7 +192,7 @@ export default function TaxRulesManagement() {
                 required
                 value={ratePercentage}
                 onChange={e => setRatePercentage(parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border rounded-xl text-xs bg-white focus:outline-none"
+                className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">%</span>
             </div>
@@ -193,9 +200,9 @@ export default function TaxRulesManagement() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+            className="w-full min-h-10 bg-[#176a35] hover:bg-[#12582b] text-white text-sm font-medium"
           >
-            {submitting ? 'Saving...' : 'Add Rule'}
+            {submitting ? 'Saving…' : 'Add rule'}
           </button>
         </form>
       )}
@@ -203,17 +210,20 @@ export default function TaxRulesManagement() {
       {/* Tax Rules List Table */}
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 gap-3">
-          <div className="w-8 h-8 border-3 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
           <p className="text-gray-400 font-bold text-xs">Loading tax rules...</p>
         </div>
+      ) : loadError ? (
+        <div role="alert" className="bg-white border border-slate-200 p-6 text-sm text-slate-700">
+          <p>{loadError}</p>
+          <button type="button" onClick={() => void fetchRules()} className="mt-3 font-medium text-[#176a35] underline">Retry</button>
+        </div>
       ) : rules.length === 0 ? (
-        <div className="bg-gray-50 border rounded-2xl p-8 text-center flex flex-col items-center">
-          <AlertCircle size={24} className="text-gray-300 mb-2" />
-          <p className="text-xs text-gray-500 font-semibold">No regional tax rules defined.</p>
-          <p className="text-[10px] text-gray-400 mt-1">Nigerian default tax rate of 7.5% is active by default.</p>
+        <div className="bg-white border border-slate-200 p-6 text-sm text-slate-600">
+          No tax rules have been configured.
         </div>
       ) : (
-        <div className="overflow-x-auto border rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto border border-slate-200 bg-white">
           <table className="w-full text-left border-collapse min-w-[600px] text-xs">
             <thead className="bg-gray-50/50 border-b">
               <tr>
@@ -229,14 +239,14 @@ export default function TaxRulesManagement() {
                 const isEditing = editingId === rule.id;
                 return (
                   <tr key={rule.id} className="hover:bg-gray-50/40 transition">
-                    <td className="p-4 font-bold text-slate-800 flex items-center gap-2">
-                      <Globe size={14} className="text-gray-400" />
-                      {rule.country} {rule.region && <span className="font-normal text-gray-400">• {rule.region}</span>}
+                    <td className="p-4 font-medium text-slate-800">
+                      {rule.country === 'NG' ? 'Nigeria' : rule.country} {rule.region && <span className="font-normal text-slate-500">· {rule.region}</span>}
                     </td>
                     <td className="p-4 font-bold text-slate-700">
                       {isEditing ? (
-                        <div className="flex items-center gap-1.5 max-w-[80px]">
+                        <div className="flex items-center gap-1.5 max-w-[100px]">
                           <input
+                            aria-label="Tax rate percentage"
                             type="number"
                             step="0.01"
                             value={editRate}
@@ -251,52 +261,51 @@ export default function TaxRulesManagement() {
                     </td>
                     <td className="p-4">
                       {rule.region ? (
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md font-semibold">Region Specific</span>
+                        <span className="text-slate-600">Region</span>
                       ) : (
-                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md font-semibold">Country Default</span>
+                        <span className="text-slate-600">Country</span>
                       )}
                     </td>
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() => handleToggleStatus(rule.id, rule.isActive)}
-                        className={`transition-colors ${rule.isActive ? 'text-emerald-500' : 'text-gray-300'}`}
-                      >
-                        {rule.isActive ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                      </button>
-                    </td>
+                    <td className="p-4 text-center text-slate-700">{rule.isActive ? 'Active' : 'Inactive'}</td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
                         {isEditing ? (
                           <>
-                            <button
+                            <button type="button"
                               onClick={() => handleSaveEdit(rule.id)}
                               disabled={savingEdit}
-                              className="p-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg transition"
-                              title="Save"
+                              className="p-1.5 text-[#176a35] hover:underline"
+                              aria-label="Save tax rate"
                             >
                               <Save size={14} />
                             </button>
-                            <button
+                            <button type="button"
                               onClick={handleCancelEdit}
-                              className="p-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg transition"
-                              title="Cancel"
+                              className="p-1.5 text-slate-600 hover:underline"
+                              aria-label="Cancel editing"
                             >
                               <X size={14} />
                             </button>
                           </>
                         ) : (
                           <>
-                            <button
+                            <button type="button"
                               onClick={() => handleStartEdit(rule)}
-                              className="p-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg transition"
-                              title="Edit Rate"
+                              className="p-1.5 text-slate-600 hover:text-[#176a35]"
+                              aria-label={`Edit tax rate for ${rule.country}`}
                             >
                               <Edit3 size={14} />
                             </button>
-                            <button
+                            <button type="button"
+                              onClick={() => handleToggleStatus(rule.id, rule.isActive)}
+                              className="px-2 text-xs font-medium text-slate-600 hover:underline"
+                            >
+                              {rule.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button type="button"
                               onClick={() => handleDeleteRule(rule.id)}
-                              className="p-1.5 bg-rose-50 text-rose-750 hover:bg-rose-100 rounded-lg transition"
-                              title="Delete Rule"
+                              className="p-1.5 text-slate-500 hover:text-rose-700"
+                              aria-label={`Delete tax rule for ${rule.country}`}
                             >
                               <Trash2 size={14} />
                             </button>

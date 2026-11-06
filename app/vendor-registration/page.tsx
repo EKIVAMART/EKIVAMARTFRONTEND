@@ -13,7 +13,7 @@ export default function VendorRegistrationRedirect() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
       <div className="text-center space-y-4">
-        <div className="w-10 h-10 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin mx-auto" />
+        <div className="w-10 h-10 border-4 border-purple-200 border-t-[#228b22] rounded-full animate-spin mx-auto" />
         <p className="text-slate-500 text-sm font-semibold">Redirecting to Become a Vendor portal...</p>
       </div>
     </div>

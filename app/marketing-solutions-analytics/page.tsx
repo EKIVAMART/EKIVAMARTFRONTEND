@@ -27,7 +27,7 @@ import {
 const Divider = () => (
   <div className="flex items-center gap-3 my-24">
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-    <div className="w-1.5 h-1.5 rounded-full bg-[#ad74e8]" />
+    <div className="w-1.5 h-1.5 rounded-full bg-[#67a652]" />
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
   </div>
 );
@@ -45,11 +45,11 @@ const SectionEyebrow = ({
 }) => (
   <FadeInSection type="slideLeft" delay={delay}>
     <div className="flex items-center gap-3 mb-10">
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
         <Icon size={18} />
       </div>
       <div>
-        <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be]">
+        <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c]">
           {eyebrow}
         </span>
         <h2
@@ -75,10 +75,10 @@ const FeatureCard = ({
   index: number;
 }) => (
   <FadeInSection type="fadeUp" delay={0.1 + index * 0.08}>
-    <div className="group relative h-full bg-white border border-[#e8b8e4] rounded-3xl p-7 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-[#8236be] overflow-hidden">
+    <div className="group relative h-full bg-white border border-[#e8b8e4] rounded-3xl p-7 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-[#1c711c] overflow-hidden">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-[#fdf3fc]/40 to-transparent" />
       <div className="relative">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white mb-5 shadow-md shadow-[#9d4ae320] group-hover:scale-110 transition-transform duration-300">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white mb-5 shadow-md shadow-[#9d4ae320] group-hover:scale-110 transition-transform duration-300">
           <Icon size={22} />
         </div>
         <h3 className="text-lg font-extrabold text-[#1a0018] mb-3 leading-tight">{title}</h3>
@@ -100,12 +100,12 @@ const StatCard = ({
   <FadeInSection type="zoom" delay={0.15 + index * 0.1}>
     <div className="text-center px-6 py-8 rounded-2xl border border-[#e8b8e4] bg-white hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
       <span
-        className="block text-4xl md:text-5xl font-black text-[#9d4ae3] mb-2 tracking-tight"
+        className="block text-4xl md:text-5xl font-black text-[#228b22] mb-2 tracking-tight"
         style={{ fontFamily: "'Georgia', serif" }}
       >
         {value}
       </span>
-      <span className="text-xs font-bold uppercase tracking-[3px] text-[#8236be]">{label}</span>
+      <span className="text-xs font-bold uppercase tracking-[3px] text-[#1c711c]">{label}</span>
     </div>
   </FadeInSection>
 );
@@ -122,8 +122,8 @@ const AnalyticsMetricRow = ({
   delay: number;
 }) => (
   <FadeInSection type="fadeUp" delay={delay}>
-    <div className="flex items-start gap-4 p-5 rounded-2xl border border-[#e8b8e4] bg-white hover:bg-[#fdf3fc]/60 hover:border-[#8236be] transition-all duration-300 group">
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] flex items-center justify-center text-[#9d4ae3] group-hover:bg-gradient-to-br group-hover:from-[#9d4ae3] group-hover:to-[#8236be] group-hover:text-white group-hover:border-transparent transition-all duration-300">
+    <div className="flex items-start gap-4 p-5 rounded-2xl border border-[#e8b8e4] bg-white hover:bg-[#fdf3fc]/60 hover:border-[#1c711c] transition-all duration-300 group">
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#fdf3fc] border border-[#e8b8e4] flex items-center justify-center text-[#228b22] group-hover:bg-gradient-to-br group-hover:from-[#228b22] group-hover:to-[#1c711c] group-hover:text-white group-hover:border-transparent transition-all duration-300">
         <Icon size={18} />
       </div>
       <div>
@@ -136,7 +136,7 @@ const AnalyticsMetricRow = ({
 
 const CheckItem = ({ text }: { text: string }) => (
   <li className="flex items-start gap-3 text-gray-600 text-[15px] md:text-[16px] leading-relaxed">
-    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center shadow-sm">
+    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center shadow-sm">
       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
         <path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -162,7 +162,7 @@ const marketingFeatures = [
     icon: Eye,
     title: 'Brand Storefront',
     description:
-      'Design a dedicated brand page on Faflora with custom banners, featured collections, and your brand story. Build recognition and loyalty at scale.',
+      'Design a dedicated brand page on EkivaMart with custom banners, featured collections, and your brand story. Build recognition and loyalty at scale.',
   },
   {
     icon: MousePointerClick,
@@ -213,7 +213,7 @@ const analyticsMetrics = [
     icon: LineChart,
     metric: 'Traffic Sources',
     description:
-      'Discover how shoppers find your store — whether through search, social media, direct links, or Faflora\'s internal recommendations. Double down on what works.',
+      'Discover how shoppers find your store — whether through search, social media, direct links, or EkivaMart\'s internal recommendations. Double down on what works.',
   },
   {
     icon: ShoppingBag,
@@ -235,9 +235,9 @@ export default function MarketingSolutionsAnalyticsPage() {
         <div className="absolute inset-0 bg-[#350834]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#350834] via-[#1f0321] to-[#0d000e]" />
         {/* Ambient glow orbs */}
-        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#8236be] opacity-[0.25] blur-[130px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#1c711c] opacity-[0.25] blur-[130px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#56154e] opacity-[0.30] blur-[110px] pointer-events-none" />
-        <div className="absolute top-[10%] right-[5%] w-[30vw] h-[30vw] rounded-full bg-[#ad74e8] opacity-[0.12] blur-[90px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[5%] w-[30vw] h-[30vw] rounded-full bg-[#67a652] opacity-[0.12] blur-[90px] pointer-events-none" />
         <div className="absolute top-[40%] right-[20%] w-[22vw] h-[22vw] rounded-full bg-[#d8acd1] opacity-[0.10] blur-[70px] pointer-events-none" />
 
         <div className="absolute top-10 right-10 w-56 h-56 rounded-full border border-white/8 pointer-events-none" />
@@ -248,14 +248,14 @@ export default function MarketingSolutionsAnalyticsPage() {
           className="absolute inset-0 opacity-[0.035] pointer-events-none"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(135deg, #ad74e8 0px, #ad74e8 1px, transparent 1px, transparent 48px)',
+              'repeating-linear-gradient(135deg, #67a652 0px, #67a652 1px, transparent 1px, transparent 48px)',
           }}
         />
         {/* Dot matrix overlay */}
         <div
           className="absolute inset-0 opacity-[0.025] pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, #ad74e8 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #67a652 1px, transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -271,7 +271,7 @@ export default function MarketingSolutionsAnalyticsPage() {
           <div className="max-w-4xl">
             <FadeInSection type="fadeDown" delay={0.1}>
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/80 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-                <TrendingUp size={12} /> Faflora · Growth Suite
+                <TrendingUp size={12} /> EkivaMart · Growth Suite
               </div>
             </FadeInSection>
 
@@ -330,7 +330,7 @@ export default function MarketingSolutionsAnalyticsPage() {
 
             <FadeInSection type="fadeUp" delay={0.5}>
               <div className="mt-7 flex items-center gap-3">
-                <div className="h-[3px] w-16 rounded-full" style={{ background: 'linear-gradient(90deg, #ad74e8, #ff7043)' }} />
+                <div className="h-[3px] w-16 rounded-full" style={{ background: 'linear-gradient(90deg, #67a652, #ff7043)' }} />
                 <div className="h-[3px] w-8 rounded-full bg-white/25" />
                 <div className="h-[3px] w-4 rounded-full bg-white/12" />
               </div>
@@ -338,7 +338,7 @@ export default function MarketingSolutionsAnalyticsPage() {
 
             <FadeInSection type="fadeUp" delay={0.65}>
               <p className="mt-8 text-white/60 text-base md:text-lg max-w-2xl leading-relaxed">
-                Grow your business with <span className="font-bold text-white/90">Faflora&rsquo;s</span> integrated marketing tools and real-time analytics dashboard. From sponsored listings to deep performance insights, everything you need to scale is at your fingertips.
+                Grow your business with <span className="font-bold text-white/90">EkivaMart&rsquo;s</span> integrated marketing tools and real-time analytics dashboard. From sponsored listings to deep performance insights, everything you need to scale is at your fingertips.
               </p>
             </FadeInSection>
 
@@ -402,11 +402,11 @@ export default function MarketingSolutionsAnalyticsPage() {
 
           <FadeInSection type="fadeUp" delay={0.15}>
             <div className="relative rounded-3xl overflow-hidden border border-[#e8b8e4] shadow-md bg-white mb-12">
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#9d4ae3] via-[#8236be] to-[#ad74e8]" />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#228b22] via-[#1c711c] to-[#67a652]" />
               <div className="px-8 md:px-12 py-8 md:py-10 pl-10 md:pl-14">
-                <p className="text-xs font-black uppercase tracking-[4px] text-[#8236be] mb-3">Overview</p>
+                <p className="text-xs font-black uppercase tracking-[4px] text-[#1c711c] mb-3">Overview</p>
                 <p className="text-gray-700 text-base md:text-[17px] leading-relaxed">
-                  Faflora&rsquo;s Marketing Suite empowers vendors of every size to compete effectively in Nigeria&rsquo;s fastest-growing e-commerce ecosystem. Whether you&rsquo;re a first-time seller or an established brand, our tools are designed to drive visibility, engagement, and conversions without requiring a marketing degree.
+                  EkivaMart&rsquo;s Marketing Suite empowers vendors of every size to compete effectively in Nigeria&rsquo;s fastest-growing e-commerce ecosystem. Whether you&rsquo;re a first-time seller or an established brand, our tools are designed to drive visibility, engagement, and conversions without requiring a marketing degree.
                 </p>
                 <p className="mt-4 text-gray-500 text-sm md:text-[15px] leading-relaxed">
                   Set budgets that work for your business, track returns in real time, and let our AI optimise your campaigns automatically. Every Naira you spend is engineered for maximum impact.
@@ -447,9 +447,9 @@ export default function MarketingSolutionsAnalyticsPage() {
               },
             ].map((item, i) => (
               <FadeInSection key={item.step} type="fadeUp" delay={0.1 + i * 0.12}>
-                <div className="relative pl-8 border-l-2 border-[#e8b8e4] hover:border-[#9d4ae3] transition-colors duration-300 h-full">
+                <div className="relative pl-8 border-l-2 border-[#e8b8e4] hover:border-[#228b22] transition-colors duration-300 h-full">
                   <span
-                    className="absolute -left-4 top-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white text-xs font-black flex items-center justify-center shadow-md"
+                    className="absolute -left-4 top-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] text-white text-xs font-black flex items-center justify-center shadow-md"
                   >
                     {item.step}
                   </span>
@@ -472,7 +472,7 @@ export default function MarketingSolutionsAnalyticsPage() {
               <div className="absolute inset-0 bg-gradient-to-br from-[#fdf3fc] to-white" />
               <div className="relative px-8 md:px-12 py-8 md:py-10">
                 <p className="text-gray-700 text-base md:text-[17px] leading-relaxed">
-                  Your vendor dashboard isn&rsquo;t just numbers on a screen. It&rsquo;s a command centre for your entire business on Faflora. Every metric is designed to answer a specific question: <em className="text-[#9d4ae3] font-semibold">What&rsquo;s selling? Who&rsquo;s buying? Where can I improve?</em>
+                  Your vendor dashboard isn&rsquo;t just numbers on a screen. It&rsquo;s a command centre for your entire business on EkivaMart. Every metric is designed to answer a specific question: <em className="text-[#228b22] font-semibold">What&rsquo;s selling? Who&rsquo;s buying? Where can I improve?</em>
                 </p>
                 <p className="mt-4 text-gray-500 text-sm md:text-[15px] leading-relaxed">
                   Filter by daily, weekly, or monthly views. Export reports as CSV. Compare performance across time periods. All data updates in real time — no manual refreshing required.
@@ -514,7 +514,7 @@ export default function MarketingSolutionsAnalyticsPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <FadeInSection type="fadeUp" delay={0.1}>
               <div className="rounded-3xl border border-[#e8b8e4] bg-white p-8 h-full">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white mb-6 shadow-md">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white mb-6 shadow-md">
                   <TrendingUp size={22} />
                 </div>
                 <h3
@@ -533,7 +533,7 @@ export default function MarketingSolutionsAnalyticsPage() {
 
             <FadeInSection type="fadeUp" delay={0.2}>
               <div className="rounded-3xl border border-[#e8b8e4] bg-white p-8 h-full">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white mb-6 shadow-md">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white mb-6 shadow-md">
                   <Users size={22} />
                 </div>
                 <h3
@@ -572,25 +572,25 @@ export default function MarketingSolutionsAnalyticsPage() {
               },
               {
                 title: 'Homepage Banner',
-                desc: 'Maximum visibility with premium placement on Faflora\'s homepage carousel. Perfect for brand launches, Black Friday events, and major promotions.',
+                desc: 'Maximum visibility with premium placement on EkivaMart\'s homepage carousel. Perfect for brand launches, Black Friday events, and major promotions.',
                 tag: 'Premium',
               },
             ].map((program, i) => (
               <FadeInSection key={program.title} type="fadeUp" delay={0.1 + i * 0.1}>
-                <div className="group relative rounded-2xl border border-[#e8b8e4] bg-white p-6 md:p-8 hover:border-[#8236be] hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div className="group relative rounded-2xl border border-[#e8b8e4] bg-white p-6 md:p-8 hover:border-[#1c711c] hover:shadow-xl transition-all duration-300 overflow-hidden">
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-r from-[#fdf3fc]/40 to-transparent" />
                   <div className="relative flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h4 className="text-lg font-extrabold text-[#1a0018]">{program.title}</h4>
-                        <span className="inline-flex items-center gap-1 bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[2px] px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-[2px] px-3 py-1 rounded-full">
                           {program.tag}
                         </span>
                       </div>
                       <p className="text-gray-500 text-sm leading-relaxed">{program.desc}</p>
                     </div>
                     <div className="flex-shrink-0">
-                      <span className="inline-flex items-center gap-2 text-[#8236be] text-sm font-semibold group-hover:gap-3 transition-all">
+                      <span className="inline-flex items-center gap-2 text-[#1c711c] text-sm font-semibold group-hover:gap-3 transition-all">
                         Learn more <ArrowRight size={15} />
                       </span>
                     </div>
@@ -606,10 +606,10 @@ export default function MarketingSolutionsAnalyticsPage() {
         {/* ── CTA BANNER ── */}
         <FadeInSection type="zoom" delay={0.1}>
           <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #ad74e8 0%, #8236be 50%, #35082e 100%)' }} />
-            <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#8236be] opacity-20 blur-[80px] pointer-events-none" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #67a652 0%, #1c711c 50%, #35082e 100%)' }} />
+            <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#1c711c] opacity-20 blur-[80px] pointer-events-none" />
             <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#56154e] opacity-[0.10] blur-[60px] pointer-events-none" />
-            <div className="absolute top-[30%] left-[40%] w-48 h-48 rounded-full bg-[#ad74e8] opacity-[0.10] blur-[60px] pointer-events-none" />
+            <div className="absolute top-[30%] left-[40%] w-48 h-48 rounded-full bg-[#67a652] opacity-[0.10] blur-[60px] pointer-events-none" />
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"
               style={{
@@ -630,7 +630,7 @@ export default function MarketingSolutionsAnalyticsPage() {
                   <span className="text-[#f0c8ec]">your business?</span>
                 </h3>
                 <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-md">
-                  Join thousands of Nigerian vendors already using Faflora&rsquo;s marketing and analytics tools to grow revenue, optimise operations, and build lasting customer relationships.
+                  Join thousands of Nigerian vendors already using EkivaMart&rsquo;s marketing and analytics tools to grow revenue, optimise operations, and build lasting customer relationships.
                 </p>
               </div>
 

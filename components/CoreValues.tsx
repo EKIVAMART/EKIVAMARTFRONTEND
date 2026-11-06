@@ -18,7 +18,7 @@ const coreValues: CoreValue[] = [
   {
     title: "Love for our customers",
     description:
-      "Satisfied customers are essential to our success. There are no kings in Faflora, only servants of the customer.",
+      "Satisfied customers are essential to our success. There are no kings in EkivaMart, only servants of the customer.",
     icon: Heart,
   },
   {

@@ -57,13 +57,13 @@ const TYPE_META: Record<
     description:
       'Sends a automated reminder email to customers who have not placed an order or engaged beyond the threshold period.',
     icon: <Users size={20} />,
-    accent: 'text-violet-600',
-    bg: 'bg-violet-50 border-violet-200',
+    accent: 'text-brand-600',
+    bg: 'bg-brand-50 border-brand-200',
     variables: [
       { tag: '{{firstName}}', label: 'Customer Name', sample: 'Sarah' },
       { tag: '{{daysSinceLastOrder}}', label: 'Inactivity Days', sample: '30' },
       { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://faflora.com' },
-      { tag: '{{appName}}', label: 'App Name', sample: 'Faflora' },
+      { tag: '{{appName}}', label: 'App Name', sample: 'EkivaMart' },
     ],
   },
   vendor_incomplete_registration: {
@@ -78,7 +78,7 @@ const TYPE_META: Record<
       { tag: '{{storeName}}', label: 'Store Name', sample: 'Flora Elegance' },
       { tag: '{{daysSinceStarted}}', label: 'Days Pending', sample: '3' },
       { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://faflora.com' },
-      { tag: '{{appName}}', label: 'App Name', sample: 'Faflora' },
+      { tag: '{{appName}}', label: 'App Name', sample: 'EkivaMart' },
     ],
   },
 };
@@ -121,11 +121,11 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-bold text-slate-700">{label}</span>
         {isSkipped ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 text-xs font-bold">
             <XCircle size={12} /> Skipped (Disabled)
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">
             <CheckCircle2 size={12} /> Ran
           </span>
         )}
@@ -137,7 +137,7 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
             { label: 'Sent', value: data.sent, color: 'text-emerald-600' },
             { label: 'Failed', value: data.failed, color: data.failed > 0 ? 'text-rose-600' : 'text-gray-400' },
           ].map(({ label: l, value, color }) => (
-            <div key={l} className="bg-slate-50 rounded-xl p-3 text-center border">
+            <div key={l} className="bg-slate-50 rounded-md p-3 text-center border">
               <p className={`text-xl font-black ${color}`}>{value}</p>
               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">{l}</p>
             </div>
@@ -151,29 +151,29 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
 function RunNowModal({ result, onClose }: RunNowModalProps) {
   if (!result) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-md rounded-3xl shadow-2xl border overflow-hidden"
+        className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
       >
-        <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-6 py-4 flex items-center justify-between">
+        <div className="bg-[#228b22] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-white">
             <Zap size={20} />
             <h3 className="font-bold text-lg">Sweep Results</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white p-1.5 hover:bg-white/20 rounded-xl transition"
+            className="text-white/80 hover:text-white p-1.5 hover:bg-white/20 rounded-md transition"
           >
             ✕
           </button>
         </div>
 
         <div className="p-6">
-          <p className="text-xs text-gray-500 font-semibold mb-4 bg-purple-50 border border-purple-100 rounded-xl px-3 py-2 flex items-center gap-2">
-            <Info size={14} className="text-[#9d4ae3] shrink-0" />
+          <p className="text-xs text-gray-500 font-semibold mb-4 bg-brand-50 border border-brand-100 rounded-md px-3 py-2 flex items-center gap-2">
+            <Info size={14} className="text-[#228b22] shrink-0" />
             {result.message}
           </p>
 
@@ -182,7 +182,7 @@ function RunNowModal({ result, onClose }: RunNowModalProps) {
 
           <button
             onClick={onClose}
-            className="w-full mt-6 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-bold rounded-xl hover:from-[#8236be] hover:to-[#692a99] transition shadow-md"
+            className="w-full mt-6 py-3 bg-[#228b22] text-white font-bold rounded-md hover:bg-[#1c711c] transition shadow-sm"
           >
             Close
           </button>
@@ -202,14 +202,14 @@ interface ConfirmRunNowModalProps {
 
 function ConfirmRunNowModal({ onConfirm, onCancel, isRunning }: ConfirmRunNowModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border p-6 text-center"
+        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
       >
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+        <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
           <AlertTriangle size={26} className="text-amber-500" />
         </div>
         <h3 className="text-lg font-extrabold text-slate-800">Run Engagement Sweep?</h3>
@@ -220,14 +220,14 @@ function ConfirmRunNowModal({ onConfirm, onCancel, isRunning }: ConfirmRunNowMod
           <button
             onClick={onCancel}
             disabled={isRunning}
-            className="flex-1 py-3 border rounded-xl text-sm font-bold hover:bg-slate-50 transition disabled:opacity-50"
+            className="flex-1 py-3 border rounded-md text-sm font-bold hover:bg-slate-50 transition disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isRunning}
-            className="flex-1 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-sm font-bold transition shadow-md hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-[#228b22] text-white rounded-md text-sm font-bold transition shadow-sm hover:bg-[#1c711c] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isRunning ? (
               <>
@@ -289,7 +289,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
     const end = textarea.selectionEnd;
     const currentVal = effective.bodyHtml || '';
     const newVal = currentVal.substring(0, start) + textToInsert + currentVal.substring(end);
-    
+
     setForm((f) => ({ ...f, bodyHtml: newVal }));
 
     setTimeout(() => {
@@ -357,12 +357,12 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+      className="bg-white rounded-md border border-gray-100 shadow-sm overflow-hidden"
     >
       {/* Card Header */}
       <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-100">
         <div className="flex items-start gap-4">
-          <div className={`p-3 rounded-2xl border ${meta.bg} ${meta.accent}`}>{meta.icon}</div>
+          <div className={`p-3 rounded-md border ${meta.bg} ${meta.accent}`}>{meta.icon}</div>
           <div>
             <h3 className="font-extrabold text-slate-800 text-base">{meta.label}</h3>
             <p className="text-xs text-gray-500 mt-1 max-w-xl leading-relaxed">{meta.description}</p>
@@ -372,7 +372,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
         <button
           onClick={handleToggleEnabled}
           title={effective.enabled ? 'Disable' : 'Enable'}
-          className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs border transition ${
+          className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-md font-bold text-xs border transition ${
             effective.enabled
               ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
               : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
@@ -408,11 +408,11 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
       {/* Fields */}
       <div className="p-6 space-y-5">
         {/* Threshold days */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50/60 p-4 rounded-md border border-slate-100">
           <div className="flex-1">
             <label className="block text-xs font-extrabold text-slate-700 mb-1">
               <span className="inline-flex items-center gap-1.5">
-                <Clock size={14} className="text-[#9d4ae3]" /> Threshold Days
+                <Clock size={14} className="text-[#228b22]" /> Threshold Days
               </span>
             </label>
             <div className="flex items-center gap-3">
@@ -425,7 +425,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                   const val = parseInt(e.target.value, 10);
                   setForm((f) => ({ ...f, thresholdDays: isNaN(val) ? 1 : val }));
                 }}
-                className="w-28 px-3.5 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition font-black text-slate-800"
+                className="w-28 px-3.5 py-2 text-sm border border-slate-200 rounded-md bg-white focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition font-black text-slate-800"
               />
               <span className="text-xs text-slate-500 font-medium">
                 days of inactivity before a reminder email is automatically triggered
@@ -438,38 +438,38 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
         <div>
           <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
             <span className="inline-flex items-center gap-1.5">
-              <Mail size={14} className="text-[#9d4ae3]" /> Email Subject
+              <Mail size={14} className="text-[#228b22]" /> Email Subject
             </span>
           </label>
           <input
             type="text"
             value={effective.subject}
             onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
-            placeholder="e.g. We miss you at Faflora!"
-            className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition font-semibold text-slate-800"
+            placeholder="e.g. We miss you at EkivaMart!"
+            className="w-full px-4 py-3 text-sm border border-slate-200 rounded-md bg-white focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition font-semibold text-slate-800"
           />
         </div>
 
         {/* Rich HTML Body Editor & Live Preview */}
-        <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-xs">
+        <div className="border border-slate-200/80 rounded-md overflow-hidden bg-white shadow-xs">
           {/* Header Toggle */}
           <div className="bg-slate-50 px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => setShowBody((v) => !v)}
-              className="flex items-center gap-2 text-xs font-extrabold text-[#9d4ae3] hover:underline"
+              className="flex items-center gap-2 text-xs font-extrabold text-[#228b22] hover:underline"
             >
               {showBody ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               {showBody ? 'Hide Email Body Editor' : 'Edit Email Body (Rich HTML & Live Preview)'}
             </button>
 
             {showBody && (
-              <div className="flex items-center bg-slate-200/70 p-1 rounded-xl text-xs font-bold">
+              <div className="flex items-center bg-slate-200/70 p-1 rounded-md text-xs font-bold">
                 <button
                   type="button"
                   onClick={() => setEditorTab('edit')}
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition ${
-                    editorTab === 'edit' ? 'bg-white text-[#9d4ae3] shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    editorTab === 'edit' ? 'bg-white text-[#228b22] shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Code size={13} /> Code (HTML)
@@ -478,7 +478,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                   type="button"
                   onClick={() => setEditorTab('preview')}
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition ${
-                    editorTab === 'preview' ? 'bg-white text-[#9d4ae3] shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    editorTab === 'preview' ? 'bg-white text-[#228b22] shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Eye size={13} /> Live Preview
@@ -498,14 +498,14 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                 {editorTab === 'edit' ? (
                   <div className="p-4 space-y-4">
                     {/* HTML Quick Formatting Toolbar */}
-                    <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+                    <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 p-2 rounded-md border border-slate-200 text-xs">
                       <span className="text-[10px] font-black uppercase text-slate-400 mr-1 flex items-center gap-1">
                         <Type size={12} /> Format:
                       </span>
                       <button
                         type="button"
                         onClick={() => insertTextAtCursor('<p>Paragraph text here...</p>')}
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-bold transition flex items-center gap-1"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-bold transition flex items-center gap-1"
                         title="Add Paragraph"
                       >
                         <Type size={12} /> Paragraph
@@ -513,7 +513,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       <button
                         type="button"
                         onClick={() => insertTextAtCursor('<h3>Heading Title</h3>')}
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-black transition"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-black transition"
                         title="Add Heading"
                       >
                         H3
@@ -521,7 +521,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       <button
                         type="button"
                         onClick={() => insertTextAtCursor('<strong>Bold text</strong>')}
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-bold transition"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-bold transition"
                         title="Bold text"
                       >
                         <Bold size={12} />
@@ -529,7 +529,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       <button
                         type="button"
                         onClick={() => insertTextAtCursor('<em>Italic text</em>')}
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-bold transition"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-bold transition"
                         title="Italic text"
                       >
                         <Italic size={12} />
@@ -538,10 +538,10 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                         type="button"
                         onClick={() =>
                           insertTextAtCursor(
-                            '<p><a href="{{frontendUrl}}" style="display:inline-block; background-color:#9d4ae3; color:#ffffff; padding:12px 24px; border-radius:12px; font-weight:bold; text-decoration:none;">Action Button →</a></p>'
+                            '<p><a href="{{frontendUrl}}" style="display:inline-block; background-color:#228b22; color:#ffffff; padding:12px 24px; border-radius:12px; font-weight:bold; text-decoration:none;">Action Button →</a></p>'
                           )
                         }
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-bold transition flex items-center gap-1"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-bold transition flex items-center gap-1"
                         title="Add Button"
                       >
                         <LinkIcon size={12} /> Button
@@ -549,7 +549,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       <button
                         type="button"
                         onClick={() => insertTextAtCursor('<hr style="border:0; border-top:1px solid #e2e8f0; margin:16px 0;" />')}
-                        className="px-2.5 py-1 bg-white hover:bg-purple-50 text-slate-700 hover:text-[#9d4ae3] border rounded-lg font-bold transition"
+                        className="px-2.5 py-1 bg-white hover:bg-brand-50 text-slate-700 hover:text-[#228b22] border rounded-lg font-bold transition"
                         title="Add Divider"
                       >
                         Divider
@@ -557,9 +557,9 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                     </div>
 
                     {/* Template Variables Toolbar */}
-                    <div className="bg-purple-50/60 p-3 rounded-xl border border-purple-100">
-                      <div className="flex items-center gap-1 text-[11px] font-extrabold text-purple-900 mb-2">
-                        <Sparkles size={13} className="text-[#9d4ae3]" /> Click to insert template variables into HTML:
+                    <div className="bg-brand-50/60 p-3 rounded-md border border-brand-100">
+                      <div className="flex items-center gap-1 text-[11px] font-extrabold text-brand-900 mb-2">
+                        <Sparkles size={13} className="text-[#228b22]" /> Click to insert template variables into HTML:
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {meta.variables.map((v) => (
@@ -567,7 +567,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                             key={v.tag}
                             type="button"
                             onClick={() => insertTextAtCursor(v.tag)}
-                            className="bg-white hover:bg-[#9d4ae3] text-purple-700 hover:text-white border border-purple-200 px-3 py-1 rounded-xl text-xs font-mono font-bold transition shadow-2xs flex items-center gap-1"
+                            className="bg-white hover:bg-[#228b22] text-brand-700 hover:text-white border border-brand-200 px-3 py-1 rounded-md text-xs font-mono font-bold transition shadow-2xs flex items-center gap-1"
                             title={`Insert ${v.label}`}
                           >
                             <span>{v.tag}</span>
@@ -584,18 +584,18 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       value={effective.bodyHtml}
                       onChange={(e) => setForm((f) => ({ ...f, bodyHtml: e.target.value }))}
                       placeholder="<p>Enter your email HTML body here...</p>"
-                      className="w-full px-4 py-3 text-xs font-mono border border-slate-200 rounded-xl bg-slate-900 text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#9d4ae3] transition resize-y leading-relaxed"
+                      className="w-full px-4 py-3 text-xs font-mono border border-slate-200 rounded-md bg-slate-900 text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#228b22] transition resize-y leading-relaxed"
                     />
                   </div>
                 ) : (
                   /* Live Email Preview Tab */
                   <div className="p-5 bg-slate-100 min-h-[350px]">
-                    <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                    <div className="max-w-xl mx-auto bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
                       {/* Fake Email Header */}
                       <div className="bg-slate-50 border-b border-slate-200 p-4 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span className="font-extrabold text-slate-700">From: Faflora Notifications &lt;no-reply@faflora.com&gt;</span>
-                          <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">Simulated Email</span>
+                          <span className="font-extrabold text-slate-700">From: EkivaMart Notifications &lt;no-reply@faflora.com&gt;</span>
+                          <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Simulated Email</span>
                         </div>
                         <div className="text-xs text-slate-600">
                           <span className="font-bold text-slate-400">Subject:</span>{' '}
@@ -617,9 +617,9 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
         </div>
 
         {/* Audit info */}
-        <div className="bg-slate-50 rounded-xl px-4 py-3 border border-gray-100 text-[11px] text-gray-500 font-semibold flex items-center justify-between flex-wrap gap-2">
+        <div className="bg-slate-50 rounded-md px-4 py-3 border border-gray-100 text-[11px] text-gray-500 font-semibold flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <UserIcon size={14} className="text-[#9d4ae3] shrink-0" />
+            <UserIcon size={14} className="text-[#228b22] shrink-0" />
             <span>
               Updated by{' '}
               <span className="text-slate-800 font-extrabold mx-0.5">
@@ -645,7 +645,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs font-bold rounded-xl shadow-md hover:from-[#8236be] hover:to-[#692a99] transition disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-[#228b22] text-white text-xs font-bold rounded-md shadow-sm hover:bg-[#1c711c] transition disabled:opacity-50"
               >
                 {isSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
                 {isSaving ? 'Saving…' : 'Save Changes'}
@@ -653,7 +653,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
               <button
                 onClick={handleDiscard}
                 disabled={isSaving}
-                className="px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition disabled:opacity-50"
+                className="px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-md transition disabled:opacity-50"
               >
                 Discard
               </button>
@@ -780,14 +780,13 @@ export default function EngagementSettingsView() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Mail className="text-[#9d4ae3]" size={24} />
-            Engagement Settings
+          <h2 className="text-2xl font-semibold text-slate-900">
+            Engagement
           </h2>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            Control how often Faflora sends automated reminder emails to inactive customers and vendors who have not finished registration.
+            Control how often EkivaMart sends automated reminder emails to inactive customers and vendors who have not finished registration.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -795,14 +794,15 @@ export default function EngagementSettingsView() {
             onClick={loadSettings}
             disabled={isLoading}
             title="Refresh"
-            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-xl transition border"
+            aria-label="Refresh engagement settings"
+            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-md transition border"
           >
             <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={() => setShowConfirm(true)}
             disabled={isLoading || isRunning}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white rounded-xl font-bold text-sm shadow-sm transition disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md font-bold text-sm shadow-sm transition disabled:opacity-50"
           >
             {isRunning ? (
               <><RefreshCw size={15} className="animate-spin" /> Running…</>
@@ -814,11 +814,11 @@ export default function EngagementSettingsView() {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex items-start gap-3">
-        <Info className="text-[#9d4ae3] shrink-0 mt-0.5" size={18} />
-        <div className="text-xs text-purple-900 leading-relaxed space-y-1">
-          <p className="font-bold">How Engagement Emails Work</p>
-          <ul className="list-disc list-inside text-purple-800/90 space-y-0.5">
+      <div className="border-l-2 border-slate-200 pl-4 flex items-start gap-3">
+        <Info className="text-[#228b22] shrink-0 mt-0.5" size={18} />
+        <div className="text-xs text-brand-900 leading-relaxed space-y-1">
+          <p className="font-medium">Automatic reminders</p>
+          <ul className="list-disc list-inside text-brand-800/90 space-y-0.5">
             <li>The system sweeps automatically on a scheduled interval to find eligible recipients.</li>
             <li>
               Use <span className="font-bold">Run Now</span> to trigger an immediate sweep — this sends real emails.
@@ -826,7 +826,6 @@ export default function EngagementSettingsView() {
             <li>
               When a type is <span className="font-bold">disabled</span>, no emails are sent regardless of eligibility.
             </li>
-            <li>Only the fields you change are sent in the update payload (partial update).</li>
           </ul>
         </div>
       </div>
@@ -834,14 +833,14 @@ export default function EngagementSettingsView() {
       {/* Setting Cards */}
       {isLoading ? (
         <div className="py-16 text-center text-gray-400">
-          <RefreshCw size={28} className="animate-spin mx-auto mb-3 text-[#9d4ae3]" />
+          <RefreshCw size={28} className="animate-spin mx-auto mb-3 text-[#228b22]" />
           <p className="text-sm font-semibold">Loading engagement settings…</p>
         </div>
       ) : settings.length === 0 ? (
-        <div className="py-16 text-center bg-white rounded-2xl border">
+        <div className="py-16 text-center bg-white rounded-md border">
           <Mail size={32} className="mx-auto mb-3 text-gray-300" />
           <p className="font-bold text-slate-700">No engagement settings found</p>
-          <p className="text-xs text-gray-400 mt-1">Please ensure the backend has seeded the default settings.</p>
+          <p className="text-xs text-gray-400 mt-1">No reminder schedules are configured.</p>
         </div>
       ) : (
         <div className="space-y-5">

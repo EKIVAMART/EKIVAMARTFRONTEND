@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Store, 
-  FileText, 
-  Check, 
-  AlertTriangle, 
-  X, 
-  ArrowRight, 
-  Calendar, 
-  Clock, 
-  ShieldCheck, 
-  RefreshCw, 
+import {
+  Store,
+  FileText,
+  Check,
+  AlertTriangle,
+  X,
+  ArrowRight,
+  Calendar,
+  Clock,
+  ShieldCheck,
+  RefreshCw,
   Sparkles,
   HelpCircle,
   Mail,
@@ -28,10 +28,10 @@ import {
   ChevronDown,
   Ban
 } from 'lucide-react';
-import { 
-  vendorApi, 
+import {
+  vendorApi,
   saveMockData,
-  VendorApplicationStatus, 
+  VendorApplicationStatus,
   VendorApplicationDraft,
   VendorDocument,
   Category,
@@ -128,12 +128,12 @@ const formatBytes = (bytes: number) => {
 
 export default function VendorStatusPage() {
   const router = useRouter();
-  
+
   const [loading, setLoading] = useState(true);
   const [appStatus, setAppStatus] = useState<VendorApplicationStatus | null>(null);
   const [appDraft, setAppDraft] = useState<VendorApplicationDraft | null>(null);
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
-  
+
   // Resubmission Mode state
   const [isResubmittingMode, setIsResubmittingMode] = useState(false);
   const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
@@ -151,7 +151,7 @@ export default function VendorStatusPage() {
       if (res.success && res.data) {
         setAppStatus(res.data);
       }
-      
+
       const draftRes = await vendorApi.getApplicationDraft();
       if (draftRes.success && draftRes.data) {
         const rawDraft = draftRes.data as any;
@@ -357,7 +357,7 @@ export default function VendorStatusPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-4 border-brand-200 border-t-[#228b22] rounded-full animate-spin mx-auto" />
           <p className="text-slate-600 font-bold">Retrieving application status...</p>
         </div>
       </div>
@@ -391,7 +391,7 @@ export default function VendorStatusPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 font-sans pt-12">
-      
+
       {/* Dev Mock Status Controls Switcher - Wrap with environment check */}
       {IS_DEV_MODE && (
         <div className="max-w-4xl mx-auto px-6 mb-6">
@@ -406,8 +406,8 @@ export default function VendorStatusPage() {
                   key={s}
                   onClick={() => handleDevStatusSwitch(s)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${
-                    status === s 
-                      ? 'bg-[#9d4ae3] text-white' 
+                    status === s
+                      ? 'bg-[#228b22] text-white'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -420,7 +420,7 @@ export default function VendorStatusPage() {
       )}
 
       <div className="max-w-4xl mx-auto px-6">
-        
+
         {/* Main Status Header Panel */}
         <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-6">
@@ -442,7 +442,7 @@ export default function VendorStatusPage() {
             <div className="space-y-1">
               <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Application Date</p>
               <h2 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                <Calendar size={14} className="text-purple-600" />
+                <Calendar size={14} className="text-brand-600" />
                 {appStatus?.submittedAt ? (
                   <span>Submitted At: {formatDate(appStatus.submittedAt)}</span>
                 ) : (
@@ -455,18 +455,18 @@ export default function VendorStatusPage() {
               {(status === 'draft' || status === 'requires_resubmission') && (
                 <button
                   onClick={() => router.push('/vendor/apply')}
-                  className="bg-[#9d4ae3] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2"
+                  className="bg-[#228b22] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2"
                 >
                   Edit My Submission
                   <ArrowRight size={14} />
                 </button>
               )}
-              
+
               {/* View Submission button whenever draft data exists */}
               {appDraft && (
                 <button
                   onClick={() => setShowViewSubmissionModal(true)}
-                  className="bg-[#9d4ae3] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2"
+                  className="bg-[#228b22] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2"
                 >
                   View Submission Details
                   <Eye size={14} />
@@ -477,7 +477,7 @@ export default function VendorStatusPage() {
 
           <AnimatePresence mode="wait">
             {isResubmittingMode ? (
-              
+
               /* TASK 4: Resubmission Flow Form View */
               <motion.div
                 key="resubmission-flow"
@@ -514,12 +514,12 @@ export default function VendorStatusPage() {
 
                           <div className="shrink-0 w-full md:w-auto">
                             {isUploading ? (
-                              <div className="flex items-center gap-2 px-6 py-2.5 bg-purple-50 text-purple-600 rounded-xl font-bold text-xs">
-                                <div className="w-3.5 h-3.5 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                              <div className="flex items-center gap-2 px-6 py-2.5 bg-brand-50 text-brand-600 rounded-xl font-bold text-xs">
+                                <div className="w-3.5 h-3.5 border-2 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
                                 Uploading replacement...
                               </div>
                             ) : (
-                              <label className="inline-flex items-center justify-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white font-extrabold text-xs px-6 py-3 rounded-xl cursor-pointer transition-all w-full md:w-auto">
+                              <label className="inline-flex items-center justify-center gap-2 bg-[#228b22] hover:opacity-90 text-white font-extrabold text-xs px-6 py-3 rounded-xl cursor-pointer transition-all w-full md:w-auto">
                                 <UploadCloud size={14} />
                                 Re-upload File
                                 <input
@@ -549,7 +549,7 @@ export default function VendorStatusPage() {
                     type="button"
                     disabled={resubmitLoading}
                     onClick={handleSubmitCorrections}
-                    className="inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-md transition-all disabled:opacity-50"
+                    className="inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-md transition-all disabled:opacity-50"
                   >
                     {resubmitLoading ? 'Submitting corrections...' : 'Submit Corrections'}
                     <ArrowRight size={16} />
@@ -558,7 +558,7 @@ export default function VendorStatusPage() {
               </motion.div>
 
             ) : (
-              
+
               /* Status view showing details, timeline & alerts */
               <motion.div
                 key="status-view"
@@ -566,7 +566,7 @@ export default function VendorStatusPage() {
                 animate={{ opacity: 1 }}
                 className="space-y-8"
               >
-                
+
                 {/* ALERTS BANNERS */}
                 {/* 1. Requires Resubmission */}
                 {status === 'requires_resubmission' && (
@@ -593,7 +593,7 @@ export default function VendorStatusPage() {
                 {status === 'approved' && (
                   <div className="p-6 bg-green-50 border border-green-100 rounded-3xl space-y-4 text-green-800 relative overflow-hidden">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-                    
+
                     <div className="flex gap-4">
                       <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0">
                         <Check className="w-6 h-6 stroke-[3]" />
@@ -605,7 +605,7 @@ export default function VendorStatusPage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="pt-2">
                       <button
                         onClick={() => router.push('/vendor/dashboard')}
@@ -641,7 +641,7 @@ export default function VendorStatusPage() {
                     </button>
                   </div>
                 )}
- 
+
                 {/* 3. Rejected banner */}
                 {status === 'rejected' && (
                   <div className="p-5 bg-red-50 border border-red-100 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-red-800">
@@ -681,7 +681,7 @@ export default function VendorStatusPage() {
                 <div className="space-y-4">
                   <h3 className="font-extrabold text-sm text-slate-700">Onboarding Journey</h3>
                   <div className="relative border-l-2 border-slate-100 ml-4 pl-6 space-y-6 text-xs">
-                    
+
                     {/* Step 1 */}
                     <div className="relative">
                       <div className="absolute -left-[31px] top-0 w-4.5 h-4.5 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white">
@@ -722,7 +722,7 @@ export default function VendorStatusPage() {
                       <div>
                         <h4 className="font-extrabold text-slate-800">Admin Review</h4>
                         <p className="text-[10px] text-slate-400 mt-0.5">
-                          {status === 'approved' 
+                          {status === 'approved'
                             ? 'Verification review completed successfully.'
                             : status === 'requires_resubmission'
                               ? 'Admin flagged items requiring correction.'
@@ -747,7 +747,7 @@ export default function VendorStatusPage() {
                       <div>
                         <h4 className="font-extrabold text-slate-800">Activation Status</h4>
                         <p className="text-[10px] text-slate-400 mt-0.5">
-                          {status === 'approved' 
+                          {status === 'approved'
                             ? 'Merchant account activated. Ready to start selling.'
                             : status === 'rejected'
                               ? 'Onboarding application rejected.'
@@ -800,7 +800,7 @@ export default function VendorStatusPage() {
                                     setSelectedDocument(fullDoc);
                                     setShowDocumentModal(true);
                                   }}
-                                  className="text-[#9d4ae3] hover:underline"
+                                  className="text-[#228b22] hover:underline"
                                 >
                                   <Eye size={12} />
                                 </button>
@@ -836,7 +836,7 @@ export default function VendorStatusPage() {
               <div className="p-6 border-b border-slate-100 flex items-start justify-between flex-shrink-0">
                 <div className="space-y-1">
                   <h3 className="font-extrabold text-lg text-slate-800 flex items-center gap-2">
-                    <Store className="w-5 h-5 text-[#9d4ae3]" />
+                    <Store className="w-5 h-5 text-[#228b22]" />
                     My Submitted Application
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -853,10 +853,10 @@ export default function VendorStatusPage() {
 
               {/* Modal Content Scrollable Area */}
               <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50/50">
-                
+
                 {/* Store Basics */}
                 <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                  <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                     <Store className="w-4 h-4" />
                     Store Basics
                   </h4>
@@ -882,7 +882,7 @@ export default function VendorStatusPage() {
 
                 {/* Selling Categories */}
                 <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                  <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                     <Tag className="w-4 h-4" />
                     Selling Categories
                   </h4>
@@ -902,7 +902,7 @@ export default function VendorStatusPage() {
                             ? (c.name || c.categoryName || c.title || foundCat?.name || c.id || c.categoryId)
                             : (foundCat?.name || c);
                           return (
-                            <span key={catId || idx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-full font-bold">
+                            <span key={catId || idx} className="text-[10px] bg-brand-50 text-brand-700 border border-brand-100 px-2.5 py-1 rounded-full font-bold">
                               {displayName}
                             </span>
                           );
@@ -917,7 +917,7 @@ export default function VendorStatusPage() {
                 {/* Personal Details */}
                 {appDraft.personalInfo && (
                   <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                    <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                    <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                       <User className="w-4 h-4" />
                       Personal Details
                     </h4>
@@ -953,7 +953,7 @@ export default function VendorStatusPage() {
                 {/* Business Registration */}
                 {(appDraft.vendorType === 'registered_business' || appDraft.vendorType === 'brand') && appDraft.businessInfo && (
                   <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                    <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                    <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                       <Building className="w-4 h-4" />
                       Business Registration
                     </h4>
@@ -989,7 +989,7 @@ export default function VendorStatusPage() {
                 {/* Store Details & Policies */}
                 {appDraft.storeInfo && (
                   <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                    <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                    <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       Description & Address
                     </h4>
@@ -1043,7 +1043,7 @@ export default function VendorStatusPage() {
 
                 {/* Uploaded Documents */}
                 <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                  <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                     <FileCheck className="w-4 h-4" />
                     Uploaded Documents Checklist
                   </h4>
@@ -1075,7 +1075,7 @@ export default function VendorStatusPage() {
                                   setSelectedDocument(fullDoc);
                                   setShowDocumentModal(true);
                                 }}
-                                className="text-[#9d4ae3] hover:underline"
+                                className="text-[#228b22] hover:underline"
                               >
                                 <Eye size={12} />
                               </button>
@@ -1091,7 +1091,7 @@ export default function VendorStatusPage() {
 
                 {/* Bank Accounts */}
                 <div className="border border-slate-200/60 bg-white rounded-2xl p-5 space-y-2">
-                  <h4 className="font-extrabold text-sm text-[#9d4ae3] border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#228b22] border-b border-slate-100 pb-2 flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
                     Linked Accounts
                   </h4>
@@ -1129,7 +1129,7 @@ export default function VendorStatusPage() {
               <div className="p-4 border-t border-slate-100 flex justify-end gap-3 flex-shrink-0">
                 <button
                   onClick={() => setShowViewSubmissionModal(false)}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
+                  className="px-6 py-2.5 bg-[#228b22] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
                 >
                   Close
                 </button>
@@ -1222,7 +1222,7 @@ export default function VendorStatusPage() {
                           href={selectedDocument.documentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-4 inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
+                          className="mt-4 inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
                         >
                           <Eye size={16} />
                           View PDF
@@ -1240,7 +1240,7 @@ export default function VendorStatusPage() {
                       href={selectedDocument.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-2 bg-[#9d4ae3] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
+                      className="mt-4 inline-flex items-center gap-2 bg-[#228b22] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all"
                     >
                       <Eye size={16} />
                       View File
@@ -1253,7 +1253,7 @@ export default function VendorStatusPage() {
               <div className="p-4 border-t border-slate-100 flex justify-end gap-3 flex-shrink-0">
                 <button
                   onClick={() => setShowDocumentModal(false)}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
+                  className="px-6 py-2.5 bg-[#228b22] hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all"
                 >
                   Close
                 </button>

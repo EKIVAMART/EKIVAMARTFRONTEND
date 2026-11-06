@@ -10,7 +10,7 @@ export default function Step5Declaration({ onPrev }: Props) {
   return (
     <FormWrapper onPrev={onPrev} isLastStep={true}>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white">
+        <div className="p-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] rounded-lg text-white">
           <FileCheck size={20} />
         </div>
         <div>
@@ -20,11 +20,11 @@ export default function Step5Declaration({ onPrev }: Props) {
       </div>
 
       {/* Declaration Alert Box */}
-      <div className="bg-[#f3ecfc] border border-[#f3ecfc] p-5 rounded-xl mb-8 flex gap-3">
-        <Info size={20} className="text-[#9d4ae3] shrink-0 mt-1" />
+      <div className="bg-[#eff4e9] border border-[#eff4e9] p-5 rounded-xl mb-8 flex gap-3">
+        <Info size={20} className="text-[#228b22] shrink-0 mt-1" />
         <div>
-          <h4 className="text-sm font-bold text-[#9d4ae3] mb-1">Declaration of Accuracy</h4>
-          <p className="text-[11px] text-[#9d4ae3] leading-relaxed font-medium">
+          <h4 className="text-sm font-bold text-[#228b22] mb-1">Declaration of Accuracy</h4>
+          <p className="text-[11px] text-[#228b22] leading-relaxed font-medium">
             The individual submitting this Service Request Form affirms that all information provided herein is true, accurate, and complete to the best of their knowledge. They understand that any false, misleading, or incomplete information may result in the delay, suspension, or termination of the onboarding process or service eligibility.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function Step5Declaration({ onPrev }: Props) {
           <div className="relative border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 h-44 flex items-center justify-center">
             {/* Cursive Placeholder Text */}
             <span className="text-4xl font-serif text-gray-300 select-none italic opacity-40">Your Signature</span>
-            
+
             <button className="absolute bottom-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-100 text-red-500 text-[10px] font-bold rounded-lg hover:bg-red-50 transition">
               <RotateCcw size={12} /> Clear Signature
             </button>
@@ -57,12 +57,12 @@ export default function Step5Declaration({ onPrev }: Props) {
                 <span className="text-xs font-bold text-gray-500">Security Verification <span className="text-red-500">*</span></span>
                 <div className="bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center gap-3">
                     <Lock size={14} className="text-gray-400" />
-                    <span className="font-mono font-bold text-[#9d4ae3]">3 + 2 = ?</span>
+                    <span className="font-mono font-bold text-[#228b22]">3 + 2 = ?</span>
                 </div>
             </div>
-            <input 
-              type="text" 
-              placeholder="Your answer" 
+            <input
+              type="text"
+              placeholder="Your answer"
               className="w-32 p-2.5 rounded-xl border bg-white outline-none focus:ring-2 ring-[#E0F2F3] text-center font-bold"
             />
         </div>

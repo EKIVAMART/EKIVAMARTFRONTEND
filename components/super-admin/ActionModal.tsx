@@ -255,11 +255,11 @@ const ChipSelector = ({
   return (
     <div className="space-y-2">
       <label className="text-xs font-bold text-gray-600 block">{label}</label>
-      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-2xl border bg-white focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 focus-within:border-[#9d4ae3] transition-all">
+      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-md border bg-white focus-within:ring-2 focus-within:ring-[#228b22]/20 focus-within:border-[#228b22] transition-all">
         {selectedValues.map((val, idx) => (
-          <span key={`${val}-${idx}`} className="bg-[#f0e1f7] text-[#8236be] text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
+          <span key={`${val}-${idx}`} className="bg-[#e3ebdf] text-[#1c711c] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
-            <button type="button" onClick={() => handleRemove(val)} className="text-[#8236be] hover:text-red-500 transition">
+            <button type="button" onClick={() => handleRemove(val)} className="text-[#1c711c] hover:text-red-500 transition">
               <X size={13} strokeWidth={3} />
             </button>
           </span>
@@ -283,7 +283,7 @@ const ChipSelector = ({
               type="button"
               onClick={() => handleToggle(opt)}
               className={`text-xs px-2.5 py-1 rounded-lg border font-bold transition-all ${isSelected
-                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-sm'
+                ? 'bg-[#228b22] text-white border-transparent shadow-sm'
                 : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                 }`}
             >
@@ -392,38 +392,13 @@ export default function ActionModal({
   };
 
   const QuickAddButton = () => (
-    <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @keyframes quick-add-shine {
-          0% { left: -150%; }
-          50% { left: 150%; }
-          100% { left: 150%; }
-        }
-        @keyframes quick-add-glow {
-          0%, 100% { box-shadow: 0 0 10px rgba(45, 212, 191, 0.4), 0 0 15px rgba(157, 74, 227, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(45, 212, 191, 0.7), 0 0 30px rgba(157, 74, 227, 0.4); }
-        }
-        .animate-quick-shine {
-          animation: quick-add-shine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-        .animate-quick-glow {
-          animation: quick-add-glow 2.5s ease-in-out infinite;
-        }
-      `}} />
-      <motion.button
-        type="button"
-        whileHover={{ scale: 1.06, y: -1 }}
-        whileTap={{ scale: 0.96 }}
-        onClick={() => setQuickAddMode(true)}
-        className="relative overflow-hidden px-5 py-2.5 bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white rounded-2xl text-xs font-black tracking-wider uppercase flex items-center gap-2 border border-teal-300/30 transition-all duration-300 animate-quick-glow shadow-lg shadow-teal-500/20"
-      >
-        <span className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-12 animate-quick-shine pointer-events-none" />
-        <Zap size={14} className="text-emerald-50 fill-emerald-100/40 animate-bounce" />
-        Quick Add
-        <Layers size={14} className="text-emerald-50 fill-emerald-100/40 ml-0.5" />
-      </motion.button>
-    </>
+    <button
+      type="button"
+      onClick={() => setQuickAddMode(true)}
+      className="px-4 py-2 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 rounded-md text-sm font-medium"
+    >
+      Quick add
+    </button>
   );
 
   const updateField = <Key extends keyof ProductFormData>(
@@ -467,7 +442,7 @@ export default function ActionModal({
 
   const saveData = async (statusOverride?: ProductFormData['status']) => {
     if (isSaving) return;
-    
+
     setIsSaving(true);
     setSaveErrors([]);
 
@@ -577,42 +552,32 @@ export default function ActionModal({
 
   const renderQuickAddForm = () => (
     <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 md:p-8 space-y-6 min-h-0 bg-white">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-gradient-to-r from-teal-400 to-teal-600 rounded-lg text-white">
-          <Plus size={22} />
-        </div>
-        <div>
-          <h3 className="font-bold text-lg text-gray-800">Quick Add Form</h3>
-          <p className="text-xs text-gray-500">Provide the required core product details to instantly create your product draft.</p>
-        </div>
-      </div>
-
       <div className={`grid gap-5 mb-5 ${isVendorRole ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
         {!isVendorRole && (
           <div>
-            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Store <span className="text-[#9d4ae3] ml-1">*</span></label>
+            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Store <span className="text-[#228b22] ml-1">*</span></label>
             <select
               value={formData.vendorProfileId || ''}
               onChange={e => setFormData(prev => ({ ...prev, vendorProfileId: e.target.value || undefined }))}
-              className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+              className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
               disabled={isLoadingStores}
             >
               <option value="">
-                {isLoadingStores ? 'Loading stores...' : stores.length === 0 ? 'Default (Faflora Official Store)' : 'Default (Faflora Official Store)'}
+                {isLoadingStores ? 'Loading stores...' : 'Default (EkivaMart Official Store)'}
               </option>
               {stores.map(s => (
-                <option key={s.id} value={s.id}>{s.storeName}{s.isFafloraOfficialStore ? ' (Official)' : ''}</option>
+                <option key={s.id} value={s.id}>{s.storeName}{s.isEkivaMartOfficialStore ? ' (Official)' : ''}</option>
               ))}
             </select>
           </div>
         )}
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#9d4ae3] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#228b22] ml-1">*</span></label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => updateField('name', e.target.value)}
-            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold"
+            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold"
             required
             placeholder="e.g. Vintage Leather Jacket"
           />
@@ -621,14 +586,14 @@ export default function ActionModal({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#9d4ae3] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#228b22] ml-1">*</span></label>
           <select
             value={selectedCategoryValue}
             onChange={e => {
               updateField('categoryId', e.target.value);
               updateField('subCategoryId', ''); // Clear subcategory on change
             }}
-            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
             required
             disabled={isLoadingCategories}
           >
@@ -643,11 +608,11 @@ export default function ActionModal({
           </select>
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#9d4ae3] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#228b22] ml-1">*</span></label>
           <select
             value={formData.subCategoryId}
             onChange={e => updateField('subCategoryId', e.target.value)}
-            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
             required
             disabled={isLoadingSubcategories || !formData.categoryId}
           >
@@ -670,25 +635,25 @@ export default function ActionModal({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
           <input
             type="number"
             value={formData.compareAtPrice || ''}
             onChange={(e) => updateField('compareAtPrice', Number(e.target.value))}
-            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold"
+            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold"
             required
             placeholder="Price"
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#9d4ae3] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#228b22] ml-1">*</span></label>
           <input
             type="number"
             min="0"
             step="1"
             value={formData.stock || ''}
             onChange={(e) => updateField('stock', toNonNegativeInteger(e.target.value))}
-            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold"
+            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold"
             required
             placeholder="Available stock"
           />
@@ -696,20 +661,20 @@ export default function ActionModal({
       </div>
 
       <div>
-        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview / Short Summary <span className="text-[#9d4ae3] ml-1">*</span></label>
+        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview / Short Summary <span className="text-[#228b22] ml-1">*</span></label>
         <textarea
           value={formData.preview}
           onChange={e => updateField('preview', e.target.value)}
           rows={2}
-          className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y"
+          className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm resize-y"
           required
           placeholder="Brief description for search listings..."
         />
       </div>
 
       <div>
-        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#9d4ae3] ml-1">*</span></label>
-        <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
+        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
+        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
               <button type="button" onClick={() => applyFormat('bold')} className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"><b>B</b></button>
@@ -720,14 +685,14 @@ export default function ActionModal({
               <button
                 type="button"
                 onClick={() => setEditorMode('write')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#1c711c]' : 'text-gray-500 hover:text-gray-800'}`}
               >
                 Write
               </button>
               <button
                 type="button"
                 onClick={() => setEditorMode('preview')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#1c711c]' : 'text-gray-500 hover:text-gray-800'}`}
               >
                 Preview
               </button>
@@ -753,32 +718,31 @@ export default function ActionModal({
       </div>
 
       {/* Origin & Location Section in Quick Add */}
-      <div className="bg-teal-50/40 rounded-2xl p-5 border border-teal-100">
-        <h4 className="font-bold text-teal-800 mb-4 text-sm flex items-center gap-2">
-          <span className="w-2 h-2 bg-teal-500 rounded-full inline-block" />
-          Origin &amp; Location <span className="text-[#9d4ae3] text-xs ml-1">(All Required)</span>
+      <div className="pt-5 border-t border-slate-200">
+        <h4 className="font-medium text-slate-700 mb-4 text-sm flex items-center gap-2">
+          Origin &amp; Location <span className="text-[#228b22] text-xs ml-1">(All Required)</span>
         </h4>
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Country of Origin <span className="text-[#9d4ae3] ml-1">*</span></label>
+            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Country of Origin <span className="text-[#228b22] ml-1">*</span></label>
             <input
               type="text"
               value={formData.origin || ''}
               onChange={e => updateField('origin', e.target.value)}
               placeholder="e.g. Nigeria, China, USA"
-              className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+              className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
               required
             />
           </div>
           <div className="border-t border-teal-100 pt-4">
-            <label className="text-xs font-bold text-gray-600 mb-3 block">Shipping Location <span className="text-[#9d4ae3] ml-1">*</span></label>
+            <label className="text-xs font-bold text-gray-600 mb-3 block">Shipping Location <span className="text-[#228b22] ml-1">*</span></label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
                 value={formData.location?.town || ''}
                 onChange={e => updateLocation('town', e.target.value)}
                 placeholder="Town / City *"
-                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                 required
               />
               <input
@@ -786,7 +750,7 @@ export default function ActionModal({
                 value={formData.location?.state || ''}
                 onChange={e => updateLocation('state', e.target.value)}
                 placeholder="State *"
-                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                 required
               />
               <input
@@ -794,7 +758,7 @@ export default function ActionModal({
                 value={formData.location?.lga || ''}
                 onChange={e => updateLocation('lga', e.target.value)}
                 placeholder="LGA (Local Government Area) *"
-                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                 required
               />
             </div>
@@ -802,18 +766,18 @@ export default function ActionModal({
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t">
+      <div className="flex flex-wrap justify-end gap-3 pt-4 border-t">
         <button
           type="button"
           onClick={() => setQuickAddMode(false)}
-          className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition text-sm"
+          className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition text-sm"
         >
           Switch to Detailed Form
         </button>
         <button
           type="submit"
           disabled={isSaving}
-          className="px-8 py-3 bg-gradient-to-r from-teal-500 to-teal-700 hover:from-teal-600 hover:to-teal-800 disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg text-sm"
+          className="px-8 py-3 bg-[#176a35] hover:bg-[#12582b] disabled:opacity-60 text-white rounded-md font-extrabold transition shadow-sm text-sm"
         >
           {isSaving ? 'Creating...' : 'Create Product'}
         </button>
@@ -871,7 +835,7 @@ export default function ActionModal({
     if (normalized.includes('fashion') || normalized.includes('clothing') || normalized.includes('apparel')) {
       return (
         <div className="col-span-1 md:col-span-2 space-y-4 animate-in fade-in duration-200">
-          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Fashion Specifications</h5>
+          <h5 className="font-extrabold text-[#1c711c] text-xs uppercase tracking-wider">Fashion Specifications</h5>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Material / Fabric</label>
@@ -880,7 +844,7 @@ export default function ActionModal({
                 placeholder="e.g. 100% Cotton"
                 value={formData.metadata.material || ''}
                 onChange={(e) => updateMetadata('material', e.target.value)}
-                className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                className="w-full p-3.5 rounded-md border bg-white outline-none text-sm font-semibold"
               />
             </div>
             <div>
@@ -890,7 +854,7 @@ export default function ActionModal({
                 placeholder="e.g. Slim Fit, Casual"
                 value={formData.metadata.fitStyle || ''}
                 onChange={(e) => updateMetadata('fitStyle', e.target.value)}
-                className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                className="w-full p-3.5 rounded-md border bg-white outline-none text-sm font-semibold"
               />
             </div>
           </div>
@@ -917,7 +881,7 @@ export default function ActionModal({
     if (normalized.includes('electronics') || normalized.includes('gadget') || normalized.includes('appliances')) {
       return (
         <div className="col-span-1 md:col-span-2 space-y-4 animate-in fade-in duration-200">
-          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Technical Specifications</h5>
+          <h5 className="font-extrabold text-[#1c711c] text-xs uppercase tracking-wider">Technical Specifications</h5>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Model Name / Number</label>
@@ -926,7 +890,7 @@ export default function ActionModal({
                 placeholder="e.g. iPhone 15 Pro"
                 value={formData.metadata.modelNumber || ''}
                 onChange={(e) => updateMetadata('modelNumber', e.target.value)}
-                className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                className="w-full p-3.5 rounded-md border bg-white outline-none text-sm font-semibold"
               />
             </div>
             <div>
@@ -936,7 +900,7 @@ export default function ActionModal({
                 placeholder="e.g. 1 Year Brand Warranty"
                 value={formData.metadata.warrantyPolicy || ''}
                 onChange={(e) => updateMetadata('warrantyPolicy', e.target.value)}
-                className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                className="w-full p-3.5 rounded-md border bg-white outline-none text-sm font-semibold"
               />
             </div>
           </div>
@@ -1220,7 +1184,7 @@ export default function ActionModal({
     if (!images.length) return;
     setIsUploadModalOpen(false);
     setSelectedImageIndex(0);
-    
+
     const newStaged: ProductImage[] = images.map((img, idx) => {
       const order = stagedImages.length + idx;
       return {
@@ -1258,7 +1222,7 @@ export default function ActionModal({
       alt,
       order
     });
-    
+
     if (replaceInputRef.current) replaceInputRef.current.value = '';
   };
 
@@ -1271,7 +1235,7 @@ export default function ActionModal({
 
   const handleConfirmReplace = () => {
     if (!imageToReplace) return;
-    
+
     if (!imageToReplace.alt.trim()) {
       toast.error('Alt text is required for the new image.');
       return;
@@ -1366,35 +1330,35 @@ export default function ActionModal({
     <>
       <AnimatePresence>
         {isOpen && (
-        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
+            className="relative bg-white w-full max-w-4xl rounded-md shadow-sm overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
           >
             <AnimatePresence>
               {saveErrors.length > 0 && (
-                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-2xl">
+                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-red-700 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
+                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-red-800">Please fix these details before saving.</p>
                       <ul className="mt-2 list-disc space-y-1 pl-4">
                         {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
                       </ul>
                     </div>
-                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-xl p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
+                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-8 py-6 text-white flex items-center justify-between">
+            <div className="border-b border-slate-200 bg-white px-5 py-4 text-slate-900 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-bold">{editingItem ? 'Edit Product' : 'Add New Product'}</h2>
-                <p className="text-sm opacity-90 mt-1">
-                  {quickAddMode ? 'Quick Add Mode' : `Step ${currentStep} of ${totalSteps}`}
+                <h2 className="text-xl font-semibold">{editingItem ? 'Edit product' : 'Add product'}</h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  {quickAddMode ? 'Quick add' : `Step ${currentStep} of ${totalSteps}`}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -1403,7 +1367,7 @@ export default function ActionModal({
                   <button
                     type="button"
                     onClick={() => setQuickAddMode(false)}
-                    className="px-3.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                    className="px-3 py-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-md text-xs font-medium transition"
                   >
                     Switch to Detailed Form
                   </button>
@@ -1411,7 +1375,7 @@ export default function ActionModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition"
+                  className="p-2 text-slate-500 hover:bg-slate-100 rounded-md transition"
                   aria-label="Close modal"
                 >
                   <X size={22} />
@@ -1433,8 +1397,8 @@ export default function ActionModal({
                       ...(totalSteps === 4 ? [{ step: 4, title: 'Images', desc: 'Manage product gallery' }] : [])
                     ].map((s) => (
                       <div key={s.step} className="flex flex-col items-center flex-1 relative">
-                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#9d4ae3]' : 'bg-gray-200'}`} />}
-                        <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#9d4ae3] text-white shadow-md shadow-[#9d4ae3]/30 ring-4 ring-[#9d4ae3]/10' : currentStep > s.step ? 'bg-[#8236be] text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#228b22]' : 'bg-gray-200'}`} />}
+                        <div className={`relative z-10 w-8 h-8 rounded-md flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#228b22] text-white shadow-sm ' : currentStep > s.step ? 'bg-[#1c711c] text-white' : 'bg-gray-200 text-gray-500'}`}>
                           {currentStep > s.step ? <Check size={14} /> : s.step}
                         </div>
                         <div className="mt-2 text-center hidden md:block">
@@ -1450,27 +1414,27 @@ export default function ActionModal({
                   {currentStep === 1 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><Layers size={22} /></div>
+                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Layers size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
                           <p className="text-xs text-gray-500">Core product details</p>
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#9d4ae3] ml-1">*</span></label>
-                        <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" required />
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Name <span className="text-[#228b22] ml-1">*</span></label>
+                        <input type="text" value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" required />
                       </div>
 
                       {/* Store / Vendor selector — only shown for admin/super-admin, not vendor */}
                       {!isVendorRole && (
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                            Store / Vendor <span className="text-[#9d4ae3] ml-1">*</span>
+                            Store / Vendor <span className="text-[#228b22] ml-1">*</span>
                           </label>
                           <select
                             value={formData.vendorId}
                             onChange={e => updateField('vendorId', e.target.value)}
-                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
                             disabled={isLoadingStores}
                           >
                             <option value="">
@@ -1485,14 +1449,14 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#9d4ae3] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Product Category <span className="text-[#228b22] ml-1">*</span></label>
                           <select
                             value={selectedCategoryValue}
                             onChange={e => {
                               updateField('categoryId', e.target.value);
                               updateField('subCategoryId', ''); // Clear subcategory on change
                             }}
-                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
                             required
                             disabled={isLoadingCategories}
                           >
@@ -1507,11 +1471,11 @@ export default function ActionModal({
                           </select>
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#9d4ae3] ml-1">*</span></label>
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Sub Category <span className="text-[#228b22] ml-1">*</span></label>
                           <select
                             value={formData.subCategoryId}
                             onChange={e => updateField('subCategoryId', e.target.value)}
-                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium"
+                            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
                             required
                             disabled={isLoadingSubcategories || !formData.categoryId}
                           >
@@ -1533,13 +1497,13 @@ export default function ActionModal({
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#9d4ae3] ml-1">*</span></label>
-                        <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm resize-y" required />
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Preview <span className="text-[#228b22] ml-1">*</span></label>
+                        <textarea value={formData.preview} onChange={e => updateField('preview', e.target.value)} rows={2} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm resize-y" required />
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#9d4ae3] ml-1">*</span></label>
-                        <div className="border rounded-2xl overflow-hidden bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E0F2F3] transition-all">
+                        <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
+                        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
                           {/* Editor Header Toolbar */}
                           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-1.5">
@@ -1589,14 +1553,14 @@ export default function ActionModal({
                               <button
                                 type="button"
                                 onClick={() => setEditorMode('write')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'write' ? 'bg-white shadow-sm text-[#1c711c]' : 'text-gray-500 hover:text-gray-800'}`}
                               >
                                 Write
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setEditorMode('preview')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#8236be]' : 'text-gray-500 hover:text-gray-800'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition ${editorMode === 'preview' ? 'bg-white shadow-sm text-[#1c711c]' : 'text-gray-500 hover:text-gray-800'}`}
                               >
                                 Preview
                               </button>
@@ -1625,14 +1589,14 @@ export default function ActionModal({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Brand</label>
-                          <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                          <input type="text" value={formData.brand} onChange={e => updateField('brand', e.target.value)} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" />
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                          <div className="w-full p-2.5 rounded-2xl border bg-[#F0F7F8] focus-within:bg-white focus-within:ring-2 focus-within:border-[#9d4ae3] focus-within:ring-[#9d4ae3]/20 ring-[#E0F2F3] min-h-[50px] flex flex-wrap gap-2 items-center">
+                          <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white focus-within:ring-2 focus-within:border-[#228b22] focus-within:ring-[#228b22]/20 ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
-                              <span key={`tag-${t}-${idx}`} className="bg-[#e9d2e5] text-[#9d4ae3] text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
-                                {t} <X size={12} className="cursor-pointer text-[#9d4ae3] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                              <span key={`tag-${t}-${idx}`} className="bg-[#e3ebdf] text-[#228b22] text-xs font-bold px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
+                                {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-red-500 transition" onClick={() => removeTag(t)} />
                               </span>
                             ))}
                             <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
@@ -1643,11 +1607,11 @@ export default function ActionModal({
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
                         <div className="flex gap-3">
-                          <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
+                          <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
                           <button
                             type="button"
                             onClick={generateSKU}
-                            className="px-5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white text-xs font-bold rounded-2xl shadow-md transition"
+                            className="px-5 bg-[#228b22] hover:bg-[#1c711c] text-white text-xs font-bold rounded-md shadow-sm transition"
                           >
                             Auto-Generate SKU
                           </button>
@@ -1660,22 +1624,22 @@ export default function ActionModal({
                       </div>
 
                       {/* Origin & Location Section - ALL FIELDS REQUIRED */}
-                      <div className="bg-purple-50/40 rounded-2xl p-5 border border-purple-100">
-                        <h4 className="font-bold text-purple-800 mb-4 text-sm flex items-center gap-2">
-                          <span className="w-2 h-2 bg-[#9d4ae3] rounded-full inline-block" />
-                          Origin &amp; Location <span className="text-[#9d4ae3] text-xs ml-1">(All Fields Required)</span>
+                      <div className="bg-brand-50/40 rounded-md p-5 border border-brand-100">
+                        <h4 className="font-bold text-brand-800 mb-4 text-sm flex items-center gap-2">
+                          <span className="w-2 h-2 bg-[#228b22] rounded-full inline-block" />
+                          Origin &amp; Location <span className="text-[#228b22] text-xs ml-1">(All Fields Required)</span>
                         </h4>
 
                         {/* Country of Origin */}
                         <div className="mb-5">
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                            Country of Origin <span className="text-[#9d4ae3] ml-1">*</span>
+                            Country of Origin <span className="text-[#228b22] ml-1">*</span>
                           </label>
                           <input
                             type="text"
                             value={formData.origin || ''}
                             onChange={e => updateField('origin', e.target.value)}
-                            className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                            className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                             required
                             placeholder="e.g. Nigeria, China, USA"
                           />
@@ -1685,46 +1649,46 @@ export default function ActionModal({
                         </div>
 
                         {/* Shipping Location */}
-                        <div className="border-t border-purple-100 pt-4">
+                        <div className="border-t border-brand-100 pt-4">
                           <label className="text-xs font-bold text-gray-600 mb-3 block">
-                            Shipping Location <span className="text-[#9d4ae3] ml-1">*</span>
+                            Shipping Location <span className="text-[#228b22] ml-1">*</span>
                           </label>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                Town / City <span className="text-[#9d4ae3] ml-1">*</span>
+                                Town / City <span className="text-[#228b22] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
                                 value={formData.location?.town || ''}
                                 onChange={e => updateLocation('town', e.target.value)}
-                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                                 required
                                 placeholder="e.g. Victoria Island"
                               />
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                State <span className="text-[#9d4ae3] ml-1">*</span>
+                                State <span className="text-[#228b22] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
                                 value={formData.location?.state || ''}
                                 onChange={e => updateLocation('state', e.target.value)}
-                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                                 required
                                 placeholder="e.g. Lagos"
                               />
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
-                                LGA (Local Government Area) <span className="text-[#9d4ae3] ml-1">*</span>
+                                LGA (Local Government Area) <span className="text-[#228b22] ml-1">*</span>
                               </label>
                               <input
                                 type="text"
                                 value={formData.location?.lga || ''}
                                 onChange={e => updateLocation('lga', e.target.value)}
-                                className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm"
+                                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                                 required
                                 placeholder="e.g. Eti-Osa"
                               />
@@ -1742,7 +1706,7 @@ export default function ActionModal({
                   {currentStep === 2 && (
                     <div className="space-y-8">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><DollarSign size={22} /></div>
+                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><DollarSign size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
                           <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
@@ -1751,34 +1715,34 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
-                          <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold" required />
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
+                          <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold" required />
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
-                          <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                          <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#9d4ae3] ml-1">*</span></label>
-                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-2xl border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#9d4ae3]" required />
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
+                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-md border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#228b22]" required />
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
-                          <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm" />
+                          <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#9d4ae3] ml-1">*</span></label>
-                          <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-2xl border bg-[#F0F7F8] focus:bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-semibold" required />
+                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Stock Quantity <span className="text-[#228b22] ml-1">*</span></label>
+                          <input type="number" min="0" step="1" value={formData.stock || ''} onChange={e => updateField('stock', toNonNegativeInteger(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold" required />
                         </div>
                         <div className="flex items-center pt-2 md:pt-8">
                           <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#9d4ae3] rounded border-gray-300 focus:ring-[#9d4ae3]" />
+                            <input type="checkbox" checked={formData.inStock} onChange={e => updateField('inStock', e.target.checked)} className="w-5 h-5 text-[#228b22] rounded border-gray-300 focus:ring-[#228b22]" />
                             <span className="font-bold text-gray-700 text-sm">In Stock</span>
                           </label>
                         </div>
@@ -1790,7 +1754,7 @@ export default function ActionModal({
                   {currentStep === 3 && (
                     <div className="space-y-8 animate-in fade-in duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white"><Info size={22} /></div>
+                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Info size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
                           <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
@@ -1798,22 +1762,22 @@ export default function ActionModal({
                       </div>
 
                       {/* General Origin */}
-                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
                         <h4 className="font-bold text-gray-700 mb-4 text-sm">General</h4>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Origin / Manufactured in</label>
-                          <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-medium" />
+                          <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} className="w-full p-3.5 rounded-md border bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium" />
                         </div>
                       </div>
 
                       {/* Return Policy */}
-                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
                         <h4 className="font-bold text-gray-700 mb-4 text-sm">Return Policy</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-4">
                           <div>
                             <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Window</label>
-                            <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                              <option value="Use Store Default">Use Faflora Store Default</option>
+                            <select value={formData.returnWindow} onChange={e => updateField('returnWindow', e.target.value)} className="w-full p-3.5 rounded-md border bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold text-gray-700">
+                              <option value="Use Store Default">Use EkivaMart Store Default</option>
                               <option value="3">3 days</option>
                               <option value="7 days">7 days</option>
                               <option value="14 days">14 days</option>
@@ -1822,9 +1786,9 @@ export default function ActionModal({
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-600 mb-1.5 block">Who Pays Return Shipping?</label>
-                            <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-2xl border outline-none text-sm bg-white focus:ring-2 ring-[#E0F2F3] font-bold text-gray-700">
-                              <option value="Use Store Default">Use Faflora Store Default</option>
-                              <option value="store">Faflora Store pays</option>
+                            <select value={formData.whoPaysReturnShipping} onChange={e => updateField('whoPaysReturnShipping', e.target.value)} className="w-full p-3.5 rounded-md border outline-none text-sm bg-white focus:ring-2 ring-slate-200 font-bold text-gray-700">
+                              <option value="Use Store Default">Use EkivaMart Store Default</option>
+                              <option value="store">EkivaMart Store pays</option>
                               <option value="vendor">Vendor pays</option>
                               <option value="customer">Customer pays</option>
                             </select>
@@ -1832,17 +1796,17 @@ export default function ActionModal({
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Return Conditions</label>
-                          <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-2xl border outline-none text-sm resize-y bg-white focus:ring-2 ring-[#E0F2F3]" placeholder="Must be in original packaging, unworn, etc." />
+                          <textarea value={formData.returnConditions} onChange={e => updateField('returnConditions', e.target.value)} rows={2} className="w-full p-3.5 rounded-md border outline-none text-sm resize-y bg-white focus:ring-2 ring-slate-200" placeholder="Must be in original packaging, unworn, etc." />
                         </div>
                       </div>
 
                       {/* Warranty */}
-                      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                      <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
                         <h4 className="font-bold text-gray-700 mb-4 text-sm">Warranty</h4>
                         <div className="mb-4">
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Period</label>
-                          <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-white focus:ring-2 ring-[#E0F2F3] outline-none text-sm font-bold text-gray-700">
-                            <option value="Use Store Default">Use Faflora Store Default</option>
+                          <select value={formData.warrantyPeriod} onChange={e => updateField('warrantyPeriod', e.target.value)} className="w-full p-3.5 rounded-md border bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold text-gray-700">
+                            <option value="Use Store Default">Use EkivaMart Store Default</option>
                             <option value="none">None</option>
                             <option value="3 months">3 months</option>
                             <option value="6 months">6 months</option>
@@ -1852,12 +1816,12 @@ export default function ActionModal({
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Warranty Details</label>
-                          <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-2xl border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-[#E0F2F3]'}`} placeholder="Covers manufacturing defects only..." />
+                          <textarea disabled={formData.warrantyPeriod === 'none'} value={formData.warrantyPeriod === 'none' ? 'Not Applicable' : formData.warrantyDetails} onChange={e => updateField('warrantyDetails', e.target.value)} rows={2} className={`w-full p-3.5 rounded-md border outline-none text-sm resize-y ${formData.warrantyPeriod === 'none' ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'bg-white focus:ring-2 ring-slate-200'}`} placeholder="Covers manufacturing defects only..." />
                         </div>
                       </div>
 
                       {/* Dynamic Category Specifications + Custom Fields */}
-                      <div className="bg-gray-50 rounded-2xl p-5 border border-[#e4d3e0] border-t-4 border-t-[#9d4ae3]">
+                      <div className="bg-gray-50 rounded-md p-5 border border-[#e3ebdf] border-t-4 border-t-[#228b22]">
                         <h4 className="font-extrabold text-gray-800 mb-4 text-sm uppercase tracking-wide">
                           {selectedCategoryName || 'General'} Specifications
                         </h4>
@@ -1867,7 +1831,7 @@ export default function ActionModal({
                           {/* Unified weight & dimension inputs nested in specs based on category */}
                           {categoryIncludesWeightAndDimensions(selectedCategoryName) && (
                             <div className="col-span-1 md:col-span-2 border-t pt-5 mt-4 space-y-4">
-                              <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
+                              <h5 className="font-extrabold text-[#1c711c] text-xs uppercase tracking-wider">Weight & Physical Dimensions</h5>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <label className="text-xs font-bold text-gray-600 mb-1.5 block">Weight</label>
@@ -1878,14 +1842,14 @@ export default function ActionModal({
                                       value={formData.weight || ''}
                                       onChange={(e) => updateField('weight', Number(e.target.value))}
                                       onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                      className="flex-1 p-3.5 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                      className="flex-1 p-3.5 rounded-md border bg-white outline-none text-sm font-semibold"
                                       placeholder="Value"
                                     />
                                     {(formData.weight > 0) && (
                                       <select
                                         value={formData.weightUnit || 'kg'}
                                         onChange={(e) => updateField('weightUnit', e.target.value)}
-                                        className="p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700 w-24 animate-in fade-in zoom-in-95 duration-150"
+                                        className="p-3.5 rounded-md border bg-white outline-none text-sm font-bold text-gray-700 w-24 animate-in fade-in zoom-in-95 duration-150"
                                       >
                                         <option value="kg">kg</option>
                                         <option value="g">g</option>
@@ -1898,7 +1862,7 @@ export default function ActionModal({
                                   <select
                                     value={formData.dimensionsUnit || 'cm'}
                                     onChange={(e) => updateField('dimensionsUnit', e.target.value)}
-                                    className="w-full p-3.5 rounded-2xl border bg-white outline-none text-sm font-bold text-gray-700"
+                                    className="w-full p-3.5 rounded-md border bg-white outline-none text-sm font-bold text-gray-700"
                                   >
                                     <option value="cm">cm</option>
                                     <option value="inches">inches</option>
@@ -1914,7 +1878,7 @@ export default function ActionModal({
                                     value={formData.dimensions.length || ''}
                                     onChange={(e) => updateField('dimensions', { ...formData.dimensions, length: Number(e.target.value) })}
                                     onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    className="w-full p-3 rounded-md border bg-white outline-none text-sm font-semibold"
                                     placeholder="L"
                                   />
                                 </div>
@@ -1926,7 +1890,7 @@ export default function ActionModal({
                                     value={formData.dimensions.width || ''}
                                     onChange={(e) => updateField('dimensions', { ...formData.dimensions, width: Number(e.target.value) })}
                                     onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    className="w-full p-3 rounded-md border bg-white outline-none text-sm font-semibold"
                                     placeholder="W"
                                   />
                                 </div>
@@ -1938,7 +1902,7 @@ export default function ActionModal({
                                     value={formData.dimensions.height || ''}
                                     onChange={(e) => updateField('dimensions', { ...formData.dimensions, height: Number(e.target.value) })}
                                     onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }}
-                                    className="w-full p-3 rounded-2xl border bg-white outline-none text-sm font-semibold"
+                                    className="w-full p-3 rounded-md border bg-white outline-none text-sm font-semibold"
                                     placeholder="H"
                                   />
                                 </div>
@@ -1948,29 +1912,29 @@ export default function ActionModal({
                         </div>
 
                         {/* Custom Attributes Fields Grid — always at the bottom of specs */}
-                        <div className="mt-6 pt-5 border-t border-[#e4d3e0] space-y-3">
-                          <h5 className="font-extrabold text-[#8236be] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
+                        <div className="mt-6 pt-5 border-t border-[#e3ebdf] space-y-3">
+                          <h5 className="font-extrabold text-[#1c711c] text-xs uppercase tracking-wider mb-3">Custom Fields</h5>
                           {customFields.map((field, index) => (
                             <div key={index} className="flex flex-col sm:flex-row gap-3">
                               <input type="text" placeholder="Key (e.g. Processor)" value={field.key} onChange={e => {
                                 const newF = [...customFields]; newF[index].key = e.target.value; setCustomFields(newF);
-                              }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
+                              }} className="flex-1 p-3 rounded-md border bg-white text-sm outline-none font-medium" />
                               <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
                                 const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
-                              }} className="flex-1 p-3 rounded-xl border bg-white text-sm outline-none font-medium" />
-                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
+                              }} className="flex-1 p-3 rounded-md border bg-white text-sm outline-none font-medium" />
+                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-md transition">
                                 <Trash2 size={18} />
                               </button>
                             </div>
                           ))}
-                          <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#9d4ae3] flex items-center gap-1.5 hover:underline mt-2">
+                          <button type="button" onClick={() => setCustomFields([...customFields, { key: '', value: '' }])} className="text-sm font-extrabold text-[#228b22] flex items-center gap-1.5 hover:underline mt-2">
                             <Plus size={15} /> Add Custom Field
                           </button>
                         </div>
                       </div>
 
                       {/* SEO collapsed layout */}
-                      <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
+                      <div className="bg-gray-50 rounded-md border border-gray-100 overflow-hidden">
                         <button type="button" onClick={() => setSeoExpanded(!seoExpanded)} className="w-full p-5 flex justify-between items-center text-left hover:bg-gray-100/50 transition">
                           <h4 className="font-bold text-gray-700 text-sm">SEO (Search Engine Optimization)</h4>
                           <span className="text-gray-400 text-xs font-bold">{seoExpanded ? 'Collapse' : 'Expand'}</span>
@@ -1978,17 +1942,17 @@ export default function ActionModal({
                         {seoExpanded && (
                           <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
                             <div className="flex justify-end">
-                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-xl hover:bg-[#e1eff8] transition">
+                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-md hover:bg-[#e1eff8] transition">
                                 Auto-Generate from Product Data
                               </button>
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Title</label>
-                              <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
+                              <input type="text" value={formData.metadata.seoTitle || ''} onChange={e => updateMetadata('seoTitle', e.target.value)} className="w-full p-3.5 rounded-md border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-semibold" />
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Meta Description</label>
-                              <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-2xl border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
+                              <textarea value={formData.metadata.seoDescription || ''} onChange={e => updateMetadata('seoDescription', e.target.value)} rows={3} className="w-full p-3.5 rounded-md border bg-gray-50 focus:bg-white focus:ring-2 ring-gray-200 outline-none text-sm font-medium resize-y" />
                             </div>
                           </div>
                         )}
@@ -2002,7 +1966,7 @@ export default function ActionModal({
                     <div className="space-y-6 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white">
+                          <div className="p-2 bg-[#228b22] rounded-lg text-white">
                             <ImageIcon size={22} />
                           </div>
                           <div>
@@ -2016,14 +1980,14 @@ export default function ActionModal({
                             setReorderImages(stagedImages || []);
                             setIsReordering(true);
                           }}
-                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs flex items-center gap-2 transition"
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold text-xs flex items-center gap-2 transition"
                         >
                           <GripVertical size={16} /> Change Order
                         </button>
                       </div>
 
                       {isReordering ? (
-                        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                        <div className="bg-gray-50 p-6 rounded-md border border-gray-100">
                           <h4 className="font-bold text-gray-800 mb-4">Reorder Images</h4>
                           <p className="text-xs text-gray-500 mb-4">Drag images to reorder them. The first image will become the cover.</p>
                           <div className="space-y-3">
@@ -2058,33 +2022,33 @@ export default function ActionModal({
                                     e.preventDefault();
                                     setDraggedIndex(null);
                                   }}
-                                  className={`flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border cursor-grab active:cursor-grabbing select-none hover:border-[#9d4ae3]/30 hover:shadow-md transition-all ${
-                                    draggedIndex === idx ? 'opacity-40 border-[#9d4ae3] scale-[0.98]' : 'border-gray-100'
+                                  className={`flex items-center gap-4 bg-white p-3 rounded-md shadow-sm border cursor-grab active:cursor-grabbing select-none hover:border-[#228b22]/30 hover:shadow-sm transition-all ${
+                                    draggedIndex === idx ? 'opacity-40 border-[#228b22] scale-[0.98]' : 'border-gray-100'
                                   }`}
                                   style={{ touchAction: 'none' }}
                                 >
                                   <GripVertical className="text-gray-400 flex-shrink-0" size={20} />
-                                  <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 pointer-events-none">
+                                  <div className="w-16 h-16 rounded-md bg-gray-100 overflow-hidden flex-shrink-0 pointer-events-none">
                                     <img src={url} alt={alt || 'Product image'} className="w-full h-full object-cover" />
                                   </div>
                                   <div className="flex-1 pointer-events-none">
                                     <p className="font-bold text-sm">Image {idx + 1}</p>
                                     {alt && <p className="text-xs text-gray-500 mt-0.5">{alt}</p>}
-                                    {isPrimary && <span className="text-[10px] font-bold text-[#9d4ae3] bg-[#f0e1f7] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
+                                    {isPrimary && <span className="text-[10px] font-bold text-[#228b22] bg-[#e3ebdf] px-2 py-0.5 rounded-lg inline-block mt-1">Cover Image</span>}
                                   </div>
                                 </div>
                               );
                             })}
                           </div>
                           <div className="flex justify-end gap-3 mt-6">
-                            <button type="button" onClick={() => setIsReordering(false)} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-50">Cancel</button>
-                            <button type="button" onClick={handleSaveReorder} className="px-5 py-2.5 bg-[#9d4ae3] text-white rounded-xl font-bold text-sm hover:bg-[#8236be]">Save New Order</button>
+                            <button type="button" onClick={() => setIsReordering(false)} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-md font-bold text-sm hover:bg-gray-50">Cancel</button>
+                            <button type="button" onClick={handleSaveReorder} className="px-5 py-2.5 bg-[#228b22] text-white rounded-md font-bold text-sm hover:bg-[#1c711c]">Save New Order</button>
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
+                        <div className="bg-gray-50 p-6 rounded-md border border-gray-100 flex flex-col items-center">
                           {/* Main Image Window */}
-                          <div className="relative w-full max-w-lg aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group mb-6">
+                          <div className="relative w-full max-w-lg aspect-square bg-white rounded-md border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group mb-6">
                             {stagedImages && stagedImages.length > 0 ? (() => {
                               const safeIdx = Math.min(selectedImageIndex, stagedImages.length - 1);
                               const previewUrl = stagedImages[safeIdx]?.url;
@@ -2105,23 +2069,23 @@ export default function ActionModal({
 
                             {stagedImages && stagedImages.length > 1 && (
                               <>
-                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.max(0, prev - 1))} disabled={selectedImageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-r-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
+                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.max(0, prev - 1))} disabled={selectedImageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-md shadow-sm flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
                                   <ChevronLeft size={24} />
                                 </button>
-                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.min((stagedImages?.length || 1) - 1, prev + 1))} disabled={selectedImageIndex === (stagedImages?.length || 1) - 1} className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-md rounded-l-full shadow-md flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
+                                <button type="button" onClick={() => setSelectedImageIndex(prev => Math.min((stagedImages?.length || 1) - 1, prev + 1))} disabled={selectedImageIndex === (stagedImages?.length || 1) - 1} className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-md shadow-sm flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition opacity-80 hover:opacity-100 focus:opacity-100">
                                   <ChevronRight size={24} />
                                 </button>
                               </>
                             )}
 
                             {stagedImages && stagedImages.length > 0 && stagedImages[Math.min(selectedImageIndex, stagedImages.length - 1)]?.isPrimary && (
-                              <div className="absolute top-4 left-4 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
+                              <div className="absolute top-4 left-4 bg-[#228b22] text-white text-xs font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1.5">
                                 <CheckCircle2 size={14} /> Cover Image
                               </div>
                             )}
                           </div>
 
-                          <div className="text-xs font-semibold text-gray-500 mb-3 bg-purple-50 text-purple-700 px-3.5 py-1.5 rounded-full border border-purple-100 shadow-sm flex items-center gap-1.5">
+                          <div className="text-xs font-semibold text-gray-500 mb-3 bg-brand-50 text-brand-700 px-3.5 py-1.5 rounded-md border border-brand-100 shadow-sm flex items-center gap-1.5">
                             <span>{(stagedImages?.length || 0)} / 10 Images Uploaded</span>
                             <span>•</span>
                             <span className="font-extrabold">{10 - (stagedImages?.length || 0)} more can be added</span>
@@ -2136,7 +2100,7 @@ export default function ActionModal({
                                   key={idx}
                                   type="button"
                                   onClick={() => { setSelectedImageIndex(idx); setEditingAltIndex(null); }}
-                                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === idx ? 'border-[#9d4ae3] shadow-md scale-110' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
+                                  className={`w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${selectedImageIndex === idx ? 'border-[#228b22] shadow-sm scale-110' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
                                 >
                                   <img src={url} className="w-full h-full object-cover" alt="" />
                                 </button>
@@ -2149,7 +2113,7 @@ export default function ActionModal({
                                   setReorderImages(stagedImages);
                                   setIsUploadModalOpen(true);
                                 }}
-                                className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#9d4ae3] text-gray-400 hover:text-[#9d4ae3] flex items-center justify-center transition-all bg-white"
+                                className="w-16 h-16 rounded-md border-2 border-dashed border-gray-300 hover:border-[#228b22] text-gray-400 hover:text-[#228b22] flex items-center justify-center transition-all bg-white"
                               >
                                 <Plus size={24} />
                               </button>
@@ -2165,18 +2129,18 @@ export default function ActionModal({
 
                             return (
                               <div className="flex flex-wrap justify-center gap-3 w-full">
-                                <button type="button" onClick={() => replaceInputRef.current?.click()} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => replaceInputRef.current?.click()} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#228b22] rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <UploadCloud size={16} /> Change Image
                                 </button>
                                 {!isPrimary && (
-                                  <button type="button" onClick={handleSetCoverImage} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                  <button type="button" onClick={handleSetCoverImage} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#228b22] rounded-md text-sm font-bold flex items-center gap-2 transition">
                                     <Check size={16} /> Set as Cover
                                   </button>
                                 )}
-                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#9d4ae3] rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#228b22] rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
                                 </button>
-                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Trash2 size={16} /> Delete
                                 </button>
                               </div>
@@ -2185,12 +2149,12 @@ export default function ActionModal({
 
                           {/* Alt text edit popup inline */}
                           {editingAltIndex !== null && (
-                            <div className="mt-6 w-full max-w-md bg-white p-4 rounded-2xl shadow-sm border border-[#e4d3e0] animate-in fade-in zoom-in-95">
+                            <div className="mt-6 w-full max-w-md bg-white p-4 rounded-md shadow-sm border border-[#e3ebdf] animate-in fade-in zoom-in-95">
                               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text</label>
-                              <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-xl border focus:border-[#9d4ae3] outline-none text-sm mb-3" />
+                              <input type="text" value={altTextInput} onChange={(e) => setAltTextInput(e.target.value)} placeholder="Describe the image for SEO" className="w-full p-3 rounded-md border focus:border-[#228b22] outline-none text-sm mb-3" />
                               <div className="flex justify-end gap-2">
                                 <button type="button" onClick={() => setEditingAltIndex(null)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
-                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#9d4ae3] text-white rounded-lg hover:bg-[#8236be]">Save Alt Text</button>
+                                <button type="button" onClick={handleSaveAltText} className="px-4 py-2 text-xs font-bold bg-[#228b22] text-white rounded-lg hover:bg-[#1c711c]">Save Alt Text</button>
                               </div>
                             </div>
                           )}
@@ -2203,16 +2167,16 @@ export default function ActionModal({
 
                       {/* Delete Confirmation */}
                       {imageToDelete && (
-                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
-                            <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
+                          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-sm animate-in zoom-in-95">
+                            <div className="w-12 h-12 bg-red-100 text-red-500 rounded-md flex items-center justify-center mb-4 mx-auto">
                               <Trash2 size={24} />
                             </div>
                             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Delete Image?</h4>
                             <p className="text-center text-sm text-gray-500 mb-6">Are you sure you want to remove this product image? This action cannot be undone.</p>
                             <div className="flex gap-3">
-                              <button type="button" onClick={() => setImageToDelete(null)} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
-                              <button type="button" onClick={handleDeleteImage} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold transition">{isImageActionLoading ? 'Deleting...' : 'Delete'}</button>
+                              <button type="button" onClick={() => setImageToDelete(null)} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition">Cancel</button>
+                              <button type="button" onClick={handleDeleteImage} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-md font-bold transition">{isImageActionLoading ? 'Deleting...' : 'Delete'}</button>
                             </div>
                           </div>
                         </div>
@@ -2238,7 +2202,7 @@ export default function ActionModal({
 
                 <div className="flex flex-col items-end gap-1">
                   {(isSaving || isImageUploading || isImageActionLoading) && loadingMessage && (
-                    <span className="text-xs text-[#8236be] font-semibold animate-pulse text-right">{loadingMessage}</span>
+                    <span className="text-xs text-[#1c711c] font-semibold text-right">{loadingMessage}</span>
                   )}
                   <div className="flex gap-3 md:gap-4">
                     {currentStep < totalSteps ? (
@@ -2246,7 +2210,7 @@ export default function ActionModal({
                         type="button"
                         onClick={nextStep}
                         disabled={isSaving || isImageActionLoading || isImageUploading}
-                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-60 text-white rounded-2xl font-bold transition shadow-md shadow-fuchsia-100"
+                        className="flex items-center justify-center gap-2 px-8 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-60 text-white rounded-md font-bold transition shadow-sm "
                       >
                         Next <ChevronRight size={20} />
                       </button>
@@ -2255,7 +2219,7 @@ export default function ActionModal({
                         type="button"
                         onClick={handleSubmit}
                         disabled={isSaving || isImageActionLoading || isImageUploading}
-                        className="flex items-center justify-center gap-2 px-10 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:opacity-60 text-white rounded-2xl font-extrabold transition shadow-lg shadow-fuchsia-200"
+                        className="flex items-center justify-center gap-2 px-10 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-60 text-white rounded-md font-extrabold transition shadow-sm "
                       >
                         {isSaving || isImageActionLoading || isImageUploading ? (
                           <>
@@ -2292,28 +2256,28 @@ export default function ActionModal({
       />
 
       {imageToReplace && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95 flex flex-col">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
             <h4 className="font-bold text-lg text-gray-800 mb-4 text-center">Replace Image</h4>
-            
-            <div className="w-full aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-4 border border-gray-200">
+
+            <div className="w-full aspect-square bg-gray-100 rounded-md overflow-hidden mb-4 border border-gray-200">
               <img src={imageToReplace.preview} alt="New Preview" className="w-full h-full object-cover" />
             </div>
 
             <div className="mb-6">
               <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                value={imageToReplace.alt} 
-                onChange={(e) => setImageToReplace({ ...imageToReplace, alt: e.target.value })} 
-                placeholder="Describe the image for SEO" 
-                className="w-full p-3 rounded-xl border focus:border-[#9d4ae3] outline-none text-sm" 
+              <input
+                type="text"
+                value={imageToReplace.alt}
+                onChange={(e) => setImageToReplace({ ...imageToReplace, alt: e.target.value })}
+                placeholder="Describe the image for SEO"
+                className="w-full p-3 rounded-md border focus:border-[#228b22] outline-none text-sm"
               />
             </div>
 
             <div className="flex gap-3">
-              <button type="button" onClick={handleCancelReplace} disabled={isImageActionLoading} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
-              <button type="button" onClick={handleConfirmReplace} disabled={isImageActionLoading || !imageToReplace.alt.trim()} className="flex-1 py-3 bg-[#9d4ae3] hover:bg-[#8236be] disabled:opacity-50 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2">
+              <button type="button" onClick={handleCancelReplace} disabled={isImageActionLoading} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition">Cancel</button>
+              <button type="button" onClick={handleConfirmReplace} disabled={isImageActionLoading || !imageToReplace.alt.trim()} className="flex-1 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-50 text-white rounded-md font-bold transition flex items-center justify-center gap-2">
                 {isImageActionLoading ? 'Saving...' : 'Save Image & Alt Text'}
               </button>
             </div>
@@ -2322,17 +2286,17 @@ export default function ActionModal({
       )}
 
       {showCancelConfirm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95 flex flex-col">
-            <div className="w-12 h-12 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
+            <div className="w-12 h-12 bg-orange-100 text-orange-500 rounded-md flex items-center justify-center mb-4 mx-auto">
               <AlertCircle size={24} />
             </div>
             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Unsaved Changes</h4>
             <p className="text-center text-sm text-gray-500 mb-6">You have unsaved changes. Do you want to save them before leaving?</p>
             <div className="flex gap-3">
-              <button type="button" onClick={closeModalAndReset} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold transition">Discard</button>
-              <button type="button" onClick={() => setShowCancelConfirm(false)} className="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-2xl font-bold transition">Cancel</button>
-              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#9d4ae3] hover:bg-[#8236be] disabled:opacity-60 text-white rounded-2xl font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
+              <button type="button" onClick={closeModalAndReset} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition">Discard</button>
+              <button type="button" onClick={() => setShowCancelConfirm(false)} className="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md font-bold transition">Cancel</button>
+              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-60 text-white rounded-md font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>

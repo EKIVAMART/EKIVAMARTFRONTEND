@@ -11,13 +11,13 @@ export default function HeroSection() {
     <section className="relative min-h-[92vh] flex items-center overflow-hidden">
       {/* ── Multi-layer background ── */}
       <div className="absolute inset-0 bg-[#1a0016]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#3d0040]/95 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#203c29]/95 to-transparent" />
 
       {/* Chromatic glow orbs */}
-      <div className="absolute top-[-8%] left-[30%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px] rounded-full bg-[#8b0d7a] opacity-30 blur-[140px] pointer-events-none" />
-      <div className="absolute top-[8%] right-[-8%] w-[40vw] h-[40vw] max-w-[540px] max-h-[540px] rounded-full bg-[#8236be] opacity-20 blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-[10%] left-[-5%] w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] rounded-full bg-[#5c0060] opacity-25 blur-[90px] pointer-events-none" />
-      <div className="absolute top-[18%] left-[48%] w-[22vw] h-[22vw] max-w-[280px] max-h-[280px] rounded-full bg-[#ff69e0] opacity-[0.12] blur-[60px] pointer-events-none" />
+      <div className="absolute top-[-8%] left-[30%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px] rounded-full bg-[#203c29] opacity-30 blur-[140px] pointer-events-none" />
+      <div className="absolute top-[8%] right-[-8%] w-[40vw] h-[40vw] max-w-[540px] max-h-[540px] rounded-full bg-[#1c711c] opacity-20 blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[-5%] w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] rounded-full bg-[#203c29] opacity-25 blur-[90px] pointer-events-none" />
+      <div className="absolute top-[18%] left-[48%] w-[22vw] h-[22vw] max-w-[280px] max-h-[280px] rounded-full bg-[#bfd4bc] opacity-[0.12] blur-[60px] pointer-events-none" />
 
       {/* Geometric art */}
       <HeroGeometry />
@@ -41,14 +41,14 @@ export default function HeroSection() {
           <FadeInSection type="fadeDown" delay={0.1}>
             <div className="relative inline-flex items-center gap-2.5 mb-9">
               {/* Left tick */}
-              <span className="block w-8 h-[1.5px] bg-gradient-to-r from-transparent to-[#ff69e0]/70" />
+              <span className="block w-8 h-[1.5px] bg-gradient-to-r from-transparent to-[#bfd4bc]/70" />
 
-              <span className="text-[10px] font-black uppercase tracking-[4.5px] text-[#ff69e0]/80 px-6 py-2.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm">
-                Faflora · Get in Touch
+              <span className="text-[10px] font-black uppercase tracking-[4.5px] text-[#bfd4bc]/80 px-6 py-2.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm">
+                EkivaMart · Get in Touch
               </span>
 
               {/* Right tick */}
-              <span className="block w-8 h-[1.5px] bg-gradient-to-l from-transparent to-[#ff69e0]/70" />
+              <span className="block w-8 h-[1.5px] bg-gradient-to-l from-transparent to-[#bfd4bc]/70" />
             </div>
           </FadeInSection>
 
@@ -66,7 +66,7 @@ export default function HeroSection() {
               <span
                 className="block italic font-extrabold pb-6"
                 style={{
-                  background: 'linear-gradient(95deg, #f0c8ec 0%, #ff69e0 45%, #e879f9 100%)',
+                  background: 'linear-gradient(95deg, #e3ebdf 0%, #bfd4bc 45%, #bfd4bc 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -80,14 +80,14 @@ export default function HeroSection() {
           {/* Refined rule */}
           <FadeInSection type="fadeUp" delay={0.42}>
             <div className="mt-9 flex items-center gap-2">
-              <div className="h-[2px] w-16 rounded-full bg-gradient-to-r from-[#ff69e0] to-[#8236be]" />
+              <div className="h-[2px] w-16 rounded-full bg-gradient-to-r from-[#bfd4bc] to-[#1c711c]" />
               <div className="h-[2px] w-8 rounded-full bg-white/20" />
               <div className="h-[2px] w-3 rounded-full bg-white/10" />
             </div>
             <p className="mt-6 text-white/55 text-[15px] md:text-[17px] max-w-lg leading-[1.75] font-normal tracking-[0.01em]"
               style={{ fontFamily: "'Palatino Linotype', Georgia, serif" }}
             >
-              Got a question, a complaint, or a great idea? Faflora' support team is standing by — for buyers, vendors, partners, and everyone in between.
+              Got a question, a complaint, or a great idea? EkivaMart' support team is standing by — for buyers, vendors, partners, and everyone in between.
             </p>
           </FadeInSection>
 
@@ -146,7 +146,7 @@ export default function HeroSection() {
         >
           <path
             d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z"
-            fill="#fdf8ff"
+            fill="#f7f9f5"
           />
         </svg>
       </div>

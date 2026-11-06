@@ -1,8 +1,9 @@
 'use client';
+import RecordStatus from "@/components/admin/RecordStatus";
+
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import {
   ShoppingBag, Package, Users, Store, ChevronRight,
   RefreshCw, BarChart3, Clock, CheckCircle2, AlertCircle,
@@ -28,112 +29,19 @@ interface AdminDashboardViewProps {
 
 // ── Skeleton loader ──────────────────────────────────────────────────────────
 const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse bg-slate-100 rounded-xl ${className}`} />
+  <div className={`bg-slate-100 rounded-md ${className}`} />
 );
 
 // ── Overview KPI stat card ────────────────────────────────────────────────────
-const OverviewCard = ({
-  title,
-  metric,
-  icon: Icon,
-  color = 'fuchsia',
-  note,
-  loading
-}: {
-  title: string;
-  metric?: CardMetric | null;
-  icon: React.ElementType;
-  color?: 'fuchsia' | 'blue' | 'emerald' | 'amber';
-  note: string;
-  loading?: boolean;
-}) => {
-  const gradients: Record<string, string> = {
-    fuchsia: 'from-fuchsia-500 to-purple-600',
-    blue: 'from-blue-500 to-cyan-600',
-    emerald: 'from-emerald-500 to-teal-600',
-    amber: 'from-amber-500 to-orange-500',
-  };
-  const bgColors: Record<string, string> = {
-    fuchsia: 'from-fuchsia-50 to-purple-50',
-    blue: 'from-blue-50 to-cyan-50',
-    emerald: 'from-emerald-50 to-teal-50',
-    amber: 'from-amber-50 to-orange-50',
-  };
-  const iconColors: Record<string, string> = {
-    fuchsia: 'text-fuchsia-600',
-    blue: 'text-blue-600',
-    emerald: 'text-emerald-600',
-    amber: 'text-amber-600',
-  };
+const OverviewCard = ({ title, metric, loading, period }: { title: string; metric?: CardMetric | null; loading?: boolean; period: PeriodType }) => (
+  <div className="min-w-0 border-r last:border-r-0 border-slate-200 px-5 py-4">
+    <p className="text-xs font-medium text-slate-600">{title}</p>
+    {loading ? <Skeleton className="h-8 w-20 mt-2" /> : <p className="mt-1 text-2xl font-semibold text-slate-900">{(metric?.filtered ?? 0).toLocaleString()}</p>}
+    {!loading && period !== 'all_time' && <p className="mt-1 text-xs text-slate-500">{(metric?.totalAllTime ?? 0).toLocaleString()} all time</p>}
+  </div>
+);
 
-  const filteredVal = metric?.filtered ?? 0;
-  const totalAllTimeVal = metric?.totalAllTime ?? 0;
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-      <div className={`h-1 bg-gradient-to-r ${gradients[color]}`} />
-      <div className="p-6 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`p-3 rounded-xl bg-gradient-to-br ${bgColors[color]}`}>
-            <Icon className={`w-5 h-5 ${iconColors[color]}`} />
-          </div>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-            {title}
-          </span>
-        </div>
-        <div className="mb-2">
-          {loading ? (
-            <Skeleton className="h-9 w-28 mb-2" />
-          ) : (
-            <h3 className="text-3xl font-black text-slate-800 tracking-tight">
-              {filteredVal.toLocaleString()}
-            </h3>
-          )}
-          <p className="text-sm font-semibold text-slate-700 mt-1">{title}</p>
-        </div>
-        <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-0.5">
-          {loading ? (
-            <Skeleton className="h-4 w-36" />
-          ) : (
-            <>
-              <div className="text-xs font-semibold text-slate-500">
-                Total All Time: <span className="font-bold text-slate-800">{totalAllTimeVal.toLocaleString()}</span>
-              </div>
-              <div className="text-[10px] text-gray-400">{note}</div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ── Status badge component ────────────────────────────────────────────────────
-const OrderStatusBadge = ({ status }: { status: string }) => {
-  const normalized = status?.toLowerCase() ?? '';
-  const map: Record<string, { cls: string; label: string }> = {
-    pending_payment: { cls: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Pending Payment' },
-    payment_failed: { cls: 'bg-rose-50 text-rose-700 border-rose-200', label: 'Payment Failed' },
-    confirmed: { cls: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Confirmed' },
-    processing: { cls: 'bg-indigo-50 text-indigo-700 border-indigo-200', label: 'Processing' },
-    shipped: { cls: 'bg-purple-50 text-purple-700 border-purple-200', label: 'Shipped' },
-    delivered: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Delivered' },
-    completed: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Completed' },
-    cancelled: { cls: 'bg-rose-50 text-rose-700 border-rose-200', label: 'Cancelled' },
-    refunded: { cls: 'bg-gray-100 text-gray-700 border-gray-200', label: 'Refunded' },
-  };
-
-  const info = map[normalized] ?? {
-    cls: 'bg-gray-50 text-gray-700 border-gray-200',
-    label: status ? status.replace(/_/g, ' ') : 'Unknown'
-  };
-
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border capitalize ${info.cls}`}>
-      {info.label}
-    </span>
-  );
-};
+const OrderStatusBadge = ({ status }: { status: string }) => <RecordStatus value={status || 'unknown'} />;
 
 export default function AdminDashboardView({ onNavigate }: AdminDashboardViewProps) {
   const router = useRouter();
@@ -307,129 +215,60 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   return (
     <div className="space-y-8">
 
-      {/* ── Header Banner ──────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-fuchsia-600 to-purple-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-fuchsia-100"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight">
-              Welcome back, {authUser?.firstName || 'Admin'}!
-            </h2>
-            <p className="text-white/80 text-sm mt-1 font-medium">
-              Store Analytics ({periodLabel[period]})
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Period Filter Switcher */}
-            <div className="flex bg-white/10 p-1 rounded-xl items-center border border-white/10">
-              {(['day', 'week', 'month', 'all_time'] as PeriodType[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setPeriod(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                    period === t
-                      ? 'bg-white text-fuchsia-600 shadow'
-                      : 'text-white/85 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {t === 'all_time' ? 'All Time' : t === 'day' ? 'Today' : t === 'week' ? 'Last 7d' : 'Last 30d'}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={handleRefreshAll}
-              className="px-3.5 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition flex items-center gap-2"
-              title="Refresh Dashboard"
-            >
-              <RefreshCw size={14} /> Refresh
-            </button>
-
-            <button
-              onClick={() => onNavigate?.('orders')}
-              className="px-3.5 py-2 bg-white text-fuchsia-600 hover:bg-fuchsia-50 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow"
-            >
-              Manage Orders <ChevronRight size={14} />
-            </button>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
+        <div className="flex items-center gap-2"><span className="text-xs text-slate-600">Activity period</span>
+          <select aria-label="Activity period" value={period} onChange={e => setPeriod(e.target.value as PeriodType)} className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800">
+            <option value="day">Today</option><option value="week">Last 7 days</option><option value="month">Last 30 days</option><option value="all_time">All time</option>
+          </select>
         </div>
-      </motion.div>
+      </div>
 
       {/* ── 3.1 Overview Cards (GET /admin/dashboard?period=...) ───────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 rounded-lg border border-slate-200 bg-white">
         <OverviewCard
           title="Orders"
           metric={stats?.orders}
-          icon={ShoppingBag}
-          color="fuchsia"
+          period={period}
           loading={loadingStats}
-          note="All orders across all statuses"
         />
         <OverviewCard
           title="Products"
           metric={stats?.products}
-          icon={Package}
-          color="blue"
+          period={period}
           loading={loadingStats}
-          note="All product rows in database"
         />
         <OverviewCard
           title="Users"
           metric={stats?.users}
-          icon={Users}
-          color="emerald"
+          period={period}
           loading={loadingStats}
-          note="All user accounts (all roles)"
         />
         <OverviewCard
           title="Vendors"
           metric={stats?.vendors}
-          icon={Store}
-          color="amber"
+          period={period}
           loading={loadingStats}
-          note="All vendor profiles & applications"
         />
       </div>
 
       {/* ── 3.2 Order Analytics (GET /admin/dashboard/order-analytics) ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+      <div
+        className="bg-white p-5 border border-slate-200"
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-gray-100 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-3 border-b border-slate-200 gap-4">
           <div>
-            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
-              <BarChart3 size={20} className="text-fuchsia-500" />
-              Order Analytics
-            </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Order counts and order value breakdown for {periodLabel[period]}
-            </p>
+            <h2 className="font-semibold text-slate-900 text-base">Orders by status</h2>
+            <p className="text-xs text-slate-500 mt-0.5">{periodLabel[period]}</p>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Orders</span>
-              <span className="text-lg font-black text-slate-800">
-                {loadingAnalytics ? '—' : (orderAnalytics?.totalOrdersCount ?? 0).toLocaleString()}
-              </span>
-            </div>
-            <div className="bg-fuchsia-50 px-4 py-2 rounded-xl border border-fuchsia-100">
-              <span className="text-[10px] font-bold text-fuchsia-500 uppercase tracking-wider block">Order Value</span>
-              <span className="text-lg font-black text-fuchsia-700">
+          <div className="flex items-baseline gap-3 text-sm">
+              <span className="text-slate-600">Order value</span>
+              <span className="font-semibold text-slate-900">
                 {loadingAnalytics
                   ? '—'
                   : new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(orderAnalytics?.totalOrdersRevenue ?? 0)}
               </span>
-            </div>
           </div>
         </div>
 
@@ -438,9 +277,8 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
           </div>
         ) : breakdownList.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-slate-400">
-            <AlertCircle size={36} className="opacity-30 mb-2" />
-            <p className="text-sm font-medium">No order analytics data for this period</p>
+          <div className="py-8 text-sm text-slate-600">
+            No orders for this period.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -474,22 +312,19 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
             </table>
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         {/* ── Top Products Widget (GET /admin/dashboard/top-products) ──── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"
+        <div
+              className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden flex flex-col"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                <Package size={18} className="text-fuchsia-500" />
+                <Package size={18} className="text-brand-500" />
                 Top Products
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">Top 5 by units sold ({periodLabel[period]})</p>
@@ -501,7 +336,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
               <select
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="text-xs font-semibold bg-slate-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
+                className="text-xs font-semibold bg-slate-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
               >
                 <option value="">All Categories</option>
                 {categories.map((c: any) => (
@@ -547,8 +382,8 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                               className="w-9 h-9 rounded-lg object-cover border border-gray-100 flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-lg bg-fuchsia-50 flex items-center justify-center flex-shrink-0">
-                              <Package size={16} className="text-fuchsia-400" />
+                            <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
+                              <Package size={16} className="text-brand-400" />
                             </div>
                           )}
                           <div className="min-w-0">
@@ -573,26 +408,23 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
               </table>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* ── Recent Orders Widget (Replacing Recent Activity) ─────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"
+        <div
+              className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden flex flex-col"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <div>
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                <ShoppingBag size={18} className="text-fuchsia-500" />
+                <ShoppingBag size={18} className="text-brand-500" />
                 Recent Orders
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">Last 5 orders (newest first)</p>
             </div>
             <button
               onClick={() => onNavigate?.('orders')}
-              className="text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 flex items-center gap-1"
+              className="text-xs font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1"
             >
               View All <ChevronRight size={14} />
             </button>
@@ -630,7 +462,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                     className="px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-fuchsia-50 flex items-center justify-center flex-shrink-0 text-fuchsia-600 font-bold text-xs">
+                      <div className="w-9 h-9 rounded-md bg-brand-50 flex items-center justify-center flex-shrink-0 text-brand-600 font-bold text-xs">
                         <ShoppingBag size={16} />
                       </div>
                       <div className="min-w-0">
@@ -655,41 +487,9 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
               })}
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
-      {/* ── Quick Actions ──────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-wrap items-center justify-between gap-4"
-      >
-        <div className="flex items-center gap-2">
-          <Zap size={18} className="text-amber-500" />
-          <span className="text-sm font-bold text-slate-700">Quick Shortcuts</span>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => onNavigate?.('products')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
-          >
-            <Package size={14} /> Products
-          </button>
-          <button
-            onClick={() => onNavigate?.('orders')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
-          >
-            <ShoppingBag size={14} /> Orders
-          </button>
-          <button
-            onClick={() => onNavigate?.('vendors')}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition flex items-center gap-2"
-          >
-            <Store size={14} /> Vendors
-          </button>
-        </div>
-      </motion.div>
 
     </div>
   );

@@ -11,7 +11,7 @@ export default function Step3ContactDetails({ onNext, onPrev }: Props) {
   return (
     <FormWrapper onNext={onNext} onPrev={onPrev}>
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-lg text-white">
+        <div className="p-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] rounded-lg text-white">
           <UserCircle2 size={20} />
         </div>
         <div>

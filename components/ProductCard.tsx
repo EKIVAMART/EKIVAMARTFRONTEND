@@ -40,7 +40,7 @@ export default function ProductCard({
   href = '#',
   location = 'Lagos',
 }: ProductCardProps) {
-  const sellerName = storeName || author || 'Faflora Store';
+  const sellerName = storeName || author || 'EkivaMart Store';
   const locationStr = typeof location === 'object' && location !== null
     ? (location.state || location.town || location.lga || 'Lagos')
     : (typeof location === 'string' && location.includes(',') ? location.split(',').pop()?.trim() || location : (location || 'Lagos'));
@@ -90,7 +90,7 @@ export default function ProductCard({
         )}
 
         <h3 className="pc-title" title={title}>
-          <Link href={href} className="hover:text-[#9d4ae3] transition-colors">{title}</Link>
+          <Link href={href} className="hover:text-[#228b22] transition-colors">{title}</Link>
         </h3>
 
         <div className="pc-rating-row">
@@ -131,7 +131,7 @@ export default function ProductCard({
             </div>
             <span className="pc-rating-num">({rating})</span>
           </div>
-          
+
           <div className="pc-location">
             <MapPin size={12} className="pc-location-icon" />
             <span>{locationStr}</span>
@@ -140,7 +140,7 @@ export default function ProductCard({
 
         <div className="pc-author-section">
           <span className="pc-seller-badge">Sold by</span>
-          <span className="pc-author font-bold text-[#9d4ae3]">{sellerName}</span>
+          <span className="pc-author font-bold text-[#228b22]">{sellerName}</span>
         </div>
 
         <div className="pc-price-row">
@@ -156,8 +156,8 @@ export default function ProductCard({
               </span>
             )}
           </div>
-          
-          <button 
+
+          <button
             className="pc-add-cart-btn"
             disabled={isActiveInCart || isSavedInCart}
             onClick={(e) => {
@@ -175,7 +175,7 @@ export default function ProductCard({
         </div>
       </div>
 
-      <button 
+      <button
         className={`pc-wishlist-btn ${isWishlisted ? 'active' : ''}`}
         onClick={(e) => {
           e.preventDefault();
@@ -219,7 +219,7 @@ export default function ProductCard({
         }
 
         .pc-image-wrap {
-          background: linear-gradient(135deg, #f8fafb 0%, #f3ecfc 100%);
+          background: linear-gradient(135deg, #f8fafb 0%, #eff4e9 100%);
           height: 240px;
           display: flex;
           align-items: center;
@@ -255,7 +255,7 @@ export default function ProductCard({
           position: absolute;
           top: 12px;
           right: 12px;
-          background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
+          background: linear-gradient(135deg, #228b22 0%, #1c711c 100%);
           color: white;
           border-radius: 12px;
           padding: 8px 12px;
@@ -289,8 +289,8 @@ export default function ProductCard({
           height: 36px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.95);
-          border: 1.5px solid #9d4ae3;
-          color: #9d4ae3;
+          border: 1.5px solid #228b22;
+          color: #228b22;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -301,7 +301,7 @@ export default function ProductCard({
         }
 
         .pc-wishlist-btn:hover {
-          background: #9d4ae3;
+          background: #228b22;
           color: white;
           transform: scale(1.1);
         }
@@ -314,8 +314,8 @@ export default function ProductCard({
           display: flex;
           align-items: center;
           gap: 4px;
-          background: #f3ecfc;
-          color: #9d4ae3;
+          background: #eff4e9;
+          color: #228b22;
           border: none;
           padding: 6px 14px;
           border-radius: 8px;
@@ -323,11 +323,11 @@ export default function ProductCard({
           font-size: 14px;
           cursor: pointer;
           transition: all 0.3s ease;
-          border: 1px solid #f3ecfc;
+          border: 1px solid #eff4e9;
         }
 
         .pc-add-cart-btn:hover {
-          background: #9d4ae3;
+          background: #228b22;
           color: white;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(157, 74, 227, 0.2);
@@ -352,7 +352,7 @@ export default function ProductCard({
           bottom: 0;
           left: 0;
           right: 0;
-          background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
+          background: linear-gradient(135deg, #228b22 0%, #1c711c 100%);
           color: white;
           padding: 12px;
           display: flex;
@@ -383,7 +383,7 @@ export default function ProductCard({
 
         .pc-category {
           font-size: 11px;
-          color: #9d4ae3;
+          color: #228b22;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.6px;
@@ -404,7 +404,7 @@ export default function ProductCard({
         }
 
         .pc-card:hover .pc-title {
-          color: #9d4ae3;
+          color: #228b22;
         }
 
         /* Rating */
@@ -446,7 +446,7 @@ export default function ProductCard({
         }
 
         .pc-location-icon {
-          color: #9d4ae3;
+          color: #228b22;
           flex-shrink: 0;
         }
 
@@ -488,13 +488,13 @@ export default function ProductCard({
         }
 
         .pc-author {
-          color: #9d4ae3;
+          color: #228b22;
           font-weight: 700;
           transition: all 0.3s ease;
         }
 
         .pc-card:hover .pc-author {
-          color: #8236be;
+          color: #1c711c;
         }
 
         /* Price Row */
@@ -517,7 +517,7 @@ export default function ProductCard({
         .pc-current {
           font-size: 18px;
           font-weight: 800;
-          color: #9d4ae3;
+          color: #228b22;
           letter-spacing: -0.3px;
         }
 

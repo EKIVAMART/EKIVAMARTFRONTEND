@@ -1,6 +1,9 @@
 'use client';
+import RecordStatus from "@/components/admin/RecordStatus";
+
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   FileText,
   Plus,
@@ -32,7 +35,6 @@ import {
   PublishResult,
 } from '@/types/blog';
 import { blogApi, decodeHtmlEntities } from '@/lib/api-blog';
-import BlogModal from '@/components/blog/BlogModal';
 import BlogPublishModal from '@/components/blog/BlogPublishModal';
 import BlogViewModal from '@/components/blog/BlogViewModal';
 import { toast } from 'react-hot-toast';
@@ -43,6 +45,9 @@ interface BlogManagementViewProps {
 }
 
 export default function BlogManagementView({ globalSearchQuery }: BlogManagementViewProps = {}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const editorBase = pathname.startsWith('/super-admin') ? '/super-admin/blog/editor' : '/admin/blog/editor';
   const [posts, setPosts] = useState<AdminBlogPostSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -70,9 +75,6 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
   });
 
   // Modal controls
-  const [isEditorModalOpen, setIsEditorModalOpen] = useState(false);
-  const [postToEdit, setPostToEdit] = useState<AdminBlogPost | null>(null);
-
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [postToPublish, setPostToPublish] = useState<AdminBlogPost | null>(null);
 
@@ -187,23 +189,8 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
   }, [fetchPosts, fetchStats]);
 
   // Handlers for modal actions
-  const handleOpenCreate = () => {
-    setPostToEdit(null);
-    setIsEditorModalOpen(true);
-  };
-
-  const handleOpenEdit = async (summary: AdminBlogPostSummary) => {
-    try {
-      toast.loading('Loading article data...', { id: 'loadPost' });
-      const fullPost = await blogApi.getAdminPostById(summary.id);
-      toast.dismiss('loadPost');
-      setPostToEdit(fullPost);
-      setIsEditorModalOpen(true);
-    } catch (err: any) {
-      toast.dismiss('loadPost');
-      toast.error(err?.message || 'Failed to load article details for editing');
-    }
-  };
+  const handleOpenCreate = () => router.push(editorBase);
+  const handleOpenEdit = (summary: AdminBlogPostSummary) => router.push(`${editorBase}?id=${encodeURIComponent(summary.id)}`);
 
   const handleOpenView = async (summary: AdminBlogPostSummary) => {
     try {
@@ -260,99 +247,22 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
     }
   };
 
-  const getStatusBadge = (status: BlogPostStatus) => {
-    switch (status) {
-      case 'published':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Published</span>
-          </span>
-        );
-      case 'draft':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            <span>Draft</span>
-          </span>
-        );
-      case 'unpublished':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-            <span>Unpublished</span>
-          </span>
-        );
-    }
-  };
+  const getStatusBadge = (status: BlogPostStatus) => <RecordStatus value={status} />;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Top Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-neutral-100 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold shadow-xs">
-            <BookOpen size={24} />
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-neutral-900">
-              Blog &amp; Article Management
-            </h1>
-            <p className="text-xs text-neutral-500 font-medium">
-              Create care guides, gifting tips &amp; announcements for Faflora buyers and sellers
-            </p>
-          </div>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Blog</h1>
+          <p className="mt-1 text-xs text-slate-600">{stats.published} published · {stats.draft} drafts</p>
         </div>
-
-        <button
-          onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-extrabold transition shadow-md cursor-pointer"
-        >
-          <Plus size={16} />
-          <span>Create New Article</span>
+        <button type="button" onClick={handleOpenCreate}
+          className="inline-flex min-h-10 items-center gap-2 bg-[#176a35] px-4 text-sm font-medium text-white hover:bg-[#12582b]">
+          <Plus size={16} aria-hidden="true" /> New article
         </button>
       </div>
 
-      {/* Stats Counter Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-3xl border border-neutral-100 shadow-xs">
-          <p className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Total Posts
-          </p>
-          <p className="text-2xl font-black text-neutral-900 mt-1">
-            {stats.total}
-          </p>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-neutral-100 shadow-xs">
-          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
-            Live Published
-          </p>
-          <p className="text-2xl font-black text-emerald-600 mt-1">
-            {stats.published}
-          </p>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-neutral-100 shadow-xs">
-          <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">
-            Saved Drafts
-          </p>
-          <p className="text-2xl font-black text-amber-600 mt-1">
-            {stats.draft}
-          </p>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-neutral-100 shadow-xs">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Unpublished
-          </p>
-          <p className="text-2xl font-black text-slate-600 mt-1">
-            {stats.unpublished}
-          </p>
-        </div>
-      </div>
-
-      {/* Filters & Search Strip */}
+            {/* Filters & Search Strip */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Search */}
         <div ref={searchWrapperRef} className="relative flex-1 max-w-md">
@@ -368,7 +278,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full bg-white border border-neutral-200 rounded-2xl pl-11 pr-9 py-2.5 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600 shadow-xs"
+            className="w-full bg-white border border-neutral-200 rounded-md pl-11 pr-9 py-2.5 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600 shadow-xs"
           />
           {searchQuery && (
             <button
@@ -385,7 +295,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
           {/* Live Search Titles Dropdown */}
           {isSearchFocused && searchQuery.trim().length > 0 && (
-            <div className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-white border border-neutral-200 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-white border border-neutral-200 rounded-md shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
               <div className="px-4 py-2.5 bg-neutral-50/90 border-b border-neutral-100 flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase text-neutral-400 tracking-wider">
                   Matching Blog Titles ({posts.filter(p => decodeHtmlEntities(p.title).toLowerCase().includes(searchQuery.toLowerCase().trim())).length})
@@ -410,7 +320,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                             setIsSearchFocused(false);
                             handleOpenEdit(post);
                           }}
-                          className="w-full px-4 py-3 text-left hover:bg-purple-50/60 transition flex items-center gap-3 group cursor-pointer"
+                          className="w-full px-4 py-3 text-left hover:bg-brand-50/60 transition flex items-center gap-3 group cursor-pointer"
                         >
                           {post.featuredImage?.url ? (
                             <img
@@ -424,14 +334,14 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-slate-800 group-hover:text-purple-700 truncate">
+                            <p className="text-xs font-bold text-slate-800 group-hover:text-brand-700 truncate">
                               {highlightMatch(decodeHtmlEntities(post.title), searchQuery)}
                             </p>
                             <p className="text-[10px] text-neutral-400 font-medium truncate">
-                              By {post.author?.name || 'Faflora'} · /blog/{post.slug}
+                              By {post.author?.name || 'EkivaMart'} · /blog/{post.slug}
                             </p>
                           </div>
-                          <ArrowRight size={13} className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                          <ArrowRight size={13} className="text-brand-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </button>
                       </li>
                     ))}
@@ -443,14 +353,14 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
         {/* Status Filter Tabs & Refresh */}
         <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide">
-          <div className="flex items-center gap-1.5 bg-white border border-neutral-200 rounded-2xl p-1 shadow-xs">
+          <div className="flex items-center gap-1.5 bg-white border border-neutral-200 rounded-md p-1 shadow-xs">
             <Filter className="w-3.5 h-3.5 text-neutral-400 ml-2" />
             <button
               onClick={() => {
                 setActiveStatusTab('all');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
                 activeStatusTab === 'all'
                   ? 'bg-brand-600 text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -463,7 +373,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('published');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
                 activeStatusTab === 'published'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -476,7 +386,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('draft');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
                 activeStatusTab === 'draft'
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -489,7 +399,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('unpublished');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
                 activeStatusTab === 'unpublished'
                   ? 'bg-slate-700 text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -504,7 +414,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
               fetchPosts();
               fetchStats();
             }}
-            className="p-2.5 rounded-2xl bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition cursor-pointer shadow-xs"
+            className="p-2.5 rounded-md bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition cursor-pointer shadow-xs"
             title="Refresh list"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -513,7 +423,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
       </div>
 
       {/* Main Table Card */}
-      <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-md border border-neutral-100 shadow-sm overflow-hidden">
         {loading && posts.length === 0 ? (
           <div className="py-24 text-center text-xs font-semibold text-neutral-400">
             Loading articles...
@@ -554,10 +464,10 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                           <img
                             src={post.featuredImage.url}
                             alt=""
-                            className="w-12 h-12 rounded-xl object-cover shrink-0 border border-neutral-200"
+                            className="w-12 h-12 rounded-md object-cover shrink-0 border border-neutral-200"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-400 shrink-0">
+                          <div className="w-12 h-12 rounded-md bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-400 shrink-0">
                             <BookOpen size={20} />
                           </div>
                         )}
@@ -616,7 +526,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         {/* View Preview */}
                         <button
                           onClick={() => handleOpenView(post)}
-                          className="p-2 rounded-xl text-neutral-600 hover:bg-neutral-100 hover:text-slate-900 transition"
+                          className="p-2 rounded-md text-neutral-600 hover:bg-neutral-100 hover:text-slate-900 transition"
                           title="Preview article"
                         >
                           <Eye size={16} />
@@ -625,7 +535,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         {/* Edit */}
                         <button
                           onClick={() => handleOpenEdit(post)}
-                          className="p-2 rounded-xl text-brand-600 hover:bg-brand-50 transition"
+                          className="p-2 rounded-md text-brand-600 hover:bg-brand-50 transition"
                           title="Edit article"
                         >
                           <Edit size={16} />
@@ -635,7 +545,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         {post.status === 'published' ? (
                           <button
                             onClick={() => setPostToUnpublish(post)}
-                            className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                            className="p-2 rounded-md text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                             title="Unpublish article"
                           >
                             <EyeOff size={16} />
@@ -643,7 +553,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         ) : (
                           <button
                             onClick={() => handleOpenPublish(post)}
-                            className="p-2 rounded-xl text-emerald-600 hover:bg-emerald-50 transition cursor-pointer"
+                            className="p-2 rounded-md text-emerald-600 hover:bg-emerald-50 transition cursor-pointer"
                             title="Publish article"
                           >
                             <Send size={16} />
@@ -653,7 +563,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         {/* Delete */}
                         <button
                           onClick={() => setPostToDelete(post)}
-                          className="p-2 rounded-xl text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                          className="p-2 rounded-md text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                           title="Delete article"
                         >
                           <Trash2 size={16} />
@@ -667,7 +577,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
           </div>
         ) : (
           <div className="py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16 rounded-md bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-3">
               <BookOpen size={28} />
             </div>
             <h3 className="text-sm font-extrabold text-neutral-800">
@@ -693,7 +603,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-100 transition cursor-pointer"
+                className="flex items-center gap-1 px-3 py-2 rounded-md border border-neutral-200 text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-100 transition cursor-pointer"
               >
                 <ChevronLeft size={16} />
                 <span>Previous</span>
@@ -722,7 +632,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                   )
                 }
                 disabled={currentPage >= pagination.totalPages}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-100 transition cursor-pointer"
+                className="flex items-center gap-1 px-3 py-2 rounded-md border border-neutral-200 text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-100 transition cursor-pointer"
               >
                 <span>Next</span>
                 <ChevronRight size={16} />
@@ -734,9 +644,9 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Delete Confirmation Modal */}
       {postToDelete && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
+            <div className="w-14 h-14 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
               <Trash2 size={28} />
             </div>
             <div>
@@ -752,7 +662,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 type="button"
                 onClick={() => setPostToDelete(null)}
                 disabled={isDeleting}
-                className="px-5 py-3 border border-neutral-200 rounded-2xl text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
+                className="px-5 py-3 border border-neutral-200 rounded-md text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -760,7 +670,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 type="button"
                 onClick={confirmDelete}
                 disabled={isDeleting}
-                className="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl text-xs font-extrabold transition shadow-md flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-md text-xs font-extrabold transition shadow-sm flex items-center gap-2 cursor-pointer"
               >
                 {isDeleting ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -776,9 +686,9 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Unpublish Confirmation Modal */}
       {postToUnpublish && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
+            <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200">
               <EyeOff size={28} />
             </div>
             <div>
@@ -794,7 +704,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 type="button"
                 onClick={() => setPostToUnpublish(null)}
                 disabled={isUnpublishing}
-                className="px-5 py-3 border border-neutral-200 rounded-2xl text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
+                className="px-5 py-3 border border-neutral-200 rounded-md text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -802,7 +712,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 type="button"
                 onClick={confirmUnpublish}
                 disabled={isUnpublishing}
-                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl text-xs font-extrabold transition shadow-md flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-md text-xs font-extrabold transition shadow-sm flex items-center gap-2 cursor-pointer"
               >
                 {isUnpublishing ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -817,16 +727,6 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
       )}
 
       {/* Modals */}
-      <BlogModal
-        isOpen={isEditorModalOpen}
-        onClose={() => setIsEditorModalOpen(false)}
-        onSuccess={() => {
-          fetchPosts();
-          fetchStats();
-        }}
-        postToEdit={postToEdit}
-      />
-
       <BlogPublishModal
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}

@@ -1,9 +1,8 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen, Truck } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen, Truck, CircleHelp } from 'lucide-react';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAppSelector, useAppDispatch } from '@/lib/hooks';
-import type { RootState } from '@/lib/store';
+import { useAppDispatch } from '@/lib/hooks';
 import { useState } from 'react';
 import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
@@ -19,7 +18,6 @@ interface AdminSidebarProps {
 }
 
 export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose }: AdminSidebarProps) {
-  const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -50,35 +48,32 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[45] md:hidden backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/50 z-[45] md:hidden transition-opacity"
           onClick={onClose}
         />
       )}
 
       <aside className={`
-        fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r flex flex-col z-50
+        fixed md:sticky top-0 left-0 h-screen w-52 bg-white border-r border-slate-200 flex flex-col z-50
         transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-6 border-b flex justify-between items-center">
+        <div className="px-4 py-3 border-b flex justify-between items-center">
           <div className="flex items-center gap-1.5 shrink-0">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/fa_logo_brand.png" alt="Faflora" width={110} height={30} className="object-contain" />
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
-                Admin
-              </span>
+              <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={108} height={30} className="object-contain" />
             </Link>
           </div>
           {isOpen && onClose && (
-            <button onClick={onClose} className="md:hidden p-2 -mr-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-xl transition">
+            <button onClick={onClose} className="md:hidden p-2 -mr-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-md transition">
               <X size={20} />
             </button>
           )}
         </div>
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
           <SidebarLink
             icon={<LayoutDashboard size={20} />}
-            label="Dashboard"
+            label="Overview"
             active={activeTab === 'dashboard'}
             onClick={() => { setActiveTab('dashboard'); onClose?.(); }}
           />
@@ -96,7 +91,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
           />
           <SidebarLink
             icon={<Users size={20} />}
-            label="Vendor Settings"
+            label="Vendors"
             active={activeTab === 'vendors'}
             onClick={() => { setActiveTab('vendors'); onClose?.(); }}
           />
@@ -114,7 +109,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
           />
           <SidebarLink
             icon={<BookOpen size={20} />}
-            label="Blog & Articles"
+            label="Blog"
             active={activeTab === 'blog'}
             onClick={() => { setActiveTab('blog'); onClose?.(); }}
           />
@@ -132,62 +127,47 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
           />
           <SidebarLink
             icon={<Settings size={20} />}
-            label="Tax Rules"
+            label="Tax rules"
             active={activeTab === 'taxes'}
             onClick={() => { setActiveTab('taxes'); onClose?.(); }}
           />
         </nav>
 
-        <div className="p-6 border-t mt-auto">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600">
-                {authUser?.firstName?.[0] || 'A'}
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-800 truncate max-w-[100px]">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{authUser?.role === 'admin' ? 'Admin' : 'Super Admin'}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowLogoutConfirm(true)}
-              className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
-              title="Logout"
-            >
-              <LogOut size={20} />
-            </button>
-          </div>
+        <div className="px-3 py-3 border-t mt-auto">
+          <a href="https://wa.me/2349069910407" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-3 min-h-10 text-sm text-slate-600 hover:bg-slate-100 rounded-md">
+            <CircleHelp size={18} aria-hidden="true" /> Help
+          </a>
+          <button type="button" onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-3 px-3 min-h-10 text-sm text-slate-600 hover:bg-slate-100 rounded-md">
+            <LogOut size={18} aria-hidden="true" /> Sign out
+          </button>
         </div>
       </aside>
 
       <AnimatePresence>
         {showLogoutConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center border"
+              className="bg-white w-full max-w-sm rounded-lg shadow-sm p-6 border border-slate-200"
             >
-              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
-                <LogOut size={24} />
-              </div>
-              <h3 className="font-extrabold text-slate-800 text-lg">Confirm Logout</h3>
-              <p className="text-xs text-gray-500 font-semibold leading-relaxed mt-2">
-                Are you sure you want to sign out of your account? Any unsaved changes may be lost.
+              <h3 className="font-semibold text-slate-900 text-lg">Sign out?</h3>
+              <p className="text-sm text-slate-600 leading-relaxed mt-2">
+                Unsaved changes may be lost.
               </p>
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 py-3 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                  className="flex-1 min-h-10 border border-slate-300 rounded-md text-sm font-medium hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md"
+                  className="flex-1 min-h-10 bg-[#176a35] hover:bg-[#12582b] text-white rounded-md text-sm font-medium"
                 >
-                  Logout
+                  Sign out
                 </button>
               </div>
             </motion.div>

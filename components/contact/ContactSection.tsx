@@ -27,22 +27,22 @@ const ContactInfoCard = ({
   delay: number;
 }) => (
   <FadeInSection type="fadeUp" delay={delay}>
-    <div className="group flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-[#e8b8e4] hover:border-[#8236be]/60 hover:shadow-lg transition-all duration-300">
-      <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-md shadow-[#9d4ae330]">
+    <div className="group flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-[#bfd4bc] hover:border-[#1c711c]/60 hover:shadow-lg transition-all duration-300">
+      <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-md shadow-[#48824d30]">
         <Icon size={18} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-[3px] text-[#8236be] mb-1">{label}</p>
+        <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c] mb-1">{label}</p>
         <div className="flex items-center flex-wrap gap-1">
           {href ? (
             <a
               href={href}
-              className="text-[14px] sm:text-[15px] font-semibold text-[#1a0018] hover:text-[#9d4ae3] transition-colors break-all"
+              className="text-[14px] sm:text-[15px] font-semibold text-[#203c29] hover:text-[#228b22] transition-colors break-all"
             >
               {value}
             </a>
           ) : (
-            <span className="text-[14px] sm:text-[15px] font-semibold text-[#1a0018]">{value}</span>
+            <span className="text-[14px] sm:text-[15px] font-semibold text-[#203c29]">{value}</span>
           )}
           {copyable && <CopyButton value={value} />}
         </div>
@@ -52,70 +52,6 @@ const ContactInfoCard = ({
 );
 
 /* ─── OFFICE CARD ─── */
-const OfficeCard = ({ delay }: { delay: number }) => (
-  <FadeInSection type="zoom" delay={delay}>
-    <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4] bg-white hover:shadow-xl transition-all duration-300 group">
-      {/* Map-style header */}
-      <div className="relative h-40 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#9d4ae3] overflow-hidden flex items-center justify-center">
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: 'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 32px)' }}
-        />
-        {Array.from({ length: 14 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white/20"
-            style={{
-              width: `${4 + (i % 4) * 3}px`,
-              height: `${4 + (i % 4) * 3}px`,
-              top: `${15 + (i * 17) % 70}%`,
-              left: `${10 + (i * 13) % 80}%`,
-              opacity: 0.2 + (i % 5) * 0.1,
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-28 h-28 rounded-full border border-white/10" />
-          <div className="absolute w-16 h-16 rounded-full border border-white/15" />
-        </div>
-        <div className="relative z-10 text-center px-4">
-          <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center mx-auto mb-2">
-            <MapPin size={18} className="text-white" />
-          </div>
-          <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Delta State, Nigeria</p>
-        </div>
-        <div className="absolute top-3 right-3">
-          <span className="text-[9px] font-black uppercase tracking-[2px] bg-white/20 border border-white/30 text-white/90 px-2.5 py-1 rounded-full">
-            Headquarters
-          </span>
-        </div>
-      </div>
-      {/* Address content */}
-      <div className="px-6 py-5">
-        <h4
-          className="text-lg font-extrabold text-[#1a0018] mb-1.5 group-hover:text-[#9d4ae3] transition-colors"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
-          Asaba HQ
-        </h4>
-        <p className="text-gray-500 text-sm leading-relaxed mb-4">
-          7 Tony Aki Str. Off Okpanam Rd,<br />
-          Behind Corner Int'l School,<br />
-          Asaba 320242, Delta State
-        </p>
-        <a
-          href="https://maps.google.com/?q=7+Tony+Aki+Str+Off+Okpanam+Rd+Asaba+Delta+State+Nigeria"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8236be] hover:text-[#9d4ae3] transition-colors"
-        >
-          Get Directions <ExternalLink size={11} />
-        </a>
-      </div>
-    </div>
-  </FadeInSection>
-);
-
 /* ─── MAIN CONTACT FORM ─── */
 const ContactForm = () => {
   const [form, setForm] = useState({
@@ -153,19 +89,19 @@ const ContactForm = () => {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center gap-6">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center shadow-2xl shadow-[#9d4ae330]">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center shadow-2xl shadow-[#48824d30]">
           <CheckCircle2 size={38} className="text-white" />
         </div>
         <div>
           <h3
-            className="text-3xl font-extrabold text-[#1a0018] mb-2"
+            className="text-3xl font-extrabold text-[#203c29] mb-2"
             style={{ fontFamily: "'Georgia', serif" }}
           >
             Message received!
           </h3>
           <p className="text-gray-500 max-w-xs leading-relaxed">
             We'll get back to you at{' '}
-            <span className="text-[#9d4ae3] font-semibold">{form.email}</span> within 24 hours.
+            <span className="text-[#228b22] font-semibold">{form.email}</span> within 24 hours.
           </p>
         </div>
         <button
@@ -174,7 +110,7 @@ const ContactForm = () => {
             setForm({ name: '', email: '', phone: '', orderId: '', subject: '', message: '' });
             setCategory('');
           }}
-          className="inline-flex items-center gap-2 text-sm font-bold text-[#9d4ae3] hover:text-[#8236be] transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-bold text-[#228b22] hover:text-[#1c711c] transition-colors"
         >
           <ArrowRight size={14} className="rotate-180" /> Send another message
         </button>
@@ -200,11 +136,11 @@ const ContactForm = () => {
       )}
       <FloatInput label="Subject" value={form.subject} onChange={set('subject')} />
       <FloatTextarea label="Your Message *" value={form.message} onChange={set('message')} error={errors.message} />
-      <div className="flex items-start gap-3 text-xs text-gray-500 border border-dashed border-[#e8b8e4] rounded-xl px-4 py-3 bg-[#fdf8ff]">
-        <Mail size={13} className="text-[#8236be] mt-0.5 flex-shrink-0" />
+      <div className="flex items-start gap-3 text-xs text-gray-500 border border-dashed border-[#bfd4bc] rounded-xl px-4 py-3 bg-[#f7f9f5]">
+        <Mail size={13} className="text-[#1c711c] mt-0.5 flex-shrink-0" />
         <span>
           Need to share a screenshot or invoice? Email us directly at{' '}
-          <a href="mailto:support@faflora.com" className="text-[#9d4ae3] font-semibold hover:underline">
+          <a href="mailto:support@faflora.com" className="text-[#228b22] font-semibold hover:underline">
             support@faflora.com
           </a>{' '}
           with your attachments.
@@ -213,7 +149,7 @@ const ContactForm = () => {
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-extrabold text-base px-8 py-4 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-[#9d4ae330] disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-extrabold text-base px-8 py-4 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-[#48824d30] disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {status === 'submitting' ? (
           <>
@@ -229,7 +165,7 @@ const ContactForm = () => {
       </button>
       <p className="text-center text-[11px] text-gray-400 leading-relaxed">
         By submitting this form you agree to our{' '}
-        <Link href="/privacy-policy" className="text-[#9d4ae3] hover:underline">Privacy Policy</Link>.
+        <Link href="/privacy-policy" className="text-[#228b22] hover:underline">Privacy Policy</Link>.
         {' '}We never share your data with third parties.
       </p>
     </form>
@@ -243,11 +179,11 @@ export default function ContactSection() {
       <div className="flex flex-col h-full">
         <FadeInSection type="slideLeft" delay={0.1}>
           <div className="mb-8">
-            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-1">
+            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-1">
               Send a message
             </span>
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a0018] leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#203c29] leading-tight"
               style={{ fontFamily: "'Georgia', serif" }}
             >
               Tell us what's on<br />your mind.
@@ -259,7 +195,7 @@ export default function ContactSection() {
         </FadeInSection>
 
         <FadeInSection type="fadeUp" delay={0.18} className="flex-1 flex flex-col">
-          <div className="bg-white border border-[#e8b8e4] rounded-3xl p-6 sm:p-8 md:p-9 shadow-sm hover:shadow-lg transition-shadow duration-500 flex-1">
+          <div className="bg-white border border-[#bfd4bc] rounded-3xl p-6 sm:p-8 md:p-9 shadow-sm hover:shadow-lg transition-shadow duration-500 flex-1">
             <ContactForm />
           </div>
         </FadeInSection>
@@ -269,30 +205,20 @@ export default function ContactSection() {
       <div className="flex flex-col h-full space-y-6 sm:space-y-8">
         <FadeInSection type="slideRight" delay={0.12}>
           <div>
-            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-4">
+            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-4">
               Direct Channels
             </span>
             <div className="space-y-3">
-              <ContactInfoCard icon={Mail} label="General Email" value="faflora@outlook.com" href="mailto:faflora@outlook.com" copyable delay={0.14} />
-              <ContactInfoCard icon={Mail} label="Support Email" value="support@faflora.com" href="mailto:support@faflora.com" copyable delay={0.18} />
-              <ContactInfoCard icon={Phone} label="Phone / WhatsApp" value="+234 900 699 1040" href="tel:+2349006991040" copyable delay={0.22} />
-              <ContactInfoCard icon={Clock} label="Business Hours" value="24 hours, 7 days a week" delay={0.26} />
+              <ContactInfoCard icon={Phone} label="Phone / WhatsApp" value="+234 906 991 0407" href="https://wa.me/2349069910407" copyable delay={0.22} />
             </div>
           </div>
         </FadeInSection>
 
-        <FadeInSection type="slideRight" delay={0.30}>
-          <div>
-            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-4">
-              Our Office
-            </span>
-            <OfficeCard delay={0.0} />
-          </div>
-        </FadeInSection>
+
 
         <FadeInSection type="fadeUp" delay={0.38}>
-          <div className="rounded-2xl border border-[#e8b8e4] bg-white p-5 sm:p-6 flex-1">
-            <p className="text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-4">
+          <div className="rounded-2xl border border-[#bfd4bc] bg-white p-5 sm:p-6 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-4">
               Find Us Online
             </p>
             <div className="flex flex-col gap-2">
@@ -302,16 +228,16 @@ export default function ContactSection() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#e8b8e4] hover:border-[#8236be]/60 hover:bg-[#fdf3fc] transition-all group"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#bfd4bc] hover:border-[#1c711c]/60 hover:bg-[#f7f9f5] transition-all group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white flex-shrink-0">
                     <Icon size={14} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#1a0018] group-hover:text-[#9d4ae3] transition-colors text-[13px] leading-tight">{label}</p>
+                    <p className="font-bold text-[#203c29] group-hover:text-[#228b22] transition-colors text-[13px] leading-tight">{label}</p>
                     <p className="text-gray-400 text-[11px]">{handle}</p>
                   </div>
-                  <ExternalLink size={13} className="text-[#8236be]/40 group-hover:text-[#8236be] transition-colors flex-shrink-0" />
+                  <ExternalLink size={13} className="text-[#1c711c]/40 group-hover:text-[#1c711c] transition-colors flex-shrink-0" />
                 </a>
               ))}
             </div>

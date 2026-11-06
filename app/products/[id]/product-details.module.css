@@ -18,13 +18,13 @@
 }
 
 .pd-breadcrumb a {
-  color: #9d4ae3;
+  color: #228b22;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .pd-breadcrumb a:hover {
-  color: #8236be;
+  color: #1c711c;
   text-decoration: underline;
 }
 
@@ -142,13 +142,13 @@
 }
 
 .pd-thumbnail:hover {
-  border-color: #9d4ae3;
+  border-color: #228b22;
   box-shadow: 0 2px 8px rgba(157, 74, 227, 0.1);
 }
 
 .pd-thumbnail.active {
-  border-color: #9d4ae3;
-  background: #f3ecfc;
+  border-color: #228b22;
+  background: #eff4e9;
   box-shadow: 0 2px 12px rgba(157, 74, 227, 0.2);
 }
 

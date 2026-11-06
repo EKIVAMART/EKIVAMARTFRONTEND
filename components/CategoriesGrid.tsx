@@ -5,47 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import { categoryApi } from '@/lib/api';
-import fashion from '../assets/fashion.png';
-import electronics from '../assets/Electronics.png';
-import bags from '../assets/beg.png';
-import footwear from '../assets/footwear.png';
-import groceries from '../assets/Groceries.png';
-import beauty from '../assets/Beauty.png';
-import wellness from '../assets/wellness.png';
-import jewellery from '../assets/jewellery.png';
+import { departments, departmentSlug } from '@/lib/data/departments';
 
-const categoryAssetMap: Record<string, any> = {
-  'fashion': fashion,
-  'electronics': electronics,
-  'bags & luggage': bags,
-  'bags': bags,
-  'footwear': footwear,
-  'groceries': groceries,
-  'beauty': beauty,
-  'wellness': wellness,
-  'jewellery': jewellery,
-};
-
-const bgClasses = [
-  'bg-white',
-  'bg-orange-50',
-  'bg-pink-50',
-  'bg-blue-50',
-  'bg-purple-50',
-  'bg-teal-50',
-  'bg-violet-50',
-  'bg-[#f3ecfc]',
-  'bg-green-50',
-  'bg-yellow-50',
-  'bg-red-50',
-  'bg-cyan-50',
-  'bg-indigo-50',
-];
+const departmentNames = new Map(departments.map(name => [departmentSlug(name), name]));
 
 const CategoriesGrid = () => {
   const params = useParams();
   const searchParams = useSearchParams();
-  const activeSlug = String(params?.slug || '').toLowerCase();
+  const activeSlug = departmentSlug(String(params?.slug || ''));
   const searchQuery = searchParams.get('search');
 
   const [categories, setCategories] = useState<any[]>([]);
@@ -84,29 +51,15 @@ const CategoriesGrid = () => {
             const isDraft = item.status === 'draft';
             return isPublished && !isDraft && !item.parentId;
           })
-          .map((item: any, index: number) => {
+          .map((item: any) => {
             const name = item.name || item.title || item.displayName || 'Unknown';
-            const slug = (item.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-            
-            // Get icon from API or asset map
-            let icon = item.imageUrl || item.image || null;
-            
-            // If no icon from API, check the asset map
-            if (!icon) {
-              const mappedIcon = categoryAssetMap[name.toLowerCase()] || categoryAssetMap[slug];
-              if (mappedIcon) {
-                icon = mappedIcon;
-              }
-            }
-            
-            // If still no icon, leave as null - CategoryCard will show initial
-
+            const slug = departmentSlug(name);
+            const displayName = departmentNames.get(slug);
             return {
-              id: String(item.id || item._id || item.categoryId || item.uuid),
-              name,
+              id: item.id || item._id || slug,
+              name: displayName || name,
               slug,
-              icon, // Can be null/undefined - handled in the render
-              bg: bgClasses[index % bgClasses.length],
+              image: displayName ? `/images/departments/${slug}.webp` : item.imageUrl || item.image,
             };
           });
 
@@ -126,11 +79,11 @@ const CategoriesGrid = () => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
-      <h3 className="font-bold text-gray-800 text-[15px] px-1.5 mb-4 uppercase tracking-wider">
+    <nav aria-label="Product categories" className="flex flex-col w-full">
+      <h3 className="font-semibold text-stone-900 text-base mb-3">
         Categories
       </h3>
-      <div className="flex flex-col gap-2 overflow-y-auto max-h-96 pr-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50">
+      <div className="flex flex-col gap-0.5 overflow-y-auto max-h-72 pr-1">
         {loading ? (
           Array.from({ length: 6 }).map((_, idx) => (
             <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-gray-50 border border-gray-100 animate-pulse h-12 w-full">
@@ -140,78 +93,23 @@ const CategoriesGrid = () => {
           ))
         ) : categories.length > 0 ? (
           categories.map((category) => {
-            // Check if the icon is a valid image object (Next.js Image import)
-            const isStaticImage = typeof category.icon !== 'string' && 
-                                  category.icon !== null && 
-                                  category.icon !== undefined && 
-                                  category.icon.src;
-            
-            // Check if the icon is a valid string URL
-            const isValidStringUrl = typeof category.icon === 'string' && 
-                                     category.icon.length > 0 && 
-                                     !category.icon.startsWith('data:');
-            
-            // Check if the icon is a data URI (emoji fallback)
-            const isDataUri = typeof category.icon === 'string' && 
-                              category.icon.startsWith('data:');
-            
-            // Determine if we should show the initial
-            const showInitial = !isStaticImage && !isValidStringUrl && !isDataUri;
-            
-            // Get first letter for fallback
-            const firstLetter = category.name?.charAt(0).toUpperCase() || '?';
-            
-            const isSelected = category.slug === activeSlug || category.name.toLowerCase() === activeSlug;
-            
+            const isSelected = category.slug === activeSlug;
             return (
               <Link
                 key={category.id}
                 ref={isSelected ? activeRef : undefined}
                 href={`/categories/${category.slug}${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`}
-                className={`flex items-center gap-3 p-2 rounded-xl transition-all duration-300 border text-gray-800 ${
-                  isSelected 
-                    ? 'border-[#9d4ae3] bg-gradient-to-r from-[#f3ecfc] to-[#f5eeff] shadow-sm font-bold scale-[1.02]' 
-                    : 'bg-white border-gray-100 hover:border-[#f3ecfc] hover:bg-[#f3ecfc]/25 hover:shadow-sm'
-                }`}
+                aria-current={isSelected ? 'page' : undefined}
+                className={`flex items-center gap-3 rounded px-2 py-1.5 text-sm leading-snug text-stone-800 focus-visible:outline-offset-[-2px] ${isSelected ? 'bg-stone-100 font-semibold' : 'font-medium hover:bg-stone-50'}`}
               >
-                <div
-                  className={`
-                    w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-                    ${category.bg}
-                    transition-all duration-300
-                  `}
-                >
-                  {showInitial ? (
-                    // Show stylized initial as fallback
-                    <span className="text-base font-extrabold text-brand-600 select-none">
-                      {firstLetter}
-                    </span>
-                  ) : isStaticImage ? (
-                    <Image
-                      src={category.icon}
-                      alt={category.name}
-                      width={22}
-                      height={22}
-                      className="transition-transform duration-300 object-contain"
-                    />
-                  ) : (isDataUri || isValidStringUrl) ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={category.icon}
-                      alt={category.name}
-                      className="w-7 h-7 transition-transform duration-300 object-contain rounded-md"
-                    />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-stone-100">
+                  {category.image ? (
+                    <Image unoptimized src={category.image} alt="" width={44} height={44} className="h-full w-full object-contain" />
                   ) : (
-                    // Final fallback - show initial
-                    <span className="text-base font-extrabold text-brand-600 select-none">
-                      {firstLetter}
-                    </span>
+                    <span aria-hidden="true">{category.name.charAt(0)}</span>
                   )}
                 </div>
-
-                <p className={`text-xs font-semibold transition-colors ${isSelected ? 'text-[#9d4ae3]' : 'text-gray-700 hover:text-[#9d4ae3]'}`}>
-                  {category.name}
-                </p>
+                {category.name}
               </Link>
             );
           })
@@ -219,7 +117,7 @@ const CategoriesGrid = () => {
           <div className="text-center py-4 text-xs text-gray-400">No categories found</div>
         )}
       </div>
-    </div>
+    </nav>
   );
 };
 

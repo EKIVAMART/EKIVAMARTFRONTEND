@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  ShoppingBag, Calendar, ArrowRight, Star, MessageSquare, Edit3, 
+import {
+  ShoppingBag, Calendar, ArrowRight, Star, MessageSquare, Edit3,
   Trash2, RefreshCw, AlertCircle, CheckCircle2, Truck, Check, HelpCircle,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
@@ -236,14 +236,14 @@ export default function CustomerOrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 py-10">
       <div className="max-w-6xl mx-auto px-4">
-        
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black text-slate-850 tracking-tight">Order Management</h1>
             <p className="text-gray-500 font-semibold mt-1">Track orders, request refunds, manage transactions and write verified reviews.</p>
           </div>
-          <button 
+          <button
             onClick={() => { activeTab === 'history' ? void fetchOrders() : void fetchEligibleProducts(); }}
             className="flex items-center gap-2 self-start sm:self-center px-4 py-2 border rounded-xl bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition"
           >
@@ -256,20 +256,20 @@ export default function CustomerOrdersPage() {
           <button
             onClick={() => setActiveTab('history')}
             className={`pb-3 text-sm font-bold border-b-2 transition-all relative ${
-              activeTab === 'history' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              activeTab === 'history' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
             Order History ({orders.length})
-            {activeTab === 'history' && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#9d4ae3] rounded-full" />}
+            {activeTab === 'history' && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#228b22] rounded-full" />}
           </button>
           <button
             onClick={() => setActiveTab('eligible')}
             className={`pb-3 text-sm font-bold border-b-2 transition-all relative ${
-              activeTab === 'eligible' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              activeTab === 'eligible' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
             Review Purchases
-            {activeTab === 'eligible' && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#9d4ae3] rounded-full" />}
+            {activeTab === 'eligible' && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#228b22] rounded-full" />}
           </button>
         </div>
 
@@ -298,11 +298,11 @@ export default function CustomerOrdersPage() {
             ) : orders.length === 0 ? (
               <div className="bg-white rounded-3xl p-16 text-center border shadow-sm flex flex-col items-center">
                 <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
-                  <ShoppingBag size={28} className="text-[#9d4ae3]" />
+                  <ShoppingBag size={28} className="text-[#228b22]" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">No orders yet</h3>
                 <p className="text-gray-500 max-w-sm mt-1.5 font-medium">You haven&apos;t placed any orders with us yet. Check out our catalogue!</p>
-                <Link href="/" className="mt-6 px-6 py-2.5 bg-[#9d4ae3] text-white rounded-xl text-sm font-bold hover:bg-[#8236be] transition">
+                <Link href="/" className="mt-6 px-6 py-2.5 bg-[#228b22] text-white rounded-xl text-sm font-bold hover:bg-[#1c711c] transition">
                   Shop Now
                 </Link>
               </div>
@@ -317,8 +317,8 @@ export default function CustomerOrdersPage() {
                   });
 
                   return (
-                    <div 
-                      key={orderId || i} 
+                    <div
+                      key={orderId || i}
                       className="bg-white border hover:border-purple-200 hover:shadow-md transition rounded-2xl overflow-hidden shadow-sm flex flex-col"
                     >
                       {/* Order Summary Header */}
@@ -337,7 +337,7 @@ export default function CustomerOrdersPage() {
                           </div>
                           <div className="space-y-1">
                             <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Amount</p>
-                            <p className="text-sm font-black text-[#9d4ae3]">{order.totalAmount?.formatted || `₦${order.totalAmount?.amount?.toLocaleString() || order.total?.toLocaleString()}`}</p>
+                            <p className="text-sm font-black text-[#228b22]">{order.totalAmount?.formatted || `₦${order.totalAmount?.amount?.toLocaleString() || order.total?.toLocaleString()}`}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ export default function CustomerOrdersPage() {
                         <div>
                           {['confirmed', 'processing', 'shipped'].includes(order.status) && order.expectedDelivery ? (
                             <div className="flex items-center gap-2 text-xs font-semibold text-purple-900">
-                              <div className="w-6 h-6 rounded-lg bg-purple-100 text-[#9d4ae3] flex items-center justify-center shrink-0">
+                              <div className="w-6 h-6 rounded-lg bg-purple-100 text-[#228b22] flex items-center justify-center shrink-0">
                                 <Truck size={13} />
                               </div>
                               <span>
@@ -406,9 +406,9 @@ export default function CustomerOrdersPage() {
                           ) : null}
                         </div>
 
-                        <Link 
+                        <Link
                           href={`/orders/${order.orderId || order.id || order.orderNumber}`}
-                          className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-90 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition ml-auto"
+                          className="px-4 py-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:opacity-90 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition ml-auto"
                         >
                           Manage Order <ArrowRight size={13} />
                         </Link>
@@ -477,7 +477,7 @@ export default function CustomerOrdersPage() {
                               disabled={ordersLoading}
                               className={`w-8 h-8 rounded-lg font-bold text-xs transition ${
                                 page === p
-                                  ? 'bg-[#9d4ae3] text-white shadow-xs'
+                                  ? 'bg-[#228b22] text-white shadow-xs'
                                   : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
                               }`}
                             >
@@ -557,7 +557,7 @@ export default function CustomerOrdersPage() {
                     </div>
                     <button
                       onClick={() => handleOpenReviewModal(item)}
-                      className="self-start sm:self-center px-4 py-2 border border-purple-200 text-[#9d4ae3] bg-purple-50/40 hover:bg-purple-50 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap"
+                      className="self-start sm:self-center px-4 py-2 border border-purple-200 text-[#228b22] bg-purple-50/40 hover:bg-purple-50 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap"
                     >
                       <MessageSquare size={14} /> Write Review
                     </button>
@@ -574,14 +574,14 @@ export default function CustomerOrdersPage() {
       {selectedProductForReview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col animate-[scaleIn_0.2s_ease-out]">
-            
+
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-6 py-4 text-white flex justify-between items-center">
+            <div className="bg-gradient-to-r from-[#228b22] to-[#1c711c] px-6 py-4 text-white flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-lg">Write a Review</h3>
                 <p className="text-xs text-fuchsia-100">Verified Purchase Review</p>
               </div>
-              <button 
+              <button
                 onClick={handleCloseReviewModal}
                 className="text-white/80 hover:text-white text-sm font-semibold hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition"
               >
@@ -659,7 +659,7 @@ export default function CustomerOrdersPage() {
                 <button
                   type="submit"
                   disabled={submittingReview}
-                  className="px-5 py-2 bg-[#9d4ae3] hover:bg-[#8236be] text-white rounded-xl text-sm font-bold transition shadow-md shadow-fuchsia-100 disabled:opacity-60 flex items-center gap-1.5"
+                  className="px-5 py-2 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-xl text-sm font-bold transition shadow-md shadow-fuchsia-100 disabled:opacity-60 flex items-center gap-1.5"
                 >
                   {submittingReview ? (
                     <>
