@@ -41,18 +41,18 @@ interface Product {
 // Beautiful Empty State Component
 const EmptyState = ({ category }: { category: string }) => (
   <div className="flex flex-col items-center justify-center py-12 px-6 bg-white rounded-3xl border border-purple-100 shadow-sm text-center max-w-md mx-auto my-6 animate-[fadeIn_0.4s_ease-out]">
-    <div className="w-16 h-16 rounded-2xl bg-[#f3ecfc] text-[#9d4ae3] flex items-center justify-center mb-5 shadow-inner">
+    <div className="w-16 h-16 rounded-2xl bg-[#eff4e9] text-[#228b22] flex items-center justify-center mb-5 shadow-inner">
       <Package size={32} strokeWidth={1.5} />
     </div>
     <h3 className="text-lg font-extrabold text-gray-900 mb-2">No Products Available</h3>
     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
       We couldn&apos;t find any published items in the{' '}
-      <span className="font-semibold text-[#9d4ae3]">{category}</span> collection
+      <span className="font-semibold text-[#228b22]">{category}</span> collection
       at the moment.
     </p>
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#f3ecfc] to-[#f5eeff] rounded-full border border-purple-100">
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#eff4e9] to-[#f5eeff] rounded-full border border-purple-100">
       <Sparkles size={14} className="text-purple-500 animate-pulse" />
-      <span className="text-[10px] font-bold text-[#8236be] uppercase tracking-wider">New Stock Arriving Daily!</span>
+      <span className="text-[10px] font-bold text-[#1c711c] uppercase tracking-wider">New Stock Arriving Daily!</span>
     </div>
   </div>
 );
@@ -416,9 +416,9 @@ export default function ProductsSection() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className="h-px w-6 bg-gradient-to-r from-[#9d4ae3] to-transparent rounded-full" />
-              <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#9d4ae3]/80">Shop</span>
-              <span className="h-px w-6 bg-gradient-to-l from-[#9d4ae3] to-transparent rounded-full" />
+              <span className="h-px w-6 bg-gradient-to-r from-[#228b22] to-transparent rounded-full" />
+              <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#228b22]/80">Shop</span>
+              <span className="h-px w-6 bg-gradient-to-l from-[#228b22] to-transparent rounded-full" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Popular Products</h2>
             <p className="mt-1 text-sm text-gray-500">Discover top picks across every category</p>
@@ -428,7 +428,7 @@ export default function ProductsSection() {
           <div className="flex items-center gap-2">
             {/* Left arrow — mobile only */}
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors sm:hidden ${canScrollLeft ? 'text-[#9d4ae3]' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors sm:hidden ${canScrollLeft ? 'text-[#228b22]' : 'text-gray-300'}`}
               onClick={() => scroll('left')}
               aria-label="Scroll left"
             >
@@ -445,8 +445,8 @@ export default function ProductsSection() {
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase transition-all duration-200 border ${activeCategory === category
-                      ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white border-transparent shadow-md shadow-purple-500/30'
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-[#9d4ae3] hover:text-[#9d4ae3]'
+                      ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white border-transparent shadow-md shadow-purple-500/30'
+                      : 'bg-white text-gray-500 border-gray-200 hover:border-[#228b22] hover:text-[#228b22]'
                     }`}
                 >
                   {category}
@@ -456,7 +456,7 @@ export default function ProductsSection() {
 
             {/* Right arrow — mobile only */}
             <button
-              className={`flex-shrink-0 p-1.5 rounded-full transition-colors sm:hidden ${canScrollRight ? 'text-[#9d4ae3]' : 'text-gray-300'}`}
+              className={`flex-shrink-0 p-1.5 rounded-full transition-colors sm:hidden ${canScrollRight ? 'text-[#228b22]' : 'text-gray-300'}`}
               onClick={() => scroll('right')}
               aria-label="Scroll right"
             >
@@ -484,7 +484,7 @@ export default function ProductsSection() {
                 ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                 : '/placeholder.png';
               const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category);
-              const storeName = product.storeName || product.store?.name || product.storeId || 'Faflora Store';
+              const storeName = product.storeName || product.store?.name || product.storeId || 'EkivaMart Store';
               const storeSlug = product.storeSlug || product.store?.slug || '';
 
               return (

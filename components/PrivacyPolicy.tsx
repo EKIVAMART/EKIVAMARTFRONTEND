@@ -45,20 +45,20 @@ const SectionAnchor = ({ id }: { id: string }) => (
 const Divider = () => (
   <div className="flex items-center gap-3 my-12">
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-    <div className="w-1.5 h-1.5 rounded-full bg-[#8236be]" />
+    <div className="w-1.5 h-1.5 rounded-full bg-[#1c711c]" />
     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
   </div>
 );
 
 const Pill = ({ text }: { text: string }) => (
-  <span className="inline-flex items-center gap-1.5 bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] text-xs font-semibold px-3 py-1.5 rounded-full">
+  <span className="inline-flex items-center gap-1.5 bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] text-xs font-semibold px-3 py-1.5 rounded-full">
     {text}
   </span>
 );
 
 const CheckRow = ({ text }: { text: string }) => (
   <li className="flex items-start gap-3 text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
-    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center shadow-sm">
+    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center shadow-sm">
       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
         <path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -68,7 +68,7 @@ const CheckRow = ({ text }: { text: string }) => (
 );
 
 const NoteBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative mt-8 pl-5 border-l-4 border-[#8236be] bg-gradient-to-r from-[#fdf3fc] to-transparent py-4 pr-4 rounded-r-xl">
+  <div className="relative mt-8 pl-5 border-l-4 border-[#1c711c] bg-gradient-to-r from-[#fdf3fc] to-transparent py-4 pr-4 rounded-r-xl">
     <p className="text-sm md:text-base text-[#6b0f6b] leading-relaxed font-medium">{children}</p>
   </div>
 );
@@ -88,11 +88,11 @@ const SectionHeading = ({
     <div className="relative pb-4 mb-8">
       <RunningNumber n={number} />
       <div className="relative flex items-center gap-3 pt-8">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330]">
           <Icon size={18} />
         </div>
         <div>
-          <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be] mb-0.5">
+          <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-0.5">
             Section {number}
           </span>
           <h2
@@ -103,7 +103,7 @@ const SectionHeading = ({
           </h2>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#8236be]/40 via-[#e8b8e4]/60 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#1c711c]/40 via-[#e8b8e4]/60 to-transparent" />
     </div>
   </FadeInSection>
 );
@@ -111,19 +111,19 @@ const SectionHeading = ({
 const TableOfContents = () => (
   <aside className="hidden xl:block sticky top-28 self-start w-56 flex-shrink-0">
     <div className="rounded-2xl border border-[#e8b8e4] bg-white/70 backdrop-blur-sm p-5 shadow-sm">
-      <p className="text-[10px] font-black uppercase tracking-[3px] text-[#8236be] mb-4">Contents</p>
+      <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c] mb-4">Contents</p>
       <nav>
         <ul className="space-y-1">
           {sections.map((s) => (
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#9d4ae3] transition-colors py-1 group"
+                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#228b22] transition-colors py-1 group"
               >
-                <span className="text-[#8236be]/50 group-hover:text-[#8236be] transition-colors">
+                <span className="text-[#1c711c]/50 group-hover:text-[#1c711c] transition-colors">
                   <s.icon size={14} />
                 </span>
-                <span className="text-[10px] font-bold text-[#8236be]/40 group-hover:text-[#8236be]/70">
+                <span className="text-[10px] font-bold text-[#1c711c]/40 group-hover:text-[#1c711c]/70">
                   {s.number}
                 </span>
                 <span className="leading-tight">{s.title}</span>
@@ -173,7 +173,7 @@ const sections: SectionData[] = [
       <>
         <p className="text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
           Whenever you use our Service, in the case of an error in the app, we collect data and information (through third-party products) on your device called{' '}
-          <span className="font-semibold text-[#9d4ae3]">Log Data</span>. This Log Data may include:
+          <span className="font-semibold text-[#228b22]">Log Data</span>. This Log Data may include:
         </p>
         <ul className="mt-5 space-y-2">
           {[
@@ -207,13 +207,13 @@ const sections: SectionData[] = [
         </p>
         <div className="mt-6 grid md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-[#e8b8e4] bg-[#fdf3fc]/50 p-5">
-            <p className="text-xs font-black uppercase tracking-[3px] text-[#8236be] mb-2">Your Control</p>
+            <p className="text-xs font-black uppercase tracking-[3px] text-[#1c711c] mb-2">Your Control</p>
             <p className="text-sm md:text-base text-gray-600 leading-relaxed">
               You have the option to accept or refuse cookies and know when a cookie is sent to your device via your browser settings.
             </p>
           </div>
           <div className="rounded-2xl border border-[#e8b8e4] bg-[#fdf3fc]/50 p-5">
-            <p className="text-xs font-black uppercase tracking-[3px] text-[#8236be] mb-2">Important Note</p>
+            <p className="text-xs font-black uppercase tracking-[3px] text-[#1c711c] mb-2">Important Note</p>
             <p className="text-sm md:text-base text-gray-600 leading-relaxed">
               If you choose to refuse cookies, you may not be able to use some portions of our Service fully.
             </p>
@@ -261,11 +261,11 @@ const sections: SectionData[] = [
             We value your trust in providing us your Personal Information. We strive to use commercially acceptable means of protecting it using industry-standard encryption and security practices.
           </p>
           <div className="mt-6 flex items-start gap-4 p-4 rounded-xl bg-white border border-[#e8b8e4] shadow-sm">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow">
               <Lock size={18} />
             </div>
             <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-              <span className="font-bold text-[#9d4ae3]">Transparency notice:</span> No method of transmission over the internet or electronic storage is 100% secure and reliable. While we endeavour to protect your data, we cannot guarantee its absolute security.
+              <span className="font-bold text-[#228b22]">Transparency notice:</span> No method of transmission over the internet or electronic storage is 100% secure and reliable. While we endeavour to protect your data, we cannot guarantee its absolute security.
             </p>
           </div>
         </div>
@@ -294,10 +294,10 @@ const sections: SectionData[] = [
     title: "Children's Privacy",
     icon: Baby,
     content: (
-      <div className="rounded-2xl border-2 border-[#8236be]/30 bg-gradient-to-br from-[#fdf3fc] to-white p-6 md:p-8">
+      <div className="rounded-2xl border-2 border-[#1c711c]/30 bg-gradient-to-br from-[#fdf3fc] to-white p-6 md:p-8">
         <p className="text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
           These Services do not address anyone under the age of{' '}
-          <span className="font-black text-[#9d4ae3] text-lg">13</span>.
+          <span className="font-black text-[#228b22] text-lg">13</span>.
           We do not knowingly collect personally identifiable information from children under 13.
         </p>
         <p className="mt-5 text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
@@ -305,7 +305,7 @@ const sections: SectionData[] = [
         </p>
         <p className="mt-5 text-gray-600 text-[15.5px] md:text-[16.5px] lg:text-[17px] leading-relaxed">
           If you are a parent or guardian and you are aware that your child has provided us with personal information, please{' '}
-          <a href="#contact" className="text-[#9d4ae3] font-semibold hover:underline">
+          <a href="#contact" className="text-[#228b22] font-semibold hover:underline">
             contact us
           </a>{' '}
           immediately so that we can take the necessary actions.
@@ -343,12 +343,12 @@ const sections: SectionData[] = [
           href="mailto:support@faflora.com"
           className="inline-flex items-center gap-3 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330] group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-lg shadow-[#9d4ae330] group-hover:scale-110 transition-transform">
             <Mail size={20} />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[3px] text-[#8236be]">Email</p>
-            <p className="text-[#9d4ae3] font-bold text-base group-hover:underline">support@faflora.com</p>
+            <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c]">Email</p>
+            <p className="text-[#228b22] font-bold text-base group-hover:underline">support@faflora.com</p>
           </div>
         </a>
       </>
@@ -368,29 +368,29 @@ export default function PrivacyPolicy() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#fdf8ff] via-white to-white" />
 
         <div className="absolute -top-24 -right-24 w-[50vw] h-[50vw] max-w-2xl max-h-2xl rounded-full bg-gradient-to-br from-[#f0c8ec] to-[#e8b8e4] opacity-30 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 -left-20 w-[35vw] h-[35vw] max-w-xl max-h-xl rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] opacity-10 blur-[90px] pointer-events-none" />
+        <div className="absolute top-1/2 -left-20 w-[35vw] h-[35vw] max-w-xl max-h-xl rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c] opacity-10 blur-[90px] pointer-events-none" />
 
         <div
           className="absolute inset-0 opacity-[0.035] pointer-events-none"
           style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, #9d4ae3 0px, #9d4ae3 1px, transparent 1px, transparent 48px), repeating-linear-gradient(90deg, #9d4ae3 0px, #9d4ae3 1px, transparent 1px, transparent 48px)',
+            backgroundImage: 'repeating-linear-gradient(0deg, #228b22 0px, #228b22 1px, transparent 1px, transparent 48px), repeating-linear-gradient(90deg, #228b22 0px, #228b22 1px, transparent 1px, transparent 48px)',
           }}
         />
 
         <div className="absolute top-20 right-[6%] hidden md:flex flex-col gap-2">
-          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
             <Lock size={10} /> NDPR Compliant
           </div>
-          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 bg-white border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
             <Eye size={10} /> Transparent by Default
           </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full pt-28 pb-20">
           <FadeInSection type="fadeDown" delay={0.1}>
-            <div className="inline-flex items-center gap-2 border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-8 bg-[#fdf3fc]">
+            <div className="inline-flex items-center gap-2 border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-8 bg-[#fdf3fc]">
               <ShieldCheck size={11} />
-              <span>Faflora · Legal</span>
+              <span>EkivaMart · Legal</span>
             </div>
           </FadeInSection>
 
@@ -407,10 +407,10 @@ export default function PrivacyPolicy() {
                 className="relative text-5xl md:text-7xl lg:-skew-x-8 -skew-x-6 lg:text-[6rem] font-black text-[#1a0018] leading-[0.92] tracking-tight"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
-                <TypingText text="Privacy" delay={400} typingSpeed={70} colorClass="text-[#8236be]" hideCursorOnComplete />
+                <TypingText text="Privacy" delay={400} typingSpeed={70} colorClass="text-[#1c711c]" hideCursorOnComplete />
                 <br />
-                <span className="text-[#9d4ae3]">
-                  <TypingText text="Policy" delay={1100} typingSpeed={70} colorClass="text-[#8236be]" />
+                <span className="text-[#228b22]">
+                  <TypingText text="Policy" delay={1100} typingSpeed={70} colorClass="text-[#1c711c]" />
                 </span>
               </h1>
             </div>
@@ -418,19 +418,19 @@ export default function PrivacyPolicy() {
 
           <FadeInSection type="fadeUp" delay={0.5}>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <div className="h-px w-16 bg-gradient-to-r from-[#9d4ae3] to-[#8236be]" />
+              <div className="h-px w-16 bg-gradient-to-r from-[#228b22] to-[#1c711c]" />
               <p className="text-gray-400 text-sm font-medium">
-                Last updated: <span className="text-[#9d4ae3] font-bold">April 03, 2026</span>
+                Last updated: <span className="text-[#228b22] font-bold">April 03, 2026</span>
               </p>
               <div className="h-px w-8 bg-[#e8b8e4]" />
-              <Pill text="Faflora Marketplace" />
+              <Pill text="EkivaMart Marketplace" />
             </div>
           </FadeInSection>
 
           <FadeInSection type="fadeUp" delay={0.65}>
             <p className="mt-8 text-gray-500 text-base md:text-lg lg:text-xl max-w-2xl leading-relaxed">
               Your privacy is the foundation of our trust. This page explains exactly how{' '}
-              <span className="font-bold text-[#9d4ae3]">Faflora</span> — Nigeria's premier
+              <span className="font-bold text-[#228b22]">EkivaMart</span> — Nigeria's premier
               multi-vendor marketplace — collects, uses, and safeguards your personal information.
             </p>
           </FadeInSection>
@@ -445,15 +445,15 @@ export default function PrivacyPolicy() {
 
       {/* Intro Ribbon */}
       <FadeInSection type="fade" delay={0.1}>
-        <div className="bg-gradient-to-r from-[#2d0029] via-[#6b0f6b] to-[#9d4ae3] py-5 px-6 md:px-12">
+        <div className="bg-gradient-to-r from-[#2d0029] via-[#6b0f6b] to-[#228b22] py-5 px-6 md:px-12">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
             <p className="text-white/80 text-sm md:text-base lg:text-[17px] leading-relaxed max-w-3xl">
-              <span className="font-bold text-white">Faflora</span> is Nigeria's premier multi-vendor marketplace connecting buyers with affordable, high-quality, locally made products. We empower vendors, offer seamless shopping, secure payments, and fast delivery — supporting local businesses and celebrating Nigerian creativity.{' '}
+              <span className="font-bold text-white">EkivaMart</span> is Nigeria's premier multi-vendor marketplace connecting buyers with affordable, high-quality, locally made products. We empower vendors, offer seamless shopping, secure payments, and fast delivery — supporting local businesses and celebrating Nigerian creativity.{' '}
               <span className="italic text-[#f0c8ec]">Shop smart. Shop Nigerian.</span>
             </p>
             <a
               href="/"
-              className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-[#9d4ae3] text-xs font-extrabold uppercase tracking-widest px-5 py-2.5 rounded-full hover:bg-[#f9eaf8] transition whitespace-nowrap shadow"
+              className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-[#228b22] text-xs font-extrabold uppercase tracking-widest px-5 py-2.5 rounded-full hover:bg-[#f9eaf8] transition whitespace-nowrap shadow"
             >
               Visit Store <ArrowRight size={13} />
             </a>
@@ -465,17 +465,17 @@ export default function PrivacyPolicy() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pt-16 pb-4">
         <FadeInSection type="zoom" delay={0.15}>
           <div className="relative rounded-3xl overflow-hidden border border-[#e8b8e4] shadow-md bg-white">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#9d4ae3] via-[#8236be] to-[#9d4ae3]" />
+            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#228b22] via-[#1c711c] to-[#228b22]" />
             <div className="px-8 md:px-12 py-8 md:py-10 pl-12 md:pl-16">
-              <p className="text-xs font-black uppercase tracking-[4px] text-[#8236be] mb-3">Overview</p>
+              <p className="text-xs font-black uppercase tracking-[4px] text-[#1c711c] mb-3">Overview</p>
               <p className="text-gray-700 text-base md:text-[17px] lg:text-[17.5px] leading-relaxed">
                 This page informs visitors regarding our policies on the collection, use, and disclosure of Personal Information when anyone uses our Service. If you choose to use our Service, you agree to the collection and use of information in relation to this policy. Personal Information we collect is used solely for providing and improving the Service. We will not use or share your information except as described herein.
               </p>
               <p className="mt-4 text-gray-500 text-sm md:text-[15.5px] lg:text-[16px] leading-relaxed">
                 Terms used in this Privacy Policy carry the same meanings as in our{' '}
-                <a href="/terms-and-conditions" className="text-[#9d4ae3] font-semibold hover:underline inline-flex items-center gap-1">
+                <a href="/terms-and-conditions" className="text-[#228b22] font-semibold hover:underline inline-flex items-center gap-1">
                   Terms and Conditions <ExternalLink size={12} />
-                </a>, accessible at Faflora, unless otherwise defined herein.
+                </a>, accessible at EkivaMart, unless otherwise defined herein.
               </p>
             </div>
           </div>
@@ -514,19 +514,19 @@ export default function PrivacyPolicy() {
         <FadeInSection type="zoom" delay={0.1}>
           <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
             <div className="absolute inset-0 bg-gradient-to-br from-[#fdf3fc] via-white to-[#f9eaf8]" />
-            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#8236be] opacity-10 blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] opacity-10 blur-[60px] pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#1c711c] opacity-10 blur-[80px] pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c] opacity-10 blur-[60px] pointer-events-none" />
 
             <div
               className="absolute inset-0 opacity-[0.025] pointer-events-none"
               style={{
-                backgroundImage: 'repeating-linear-gradient(45deg, #9d4ae3 0px, #9d4ae3 1px, transparent 1px, transparent 28px)',
+                backgroundImage: 'repeating-linear-gradient(45deg, #228b22 0px, #228b22 1px, transparent 1px, transparent 28px)',
               }}
             />
 
             <div className="relative px-8 md:px-16 py-12 md:py-16 flex flex-col md:flex-row items-center gap-10">
               <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 bg-[#f0c8ec] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-5">
+                <div className="inline-flex items-center gap-2 bg-[#f0c8ec] text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-4 py-2 rounded-full mb-5">
                   <ShieldCheck size={11} /> Your data. Your rights.
                 </div>
                 <h3
@@ -534,28 +534,28 @@ export default function PrivacyPolicy() {
                   style={{ fontFamily: "'Georgia', serif" }}
                 >
                   Privacy-first.<br />
-                  <span className="text-[#9d4ae3]">Always.</span>
+                  <span className="text-[#228b22]">Always.</span>
                 </h3>
                 <p className="text-gray-500 text-sm md:text-base lg:text-[17px] leading-relaxed max-w-md">
-                  At Faflora, transparency is not a legal checkbox — it's a commitment. We build trust with every vendor and buyer, one interaction at a time.
+                  At EkivaMart, transparency is not a legal checkbox — it's a commitment. We build trust with every vendor and buyer, one interaction at a time.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 flex-shrink-0 w-full md:w-auto">
                 <a
                   href="/terms-and-conditions"
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-8 py-3.5 rounded-full font-extrabold text-sm shadow-lg shadow-[#9d4ae330] hover:scale-105 active:scale-95 transition-transform"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white px-8 py-3.5 rounded-full font-extrabold text-sm shadow-lg shadow-[#9d4ae330] hover:scale-105 active:scale-95 transition-transform"
                 >
                   Read Terms of Service <ArrowRight size={16} />
                 </a>
                 <a
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-[#9d4ae3] text-[#9d4ae3] px-8 py-3.5 rounded-full font-extrabold text-sm hover:bg-[#fdf3fc] transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-[#228b22] text-[#228b22] px-8 py-3.5 rounded-full font-extrabold text-sm hover:bg-[#fdf3fc] transition-colors"
                 >
                   Return to Homepage
                 </a>
                 <p className="text-center text-[11px] text-gray-400 mt-1">
-                  By using Faflora, you accept this Privacy Policy.
+                  By using EkivaMart, you accept this Privacy Policy.
                 </p>
               </div>
             </div>

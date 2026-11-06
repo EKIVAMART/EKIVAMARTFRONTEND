@@ -194,7 +194,7 @@ export default function VendorEarningsView() {
             }}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm ${
               canWithdraw
-                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white hover:opacity-90'
+                ? 'bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white hover:opacity-90'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
           >
@@ -204,7 +204,7 @@ export default function VendorEarningsView() {
 
           <button
             onClick={() => loadEarnings()}
-            className="p-2.5 text-slate-600 hover:text-[#9d4ae3] hover:bg-purple-50 border border-slate-200 rounded-xl transition-all flex items-center gap-2 text-xs font-bold"
+            className="p-2.5 text-slate-600 hover:text-[#228b22] hover:bg-brand-50 border border-slate-200 rounded-xl transition-all flex items-center gap-2 text-xs font-bold"
           >
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -215,13 +215,13 @@ export default function VendorEarningsView() {
       {/* Summary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Available Balance */}
-        <div className="bg-gradient-to-br from-purple-700 to-indigo-800 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-brand-700 to-brand-800 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
           <div className="absolute right-[-10px] bottom-[-10px] w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
           <div>
-            <p className="text-[10px] font-bold text-purple-200 uppercase tracking-wider">Available Balance</p>
+            <p className="text-[10px] font-bold text-brand-200 uppercase tracking-wider">Available Balance</p>
             <p className="text-2xl font-black mt-2 tracking-tight">{fmt(availableBalance)}</p>
           </div>
-          <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-[11px] text-purple-100 font-medium">
+          <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-[11px] text-brand-100 font-medium">
             <span>Withdrawable</span>
             <span className="font-bold bg-white/20 px-2 py-0.5 rounded-full text-[9px]">Active</span>
           </div>
@@ -270,11 +270,11 @@ export default function VendorEarningsView() {
         </div>
 
         {/* Lifetime Earnings */}
-        <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-purple-200 transition-colors">
+        <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-brand-200 transition-colors">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Lifetime Net Earnings</span>
-              <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-[#9d4ae3]">
+              <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-[#228b22]">
                 <TrendingUp size={16} />
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function VendorEarningsView() {
                 }}
                 className={`px-3 py-1.5 rounded-lg capitalize transition-all whitespace-nowrap ${
                   filterStatus === st
-                    ? 'bg-white text-[#9d4ae3] shadow-xs font-black'
+                    ? 'bg-white text-[#228b22] shadow-xs font-black'
                     : 'hover:text-slate-900'
                 }`}
               >
@@ -318,7 +318,7 @@ export default function VendorEarningsView() {
         {/* Ledger Table */}
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3">
-            <div className="w-8 h-8 border-3 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-brand-200 border-t-[#228b22] rounded-full animate-spin" />
             <p className="text-xs font-bold text-slate-400">Loading itemized earnings...</p>
           </div>
         ) : earningsList.length > 0 ? (
@@ -375,7 +375,7 @@ export default function VendorEarningsView() {
                           status === 'paid' || status === 'available' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                           status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                           status === 'refunded' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                          'bg-purple-50 text-purple-700 border-purple-200'
+                          'bg-brand-50 text-brand-700 border-brand-200'
                         }`}>
                           {status}
                         </span>
@@ -422,7 +422,7 @@ export default function VendorEarningsView() {
           <div className="bg-white w-full max-w-md rounded-3xl shadow-xl border overflow-hidden">
             <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
               <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                <CreditCard size={18} className="text-[#9d4ae3]" />
+                <CreditCard size={18} className="text-[#228b22]" />
                 Request Earnings Withdrawal
               </h3>
               <button onClick={() => setShowWithdrawModal(false)} className="p-1 hover:bg-slate-100 rounded-full transition">
@@ -433,9 +433,9 @@ export default function VendorEarningsView() {
             <form onSubmit={handleWithdrawSubmit} className="p-6 space-y-4">
               <div>
                 <label className="text-xs font-bold text-slate-600 block mb-1">Available for Withdrawal</label>
-                <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex items-center justify-between">
-                  <span className="text-xs font-bold text-purple-700">Withdrawable Balance</span>
-                  <span className="text-base font-black text-purple-900">{fmt(availableBalance)}</span>
+                <div className="p-3 bg-brand-50 rounded-xl border border-brand-100 flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-700">Withdrawable Balance</span>
+                  <span className="text-base font-black text-brand-900">{fmt(availableBalance)}</span>
                 </div>
               </div>
 
@@ -449,7 +449,7 @@ export default function VendorEarningsView() {
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   placeholder="e.g. 25000 (Min ₦5,000)"
-                  className="w-full px-4 py-2.5 text-xs font-bold border border-slate-200 rounded-xl outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-purple-100"
+                  className="w-full px-4 py-2.5 text-xs font-bold border border-slate-200 rounded-xl outline-none focus:border-[#228b22] focus:ring-2 focus:ring-brand-100"
                 />
                 <p className="text-[10px] text-slate-400 font-medium mt-1">Minimum amount is ₦5,000. Maximum is ₦{availableBalance.toLocaleString()}.</p>
               </div>
@@ -461,7 +461,7 @@ export default function VendorEarningsView() {
                     value={selectedBankId}
                     onChange={(e) => setSelectedBankId(e.target.value)}
                     required
-                    className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 rounded-xl outline-none focus:border-[#9d4ae3]"
+                    className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 rounded-xl outline-none focus:border-[#228b22]"
                   >
                     {bankAccounts.map((b) => (
                       <option key={b.id} value={b.id}>
@@ -491,7 +491,7 @@ export default function VendorEarningsView() {
                 <button
                   type="submit"
                   disabled={submittingWithdrawal || bankAccounts.length === 0}
-                  className="px-5 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white text-xs font-bold rounded-xl hover:opacity-90 disabled:opacity-50"
+                  className="px-5 py-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white text-xs font-bold rounded-xl hover:opacity-90 disabled:opacity-50"
                 >
                   {submittingWithdrawal ? 'Submitting...' : 'Confirm Withdrawal'}
                 </button>

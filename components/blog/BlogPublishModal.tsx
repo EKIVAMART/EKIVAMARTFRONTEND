@@ -93,17 +93,17 @@ export default function BlogPublishModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6"
+          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6"
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                 <Send size={20} />
               </div>
               <div>
@@ -117,25 +117,25 @@ export default function BlogPublishModal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+              className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Banner */}
-          <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-4 flex items-start gap-3 text-emerald-950">
+          <div className="bg-emerald-50/60 border border-emerald-100 rounded-md p-4 flex items-start gap-3 text-emerald-950">
             <Sparkles size={18} className="text-emerald-600 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed">
               <p className="font-extrabold">Ready to go live?</p>
               <p className="text-emerald-700 font-medium">
-                Publishing makes this story immediately visible to all visitors on the public Faflora website.
+                Publishing makes this story immediately visible to all visitors on the public EkivaMart website.
               </p>
             </div>
           </div>
 
           {/* Notification Setting Toggle */}
-          <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 space-y-4">
+          <div className="bg-neutral-50 border border-neutral-200 rounded-md p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-extrabold text-slate-800">
@@ -148,12 +148,12 @@ export default function BlogPublishModal({
               <button
                 type="button"
                 onClick={() => setSendNotification(!sendNotification)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                   sendNotification ? 'bg-brand-600' : 'bg-neutral-300'
                 }`}
               >
                 <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-md bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                     sendNotification ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
@@ -173,7 +173,7 @@ export default function BlogPublishModal({
                     <button
                       type="button"
                       onClick={() => toggleChannel('in_app')}
-                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+                      className={`p-3 rounded-md border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
                         channels.includes('in_app')
                           ? 'bg-brand-50 border-brand-300 text-brand-700 shadow-xs'
                           : 'bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-100'
@@ -187,7 +187,7 @@ export default function BlogPublishModal({
                     <button
                       type="button"
                       onClick={() => toggleChannel('push')}
-                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+                      className={`p-3 rounded-md border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
                         channels.includes('push')
                           ? 'bg-brand-50 border-brand-300 text-brand-700 shadow-xs'
                           : 'bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-100'
@@ -201,7 +201,7 @@ export default function BlogPublishModal({
                     <button
                       type="button"
                       onClick={() => toggleChannel('email')}
-                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+                      className={`p-3 rounded-md border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
                         channels.includes('email')
                           ? 'bg-brand-50 border-brand-300 text-brand-700 shadow-xs'
                           : 'bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-100'
@@ -225,7 +225,7 @@ export default function BlogPublishModal({
                       onChange={(e) =>
                         setAudience(e.target.value as BlogNotificationAudience)
                       }
-                      className="w-full bg-white border border-neutral-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                      className="w-full bg-white border border-neutral-200 rounded-md pl-10 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
                     >
                       <option value="ALL_USERS">
                         All Users (Registered Customers, Vendors & Admin Staff)
@@ -242,7 +242,7 @@ export default function BlogPublishModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-3 border border-neutral-200 rounded-2xl text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition"
+              className="px-5 py-3 border border-neutral-200 rounded-md text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition"
             >
               Cancel
             </button>
@@ -250,7 +250,7 @@ export default function BlogPublishModal({
               type="button"
               onClick={handlePublish}
               disabled={isPublishing}
-              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-extrabold transition shadow-md flex items-center gap-2"
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-extrabold transition shadow-sm flex items-center gap-2"
             >
               {isPublishing ? (
                 <Loader2 size={16} className="animate-spin" />

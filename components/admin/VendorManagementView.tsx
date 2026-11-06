@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Check, X, Ban, 
-  Award, Shield, FileText, Settings, UserCheck, DollarSign, Clock, AlertTriangle, 
+import {
+  Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Check, X, Ban,
+  Award, Shield, FileText, Settings, UserCheck, DollarSign, Clock, AlertTriangle,
   HelpCircle, MoreVertical, RefreshCw, Trash2, ShieldAlert, BookOpen, AlertCircle, Briefcase
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -14,13 +14,12 @@ import { authApi, categoryApi } from '@/lib/api';
 interface VendorManagementViewProps {
   isSuperAdmin: boolean;
   currentUserId: string;
-  globalSearchQuery?: string;
 }
 
 type TabType = 'assigned' | 'pending' | 'in_review' | 'requires_resubmission' | 'approved' | 'rejected' | 'suspended' | 'banned';
 type SubSectionType = 'applications' | 'withdrawals' | 'commissions' | 'reviews' | 'audit-log';
 
-export default function VendorManagementView({ isSuperAdmin, currentUserId, globalSearchQuery }: VendorManagementViewProps) {
+export default function VendorManagementView({ isSuperAdmin, currentUserId }: VendorManagementViewProps) {
   // Navigation States
   const [activeSection, setActiveSection] = useState<SubSectionType>('applications');
   const [activeTab, setActiveTab] = useState<TabType>(isSuperAdmin ? 'pending' : 'assigned');
@@ -205,14 +204,6 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
     };
     fetchAllVendorsAndCategories();
   }, []);
-
-  // Sync global search query from parent dashboard when on vendors tab
-  useEffect(() => {
-    if (globalSearchQuery !== undefined && activeSection === 'applications') {
-      setSearchQuery(globalSearchQuery);
-      setPage(1);
-    }
-  }, [globalSearchQuery]);
 
   // Fetch Platform Stats (Super Admin only)
   const fetchStats = async () => {
@@ -802,57 +793,28 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      
-      {/* Super Admin Top Stats Widgets */}
+    <div className="space-y-5">
+
       {isSuperAdmin && activeSection === 'applications' && stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Vendors</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.totalVendors}</h3>
-            </div>
-            <div className="p-4 bg-fuchsia-50 text-[#9d4ae3] rounded-2xl">
-              <Briefcase size={24} />
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Approved Stores</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.vendorsByStatus?.approved || 0}</h3>
-            </div>
-            <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl">
-              <UserCheck size={24} />
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Review</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.vendorsByStatus?.submitted || 0}</h3>
-            </div>
-            <div className="p-4 bg-amber-50 text-amber-600 rounded-2xl">
-              <Clock size={24} />
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Payouts</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.totalPendingWithdrawals}</h3>
-            </div>
-            <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl">
-              <DollarSign size={24} />
-            </div>
-          </div>
+        <div className="grid grid-cols-3 border border-slate-200 bg-white">
+          {[
+            { label: 'Vendors', value: stats.totalVendors },
+            { label: 'Approved', value: stats.vendorsByStatus?.approved || 0 },
+            { label: 'Pending review', value: stats.vendorsByStatus?.submitted || 0 },
+          ].map((metric) => <div key={metric.label} className="border-r last:border-r-0 border-slate-200 px-4 py-4">
+            <p className="text-xs text-slate-600">{metric.label}</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">{metric.value}</p>
+          </div>)}
         </div>
       )}
 
-      {/* Primary Section Switcher */}
-      <div className="flex flex-wrap gap-2.5 border-b pb-4 bg-[#F8F9FA] sticky top-0 z-30">
+            {/* Primary Section Switcher */}
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
         <button
           onClick={() => setActiveSection('applications')}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`px-4 min-h-10 font-medium text-sm ${
             activeSection === 'applications'
-              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+              ? 'bg-[#e8f3e8] text-[#166a24]'
               : 'bg-white border text-slate-600 hover:bg-slate-50'
           }`}
         >
@@ -861,9 +823,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         {isSuperAdmin && (
           <button
             onClick={() => setActiveSection('withdrawals')}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            className={`px-4 min-h-10 font-medium text-sm ${
               activeSection === 'withdrawals'
-                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+                ? 'bg-[#e8f3e8] text-[#166a24]'
                 : 'bg-white border text-slate-600 hover:bg-slate-50'
             }`}
           >
@@ -873,9 +835,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         {isSuperAdmin && (
           <button
             onClick={() => setActiveSection('commissions')}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            className={`px-4 min-h-10 font-medium text-sm ${
               activeSection === 'commissions'
-                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+                ? 'bg-[#e8f3e8] text-[#166a24]'
                 : 'bg-white border text-slate-600 hover:bg-slate-50'
             }`}
           >
@@ -884,9 +846,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         )}
         <button
           onClick={() => setActiveSection('reviews')}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`px-4 min-h-10 font-medium text-sm ${
             activeSection === 'reviews'
-              ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+              ? 'bg-[#e8f3e8] text-[#166a24]'
               : 'bg-white border text-slate-600 hover:bg-slate-50'
           }`}
         >
@@ -895,9 +857,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         {isSuperAdmin && (
           <button
             onClick={() => setActiveSection('audit-log')}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            className={`px-4 min-h-10 font-medium text-sm ${
               activeSection === 'audit-log'
-                ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md shadow-fuchsia-100'
+                ? 'bg-[#e8f3e8] text-[#166a24]'
                 : 'bg-white border text-slate-600 hover:bg-slate-50'
           }`}
           >
@@ -907,19 +869,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       </div>
 
       {/* Main Display Area */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-        
+      <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+
         {/* Sub-header with Title & Search & Action buttons */}
-        <div className="p-6 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
+        <div className="p-4 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
           <div>
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">{getSubSectionLabel(activeSection)}</h2>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">Admin operations center for seller data integration</p>
+            <h2 className="text-base font-semibold text-slate-900">{getSubSectionLabel(activeSection)}</h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input (For relevant sections) */}
             {(activeSection === 'applications' || activeSection === 'withdrawals') && (
-              <div className="relative flex items-center bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm max-w-xs focus-within:border-fuchsia-400 focus-within:ring-2 ring-fuchsia-100 transition-all">
+              <div className="relative flex items-center bg-white border border-gray-200 rounded-md px-3 py-2 text-sm max-w-xs focus-within:border-brand-400 focus-within:ring-2 ring-brand-100 transition-all">
                 <Search size={16} className="text-gray-400 mr-2" />
                 <input
                   type="text"
@@ -932,20 +893,22 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
             )}
 
             {/* Bulk Actions for Super Admin in Applications Queue */}
-            {isSuperAdmin && activeSection === 'applications' && (activeTab === 'pending' || activeTab === 'in_review') && (
+            {isSuperAdmin && activeSection === 'applications' && (activeTab === 'pending' || activeTab === 'in_review') && selectedVendorIds.length > 1 && (
               <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-600">{selectedVendorIds.length} selected</span>
                 <button
                   onClick={handleBulkApprove}
-                  className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                  className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
                 >
                   <Check size={14} /> Bulk Approve
                 </button>
                 <button
                   onClick={handleBulkReject}
-                  className="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                  className="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
                 >
                   <X size={14} /> Bulk Reject
                 </button>
+                <button type="button" onClick={() => setSelectedVendorIds([])} className="px-2 text-xs text-slate-600 underline">Clear</button>
               </div>
             )}
 
@@ -960,7 +923,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   categoryId: '',
                   vendorId: ''
                 })}
-                className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition flex items-center gap-1"
+                className="bg-[#228b22] text-white px-4 py-2 rounded-md text-xs font-bold shadow-sm hover:shadow-sm transition flex items-center gap-1"
               >
                 + Configure Rate
               </button>
@@ -990,7 +953,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   activeTab === tab.id
                     ? tab.id === 'banned'
                       ? 'border-red-500 text-red-600 bg-red-50/30 font-black'
-                      : 'border-[#9d4ae3] text-[#9d4ae3] bg-fuchsia-50/20 font-black'
+                      : 'border-[#228b22] text-[#228b22] bg-brand-50/20 font-black'
                     : 'border-transparent text-gray-500 hover:text-slate-700 hover:bg-slate-50/50'
                 }`}
               >
@@ -1012,19 +975,19 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
         <div className="flex-1 overflow-x-auto min-h-[400px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <div className="w-10 h-10 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading administrative records...</p>
+              <div className="w-10 h-10 border-4 border-[#228b22]/20 border-t-[#228b22] rounded-full animate-spin" />
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest ">Loading administrative records...</p>
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-              <div className="bg-red-50 p-4 rounded-3xl border border-red-100 text-red-500 mb-4 animate-bounce">
+              <div className="bg-red-50 p-4 rounded-md border border-red-100 text-red-500 mb-4 ">
                 <ShieldAlert size={36} />
               </div>
               <h3 className="text-base font-black text-slate-800">Operational Failure</h3>
               <p className="text-xs text-gray-500 font-medium max-w-sm mt-2 leading-relaxed">{error}</p>
               <button
                 onClick={fetchData}
-                className="mt-6 px-5 py-2 bg-slate-100 hover:bg-slate-200 border text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                className="mt-6 px-5 py-2 bg-slate-100 hover:bg-slate-200 border text-slate-700 rounded-md text-xs font-bold transition flex items-center gap-1"
               >
                 <RefreshCw size={12} /> Retry Fetch
               </button>
@@ -1039,7 +1002,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     <th className="p-4 w-10">
                       <input
                         type="checkbox"
-                        className="rounded accent-[#9d4ae3] cursor-pointer"
+                        className="rounded accent-[#228b22] cursor-pointer"
                         checked={selectedVendorIds.length === vendors.length && vendors.length > 0}
                         onChange={(e) => setSelectedVendorIds(e.target.checked ? vendors.map(v => v.id) : [])}
                         title="Select all"
@@ -1078,7 +1041,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     const isSelected = selectedVendorIds.includes(vendor.id);
 
                     return (
-                      <tr key={vendor.id} className={`hover:bg-slate-50/30 transition-colors group ${isSelected ? 'bg-fuchsia-50/30' : ''}`}>
+                      <tr key={vendor.id} className={`hover:bg-slate-50/30 transition-colors group ${isSelected ? 'bg-brand-50/30' : ''}`}>
                         {/* Checkbox cell */}
                         {isSuperAdmin && (activeTab === 'pending' || activeTab === 'in_review') && (
                           <td className="p-4 w-10">
@@ -1090,7 +1053,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                   e.target.checked ? [...prev, vendor.id] : prev.filter(id => id !== vendor.id)
                                 );
                               }}
-                              className="rounded accent-[#9d4ae3] cursor-pointer"
+                              className="rounded accent-[#228b22] cursor-pointer"
                             />
                           </td>
                         )}
@@ -1101,7 +1064,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         {/* Store Details */}
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-fuchsia-50 flex items-center justify-center font-bold text-[#9d4ae3] text-sm overflow-hidden shrink-0 border border-fuchsia-100 shadow-sm">
+                            <div className="w-10 h-10 rounded-md bg-brand-50 flex items-center justify-center font-bold text-[#228b22] text-sm overflow-hidden shrink-0 border border-brand-100 shadow-sm">
                               {vendor.storeLogoUrl ? (
                                 <img src={vendor.storeLogoUrl} className="w-full h-full object-cover" alt="" />
                               ) : (
@@ -1109,9 +1072,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                               )}
                             </div>
                             <div>
-                              <span 
+                              <span
                                 onClick={() => handleViewVendor(vendor.id)}
-                                className="font-bold text-slate-800 text-sm hover:text-[#9d4ae3] cursor-pointer flex items-center gap-1.5 transition-colors"
+                                className="font-bold text-slate-800 text-sm hover:text-[#228b22] cursor-pointer flex items-center gap-1.5 transition-colors"
                               >
                                 {vendor.storeName}
                                 <Eye size={12} className="opacity-0 group-hover:opacity-100 text-gray-400 transition" />
@@ -1137,11 +1100,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
 
                         {/* Trust Level */}
                         <td className="p-4 text-center">
-                          <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${
+                          <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-md border ${
                             vendor.trustLevel === 'official_brand'
-                              ? 'bg-purple-100 text-purple-700 border-purple-200'
+                              ? 'bg-brand-100 text-brand-700 border-brand-200'
                               : vendor.trustLevel === 'top_seller'
-                                ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                                ? 'bg-brand-100 text-brand-700 border-brand-200'
                                 : 'bg-slate-100 text-slate-600 border-slate-200'
                           }`}>
                             {vendor.trustLevel.replace('_', ' ')}
@@ -1151,12 +1114,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         {/* Dynamic Status Badge (search results only) */}
                         {searchQuery && (
                           <td className="p-4 text-center">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border ${
                               vendor.applicationStatus === 'approved' ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
                               : vendor.applicationStatus === 'rejected' ? 'bg-rose-100 text-rose-700 border-rose-200'
                               : vendor.applicationStatus === 'suspended' ? 'bg-amber-100 text-amber-700 border-amber-200'
                               : vendor.applicationStatus === 'banned' ? 'bg-red-100 text-red-700 border-red-200'
-                              : vendor.applicationStatus === 'in_review' ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                              : vendor.applicationStatus === 'in_review' ? 'bg-brand-100 text-brand-700 border-brand-200'
                               : vendor.applicationStatus === 'requires_resubmission' ? 'bg-orange-100 text-orange-700 border-orange-200'
                               : 'bg-slate-100 text-slate-600 border-slate-200'
                             }`}>
@@ -1168,7 +1131,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                           <td className="p-4 text-center">
                             <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase border ${
                               (vendor as any).isUrgent
-                                ? 'bg-rose-100 text-rose-700 border-rose-200 animate-pulse'
+                                ? 'bg-rose-100 text-rose-700 border-rose-200 '
                                 : 'bg-amber-100 text-amber-700 border-amber-200'
                             }`}>
                               {vendor.daysWaiting !== null && vendor.daysWaiting !== undefined ? `${vendor.daysWaiting} days` : '0 days'}
@@ -1218,7 +1181,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             {/* View full details (Always present) */}
                             <button
                               onClick={() => handleViewVendor(vendor.id)}
-                              className="p-1.5 text-fuchsia-600 hover:bg-fuchsia-50 rounded-xl transition"
+                              className="p-1.5 text-brand-600 hover:bg-brand-50 rounded-md transition"
                               title="View Details"
                             >
                               <Eye size={16} />
@@ -1228,7 +1191,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             {(activeTab === 'pending') && (
                               <button
                                 onClick={() => { setAssignVendorTarget(vendor); setSelectedAdminId(''); }}
-                                className="px-2.5 py-1.5 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                                className="px-2.5 py-1.5 bg-brand-50 border border-brand-100 hover:bg-brand-100 text-brand-700 rounded-md text-xs font-bold transition flex items-center gap-1"
                                 title="Assign Application to Admin"
                               >
                                 <UserCheck size={12} /> Assign
@@ -1258,14 +1221,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                               <>
                                 <button
                                   onClick={() => { setTrustLevelVendor(vendor); setSelectedTrustLevel(vendor.trustLevel); }}
-                                  className="p-1.5 text-[#9d4ae3] hover:bg-fuchsia-50 rounded-xl transition"
+                                  className="p-1.5 text-[#228b22] hover:bg-brand-50 rounded-md transition"
                                   title="Change Trust Level"
                                 >
                                   <Award size={16} />
                                 </button>
                                 <button
                                   onClick={() => { setActionVendor(vendor); setActionType('suspend'); setActionReason(''); }}
-                                  className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-xl transition"
+                                  className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-md transition"
                                   title="Suspend Seller"
                                 >
                                   <Ban size={15} />
@@ -1277,7 +1240,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             {activeTab === 'suspended' && (
                               <button
                                 onClick={() => handleReactivateVendor(vendor)}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold transition flex items-center gap-1"
                                 title="Reactivate Store"
                               >
                                 <Check size={12} /> Reactivate
@@ -1288,7 +1251,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             {activeTab === 'banned' && isSuperAdmin && (
                               <button
                                 onClick={() => { setActionVendor(vendor); setActionType('unban'); setActionReason(''); }}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold transition flex items-center gap-1"
                                 title="Unban Vendor"
                               >
                                 <Check size={12} /> Unban
@@ -1304,7 +1267,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                   setActionDecision(vendor.applicationStatus === 'approved' ? 'rejected' : 'approved');
                                   setActionReason('');
                                 }}
-                                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-xl transition"
+                                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-md transition"
                                 title="Override Decision"
                               >
                                 <Settings size={14} />
@@ -1315,7 +1278,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             {isSuperAdmin && activeTab !== 'banned' && (
                               <button
                                 onClick={() => { setActionVendor(vendor); setActionType('ban'); setActionReason(''); }}
-                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-xl transition"
+                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition"
                                 title="Ban Permanently"
                               >
                                 <Ban size={14} className="text-red-500" />
@@ -1330,7 +1293,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <tr>
                     <td colSpan={10} className="p-16 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-slate-100 rounded-md flex items-center justify-center">
                           <Search size={28} className="text-slate-300" />
                         </div>
                         <p className="text-sm font-bold text-slate-500">
@@ -1371,7 +1334,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         {Number(withdrawal.amount).toLocaleString()} NGN
                       </td>
                       <td className="p-4 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                           withdrawal.status === 'completed'
                             ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
                             : withdrawal.status === 'pending'
@@ -1398,7 +1361,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                 setWithdrawalAction('complete');
                                 setActionReason('');
                               }}
-                              className="px-2.5 py-1.5 bg-fuchsia-50 hover:bg-fuchsia-100 border border-fuchsia-100 text-[#9d4ae3] rounded-xl text-xs font-bold transition"
+                              className="px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 border border-brand-100 text-[#228b22] rounded-md text-xs font-bold transition"
                             >
                               Process
                             </button>
@@ -1413,7 +1376,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                 setWithdrawalAction(withdrawal.status === 'completed' ? 'fail' : 'complete');
                                 setActionReason('');
                               }}
-                              className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-slate-700 rounded-xl transition"
+                              className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-slate-700 rounded-md transition"
                               title="Override Withdrawal Payout State"
                             >
                               <Settings size={14} />
@@ -1456,7 +1419,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                           </span>
                         ) : comm.vendorId ? (
                           <div>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold rounded-lg uppercase tracking-wider">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold rounded-lg uppercase tracking-wider">
                               Vendor Specific Scope
                             </span>
                             <p className="text-xs text-gray-500 mt-1 font-semibold">
@@ -1498,7 +1461,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                               categoryId: comm.categoryId || '',
                               vendorId: comm.vendorId || ''
                             })}
-                            className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-xl transition"
+                            className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-md transition"
                             title="Edit Config Rates"
                           >
                             <Settings size={16} />
@@ -1507,7 +1470,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                           {(comm.categoryId || comm.vendorId) && (
                             <button
                               onClick={() => handleCommissionDelete(comm.id)}
-                              className="p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition"
+                              className="p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition"
                               title="Delete Config Rate"
                             >
                               <Trash2 size={16} />
@@ -1539,11 +1502,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         {rev.productId && (
                           <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded">Product: {rev.productId}</span>
                         )}
-                        <span className="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
                           <AlertCircle size={10} /> Flagged: {rev.flaggedReason}
                         </span>
                         {rev.isHidden && (
-                          <span className="text-[10px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                          <span className="text-[10px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
                             <Ban size={10} /> Hidden
                           </span>
                         )}
@@ -1562,14 +1525,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         <span className="text-xs text-gray-400 ml-1 font-semibold">{rev.rating}/5 Rating</span>
                       </div>
 
-                      <p className="text-sm text-slate-700 font-medium leading-relaxed italic bg-slate-50 p-3 rounded-2xl border border-slate-100">{rev.comment}</p>
+                      <p className="text-sm text-slate-700 font-medium leading-relaxed italic bg-slate-50 p-3 rounded-md border border-slate-100">{rev.comment}</p>
 
                       {/* Review images */}
                       {rev.images && rev.images.length > 0 && (
                         <div className="flex gap-2 flex-wrap">
                           {rev.images.map((img: string, idx: number) => (
                             <a key={idx} href={img} target="_blank" rel="noreferrer">
-                              <img src={img} alt={`Review image ${idx + 1}`} className="w-16 h-16 object-cover rounded-xl border border-slate-200 hover:opacity-80 transition" />
+                              <img src={img} alt={`Review image ${idx + 1}`} className="w-16 h-16 object-cover rounded-md border border-slate-200 hover:opacity-80 transition" />
                             </a>
                           ))}
                         </div>
@@ -1595,21 +1558,21 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                       {rev.isHidden ? (
                         <button
                           onClick={() => handleReviewModerate(rev.id, 'unhide')}
-                          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-100 transition flex items-center gap-1"
+                          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md border border-emerald-100 transition flex items-center gap-1"
                         >
                           Unhide Review
                         </button>
                       ) : (
                         <button
                           onClick={() => handleReviewModerate(rev.id, 'hide')}
-                          className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold rounded-xl border border-amber-100 transition flex items-center gap-1"
+                          className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold rounded-md border border-amber-100 transition flex items-center gap-1"
                         >
                           Hide Review
                         </button>
                       )}
                       <button
                         onClick={() => handleReviewModerate(rev.id, 'delete')}
-                        className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-xl transition"
+                        className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-md transition"
                         title="Permanently Delete Review"
                       >
                         <Trash2 size={16} />
@@ -1619,7 +1582,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-md flex items-center justify-center">
                     <BookOpen size={28} className="text-slate-300" />
                   </div>
                   <p className="text-sm font-bold text-slate-500">No flagged reviews found.</p>
@@ -1636,7 +1599,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <select
                   value={selectedAuditVendorId}
                   onChange={(e) => { setSelectedAuditVendorId(e.target.value); setPage(1); }}
-                  className="flex-1 max-w-xs p-2.5 rounded-xl border bg-white font-semibold text-xs text-slate-700 outline-none focus:ring-2 ring-fuchsia-100 transition"
+                  className="flex-1 max-w-xs p-2.5 rounded-md border bg-white font-semibold text-xs text-slate-700 outline-none focus:ring-2 ring-brand-100 transition"
                 >
                   <option value="">— Select a vendor to view audit logs —</option>
                   {allVendorsList.map((v) => (
@@ -1646,7 +1609,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
               </div>
               {!selectedAuditVendorId ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-md flex items-center justify-center">
                     <Search size={28} className="text-slate-300" />
                   </div>
                   <p className="text-sm font-bold text-slate-500">Select a vendor to view audit logs</p>
@@ -1673,7 +1636,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                                 : log.action.includes('REJECT') || log.action.includes('BAN')
                                   ? 'bg-rose-50 text-rose-700 border border-rose-100'
-                                  : 'bg-indigo-50 text-indigo-700 border border-indigo-100'
+                                  : 'bg-brand-50 text-brand-700 border border-brand-100'
                             }`}>
                               {log.action}
                             </span>
@@ -1720,7 +1683,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white border shadow-sm hover:bg-slate-50 disabled:opacity-50 transition"
+                className="w-8 h-8 flex items-center justify-center rounded-md bg-white border shadow-sm hover:bg-slate-50 disabled:opacity-50 transition"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -1728,9 +1691,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   key={idx}
                   onClick={() => setPage(idx + 1)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition ${
+                  className={`w-8 h-8 flex items-center justify-center rounded-md text-xs font-bold transition ${
                     page === idx + 1
-                      ? 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white shadow-md'
+                      ? 'bg-[#228b22] text-white shadow-sm'
                       : 'bg-white border hover:bg-slate-50 text-slate-700 shadow-sm'
                   }`}
                 >
@@ -1740,7 +1703,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white border shadow-sm hover:bg-slate-50 disabled:opacity-50 transition"
+                className="w-8 h-8 flex items-center justify-center rounded-md bg-white border shadow-sm hover:bg-slate-50 disabled:opacity-50 transition"
               >
                 <ChevronRight size={16} />
               </button>
@@ -1752,22 +1715,22 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* FULL VENDOR DETAIL MODAL CONTAINER */}
       <AnimatePresence>
         {detailVendorId && detailData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-5xl rounded-[2rem] shadow-2xl overflow-hidden border max-h-full flex flex-col relative"
+              className="bg-white w-full max-w-5xl rounded-[2rem] shadow-sm overflow-hidden border max-h-full flex flex-col relative"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-8 py-5 text-white flex items-center justify-between shrink-0">
+              <div className="bg-[#184b3d] px-6 py-4 text-white flex items-center justify-between shrink-0">
                 <div>
                   <h3 className="text-xl font-black tracking-tight">{detailData.profile.storeName}</h3>
                   <div className="flex items-center gap-3 mt-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-[#9d4ae3] bg-white border px-2 py-0.5 rounded-full shadow-sm">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-[#228b22] bg-white border px-2 py-0.5 rounded-md shadow-sm">
                       {detailData.profile.applicationStatus}
                     </span>
-                    <span className="text-xs font-medium text-white/90 bg-white/20 px-2.5 py-0.5 rounded-full border border-white/30">
+                    <span className="text-xs font-medium text-white/90 bg-white/20 px-2.5 py-0.5 rounded-md border border-white/30">
                       Ref: {detailData.profile.applicationReference || 'N/A'}
                     </span>
                   </div>
@@ -1775,7 +1738,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   type="button"
                   onClick={() => setDetailVendorId(null)}
-                  className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                  className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-md transition-colors"
                 >
                   <X size={20} strokeWidth={3} />
                 </button>
@@ -1786,7 +1749,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   onClick={() => setDetailTab('profile')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'profile' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    detailTab === 'profile' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
                   }`}
                 >
                   Seller Profile
@@ -1794,7 +1757,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   onClick={() => setDetailTab('docs')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'docs' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    detailTab === 'docs' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
                   }`}
                 >
                   Uploaded Documents ({detailData.documents.length})
@@ -1802,7 +1765,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   onClick={() => setDetailTab('bank')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'bank' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    detailTab === 'bank' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
                   }`}
                 >
                   Bank Payout Details
@@ -1810,7 +1773,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   onClick={() => setDetailTab('earnings')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'earnings' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    detailTab === 'earnings' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
                   }`}
                 >
                   Earnings Balance
@@ -1818,7 +1781,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   onClick={() => setDetailTab('audit')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'audit' ? 'border-[#9d4ae3] text-[#9d4ae3]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    detailTab === 'audit' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
                   }`}
                 >
                   Audit Trail
@@ -1867,11 +1830,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-400 uppercase">Return Policy</p>
-                        <p className="text-xs text-slate-700 font-medium mt-1 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">{detailData.profile.returnPolicy || 'No policy.'}</p>
+                        <p className="text-xs text-slate-700 font-medium mt-1 leading-relaxed bg-slate-50 p-3 rounded-md border border-slate-100">{detailData.profile.returnPolicy || 'No policy.'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-400 uppercase">Shipping Policy</p>
-                        <p className="text-xs text-slate-700 font-medium mt-1 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">{detailData.profile.shippingPolicy || 'No policy.'}</p>
+                        <p className="text-xs text-slate-700 font-medium mt-1 leading-relaxed bg-slate-50 p-3 rounded-md border border-slate-100">{detailData.profile.shippingPolicy || 'No policy.'}</p>
                       </div>
                     </div>
 
@@ -1900,9 +1863,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <div className="space-y-6">
                     {detailData.documents.length > 0 ? (
                       detailData.documents.map((doc) => (
-                        <div key={doc.id} className="border rounded-3xl p-5 hover:shadow-sm transition flex flex-col md:flex-row md:items-start justify-between gap-6">
+                        <div key={doc.id} className="border rounded-md p-5 hover:shadow-sm transition flex flex-col md:flex-row md:items-start justify-between gap-6">
                           <div className="flex items-start gap-4">
-                            <div className="p-3 bg-fuchsia-50 border border-fuchsia-100 rounded-2xl text-[#9d4ae3] shrink-0">
+                            <div className="p-3 bg-brand-50 border border-brand-100 rounded-md text-[#228b22] shrink-0">
                               <FileText size={24} />
                             </div>
                             <div className="space-y-1 font-semibold">
@@ -1948,7 +1911,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                                   name: doc.documentType.replace('_', ' ')
                                 });
                               }}
-                              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border text-slate-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1"
+                              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border text-slate-700 text-xs font-bold rounded-md flex items-center justify-center gap-1"
                             >
                               View Document File
                             </button>
@@ -1958,21 +1921,21 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                               <div className="flex items-center gap-1.5">
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'verified')}
-                                  className="p-2 text-emerald-700 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 rounded-xl transition"
+                                  className="p-2 text-emerald-700 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 rounded-md transition"
                                   title="Approve / Verify Document"
                                 >
                                   <Check size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'rejected')}
-                                  className="p-2 text-rose-700 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded-xl transition"
+                                  className="p-2 text-rose-700 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded-md transition"
                                   title="Reject Document"
                                 >
                                   <X size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'requires_resubmission')}
-                                  className="p-2 text-amber-700 bg-amber-50 border border-amber-100 hover:bg-amber-100 rounded-xl transition"
+                                  className="p-2 text-amber-700 bg-amber-50 border border-amber-100 hover:bg-amber-100 rounded-md transition"
                                   title="Request Resubmission"
                                 >
                                   <RefreshCw size={14} />
@@ -1993,19 +1956,19 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {detailData.bankAccounts.length > 0 ? (
                       detailData.bankAccounts.map((account) => (
-                        <div key={account.id} className="border rounded-3xl p-6 bg-slate-50/50 space-y-4">
+                        <div key={account.id} className="border rounded-md p-6 bg-slate-50/50 space-y-4">
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="font-extrabold text-slate-800 text-sm">{account.bankName}</p>
                               <p className="text-xs text-gray-400 font-semibold mt-1">Bank Code: {account.bankCode} • {account.accountType.toUpperCase()}</p>
                             </div>
                             {account.isPrimary && (
-                              <span className="text-[10px] font-black uppercase bg-fuchsia-50 border border-fuchsia-100 text-[#9d4ae3] px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-black uppercase bg-brand-50 border border-brand-100 text-[#228b22] px-2 py-0.5 rounded">
                                 Primary payout
                               </span>
                             )}
                           </div>
-                          <div className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between font-semibold">
+                          <div className="bg-white p-4 rounded-md border border-slate-100 flex items-center justify-between font-semibold">
                             <div>
                               <p className="text-[10px] text-gray-400 uppercase">Account Name</p>
                               <p className="text-sm text-slate-800">{account.accountName}</p>
@@ -2029,29 +1992,29 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     {/* Account Balance Summaries */}
                     {detailData.earnings ? (
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div className="border rounded-2xl p-4 text-center bg-slate-50/30">
+                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
                           <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.availableBalance).toLocaleString()} NGN</p>
                         </div>
-                        <div className="border rounded-2xl p-4 text-center bg-slate-50/30">
+                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pending Balance</span>
                           <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.pendingBalance).toLocaleString()} NGN</p>
                         </div>
-                        <div className="border rounded-2xl p-4 text-center bg-slate-50/30">
+                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Withdrawn</span>
                           <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.totalWithdrawn).toLocaleString()} NGN</p>
                         </div>
-                        <div className="border rounded-2xl p-4 text-center bg-slate-50/30">
+                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Lifetime Earnings</span>
                           <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.lifetimeEarnings).toLocaleString()} NGN</p>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-xs text-gray-400 font-bold uppercase text-center animate-pulse">Failed to load live earnings balances.</p>
+                      <p className="text-xs text-gray-400 font-bold uppercase text-center ">Failed to load live earnings balances.</p>
                     )}
 
                     {/* Earnings History Ledger */}
-                    <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-md border border-slate-200 overflow-hidden shadow-sm">
                       <div className="bg-slate-50 px-6 py-4 border-b">
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Earnings Ledger History</h4>
                       </div>
@@ -2099,7 +2062,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
 
                 {/* Audit log for vendor */}
                 {detailTab === 'audit' && (
-                  <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="bg-white rounded-md border border-slate-200 overflow-hidden shadow-sm">
                     <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
                       <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Vendor Specific Audit Trail</h4>
                     </div>
@@ -2146,7 +2109,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button
                       onClick={() => handleApproveVendor(detailData.profile)}
-                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl text-xs font-black shadow-md hover:shadow-lg transition-all"
+                      className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-black shadow-sm hover:shadow-sm transition-all"
                     >
                       Approve Application
                     </button>
@@ -2156,7 +2119,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button
                       onClick={() => { setActionVendor(detailData.profile); setActionType('reject'); }}
-                      className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-black transition-all"
+                      className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-md text-xs font-black transition-all"
                     >
                       Reject Application
                     </button>
@@ -2166,7 +2129,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   {detailData.profile.applicationStatus === 'in_review' && (
                     <button
                       onClick={() => { setActionVendor(detailData.profile); setActionType('resubmission'); }}
-                      className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 rounded-xl text-xs font-black transition-all"
+                      className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 rounded-md text-xs font-black transition-all"
                     >
                       Request Corrections
                     </button>
@@ -2181,29 +2144,29 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* ADMIN ASSIGN REVIEWER MODAL */}
       <AnimatePresence>
         {assignVendorTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">Assign Application Reviewer</h3>
-                <button onClick={() => setAssignVendorTarget(null)} className="p-1 hover:bg-slate-100 rounded-full transition">
+                <button onClick={() => setAssignVendorTarget(null)} className="p-1 hover:bg-slate-100 rounded-md transition">
                   <X size={18} />
                 </button>
               </div>
               <div className="p-6 space-y-4">
                 <p className="text-xs text-gray-500 leading-relaxed font-semibold">
-                  Assign the submitted application of <strong className="text-slate-700">{assignVendorTarget.storeName}</strong> to an administrative reviewer. The status will move to <strong className="text-[#9d4ae3]">In Review</strong> automatically.
+                  Assign the submitted application of <strong className="text-slate-700">{assignVendorTarget.storeName}</strong> to an administrative reviewer. The status will move to <strong className="text-[#228b22]">In Review</strong> automatically.
                 </p>
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-400 uppercase">Reviewer Admin Name</label>
                   <select
                     value={selectedAdminId}
                     onChange={(e) => setSelectedAdminId(e.target.value)}
-                    className="w-full p-3 rounded-xl border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                    className="w-full p-3 rounded-md border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                   >
                     <option value="">Select admin...</option>
                     {adminsList.map((admin) => (
@@ -2217,14 +2180,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
               <div className="p-6 border-t flex gap-2 justify-end bg-slate-50/50">
                 <button
                   onClick={() => setAssignVendorTarget(null)}
-                  className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                  className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAssignReviewerSubmit}
                   disabled={!selectedAdminId}
-                  className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold disabled:opacity-50 transition"
+                  className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold disabled:opacity-50 transition"
                 >
                   Assign Application
                 </button>
@@ -2237,14 +2200,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* DOUBLE CONFIRM ASSIGN MODAL */}
       <AnimatePresence>
         {confirmAssignModal && assignVendorTarget && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 ">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center border"
+              className="bg-white w-full max-w-sm rounded-[2rem] shadow-sm p-6 text-center border"
             >
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-100">
+              <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-md flex items-center justify-center mx-auto mb-4 border border-brand-100">
                 <UserCheck size={24} />
               </div>
               <h3 className="font-extrabold text-slate-800 text-lg">Confirm Reviewer Assignment</h3>
@@ -2260,13 +2223,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
               <div className="flex gap-2.5 mt-8">
                 <button
                   onClick={() => setConfirmAssignModal(false)}
-                  className="flex-1 py-3 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                  className="flex-1 py-3 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={executeAssignment}
-                  className="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-md"
+                  className="flex-1 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-md text-xs font-bold transition shadow-sm"
                 >
                   Confirm Assignment
                 </button>
@@ -2279,16 +2242,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* TRUST LEVEL UPGRADE DIALOG */}
       <AnimatePresence>
         {trustLevelVendor && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">Adjust Seller Trust Level</h3>
-                <button onClick={() => setTrustLevelVendor(null)} className="p-1 hover:bg-slate-100 rounded-full transition">
+                <button onClick={() => setTrustLevelVendor(null)} className="p-1 hover:bg-slate-100 rounded-md transition">
                   <X size={18} />
                 </button>
               </div>
@@ -2302,7 +2265,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     <select
                       value={selectedTrustLevel}
                       onChange={(e) => setSelectedTrustLevel(e.target.value)}
-                      className="w-full p-3 rounded-xl border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                      className="w-full p-3 rounded-md border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                     >
                       <option value="new_seller">New Seller</option>
                       <option value="verified_seller">Verified Seller</option>
@@ -2316,13 +2279,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <button
                     type="button"
                     onClick={() => setTrustLevelVendor(null)}
-                    className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                    className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                    className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                   >
                     Save Changes
                   </button>
@@ -2336,18 +2299,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* COMMISSION RATE MANAGE MODAL (Super Admin) */}
       <AnimatePresence>
         {commissionModal.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">
                   {commissionModal.mode === 'create' ? 'Create Commission Configuration' : 'Edit Configuration Rate'}
                 </h3>
-                <button onClick={() => setCommissionModal({ ...commissionModal, isOpen: false })} className="p-1 hover:bg-slate-100 rounded-full transition">
+                <button onClick={() => setCommissionModal({ ...commissionModal, isOpen: false })} className="p-1 hover:bg-slate-100 rounded-md transition">
                   <X size={18} />
                 </button>
               </div>
@@ -2363,7 +2326,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         step="0.1"
                         value={commissionModal.commissionRate}
                         onChange={(e) => setCommissionModal({ ...commissionModal, commissionRate: Number(e.target.value) })}
-                        className="w-full p-3 rounded-xl border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                        className="w-full p-3 rounded-md border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                       />
                     </div>
                     <div className="space-y-1">
@@ -2375,7 +2338,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                         step="0.1"
                         value={commissionModal.gatewayFeeRate}
                         onChange={(e) => setCommissionModal({ ...commissionModal, gatewayFeeRate: Number(e.target.value) })}
-                        className="w-full p-3 rounded-xl border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                        className="w-full p-3 rounded-md border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                       />
                     </div>
                   </div>
@@ -2386,11 +2349,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     return (
                       <>
                         {globalConfigExists ? (
-                          <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-700 font-medium leading-relaxed">
+                          <div className="p-3 bg-rose-50 border border-rose-100 rounded-md text-xs text-rose-700 font-medium leading-relaxed">
                             <strong>⚠ Global config already exists.</strong> You must specify a <em>Category</em> or <em>Vendor</em> scope for this new configuration — another global config cannot be created.
                           </div>
                         ) : (
-                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xs text-emerald-700 font-medium leading-relaxed">
+                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-md text-xs text-emerald-700 font-medium leading-relaxed">
                             <strong>No global config yet.</strong> Leave both fields blank to create the <em>Global</em> platform default, or select a scope to limit this config to a specific category or vendor.
                           </div>
                         )}
@@ -2402,7 +2365,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             value={commissionModal.categoryId}
                             onChange={(e) => setCommissionModal({ ...commissionModal, categoryId: e.target.value })}
                             required={scopeRequired && !commissionModal.vendorId}
-                            className="w-full p-3 rounded-xl border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                            className="w-full p-3 rounded-md border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                           >
                             <option value="">— {scopeRequired ? 'Select a category scope' : 'Global / No Category Scope'} —</option>
                             {categoriesList.map((cat: any) => (
@@ -2420,7 +2383,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             value={commissionModal.vendorId}
                             onChange={(e) => setCommissionModal({ ...commissionModal, vendorId: e.target.value })}
                             required={scopeRequired && !commissionModal.categoryId}
-                            className="w-full p-3 rounded-xl border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition"
+                            className="w-full p-3 rounded-md border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                           >
                             <option value="">— {scopeRequired ? 'Select a vendor scope' : 'Global / No Vendor Scope'} —</option>
                             {allVendorsList.map((v) => (
@@ -2443,13 +2406,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <button
                     type="button"
                     onClick={() => setCommissionModal({ ...commissionModal, isOpen: false })}
-                    className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                    className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                    className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                   >
                     Save Configuration
                   </button>
@@ -2463,12 +2426,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* GENERIC ACTION NOTE / REASON MODALS (Scale transition animation) */}
       <AnimatePresence>
         {actionType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
             >
               {/* Header */}
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
@@ -2483,7 +2446,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   {actionType === 'override_withdrawal' && 'Force-Override Payout Status'}
                   {actionType === 'bulk_reject' && `Bulk Reject ${selectedVendorIds.length} Applications`}
                 </h3>
-                <button onClick={() => { setActionType(null); setActionReason(''); setActionVendor(null); setActionWithdrawal(null); }} className="p-1 hover:bg-slate-100 rounded-full transition">
+                <button onClick={() => { setActionType(null); setActionReason(''); setActionVendor(null); setActionWithdrawal(null); }} className="p-1 hover:bg-slate-100 rounded-md transition">
                   <X size={18} />
                 </button>
               </div>
@@ -2499,7 +2462,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <p className="text-xs text-gray-500 font-semibold leading-relaxed">
                     {actionVendor && actionType !== 'bulk_reject' && (
                       <>
-                        You are performing this action on <strong className="text-slate-700">{actionVendor.storeName}</strong>. 
+                        You are performing this action on <strong className="text-slate-700">{actionVendor.storeName}</strong>.
                         Please explain your decision. This note is logged in the audit trail.
                       </>
                     )}
@@ -2528,7 +2491,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             name="override_decision"
                             checked={actionDecision === 'approved'}
                             onChange={() => setActionDecision('approved')}
-                            className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            className="text-[#228b22] focus:ring-[#228b22]"
                           />
                           <span>Approved</span>
                         </label>
@@ -2538,7 +2501,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             name="override_decision"
                             checked={actionDecision === 'rejected'}
                             onChange={() => setActionDecision('rejected')}
-                            className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            className="text-[#228b22] focus:ring-[#228b22]"
                           />
                           <span>Rejected</span>
                         </label>
@@ -2557,7 +2520,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             name="wd_action"
                             checked={withdrawalAction === 'complete'}
                             onChange={() => setWithdrawalAction('complete')}
-                            className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            className="text-[#228b22] focus:ring-[#228b22]"
                           />
                           <span>Completed Payout</span>
                         </label>
@@ -2567,7 +2530,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                             name="wd_action"
                             checked={withdrawalAction === 'fail'}
                             onChange={() => setWithdrawalAction('fail')}
-                            className="text-[#9d4ae3] focus:ring-[#9d4ae3]"
+                            className="text-[#228b22] focus:ring-[#228b22]"
                           />
                           <span>Failed Payout</span>
                         </label>
@@ -2588,7 +2551,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                       placeholder="Explain details..."
                       value={actionReason}
                       onChange={(e) => setActionReason(e.target.value)}
-                      className="w-full p-3 rounded-xl border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition font-medium text-xs"
+                      className="w-full p-3 rounded-md border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition font-medium text-xs"
                     />
                   </div>
                 </div>
@@ -2598,13 +2561,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <button
                     type="button"
                     onClick={() => { setActionType(null); setActionReason(''); setActionVendor(null); setActionWithdrawal(null); }}
-                    className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                    className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                    className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                   >
                     Confirm Action
                   </button>
@@ -2618,18 +2581,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* CUSTOM CONFIRM MODAL (Replaces alerts and window.confirm) */}
       <AnimatePresence>
         {confirmModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">{confirmModal.title}</h3>
                 <button
                   onClick={() => setConfirmModal(prev => ({ ...prev, open: false }))}
-                  className="p-1 hover:bg-slate-100 rounded-full transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition"
                 >
                   <X size={18} />
                 </button>
@@ -2643,14 +2606,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   type="button"
                   onClick={() => setConfirmModal(prev => ({ ...prev, open: false }))}
-                  className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                  className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={confirmModal.onConfirm}
-                  className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                  className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                 >
                   Confirm
                 </button>
@@ -2663,12 +2626,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* BULK ACTION SKIPPED DETAILS WARNING MODAL */}
       <AnimatePresence>
         {skippedModal && skippedModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-lg rounded-3xl shadow-xl border overflow-hidden"
+              className="bg-white w-full max-w-lg rounded-md shadow-sm border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
@@ -2676,7 +2639,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 </h3>
                 <button
                   onClick={() => setSkippedModal(null)}
-                  className="p-1 hover:bg-slate-100 rounded-full transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition"
                 >
                   <X size={18} />
                 </button>
@@ -2693,7 +2656,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   {skippedModal.details.map((detail, idx) => {
                     const name = allVendorsList.find(v => v.id === detail.vendorId)?.storeName || detail.vendorId;
                     return (
-                      <div key={idx} className="p-3 bg-rose-50 border border-rose-100 rounded-xl space-y-1">
+                      <div key={idx} className="p-3 bg-rose-50 border border-rose-100 rounded-md space-y-1">
                         <p className="text-xs font-bold text-slate-700">{name}</p>
                         <p className="text-[11px] font-semibold text-rose-600 leading-relaxed">{detail.reason}</p>
                       </div>
@@ -2705,7 +2668,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 <button
                   type="button"
                   onClick={() => setSkippedModal(null)}
-                  className="px-5 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                  className="px-5 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                 >
                   Close & Acknowledge
                 </button>
@@ -2718,7 +2681,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* DOCUMENT LIGHTBOX MODAL */}
       <AnimatePresence>
         {docLightbox && docLightbox.open && (
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/85 ">
             <div className="w-full max-w-4xl flex items-center justify-between text-white mb-4">
               <span className="text-sm font-extrabold uppercase tracking-wider">{docLightbox.name}</span>
               <div className="flex items-center gap-2">
@@ -2726,31 +2689,31 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   href={docLightbox.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition border border-white/10"
+                  className="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-xs font-bold transition border border-white/10"
                 >
                   Open in New Tab
                 </a>
                 <button
                   onClick={() => setDocLightbox(null)}
-                  className="p-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition"
+                  className="p-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md transition"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="w-full max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl p-4 flex items-center justify-center min-h-[300px] max-h-[80vh]">
+            <div className="w-full max-w-4xl bg-white rounded-md overflow-hidden shadow-sm p-4 flex items-center justify-center min-h-[300px] max-h-[80vh]">
               {docLightbox.type === 'image' ? (
                 <img
                   src={docLightbox.url}
                   alt={docLightbox.name}
-                  className="max-w-full max-h-[75vh] object-contain rounded-2xl animate-in zoom-in-95 duration-200"
+                  className="max-w-full max-h-[75vh] object-contain rounded-md animate-in zoom-in-95 duration-200"
                 />
               ) : docLightbox.type === 'pdf' ? (
                 <iframe
                   src={docLightbox.url}
                   title={docLightbox.name}
-                  className="w-full h-[70vh] border-0 rounded-2xl"
+                  className="w-full h-[70vh] border-0 rounded-md"
                 />
               ) : (
                 <div className="flex flex-col items-center gap-3 p-10 text-center text-slate-500">
@@ -2761,7 +2724,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                     href={docLightbox.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-2 px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                    className="mt-2 px-5 py-2.5 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                   >
                     Open Document File
                   </a>
@@ -2775,12 +2738,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
       {/* DOCUMENT REVIEW REASON MODAL */}
       <AnimatePresence>
         {docReviewModal && docReviewModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-xl border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">
@@ -2788,7 +2751,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                 </h3>
                 <button
                   onClick={() => setDocReviewModal(null)}
-                  className="p-1 hover:bg-slate-100 rounded-full transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition"
                 >
                   <X size={18} />
                 </button>
@@ -2815,7 +2778,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                       placeholder="Explain what is wrong with the document..."
                       value={docReviewModal.reason}
                       onChange={(e) => setDocReviewModal({ ...docReviewModal, reason: e.target.value })}
-                      className="w-full p-3 rounded-xl border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-fuchsia-100 transition font-medium text-xs"
+                      className="w-full p-3 rounded-md border bg-slate-50 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition font-medium text-xs"
                     />
                   </div>
                 </div>
@@ -2823,13 +2786,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId, glob
                   <button
                     type="button"
                     onClick={() => setDocReviewModal(null)}
-                    className="px-4 py-2 border rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                    className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white rounded-xl text-xs font-bold shadow-md transition"
+                    className="px-4 py-2 bg-[#228b22] text-white rounded-md text-xs font-bold shadow-sm transition"
                   >
                     Submit Feedback
                   </button>

@@ -17,12 +17,12 @@ export default function FormWrapper({
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
       {/* Blue Header */}
-      <div className="bg-linear-to-r from-[#9d4ae3] to-[#8236be] p-8 text-center text-white">
+      <div className="bg-linear-to-r from-[#228b22] to-[#1c711c] p-8 text-center text-white">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">
           Vendor Registration
         </h2>
         <p className="text-sm opacity-90 font-medium">
-          Faflora a muilti-vendor marketplace platform that connects local
+          EkivaMart a muilti-vendor marketplace platform that connects local
           vendors with customers, providing a seamless online shopping
           experience. Join us to expand your reach and grow your business!
         </p>
@@ -47,7 +47,7 @@ export default function FormWrapper({
           {onNext || isLastStep ? (
             <button
               onClick={onNext}
-              className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-linear-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99]' : 'bg-linear-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99]'}`}
+              className={`flex items-center gap-3 px-8 py-2.5 text-white rounded-xl font-bold transition ${isLastStep ? 'bg-linear-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#185b1a]' : 'bg-linear-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#185b1a]'}`}
             >
               {isLastStep ? 'Submit Application' : 'Next'}
               {isLastStep ? <Check size={18} /> : <ChevronRight size={18} />}

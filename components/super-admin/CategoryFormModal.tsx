@@ -240,8 +240,8 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
+      <div className="relative w-full max-w-2xl bg-white rounded-md shadow-sm flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
@@ -250,20 +250,20 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
               {editingCategory ? 'Edit Category' : 'Add New Category'}
             </h2>
             {isPublished && (
-              <div className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+              <div className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-md text-xs font-bold">
                 <CheckCircle size={14} />
                 Published
               </div>
             )}
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-xl transition">
+          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
             <X size={20} />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium text-sm flex items-start gap-3">
+            <div className="mb-6 p-4 bg-red-50 text-red-600 border border-red-200 rounded-md font-medium text-sm flex items-start gap-3">
               <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
               {error}
             </div>
@@ -283,16 +283,16 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
               </label>
 
               <div
-                className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                className={`border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer transition-all ${
                   imagePreview
-                    ? 'border-[#9d4ae3]/30 bg-fuchsia-50/50'
-                    : 'border-gray-200 hover:border-[#9d4ae3]/50 hover:bg-fuchsia-50/20'
+                    ? 'border-[#228b22]/30 bg-brand-50/50'
+                    : 'border-gray-200 hover:border-[#228b22]/50 hover:bg-brand-50/20'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
               >
                 {imagePreview ? (
                   <div className="w-full">
-                    <div className="relative w-full max-w-[200px] mx-auto aspect-square rounded-xl overflow-hidden shadow-md ring-4 ring-white mb-3">
+                    <div className="relative w-full max-w-[200px] mx-auto aspect-square rounded-md overflow-hidden shadow-sm ring-4 ring-white mb-3">
                       <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                     </div>
                     <div className="flex gap-2 justify-center">
@@ -302,7 +302,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                           e.stopPropagation();
                           fileInputRef.current?.click();
                         }}
-                        className="text-xs font-bold text-[#8236be] hover:text-[#9d4ae3] px-3 py-1 border border-[#9d4ae3]/30 rounded-lg hover:bg-fuchsia-50 transition"
+                        className="text-xs font-bold text-[#1c711c] hover:text-[#228b22] px-3 py-1 border border-[#228b22]/30 rounded-lg hover:bg-brand-50 transition"
                       >
                         Click to change image
                       </button>
@@ -323,10 +323,10 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
+                    <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center mb-3 text-gray-400">
                       <Upload size={24} />
                     </div>
-                    <p className="text-sm font-bold text-[#8236be]">Click to upload image</p>
+                    <p className="text-sm font-bold text-[#1c711c]">Click to upload image</p>
                     <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF or WebP (Max 10MB)</p>
                   </div>
                 )}
@@ -350,7 +350,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition bg-white text-slate-800"
+                className="w-full border border-gray-200 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#228b22]/20 focus:border-[#228b22] transition bg-white text-slate-800"
                 placeholder="e.g., Electronics, Fashion"
                 required
               />
@@ -365,7 +365,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                 id="catDesc"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition bg-white text-slate-800 min-h-[100px]"
+                className="w-full border border-gray-200 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#228b22]/20 focus:border-[#228b22] transition bg-white text-slate-800 min-h-[100px]"
                 placeholder="Brief description of the category..."
                 required
               />
@@ -379,7 +379,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3 border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-100 transition disabled:opacity-50"
+            className="flex-1 py-3 border border-gray-200 text-slate-700 font-bold rounded-md hover:bg-gray-100 transition disabled:opacity-50"
             disabled={isLoading || isPublishing}
           >
             Cancel
@@ -389,7 +389,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             type="submit"
             form="categoryForm"
             disabled={isLoading || isPublishing}
-            className="flex-1 py-3 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white font-bold rounded-xl transition flex items-center justify-center shadow-lg shadow-fuchsia-100 disabled:opacity-70"
+            className="flex-1 py-3 bg-[#228b22] hover:bg-[#1c711c] text-white font-bold rounded-md transition flex items-center justify-center shadow-sm disabled:opacity-70"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -404,7 +404,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
               type="button"
               onClick={handlePublishCategory}
               disabled={isLoading || isPublishing}
-              className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl transition flex items-center justify-center shadow-lg shadow-green-100 disabled:opacity-70"
+              className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-md transition flex items-center justify-center shadow-sm disabled:opacity-70"
             >
               {isPublishing ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

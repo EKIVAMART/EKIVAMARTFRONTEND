@@ -1,4 +1,8 @@
 'use client';
+import RecordActions from "@/components/admin/RecordActions";
+
+import RecordStatus from "@/components/admin/RecordStatus";
+
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -54,24 +58,6 @@ interface UserTableProps {
 const allStatuses = ['All', 'active', 'blocked', 'deleted'];
 const authFilters = ['All', 'Authenticated', 'Not Authenticated'];
 
-const statusStyles: Record<string, { label: string; className: string; dot: string }> = {
-  active: {
-    label: 'Active',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    dot: 'bg-emerald-500',
-  },
-  blocked: {
-    label: 'Blocked',
-    className: 'bg-red-100 text-red-700 border-red-200',
-    dot: 'bg-red-500',
-  },
-  deleted: {
-    label: 'Deleted',
-    className: 'bg-gray-100 text-gray-500 border-gray-200',
-    dot: 'bg-gray-400',
-  },
-};
-
 const sortOptions = [
   { value: 'name-asc', label: 'Name: A → Z' },
   { value: 'name-desc', label: 'Name: Z → A' },
@@ -113,16 +99,6 @@ const getInitials = (firstName: string, lastName: string) =>
   `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase() || '?';
 
 /** Tooltip wrapper for desktop */
-const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="relative group/tip">
-    {children}
-    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50 transition-all">
-      {label}
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
-    </div>
-  </div>
-);
 
 export default function UserTable({
   data,
@@ -277,34 +253,13 @@ export default function UserTable({
     }
   }, [isServerPaginated, searchQuery, statusFilter, authFilter, sortBy, dateFrom, dateTo]);
 
-  const StatusBadge = ({ status }: { status: string }) => {
-    const s = statusStyles[status] || statusStyles.active;
-    return (
-      <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${s.className}`}
-      >
-        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-        {s.label}
-      </span>
-    );
-  };
-
-  const AuthBadge = ({ verified }: { verified: boolean }) => (
-    verified ? (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-        <ShieldCheck size={10} /> Verified
-      </span>
-    ) : (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-        <ShieldOff size={10} /> Unverified
-      </span>
-    )
-  );
+  const StatusBadge = ({ status }: { status: string }) => <RecordStatus value={status} />;
+  const AuthBadge = ({ verified }: { verified: boolean }) => <RecordStatus value={verified ? 'verified' : 'unverified'} />;
 
   const userStatus = (u: AppUser) => u.status || 'active';
 
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="bg-white rounded-md border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       {/* ── Desktop Action Bar ── */}
       <div className="hidden md:flex flex-wrap justify-between items-center p-4 border-b gap-3 bg-white">
@@ -441,14 +396,14 @@ export default function UserTable({
                         className="w-9 h-9 rounded-full object-cover border border-gray-100"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center text-sm font-bold text-fuchsia-700 shrink-0">
+                      <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center text-sm font-bold text-brand-700 shrink-0">
                         {getInitials(u.firstName, u.lastName)}
                       </div>
                     )}
                     <div>
-                      <span className="font-semibold text-slate-800 text-sm group-hover:text-fuchsia-600 transition-colors">
+                      <button type="button" onClick={(event) => { event.stopPropagation(); onView?.(u); }} className="text-left font-semibold text-slate-800 text-sm hover:underline underline-offset-2">
                         {u.firstName} {u.lastName}
-                      </span>
+                      </button>
                       <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{u.role}</p>
                     </div>
                   </div>
@@ -498,49 +453,12 @@ export default function UserTable({
 
                 {/* Actions */}
                 <td className="p-4 text-right">
-                  <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Tooltip label="View Details">
-                      <button
-                        onClick={() => onView?.(u)}
-                        className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
-                      >
-                        <Eye size={16} />
-                      </button>
-                    </Tooltip>
-
-                    {userStatus(u) !== 'deleted' && userStatus(u) !== 'blocked' && onBlock && (
-                      <Tooltip label="Block User">
-                        <button
-                          onClick={() => onBlock(u.id)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Ban size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {userStatus(u) === 'blocked' && onUnblock && (
-                      <Tooltip label="Unblock User">
-                        <button
-                          onClick={() => onUnblock(u.id)}
-                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        >
-                          <CheckCircle size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {userStatus(u) !== 'deleted' && onDelete && (
-                      <Tooltip label="Delete User">
-                        <button
-                          onClick={() => onDelete(u.id)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-                  </div>
+                  <RecordActions name={u.firstName + ' ' + u.lastName} actions={[
+  onView && { label: 'View details', onSelect: () => onView(u) },
+  userStatus(u) !== 'deleted' && userStatus(u) !== 'blocked' && onBlock && { label: 'Block user', onSelect: () => onBlock(u.id), destructive: true },
+  userStatus(u) === 'blocked' && onUnblock && { label: 'Unblock user', onSelect: () => onUnblock(u.id) },
+  userStatus(u) !== 'deleted' && onDelete && { label: 'Delete user', onSelect: () => onDelete(u.id), destructive: true },
+]} />
                 </td>
               </tr>
             )) : (
@@ -563,14 +481,14 @@ export default function UserTable({
           <div
             key={u.id}
             onClick={() => onView?.(u)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3 cursor-pointer hover:border-fuchsia-200 transition"
+            className="bg-white p-4 rounded-md shadow-sm border border-gray-100 space-y-3 cursor-pointer hover:border-brand-200 transition"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {u.avatar ? (
                   <img src={u.avatar} alt={u.fullName} className="w-12 h-12 rounded-full object-cover border border-gray-100" />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center text-base font-bold text-fuchsia-700">
+                  <div className="w-12 h-12 rounded-md bg-brand-100 flex items-center justify-center text-base font-bold text-brand-700">
                     {getInitials(u.firstName, u.lastName)}
                   </div>
                 )}
@@ -604,41 +522,15 @@ export default function UserTable({
               )}
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => onView?.(u)}
-                className="flex-1 py-2 bg-fuchsia-50 text-fuchsia-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-              >
-                <Eye size={14} /> View Details
-              </button>
-              {userStatus(u) !== 'deleted' && userStatus(u) !== 'blocked' && onBlock && (
-                <button
-                  onClick={() => onBlock(u.id)}
-                  className="flex-1 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-                >
-                  <Ban size={14} /> Block
-                </button>
-              )}
-              {userStatus(u) === 'blocked' && onUnblock && (
-                <button
-                  onClick={() => onUnblock(u.id)}
-                  className="flex-1 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-                >
-                  <CheckCircle size={14} /> Unblock
-                </button>
-              )}
-              {userStatus(u) !== 'deleted' && onDelete && (
-                <button
-                  onClick={() => onDelete(u.id)}
-                  className="flex-1 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-                >
-                  <Trash2 size={14} /> Delete
-                </button>
-              )}
-            </div>
+            <RecordActions name={u.firstName + ' ' + u.lastName} actions={[
+  onView && { label: 'View details', onSelect: () => onView(u) },
+  userStatus(u) !== 'deleted' && userStatus(u) !== 'blocked' && onBlock && { label: 'Block user', onSelect: () => onBlock(u.id), destructive: true },
+  userStatus(u) === 'blocked' && onUnblock && { label: 'Unblock user', onSelect: () => onUnblock(u.id) },
+  userStatus(u) !== 'deleted' && onDelete && { label: 'Delete user', onSelect: () => onDelete(u.id), destructive: true },
+]} />
           </div>
         )) : (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
+          <div className="bg-white p-8 rounded-md shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
             <div className="flex flex-col items-center gap-3">
               <User size={40} className="text-gray-200" />
               No users found.

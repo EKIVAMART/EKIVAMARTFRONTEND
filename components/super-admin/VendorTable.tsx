@@ -22,7 +22,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [statusFilter, setStatusFilter] = useState<string>('All');
-  
+
   const itemsPerPage = 10;
 
   const filteredAndSortedData = useMemo(() => {
@@ -31,7 +31,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(vendor => 
+      result = result.filter(vendor =>
         vendor.name.toLowerCase().includes(query) ||
         vendor.email.toLowerCase().includes(query) ||
         vendor.type.toLowerCase().includes(query) ||
@@ -65,13 +65,13 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
   }, [searchQuery, statusFilter]);
 
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
+    <div className="bg-white rounded-md border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+
       {/* Desktop Action Bar */}
       <div className="hidden md:flex justify-end items-center p-4 border-b gap-4 bg-white">
         <div className="flex items-center gap-2">
           <Filter size={16} className="text-gray-400" />
-          <select 
+          <select
             className="bg-gray-50 border-none text-sm font-medium text-slate-700 rounded-lg p-2 outline-none cursor-pointer"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -81,7 +81,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
             ))}
           </select>
         </div>
-        <button 
+        <button
           onClick={handleSortToggle}
           className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-500 flex items-center gap-2 text-sm font-medium"
         >
@@ -94,7 +94,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
       <div className="md:hidden flex justify-between items-center p-4 border-b bg-gray-50/50">
         <h2 className="text-lg font-bold text-slate-800">Vendors</h2>
         <div className="flex gap-2">
-          <select 
+          <select
             className="bg-white border text-sm font-medium text-slate-700 rounded-lg px-2 py-1 outline-none"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -145,11 +145,11 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
 
                 {/* Status Badge */}
                 <td className="p-4 text-center">
-                  <span 
+                  <span
                     className={`
-                      px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter
-                      ${vendor.status === 'Active' 
-                        ? 'bg-fuchsia-100 text-fuchsia-600 border border-fuchsia-200' 
+                      px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter
+                      ${vendor.status === 'Active'
+                        ? 'bg-brand-100 text-brand-600 border border-brand-200'
                         : 'bg-amber-100 text-amber-600 border border-amber-200'
                       }
                     `}
@@ -161,16 +161,16 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                 {/* Action Buttons */}
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button 
+                    <button
                       onClick={() => onEdit(vendor)}
-                      className="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition-all active:scale-90"
+                      className="p-2 text-blue-500 hover:bg-blue-50 rounded-md transition-all active:scale-90"
                       title="Edit Vendor"
                     >
                       <Edit3 size={18} />
                     </button>
-                    <button 
+                    <button
                       onClick={() => onDelete(vendor.id)}
-                      className="p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:scale-90"
+                      className="p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-all active:scale-90"
                       title="Delete Vendor"
                     >
                       <Trash2 size={18} />
@@ -190,7 +190,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
       {/* Mobile Card View */}
       <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
         {paginatedData.length > 0 ? paginatedData.map((vendor) => (
-          <div key={vendor.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
+          <div key={vendor.id} className="bg-white p-4 rounded-md shadow-sm border border-gray-100 flex flex-col gap-3">
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
                 <span className="font-bold text-slate-800 text-sm flex items-center gap-1">
@@ -201,11 +201,11 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                   {vendor.email}
                 </div>
               </div>
-              <span 
+              <span
                 className={`
-                  px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shrink-0
-                  ${vendor.status === 'Active' 
-                    ? 'bg-fuchsia-100 text-fuchsia-600 border border-fuchsia-200' 
+                  px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter shrink-0
+                  ${vendor.status === 'Active'
+                    ? 'bg-brand-100 text-brand-600 border border-brand-200'
                     : 'bg-amber-100 text-amber-600 border border-amber-200'
                   }
                 `}
@@ -224,7 +224,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
             </div>
           </div>
         )) : (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
+          <div className="bg-white p-8 rounded-md shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
             No vendors found.
           </div>
         )}
@@ -237,21 +237,21 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
             Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} entries
           </span>
           <div className="flex items-center gap-1 mx-auto sm:mx-0">
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"
             >
               <ChevronLeft size={18} />
             </button>
-            
+
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button 
+              <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                  currentPage === page 
-                    ? 'bg-gray-100 text-slate-800 font-bold' 
+                  currentPage === page
+                    ? 'bg-gray-100 text-slate-800 font-bold'
                     : 'hover:bg-gray-50 text-gray-500'
                 }`}
               >
@@ -259,7 +259,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
               </button>
             ))}
 
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-500 disabled:opacity-50 transition"

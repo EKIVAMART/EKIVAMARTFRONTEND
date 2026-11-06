@@ -8,8 +8,6 @@ import { setCredentials } from '@/lib/features/auth/authSlice';
 import { useAppDispatch } from '@/lib/hooks';
 
 const ALLOWED_ROLES = ['ADMIN', 'admin', 'SUPER-ADMIN', 'super-admin'];
-const ADMIN_ROLES = ['ADMIN', 'admin'];
-const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin'];
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -95,14 +93,11 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-full blur-[120px] opacity-20 pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative z-10">
+      <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 relative z-10">
         <div className="flex justify-center mb-8">
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <ShieldCheck size={36} className="text-[#9d4ae3]" />
+          <div className="bg-slate-50 p-4 rounded-md border border-slate-100">
+            <ShieldCheck size={36} className="text-[#228b22]" />
           </div>
         </div>
 
@@ -112,7 +107,7 @@ export default function AdminLoginPage() {
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-medium">
+          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-medium">
             <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
             {error}
           </div>
@@ -120,18 +115,20 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-slate-700 block">Email Address</label>
+            <label htmlFor="admin-email" className="text-sm font-medium text-slate-700 block">Email address</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail size={18} className="text-slate-400" />
               </div>
               <input
                 type="email"
+                id="admin-email"
+                autoComplete="username"
                 required
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#9d4ae3] focus:ring-4 focus:ring-[#9d4ae3]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
-                placeholder="admin@faflora.com"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10 rounded-md outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                placeholder="admin@example.com"
                 disabled={isLoading}
               />
             </div>
@@ -139,8 +136,8 @@ export default function AdminLoginPage() {
 
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-bold text-slate-700 block">Password</label>
-              <a href="#" className="text-xs font-semibold text-[#9d4ae3] hover:text-[#8236be] transition-colors">Forgot?</a>
+              <label htmlFor="admin-password" className="text-sm font-medium text-slate-700 block">Password</label>
+              <a href="#" className="text-xs font-semibold text-[#228b22] hover:text-[#1c711c] transition-colors">Forgot?</a>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -148,10 +145,12 @@ export default function AdminLoginPage() {
               </div>
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="admin-password"
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#9d4ae3] focus:ring-4 focus:ring-[#9d4ae3]/10 rounded-xl outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10 rounded-md outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
@@ -159,7 +158,7 @@ export default function AdminLoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                tabIndex={-1}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -169,7 +168,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={isLoading || !email || !password}
-            className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
+            className="w-full bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
           >
             {isLoading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -185,7 +184,7 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="mt-8 text-center text-sm font-medium text-slate-400">
-        <p>&copy; {new Date().getFullYear()} Faflora Group. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} EkivaMart Group. All rights reserved.</p>
         <p className="mt-1 flex items-center justify-center gap-1">
             <Lock size={12} />
             Secured by enterprise-grade encryption

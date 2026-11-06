@@ -7,6 +7,7 @@ import { fetchWishlistCount } from '@/lib/features/wishlist/wishlistSlice';
 import { fetchCartCount, fetchCart } from '@/lib/features/cart/cartSlice';
 import { setUser } from '@/lib/features/auth/authSlice';
 
+import { departments, departmentSlug } from '@/lib/data/departments';
 import TopBar from './TopBar';
 import DesktopNavbar from './DesktopNavbar';
 import MobileHeader from './MobileHeader';
@@ -19,10 +20,15 @@ import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 import { OTPVerificationModal } from '@/components/auth/OTPVerificationModal';
 import { ResetPasswordModal } from '@/components/auth/ResetPasswordModal';
 
+const navigationDepartments = departments.map(name => {
+  const slug = departmentSlug(name);
+  return { id: slug, name, slug, imageUrl: `/images/departments/${slug}.webp`, subcategories: [] };
+});
+
 export default function Navbar() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [topBarHidden, setTopBarHidden] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>(navigationDepartments);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
@@ -60,6 +66,12 @@ export default function Navbar() {
       void fetchUserProfile();
     }
   }, [isAuthenticated, user, dispatch]);
+
+  useEffect(() => {
+    const openLogin = () => setIsLoginModalOpen(true);
+    window.addEventListener('ekivamart:sign-in', openLogin);
+    return () => window.removeEventListener('ekivamart:sign-in', openLogin);
+  }, []);
 
   // Fetch categories from API
   useEffect(() => {
@@ -108,14 +120,19 @@ export default function Navbar() {
             return {
               id: parentId,
               name: parent.name || parent.title || parent.displayName || 'Unknown',
-              slug: (parent.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+              slug: departmentSlug(parent.slug || parent.name || ''),
               imageUrl: parent.imageUrl || '/images/product_cover_image.png',
               subcategories,
             };
           })
         );
 
-        if (isMounted) setCategories(formatted);
+        if (isMounted) {
+          setCategories(navigationDepartments.map(department => {
+            const live = formatted.find(item => item.slug === department.slug || departmentSlug(item.name) === department.slug);
+            return live ? { ...department, id: live.id, subcategories: live.subcategories } : department;
+          }));
+        }
       } catch (err) {
         console.warn('Failed to load navbar categories:', err);
       }

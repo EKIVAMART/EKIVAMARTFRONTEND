@@ -54,7 +54,7 @@ function formatDateTime(iso?: string | null): string {
 const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="relative group/tip">
     {children}
-    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50">
+    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-sm z-50">
       {label}
       <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
       <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
@@ -97,7 +97,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/40 "
           onClick={onClose}
         />
         <motion.div
@@ -105,27 +105,25 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
+          className="relative bg-white rounded-md shadow-sm w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="relative bg-gradient-to-br from-fuchsia-600 to-purple-700 px-6 pt-8 pb-16 text-white overflow-hidden shrink-0">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-xl hover:bg-white/10 transition">
+          <div className="relative bg-brand-600 px-6 pt-8 pb-16 text-white overflow-hidden shrink-0">
+            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-md hover:bg-white/10 transition">
               <X size={18} />
             </button>
             <div className="relative z-10">
               <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-3">Vendor Specialist</p>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/20 border-2 border-white/20 flex items-center justify-center text-2xl font-black">
+                <div className="w-16 h-16 rounded-md bg-white/20 border-2 border-white/20 flex items-center justify-center text-2xl font-black">
                   <Truck size={28} className="text-white/90" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-xl font-black tracking-tight truncate">{specialist.name}</h2>
                   <p className="text-white/70 text-xs font-medium">{specialist.contactPhone}</p>
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                       specialist.isActive
                         ? 'bg-emerald-400/30 text-white border-white/30'
                         : 'bg-gray-400/30 text-white/70 border-white/20'
@@ -133,7 +131,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
                       <span className={`w-1.5 h-1.5 rounded-full ${specialist.isActive ? 'bg-emerald-300' : 'bg-gray-400'}`} />
                       {specialist.isActive ? 'Active' : 'Inactive'}
                     </span>
-                    <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-white/20">
+                    <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider border border-white/20">
                       {formatStateLabel(specialist.state)}
                     </span>
                   </div>
@@ -143,7 +141,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           </div>
 
           {/* Active status banner */}
-          <div className={`-mt-8 mx-6 rounded-2xl p-4 shadow-md z-10 shrink-0 ${specialist.isActive ? 'bg-emerald-500' : 'bg-slate-500'}`}>
+          <div className={`-mt-8 mx-6 rounded-md p-4 shadow-sm z-10 shrink-0 ${specialist.isActive ? 'bg-emerald-500' : 'bg-slate-500'}`}>
             <div className="flex items-center gap-3">
               {specialist.isActive
                 ? <CheckCircle2 size={20} className="text-white shrink-0" />
@@ -165,11 +163,11 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           <div className="flex-1 overflow-y-auto p-6 space-y-6 mt-2">
             <div>
               <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Specialist Details</h3>
-              <div className="bg-gray-50/50 rounded-2xl p-2">
+              <div className="bg-gray-50/50 rounded-md p-2">
                 <DetailRow icon={User} label="Full Name" value={specialist.name} />
                 <DetailRow icon={Phone} label="Contact Phone" value={specialist.contactPhone} />
                 <DetailRow icon={MapPin} label="Operating State" value={
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-brand-100 text-brand-700 border border-brand-200">
                     {formatStateLabel(specialist.state)}
                   </span>
                 } />
@@ -180,7 +178,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
             </div>
             <div>
               <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Timestamps</h3>
-              <div className="bg-gray-50/50 rounded-2xl p-2">
+              <div className="bg-gray-50/50 rounded-md p-2">
                 <DetailRow icon={Calendar} label="Created At" value={formatDateTime(specialist.createdAt)} />
                 <DetailRow icon={Clock} label="Last Updated" value={formatDateTime(specialist.updatedAt)} />
               </div>
@@ -191,7 +189,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           <div className="border-t border-gray-100 p-4 flex flex-wrap gap-3 shrink-0">
             <button
               onClick={() => { onToggleActive(specialist); onClose(); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-bold transition ${
                 specialist.isActive
                   ? 'bg-amber-50 hover:bg-amber-100 text-amber-600'
                   : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
@@ -203,13 +201,13 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
             </button>
             <button
               onClick={() => { onEdit(specialist); onClose(); }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold transition"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-md text-sm font-bold transition"
             >
               <Edit2 size={15} /> Edit
             </button>
             <button
               onClick={() => { onDelete(specialist.id); onClose(); }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-bold transition"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
             >
               <Trash2 size={15} /> Delete
             </button>
@@ -310,21 +308,21 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border"
+            className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
           >
-            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-6 py-4 text-white flex justify-between items-center">
+            <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Truck size={20} />
                 <h3 className="font-bold text-lg">
                   {isEditing ? 'Edit Specialist' : 'Add Vendor Specialist'}
                 </h3>
               </div>
-              <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-xl transition">
+              <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-md transition">
                 <X size={18} />
               </button>
             </div>
@@ -341,7 +339,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Chinedu Okafor"
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition"
+                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">2–150 characters</p>
               </div>
@@ -355,7 +353,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   value={form.contactPhone}
                   onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))}
                   placeholder="+2348012345678"
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition font-mono"
+                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition font-mono"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">E.164 format — no spaces, dashes or leading 0 (e.g. +2348012345678)</p>
                 {form.contactPhone && !PHONE_REGEX.test(form.contactPhone) && (
@@ -372,7 +370,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   required
                   value={form.state}
                   onChange={(e) => setForm((f) => ({ ...f, state: e.target.value as StateEnumValue }))}
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 transition"
+                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition"
                 >
                   <option value="">Select a state…</option>
                   {STATE_ENUM_VALUES.map((s) => (
@@ -392,7 +390,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   <button
                     type="button"
                     onClick={() => setIsActiveForm((v) => !v)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold border transition ${
                       isActiveForm
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                         : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
@@ -407,14 +405,14 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                  className="px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-md transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] rounded-xl shadow-sm transition disabled:opacity-50"
+                  className="px-6 py-2.5 text-sm font-bold text-white bg-[#228b22] hover:bg-[#1c711c] rounded-md shadow-sm transition disabled:opacity-50"
                 >
                   {isSaving ? 'Saving…' : isEditing ? 'Update Specialist' : 'Create Specialist'}
                 </button>
@@ -438,14 +436,14 @@ interface DeleteConfirmProps {
 
 function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteConfirmProps) {
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border p-6 text-center"
+        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
       >
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mb-4">
+        <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4">
           <Trash2 size={24} className="text-red-500" />
         </div>
         <h3 className="text-lg font-extrabold text-slate-800">Delete Specialist?</h3>
@@ -456,14 +454,14 @@ function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteCon
           <button
             onClick={onCancel}
             disabled={isDeleting}
-            className="flex-1 py-3 border rounded-xl text-sm font-bold hover:bg-slate-50 transition disabled:opacity-50"
+            className="flex-1 py-3 border rounded-md text-sm font-bold hover:bg-slate-50 transition disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isDeleting}
-            className="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl text-sm font-bold transition shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isDeleting ? <><RefreshCw size={14} className="animate-spin" /> Deleting…</> : <><Trash2 size={14} /> Delete</>}
           </button>
@@ -597,10 +595,9 @@ export default function VendorSpecialistsView() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Truck className="text-[#9d4ae3]" size={24} />
+          <h2 className="text-2xl font-semibold text-slate-900">
             Vendor Specialists
           </h2>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">
@@ -612,13 +609,14 @@ export default function VendorSpecialistsView() {
             onClick={() => loadSpecialists(page)}
             disabled={isLoading}
             title="Refresh"
-            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-xl transition border"
+            aria-label="Refresh specialists"
+            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-md transition border"
           >
             <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={handleOpenCreate}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white rounded-xl font-bold text-sm shadow-sm transition"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md font-bold text-sm shadow-sm transition"
           >
             <Plus size={15} /> Add Specialist
           </button>
@@ -626,9 +624,9 @@ export default function VendorSpecialistsView() {
       </div>
 
       {/* Filters row */}
-      <div className="bg-white rounded-2xl border shadow-xs p-4 space-y-3">
+      <div className="bg-white rounded-md border shadow-xs p-4 space-y-3">
         {/* Search */}
-        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition bg-slate-50">
+        <div className="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2.5 focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition bg-slate-50">
           <Search size={16} className="text-gray-400 shrink-0" />
           <input
             type="text"
@@ -647,14 +645,14 @@ export default function VendorSpecialistsView() {
         {/* Status tabs + State filter */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Active status tabs */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-1">
+          <div className="flex items-center bg-gray-100 rounded-md p-1 gap-1">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => { setActiveFilter(tab.value as any); setPage(1); }}
-                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${
+                className={`px-4 py-1.5 rounded-md text-xs font-bold transition ${
                   activeFilter === tab.value
-                    ? 'bg-white text-[#9d4ae3] shadow-sm border border-gray-200'
+                    ? 'bg-white text-[#228b22] shadow-sm border border-gray-200'
                     : 'text-gray-500 hover:text-slate-700'
                 }`}
               >
@@ -669,7 +667,7 @@ export default function VendorSpecialistsView() {
             <select
               value={stateFilter}
               onChange={(e) => { setStateFilter(e.target.value as any); setPage(1); }}
-              className="text-sm border border-gray-200 rounded-xl px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-[#9d4ae3] transition font-medium"
+              className="text-sm border border-gray-200 rounded-md px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-[#228b22] transition font-medium"
             >
               <option value="">All States</option>
               {STATE_ENUM_VALUES.map((s) => (
@@ -681,7 +679,7 @@ export default function VendorSpecialistsView() {
           {(activeFilter !== '' || stateFilter) && (
             <button
               onClick={() => { setActiveFilter(''); setStateFilter(''); setPage(1); }}
-              className="text-xs font-bold text-[#9d4ae3] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#228b22] hover:underline flex items-center gap-1"
             >
               <X size={12} /> Clear filters
             </button>
@@ -690,10 +688,10 @@ export default function VendorSpecialistsView() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-md border shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="py-16 text-center text-gray-400">
-            <RefreshCw size={28} className="animate-spin mx-auto mb-3 text-[#9d4ae3]" />
+            <RefreshCw size={28} className="animate-spin mx-auto mb-3 text-[#228b22]" />
             <p className="text-sm font-semibold">Loading specialists…</p>
           </div>
         ) : filtered.length === 0 ? (
@@ -729,12 +727,12 @@ export default function VendorSpecialistsView() {
                       {/* Name + Phone */}
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                            <Truck size={16} className="text-[#9d4ae3]" />
+                          <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center shrink-0">
+                            <Truck size={16} className="text-[#228b22]" />
                           </div>
                           <div>
                             <p
-                              className="font-bold text-slate-800 text-sm group-hover:text-[#9d4ae3] transition-colors cursor-pointer flex items-center gap-1"
+                              className="font-bold text-slate-800 text-sm group-hover:text-[#228b22] transition-colors cursor-pointer flex items-center gap-1"
                               onClick={() => handleOpenView(s)}
                             >
                               {s.name}
@@ -750,7 +748,7 @@ export default function VendorSpecialistsView() {
 
                       {/* State */}
                       <td className="p-4 text-center">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200">
                           <MapPin size={10} />
                           {formatStateLabel(s.state)}
                         </span>
@@ -760,7 +758,7 @@ export default function VendorSpecialistsView() {
                       <td className="p-4 text-center">
                         <button
                           onClick={() => handleToggleActive(s)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter transition border ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter transition border ${
                             s.isActive
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                               : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
@@ -784,7 +782,7 @@ export default function VendorSpecialistsView() {
                           <Tooltip label="View details">
                             <button
                               onClick={() => handleOpenView(s)}
-                              className="p-2 text-gray-400 hover:text-[#9d4ae3] hover:bg-purple-50 rounded-xl transition-all active:scale-90"
+                              className="p-2 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-md transition-all active:scale-90"
                             >
                               <Eye size={16} />
                             </button>
@@ -792,7 +790,7 @@ export default function VendorSpecialistsView() {
                           <Tooltip label="Edit specialist">
                             <button
                               onClick={() => handleOpenEdit(s)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all active:scale-90"
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all active:scale-90"
                             >
                               <Edit2 size={16} />
                             </button>
@@ -800,7 +798,7 @@ export default function VendorSpecialistsView() {
                           <Tooltip label="Delete specialist">
                             <button
                               onClick={() => handleDeleteRequest(s.id, s.name)}
-                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all active:scale-90"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all active:scale-90"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -816,11 +814,11 @@ export default function VendorSpecialistsView() {
             {/* Mobile card view */}
             <div className="md:hidden flex flex-col p-4 space-y-3 bg-gray-50/50">
               {filtered.map((s) => (
-                <div key={s.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div key={s.id} className="bg-white p-4 rounded-md shadow-sm border border-gray-100">
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                        <Truck size={16} className="text-[#9d4ae3]" />
+                      <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center shrink-0">
+                        <Truck size={16} className="text-[#228b22]" />
                       </div>
                       <div>
                         <p className="font-bold text-slate-800 text-sm">{s.name}</p>
@@ -831,7 +829,7 @@ export default function VendorSpecialistsView() {
                     </div>
                     <button
                       onClick={() => handleToggleActive(s)}
-                      className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase border transition ${
+                      className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase border transition ${
                         s.isActive
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : 'bg-gray-100 text-gray-500 border-gray-200'
@@ -842,11 +840,11 @@ export default function VendorSpecialistsView() {
                     </button>
                   </div>
                   <div className="flex items-center justify-between mt-3 border-t border-gray-50 pt-3">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200">
                       <MapPin size={10} /> {formatStateLabel(s.state)}
                     </span>
                     <div className="flex gap-1">
-                      <button onClick={() => handleOpenView(s)} className="p-1.5 text-gray-400 hover:text-[#9d4ae3] hover:bg-purple-50 rounded-lg transition"><Eye size={15} /></button>
+                      <button onClick={() => handleOpenView(s)} className="p-1.5 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-lg transition"><Eye size={15} /></button>
                       <button onClick={() => handleOpenEdit(s)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit2 size={15} /></button>
                       <button onClick={() => handleDeleteRequest(s.id, s.name)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={15} /></button>
                     </div>
@@ -874,7 +872,7 @@ export default function VendorSpecialistsView() {
                       key={pg}
                       onClick={() => setPage(pg)}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
-                        page === pg ? 'bg-[#9d4ae3] text-white font-bold shadow-sm' : 'hover:bg-gray-50 text-gray-500'
+                        page === pg ? 'bg-[#228b22] text-white font-bold shadow-sm' : 'hover:bg-gray-50 text-gray-500'
                       }`}
                     >
                       {pg}

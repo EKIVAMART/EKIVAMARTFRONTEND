@@ -43,15 +43,15 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col"
+          className="relative bg-white w-full max-w-2xl rounded-md shadow-sm overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 px-6 py-5 text-white">
+          <div className="bg-brand-600 px-6 py-5 text-white">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold">Admin Details</h2>
@@ -62,7 +62,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition"
+                className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-md transition"
               >
                 <X size={20} />
               </button>
@@ -73,7 +73,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Profile Section */}
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center text-2xl font-bold text-fuchsia-700 shadow-md">
+              <div className="w-20 h-20 rounded-md bg-brand-100 flex items-center justify-center text-2xl font-bold text-brand-700 shadow-sm">
                 {admin.avatar ? (
                   <img src={admin.avatar} alt={`${admin.firstName} ${admin.lastName}`} className="w-full h-full rounded-full object-cover" />
                 ) : (
@@ -85,7 +85,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
                   <h3 className="text-xl font-bold text-slate-800">
                     {admin.firstName} {admin.lastName}
                   </h3>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${status.bg} ${status.color} border`}>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${status.bg} ${status.color} border`}>
                     <StatusIcon size={12} />
                     {status.label}
                   </span>
@@ -104,9 +104,9 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
             </div>
 
             {/* Contact Information */}
-            <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+            <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
               <h4 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
-                <Mail size={16} className="text-fuchsia-500" />
+                <Mail size={16} className="text-brand-500" />
                 Contact Information
               </h4>
               <div className="space-y-3">
@@ -122,9 +122,9 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
             </div>
 
             {/* Timeline Information */}
-            <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+            <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
               <h4 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
-                <Calendar size={16} className="text-fuchsia-500" />
+                <Calendar size={16} className="text-brand-500" />
                 Activity Timeline
               </h4>
               <div className="space-y-3">
@@ -144,25 +144,25 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
             </div>
 
             {/* Permissions Section - All permissions available by default */}
-            <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+            <div className="bg-gray-50 rounded-md p-5 border border-gray-100">
               <h4 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
-                <Shield size={16} className="text-fuchsia-500" />
+                <Shield size={16} className="text-brand-500" />
                 Assigned Permissions (Full Access)
               </h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
                   <Package size={14} />
                   <span className="text-xs font-bold">Manage Products</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
                   <ShoppingBag size={14} />
                   <span className="text-xs font-bold">Manage Orders</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
                   <Users size={14} />
                   <span className="text-xs font-bold">Manage Vendors</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
                   <BarChart3 size={14} />
                   <span className="text-xs font-bold">View Analytics</span>
                 </div>
@@ -174,7 +174,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
           <div className="px-6 py-4 border-t bg-gray-50 flex justify-end">
             <button
               onClick={onClose}
-              className="px-6 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white rounded-xl font-bold transition shadow-md shadow-fuchsia-100"
+              className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-md font-bold transition shadow-sm "
             >
               Close
             </button>

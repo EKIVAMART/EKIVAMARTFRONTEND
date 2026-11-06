@@ -1,5 +1,7 @@
 'use client';
 
+import ShoppingNavLink from './ShoppingNavLink';
+import { UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -34,68 +36,6 @@ function SearchIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function HeartIcon({ filled }: { filled?: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.94 12 5C12.2 3.94 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
-        fill={filled ? '#9d4ae3' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CartIcon({ filled }: { filled?: boolean }) {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 23 21"
-      shapeRendering="crispEdges"
-      aria-hidden
-    >
-      <g fill={filled ? '#9d4ae3' : 'currentColor'}>
-        <rect x="0" y="0" width="1" height="1" />
-        <rect x="0" y="1" width="2" height="1" />
-        <rect x="0" y="2" width="2" height="1" />
-        <rect x="1" y="3" width="1" height="1" />
-        <rect x="1" y="4" width="20" height="1" />
-        <rect x="1" y="5" width="22" height="1" />
-        <rect x="1" y="6" width="2" height="1" />
-        <rect x="21" y="6" width="2" height="1" />
-        <rect x="2" y="7" width="1" height="1" />
-        <rect x="21" y="7" width="2" height="1" />
-        <rect x="2" y="8" width="1" height="1" />
-        <rect x="21" y="8" width="2" height="1" />
-        <rect x="2" y="9" width="2" height="1" />
-        <rect x="21" y="9" width="2" height="1" />
-        <rect x="2" y="10" width="2" height="1" />
-        <rect x="21" y="10" width="1" height="1" />
-        <rect x="3" y="11" width="1" height="1" />
-        <rect x="21" y="11" width="1" height="1" />
-        <rect x="3" y="12" width="1" height="1" />
-        <rect x="9" y="12" width="7" height="1" />
-        <rect x="20" y="12" width="2" height="1" />
-        <rect x="3" y="13" width="2" height="1" />
-        <rect x="20" y="13" width="1" height="1" />
-        <rect x="4" y="14" width="1" height="1" />
-        <rect x="19" y="14" width="2" height="1" />
-        <rect x="4" y="15" width="3" height="1" />
-        <rect x="18" y="15" width="2" height="1" />
-        <rect x="6" y="16" width="13" height="1" />
-        <rect x="8" y="19" width="2" height="1" />
-        <rect x="14" y="19" width="2" height="1" />
-        <rect x="9" y="20" width="1" height="1" />
-        <rect x="15" y="20" width="1" height="1" />
-      </g>
-    </svg>
-  );
-}
-
 export default function MobileHeader({
   categories,
   onOpenCategories,
@@ -107,7 +47,7 @@ export default function MobileHeader({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Category scroller properties
   const catScrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0); // 0 to 1 representing scroll position
@@ -170,7 +110,7 @@ export default function MobileHeader({
       {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
       <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-brand-200 scrollbar-track-brand-50/60 [scrollbar-width:thin] [scrollbar-color:rgba(157,74,227,0.35)_rgba(157,74,227,0.08)]">
         <div className="flex w-max min-w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 min-w-0">
-          
+
           {/* Categories button */}
           <button
             type="button"
@@ -185,8 +125,8 @@ export default function MobileHeader({
           {/* Logo (moved left, close to categories but with equal layout spacing) */}
           <Link href="/" className="flex items-center shrink-0 ml-[5%] mr-auto">
             <Image
-              src="/fa_logo_brand.png"
-              alt="Faflora"
+              src="/brand/ekivamart-logo.svg"
+              alt="EkivaMart"
               width={82}
               height={26}
               className="h-6.5 w-auto object-contain"
@@ -208,33 +148,9 @@ export default function MobileHeader({
             <SearchIcon />
           </button>
 
-          {/* Wishlist */}
-          <Link
-            href="/wishlist"
-            aria-label="Wishlist"
-            className={`relative flex items-center justify-center p-0.5 transition-colors ${
-              onWishlist ? 'text-brand-600' : 'text-neutral-700'
-            }`}
-          >
-            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[9px] font-bold text-white shadow-sm">
-              {wishlistCount}
-            </span>
-            <HeartIcon filled={onWishlist} />
-          </Link>
+          <ShoppingNavLink href="/wishlist" active={onWishlist} count={wishlistCount} />
 
-          {/* Cart */}
-          <Link
-            href="/cart"
-            aria-label="Cart"
-            className={`relative flex items-center justify-center p-0.5 transition-colors ${
-              onCart ? 'text-brand-600' : 'text-neutral-700'
-            }`}
-          >
-            <span className="absolute -top-1 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[9px] font-bold text-white shadow-sm">
-              {cartCount}
-            </span>
-            <CartIcon filled={onCart} />
-          </Link>
+          <ShoppingNavLink href="/cart" active={onCart} count={cartCount} />
 
           {/* In-App Notifications Bell (Renders strictly for authenticated users) */}
           <NotificationBell />
@@ -259,7 +175,7 @@ export default function MobileHeader({
               aria-label="Account"
               className="relative shrink-0 flex items-center justify-center p-0.5"
             >
-              <Image src="/icons/Frame.png" alt="Account" width={20} height={20} className="rounded-full" />
+              <UserRound aria-hidden="true" size={22} strokeWidth={1.75} className="text-stone-700" />
             </button>
           )}
           </div>

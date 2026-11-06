@@ -146,7 +146,7 @@ export default function VendorPage({ params }: VendorPageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-brand-300 border-t-purple-600 rounded-full animate-spin" />
           <p className="text-gray-500 font-medium">Loading store details...</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function VendorPage({ params }: VendorPageProps) {
           <AlertCircle size={48} className="mx-auto text-amber-500 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Store Not Available</h2>
           <p className="text-gray-500 mb-6">{loadError || 'This store profile could not be found.'}</p>
-          <Link href="/" className="bg-[#9d4ae3] text-white px-6 py-2.5 rounded-xl font-bold inline-block hover:bg-[#8236be] transition">
+          <Link href="/" className="bg-[#228b22] text-white px-6 py-2.5 rounded-xl font-bold inline-block hover:bg-[#1c711c] transition">
             Back to Home
           </Link>
         </div>
@@ -171,8 +171,8 @@ export default function VendorPage({ params }: VendorPageProps) {
   const storeName = store.storeName || 'Store';
   const averageRating = store.averageRating ?? reviewsData?.averageRating ?? 4.8;
   const memberSince = store.approvedAt
-    ? `Started selling on Faflora in ${new Date(store.approvedAt).getFullYear()}`
-    : 'Verified seller on Faflora';
+    ? `Started selling on EkivaMart in ${new Date(store.approvedAt).getFullYear()}`
+    : 'Verified seller on EkivaMart';
 
   const ratingDistribution = reviewsData?.ratingDistribution || { 5: 85, 4: 10, 3: 3, 2: 1, 1: 1 };
   const totalReviewsCount = reviewsData?.totalReviews || Object.values(ratingDistribution).reduce((a, b) => a + b, 0);

@@ -173,40 +173,40 @@ export default function BlogModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#f8faf7] p-0">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]"
+          className="bg-white w-full min-h-screen border-0 flex flex-col"
         >
           {/* Header */}
           <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-md bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
                 <FileText size={20} />
               </div>
               <div>
                 <h3 className="text-lg font-extrabold text-slate-800">
-                  {isEditing ? 'Edit Blog Article' : 'Create New Blog Article'}
+                  {isEditing ? 'Edit article' : 'New article'}
                 </h3>
                 <p className="text-xs text-neutral-500 font-medium">
                   {isEditing
                     ? 'Modify article content, images, and search engine metadata'
-                    : 'Compose a story to publish on the Faflora blog page'}
+                    : 'Compose a story to publish on the EkivaMart blog page'}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+              className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Form Content Scrollable Area */}
-          <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-6">
+          <form onSubmit={handleSave} className="flex-1 w-full max-w-5xl mx-auto p-6 md:p-10 space-y-6">
             {/* Title */}
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
@@ -216,10 +216,10 @@ export default function BlogModal({
                 type="text"
                 required
                 maxLength={200}
-                placeholder="e.g. How to Keep Your Roses Fresh in the Lagos Heat"
+                placeholder="Give your article a clear title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white transition"
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white transition"
               />
             </div>
 
@@ -231,13 +231,13 @@ export default function BlogModal({
               <p className="text-[11px] text-neutral-400 mb-1.5">
                 Leave blank to automatically build URL slug from article title.
               </p>
-              <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-2xl px-3 py-2 text-xs font-semibold text-neutral-500">
+              <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-neutral-500">
                 <Globe size={14} className="text-neutral-400" />
-                <span className="text-neutral-400">faflora.com/blog/</span>
+                <span className="text-neutral-400">ekivamart.com/blog/</span>
                 <input
                   type="text"
                   maxLength={220}
-                  placeholder="how-to-keep-your-roses-fresh"
+                  placeholder="article-slug"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
@@ -252,7 +252,7 @@ export default function BlogModal({
               </label>
 
               {featuredImageUrl ? (
-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200 max-h-56 bg-neutral-100 group">
+                <div className="relative rounded-md overflow-hidden border border-neutral-200 max-h-56 bg-neutral-100 group">
                   <img
                     src={featuredImageUrl}
                     alt="Featured preview"
@@ -265,7 +265,7 @@ export default function BlogModal({
                         setFeaturedImageUrl('');
                         setFeaturedImageKey(null);
                       }}
-                      className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md hover:bg-rose-700 transition"
+                      className="px-4 py-2 bg-rose-600 text-white rounded-md text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-rose-700 transition"
                     >
                       <Trash2 size={14} /> Remove
                     </button>
@@ -273,7 +273,7 @@ export default function BlogModal({
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                  <label className="flex-1 border-2 border-dashed border-neutral-200 hover:border-brand-500 rounded-2xl p-4 text-center cursor-pointer transition bg-neutral-50/50 flex flex-col items-center justify-center">
+                  <label className="flex-1 border-2 border-dashed border-neutral-200 hover:border-brand-500 rounded-md p-4 text-center cursor-pointer transition bg-neutral-50/50 flex flex-col items-center justify-center">
                     {isUploadingHero ? (
                       <Loader2 size={24} className="animate-spin text-brand-600 my-1" />
                     ) : (
@@ -309,7 +309,7 @@ export default function BlogModal({
                           setFeaturedImageUrl(e.target.value);
                           setFeaturedImageKey(null);
                         }}
-                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-9 pr-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-md pl-9 pr-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
                       />
                     </div>
                   </div>
@@ -330,7 +330,7 @@ export default function BlogModal({
             </div>
 
             {/* Excerpt Section */}
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 space-y-3">
+            <div className="bg-neutral-50 border border-neutral-200 rounded-md p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-800">
                   Card Summary Excerpt
@@ -338,7 +338,7 @@ export default function BlogModal({
                 <button
                   type="button"
                   onClick={() => setAutoGenerateExcerpt(!autoGenerateExcerpt)}
-                  className={`text-xs font-bold px-3 py-1 rounded-xl transition flex items-center gap-1.5 ${
+                  className={`text-xs font-bold px-3 py-1 rounded-md transition flex items-center gap-1.5 ${
                     autoGenerateExcerpt
                       ? 'bg-brand-100 text-brand-700'
                       : 'bg-neutral-200 text-neutral-700'
@@ -356,13 +356,13 @@ export default function BlogModal({
                   placeholder="Enter a short custom summary for article cards (max 500 characters)..."
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  className="w-full bg-white border border-neutral-200 rounded-xl p-3 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                  className="w-full bg-white border border-neutral-200 rounded-md p-3 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
                 />
               )}
             </div>
 
             {/* SEO Metadata Accordion */}
-            <div className="border border-neutral-200 rounded-2xl p-4 space-y-4 bg-white">
+            <div className="border border-neutral-200 rounded-md p-4 space-y-4 bg-white">
               <h4 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
                 <Globe size={14} className="text-brand-600" />
                 <span>Search Engine Optimization (SEO Metadata)</span>
@@ -376,10 +376,10 @@ export default function BlogModal({
                   <input
                     type="text"
                     maxLength={200}
-                    placeholder="Keep Roses Fresh in Lagos Heat | Faflora Care Guide"
+                    placeholder="Article title | EkivaMart"
                     value={seoTitle}
                     onChange={(e) => setSeoTitle(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
                   />
                 </div>
 
@@ -390,10 +390,10 @@ export default function BlogModal({
                   <input
                     type="text"
                     maxLength={500}
-                    placeholder="Seven easy tips to make cut roses last longer in Nigerian weather."
+                    placeholder="A short description of this article."
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-600"
                   />
                 </div>
               </div>
@@ -404,14 +404,14 @@ export default function BlogModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-3 border border-neutral-200 rounded-2xl text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition"
+                className="px-5 py-3 border border-neutral-200 rounded-md text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-xs font-extrabold transition shadow-md flex items-center gap-2"
+                className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-xs font-extrabold transition shadow-sm flex items-center gap-2"
               >
                 {isSaving && <Loader2 size={16} className="animate-spin" />}
                 <span>

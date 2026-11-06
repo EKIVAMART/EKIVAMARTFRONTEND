@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { MapPin, Store } from 'lucide-react';
 import { useAppDispatch, useAppSelector, useWishlist } from '@/lib/hooks';
 import { addWishlistItem, removeWishlistItem } from '@/lib/features/wishlist/wishlistSlice';
 import { openNoteModal } from '@/lib/features/cart/cartSlice';
@@ -17,15 +18,7 @@ function formatNaira(amount: number) {
 /** 12-point rosette/star-burst discount badge on top-right, floating over border */
 function RosetteBadge({ percent }: { percent: number }) {
   return (
-    <div className="absolute -top-2.5 -right-2.5 z-20 flex h-10 w-10 items-center justify-center">
-      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-[0_2px_5px_rgba(0,0,0,0.15)]">
-        <path
-          fill="#ff3b30"
-          d="M50 0 L58 12 L71 5 L74 19 L88 17 L85 30 L97 34 L89 46 L98 56 L86 63 L91 76 L78 78 L78 91 L65 89 L60 100 L48 93 L38 100 L32 89 L19 91 L20 78 L7 76 L13 63 L1 56 L10 46 L2 34 L14 30 L11 17 L25 19 L28 5 L41 12 Z"
-        />
-      </svg>
-      <span className="relative z-10 text-[9px] font-bold text-white">-{percent}%</span>
-    </div>
+    <span className="ek-discount">−{percent}%</span>
   );
 }
 
@@ -84,9 +77,9 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       toast.error('Please log in to add items to your cart');
       return;
     }
-    
+
     // dispatch(openNoteModal({ productId: product.id, quantity: 1 }));
-    
+
     // direct add to cart with no note modal
     dispatch(addItemToCartApi({ productId: product.id, quantity: 1 }));
     toast.success('Added to cart!');
@@ -95,7 +88,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
   return (
     <Link
       href={productHref}
-      className="group flex w-full h-full sm:w-52 sm:h-[415px] sm:shrink-0 flex-col rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm hover:shadow-md hover:scale-103 transition-shadow duration-200 relative"
+      className="ek-product-card group flex w-full h-full sm:w-52 sm:h-[415px] sm:shrink-0 flex-col border bg-white relative"
     >
       {/* Image container — no overflow-hidden so the rosette badge overflows beautifully */}
       <div className="relative mb-3.5 aspect-square rounded-xl bg-neutral-50 border border-neutral-100/50">
@@ -165,17 +158,20 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       </div>
 
       {/* Location & Vendor */}
-      <div className="mb-2.5 flex items-start gap-1.1 text-[11px] text-neutral-500">
-        <Image src="/icons/location.png" alt="" width={14} height={14} className="shrink-0 mt-px mr-1" />
-        <span className="flex-1 break-words">
+      <div className="mb-3 grid min-w-0 gap-1 text-[11px] leading-4 text-stone-600">
+        {(product.storeName || product.vendor) && (
+          <span className="flex min-w-0 items-baseline gap-1.5 font-medium text-stone-700">
+            <Store size={13} strokeWidth={1.5} aria-hidden="true" className="shrink-0 self-start mt-px" />
+            <span className="min-w-0 break-words"><span className="sr-only">Sold by </span>{product.storeName || product.vendor}</span>
+          </span>
+        )}
+        <span className="flex items-baseline gap-1.5">
+          <MapPin size={13} strokeWidth={1.5} aria-hidden="true" className="shrink-0 self-start mt-px" />
           {typeof product.location === 'object' && product.location !== null
             ? ((product.location as any).state || 'Lagos')
             : typeof product.location === 'string' && product.location.includes(',')
             ? product.location.split(',').pop()?.trim() || product.location
             : (product.location || 'Lagos')}
-        </span>
-        <span className="rounded break-words bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 shrink-0 max-w-[45%]">
-          {product.storeName || product.vendor}
         </span>
       </div>
 

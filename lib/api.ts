@@ -672,7 +672,7 @@ export interface StoreOption {
   storeSlug: string;
   storeLogoUrl: string | null;
   applicationStatus: string;
-  isFafloraOfficialStore: boolean;
+  isEkivaMartOfficialStore: boolean;
 }
 
 export const productApi = {

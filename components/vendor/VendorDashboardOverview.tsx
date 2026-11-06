@@ -144,13 +144,13 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
   const todayEarnings = stats?.todayEarnings ?? 0;
   const totalEarnings = stats?.totalEarnings ?? stats?.netRevenue ?? 0;
   const pendingEarnings = stats?.pendingEarnings ?? 0;
-  
+
   const todayOrders = stats?.todayOrders ?? 0;
   const totalOrders = stats?.totalOrders ?? 0;
-  
+
   const totalProducts = stats?.totalProducts ?? 0;
   const totalUnitsSold = stats?.totalUnitsSold ?? 0;
-  
+
   const pendingOrders = stats?.pendingOrders ?? 0;
   const averageOrderValue = stats?.averageOrderValue ?? 0;
 
@@ -167,7 +167,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-32 gap-4">
-      <div className="w-12 h-12 border-4 border-purple-200 border-t-[#9d4ae3] rounded-full animate-spin" />
+      <div className="w-12 h-12 border-4 border-brand-200 border-t-[#228b22] rounded-full animate-spin" />
       <p className="text-sm font-bold text-slate-500">Loading vendor analytics...</p>
     </div>
   );
@@ -176,7 +176,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
     <div className="flex flex-col items-center gap-4 py-24 text-center">
       <AlertCircle size={40} className="text-rose-500" />
       <p className="text-slate-700 font-bold text-sm">{error}</p>
-      <button onClick={() => loadAllData()} className="flex items-center gap-2 px-5 py-2.5 bg-[#9d4ae3] text-white rounded-xl text-sm font-bold hover:opacity-90 transition">
+      <button onClick={() => loadAllData()} className="flex items-center gap-2 px-5 py-2.5 bg-[#228b22] text-white rounded-xl text-sm font-bold hover:opacity-90 transition">
         <RefreshCw size={14} /> Refresh Analytics
       </button>
     </div>
@@ -217,7 +217,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
                 onClick={() => handlePeriodChange(p.id as StatsPeriod)}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   period === p.id
-                    ? 'bg-white text-[#9d4ae3] shadow-xs font-black'
+                    ? 'bg-white text-[#228b22] shadow-xs font-black'
                     : 'hover:text-slate-900'
                 }`}
               >
@@ -228,7 +228,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
 
           <button
             onClick={() => loadAllData()}
-            className="p-2 text-slate-500 hover:text-[#9d4ae3] hover:bg-purple-50 border border-slate-200 rounded-xl transition-all"
+            className="p-2 text-slate-500 hover:text-[#228b22] hover:bg-brand-50 border border-slate-200 rounded-xl transition-all"
             title="Refresh analytics"
           >
             <RefreshCw size={16} className={statsLoading ? 'animate-spin' : ''} />
@@ -238,8 +238,8 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
 
       {/* Custom Date Pickers if custom selected */}
       {period === 'custom' && (
-        <div className="bg-purple-50/60 border border-purple-100 rounded-2xl p-4 flex flex-wrap items-center gap-3 text-xs">
-          <Calendar size={16} className="text-[#9d4ae3]" />
+        <div className="bg-brand-50/60 border border-brand-100 rounded-2xl p-4 flex flex-wrap items-center gap-3 text-xs">
+          <Calendar size={16} className="text-[#228b22]" />
           <span className="font-bold text-slate-700">Custom Range:</span>
           <input
             type="date"
@@ -257,7 +257,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
           <button
             onClick={handleCustomDateSubmit}
             disabled={!startDate || !endDate}
-            className="px-4 py-1.5 bg-[#9d4ae3] text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 transition"
+            className="px-4 py-1.5 bg-[#228b22] text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 transition"
           >
             Apply Filter
           </button>
@@ -291,10 +291,10 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
       {/* Grouped Stats Cards Grid (Today's bold + Totals underneath) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Earnings Card */}
-        <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-purple-200 transition-colors">
+        <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-brand-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Earnings Overview</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-[#9d4ae3] flex items-center justify-center border border-purple-100">
+            <div className="w-9 h-9 rounded-xl bg-brand-50 text-[#228b22] flex items-center justify-center border border-brand-100">
               <NairaIcon size={18} />
             </div>
           </div>
@@ -304,7 +304,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
           </div>
           <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
             <span className="text-slate-500 font-medium">Total Net Earnings:</span>
-            <span className="font-black text-[#9d4ae3]">{fmt(totalEarnings)}</span>
+            <span className="font-black text-[#228b22]">{fmt(totalEarnings)}</span>
           </div>
         </div>
 
@@ -380,7 +380,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
           </div>
           <div>
             <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Pending Escrow Funds</span>
-            <p className="text-lg font-black text-purple-600 mt-0.5">{fmt(pendingEarnings)}</p>
+            <p className="text-lg font-black text-brand-600 mt-0.5">{fmt(pendingEarnings)}</p>
           </div>
         </div>
       )}
@@ -391,7 +391,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
         <div className="bg-white border border-slate-200/70 rounded-2xl shadow-xs overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
-              <ShoppingCart size={16} className="text-[#9d4ae3]" />
+              <ShoppingCart size={16} className="text-[#228b22]" />
               Recent Store Orders (Top 5)
             </h3>
             <span className="text-xs font-bold text-slate-400">{recentOrders.length} Recent</span>
@@ -407,7 +407,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
                 return (
                   <div key={orderId} className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/60 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 text-[#9d4ae3] text-xs font-black flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-brand-50 border border-brand-100 text-[#228b22] text-xs font-black flex items-center justify-center">
                         {customerName.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -441,7 +441,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
         <div className="bg-white border border-slate-200/70 rounded-2xl shadow-xs overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
-              <TrendingUp size={16} className="text-[#9d4ae3]" />
+              <TrendingUp size={16} className="text-[#228b22]" />
               Top Performing Products
             </h3>
             <span className="text-xs font-bold text-slate-400">By Revenue</span>
@@ -456,7 +456,7 @@ export default function VendorDashboardOverview({ vendorDashboardApi }: Props) {
                 return (
                   <div key={product?.productId || product?.id || i} className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/60 transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-black text-purple-600 bg-purple-50 w-6 h-6 rounded-lg flex items-center justify-center">
+                      <span className="text-xs font-black text-brand-600 bg-brand-50 w-6 h-6 rounded-lg flex items-center justify-center">
                         #{i + 1}
                       </span>
                       <div>

@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { 
+import {
   ArrowRight, Users, Box, MapPin, CheckCircle2,
   Building2, Briefcase, Factory, Landmark, Truck, Wrench,
   Stethoscope, Scissors, Plane, GraduationCap, HardHat, Store,
@@ -18,15 +18,15 @@ import VisionMission from './VisionMission';
 
 // --- Shared Components ---
 const TealButton = ({ text }: { text: string }) => (
-  <button className="flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white px-6 py-3 rounded-md font-bold hover:bg-[#366d64] transition-all group">
+  <button className="flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white px-6 py-3 rounded-md font-bold hover:bg-[#366d64] transition-all group">
     {text} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
   </button>
 );
 
 const SectionHeading = ({ sub, title }: { sub: string; title: string }) => (
   <div className="mb-6">
-    <span className="text-[#9d4ae3] font-bold uppercase tracking-widest text-sm">{sub}</span>
-    <h2 className="text-4xl font-extrabold text-[#9d4ae3] mt-2">{title}</h2>
+    <span className="text-[#228b22] font-bold uppercase tracking-widest text-sm">{sub}</span>
+    <h2 className="text-4xl font-extrabold text-[#228b22] mt-2">{title}</h2>
   </div>
 );
 
@@ -49,7 +49,7 @@ export default function AboutUs() {
         sizes="100vw"
         className="object-cover object-center z-0"
       />
-      <div className="absolute inset-0 z-10 bg-gradient-to-t md:bg-gradient-to-r from-[#9d4ae3]/80 via-[#8236be]/50 to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-t md:bg-gradient-to-r from-[#228b22]/80 via-[#1c711c]/50 to-transparent" />
       <div className="absolute inset-0 z-20 flex flex-col items-left justify-center text-left p-4  ml-10">
         <h1 className="text-5xl md:text-5xl font-bold text-white mb-4 text-yellow-400">The Easy Way to Do Business.</h1>
         <p className="text-lg text-white max-w-2xl">

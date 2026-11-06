@@ -91,8 +91,8 @@ const NairaIcon = ({ size = 20, className = '' }: { size?: number; className?: s
         <div className="p-6 border-b flex justify-between items-center">
           <div className="flex items-center gap-1.5 shrink-0">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/fa_logo_brand.png" alt="Faflora" width={110} height={30} className="object-contain" />
-              <span className="text-[10px] text-fuchsia-600 font-bold uppercase tracking-wider bg-fuchsia-50 px-2 py-0.5 rounded border border-fuchsia-100">
+              <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={110} height={30} className="object-contain" />
+              <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider bg-brand-50 px-2 py-0.5 rounded border border-brand-100">
                 Vendor
               </span>
             </Link>
@@ -119,9 +119,9 @@ const NairaIcon = ({ size = 20, className = '' }: { size?: number; className?: s
         <div className="p-4 border-t">
           <Link
             href="/vendor/application/status"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-fuchsia-50 hover:text-fuchsia-700 transition group"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition group"
           >
-            <ChevronRight size={16} className="text-fuchsia-400 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight size={16} className="text-brand-400 group-hover:translate-x-0.5 transition-transform" />
             Store Application Status
           </Link>
         </div>
@@ -129,14 +129,14 @@ const NairaIcon = ({ size = 20, className = '' }: { size?: number; className?: s
         <div className="p-6 border-t">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-500 to-violet-600 flex items-center justify-center font-bold text-white text-sm">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center font-bold text-white text-sm">
                 {authUser?.firstName?.[0] || 'V'}{authUser?.lastName?.[0] || ''}
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-800 truncate max-w-[100px]">
                   {authUser?.firstName || 'Vendor'} {authUser?.lastName || ''}
                 </p>
-                <p className="text-[10px] text-fuchsia-500 font-bold uppercase tracking-tighter">Vendor</p>
+                <p className="text-[10px] text-brand-500 font-bold uppercase tracking-tighter">Vendor</p>
               </div>
             </div>
             <button

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store, 
+import {
+  X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store,
   MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText, Truck
 } from 'lucide-react';
 import { ordersApi } from '@/lib/api';
@@ -24,16 +24,16 @@ const statusBadgeStyles: Record<string, string> = {
   payment_failed: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
   CONFIRMED: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
   confirmed: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
-  PROCESSING: 'bg-indigo-400/20 text-indigo-100 border-indigo-400/30',
-  processing: 'bg-indigo-400/20 text-indigo-100 border-indigo-400/30',
+  PROCESSING: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
+  processing: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
   SHIPPED: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
   shipped: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
   DELIVERED: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
   delivered: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
   CANCELLED: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   cancelled: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
-  REFUNDED: 'bg-purple-400/20 text-purple-100 border-purple-400/30',
-  refunded: 'bg-purple-400/20 text-purple-100 border-purple-400/30',
+  REFUNDED: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
+  refunded: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
 };
 
 const statusLabels: Record<string, string> = {
@@ -253,36 +253,36 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-[#F8F9FA] w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden border border-gray-150 md:max-h-[90vh] max-h-full flex flex-col"
+            className="bg-[#F8F9FA] w-full max-w-5xl rounded-md shadow-sm overflow-hidden border border-gray-150 md:max-h-[90vh] max-h-full flex flex-col"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
+            <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="text-2xl font-bold tracking-tight">Order {order?.orderNumber || basicOrder?.orderNumber || basicOrder?.id}</h2>
                   {order && (
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-sm ${statusBadgeStyles[order.status] || 'bg-white/20 text-white border-white/30'}`}>
+                    <span className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border shadow-sm ${statusBadgeStyles[order.status] || 'bg-white/20 text-white border-white/30'}`}>
                       {statusLabels[order.status] || order.status}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-1.5 text-sm text-fuchsia-100 font-semibold">
+                <div className="flex items-center gap-2 mt-1.5 text-sm text-brand-100 font-semibold">
                   <Calendar size={14} /> Placed on {order ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <button 
+                <button
                   onClick={() => window.print()}
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl font-bold transition text-xs"
+                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-md font-bold transition text-xs"
                 >
                   <Printer size={15} /> Print Invoice
                 </button>
-                <button onClick={onClose} className="p-3 hover:bg-white/20 rounded-2xl transition-colors">
+                <button onClick={onClose} className="p-3 hover:bg-white/20 rounded-md transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -291,24 +291,24 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
             {/* Content Body */}
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center p-20 gap-3">
-                <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
                 <p className="text-gray-500 font-bold text-sm">Fetching detailed order information...</p>
               </div>
             ) : order ? (
               <div className="flex-1 overflow-y-auto p-8 space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  
+
                   {/* Left Side: Items & Payments */}
                   <div className="lg:col-span-2 space-y-8">
-                    
+
                     {/* Items List */}
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                    <div className="bg-white rounded-md border p-6 shadow-sm">
                       <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <Package size={18} className="text-[#9d4ae3]" /> Order Items
+                        <Package size={18} className="text-[#228b22]" /> Order Items
                       </h3>
                       <div className="space-y-4">
                         {order.items?.map((item: any, idx: number) => (
-                          <div key={idx} className="flex gap-4 items-center p-3 border rounded-xl hover:bg-gray-50 transition">
+                          <div key={idx} className="flex gap-4 items-center p-3 border rounded-md hover:bg-gray-50 transition">
                             <div className="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden border shrink-0 flex items-center justify-center">
                               {item.productImage ? (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -331,9 +331,9 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     </div>
 
                     {/* Cost Breakdowns */}
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                    <div className="bg-white rounded-md border p-6 shadow-sm">
                       <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <CreditCard size={18} className="text-[#9d4ae3]" /> Financial summary
+                        <CreditCard size={18} className="text-[#228b22]" /> Financial summary
                       </h3>
                       <div className="space-y-3.5 text-sm">
                         <div className="flex justify-between text-gray-600 font-semibold">
@@ -364,7 +364,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                         )}
                         <div className="pt-3 mt-3 border-t flex justify-between items-center">
                           <span className="text-base font-bold text-slate-800">Total Paid</span>
-                          <span className="text-xl font-black text-[#9d4ae3] flex items-center gap-0.5">
+                          <span className="text-xl font-black text-[#228b22] flex items-center gap-0.5">
                             <NairaIcon size={16} />
                             {order.totalAmount?.formatted?.replace('₦', '') || order.totalAmount?.amount?.toLocaleString()}
                           </span>
@@ -374,26 +374,26 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
                     {/* Refund Review Action Section (ADMIN/SUPER_ADMIN only) */}
                     {order.refundStatus === 'requested' && isAdmin && (
-                      <div className="bg-purple-50 border border-purple-200 rounded-2xl p-6 shadow-sm">
-                        <h3 className="text-sm font-bold text-purple-950 uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <RotateCcw size={18} className="text-purple-700" /> Review Refund Request
+                      <div className="bg-brand-50 border border-brand-200 rounded-md p-6 shadow-sm">
+                        <h3 className="text-sm font-bold text-brand-950 uppercase tracking-wider mb-3 flex items-center gap-2">
+                          <RotateCcw size={18} className="text-brand-700" /> Review Refund Request
                         </h3>
-                        <p className="text-xs text-purple-700 font-semibold mb-4 leading-relaxed">
-                          The customer has requested a refund of <span className="font-bold">{order.refundAmount?.formatted || order.totalAmount?.formatted}</span>. 
+                        <p className="text-xs text-brand-700 font-semibold mb-4 leading-relaxed">
+                          The customer has requested a refund of <span className="font-bold">{order.refundAmount?.formatted || order.totalAmount?.formatted}</span>.
                           Reason: &ldquo;{order.refundReason || 'No reason provided'}&rdquo;.
                         </p>
-                        
+
                         <form onSubmit={handleRefundReview} className="space-y-4">
                           <div className="flex gap-4">
                             {(['approve', 'reject', 'process'] as const).map((act) => (
-                              <label key={act} className="flex items-center gap-1.5 text-xs font-bold text-purple-950 cursor-pointer capitalize">
+                              <label key={act} className="flex items-center gap-1.5 text-xs font-bold text-brand-950 cursor-pointer capitalize">
                                 <input
                                   type="radio"
                                   name="refundAction"
                                   value={act}
                                   checked={refundAction === act}
                                   onChange={() => setRefundAction(act)}
-                                  className="text-purple-600 focus:ring-purple-400"
+                                  className="text-brand-600 focus:ring-brand-400"
                                 />
                                 {act}
                               </label>
@@ -402,14 +402,14 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
                           {refundAction === 'reject' && (
                             <div className="space-y-1.5">
-                              <label className="text-[11px] font-bold text-purple-900 uppercase">Rejection Reason Note</label>
+                              <label className="text-[11px] font-bold text-brand-900 uppercase">Rejection Reason Note</label>
                               <textarea
                                 required
                                 rows={2}
                                 value={rejectionNote}
                                 onChange={e => setRejectionNote(e.target.value)}
                                 placeholder="Explain why the refund request is rejected..."
-                                className="w-full text-xs p-2.5 border border-purple-200 bg-white rounded-xl focus:outline-none"
+                                className="w-full text-xs p-2.5 border border-brand-200 bg-white rounded-md focus:outline-none"
                               />
                             </div>
                           )}
@@ -417,7 +417,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           <button
                             type="submit"
                             disabled={submittingRefundReview}
-                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
+                            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-xs font-bold shadow-sm transition"
                           >
                             {submittingRefundReview ? 'Reviewing...' : 'Submit Refund Decision'}
                           </button>
@@ -431,21 +431,21 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                   <div className="space-y-6">
                     {/* Expected Delivery Promise */}
                     {order.expectedDelivery && (
-                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-5 shadow-xs flex items-start gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="bg-brand-50 border border-brand-200 rounded-md p-5 shadow-xs flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-md bg-[#228b22] text-white flex items-center justify-center shrink-0 shadow-sm">
                           <Truck size={20} />
                         </div>
                         <div className="flex-1 text-xs">
-                          <span className="text-[10px] font-black uppercase text-[#9d4ae3] bg-purple-100 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-black uppercase text-[#228b22] bg-brand-100 px-2 py-0.5 rounded-md">
                             Expected Delivery
                           </span>
-                          <p className="font-extrabold text-purple-950 text-sm mt-1">
+                          <p className="font-extrabold text-brand-950 text-sm mt-1">
                             {order.expectedDelivery.expectedDeliveryLabel}
                           </p>
-                          <p className="text-purple-800 font-medium mt-0.5">
+                          <p className="text-brand-800 font-medium mt-0.5">
                             Within {order.expectedDelivery.maxWorkingDays} working days of processing.
                             {order.expectedDelivery.isInterState && (
-                              <span className="ml-1.5 px-1.5 py-0.2 bg-purple-200 text-purple-900 rounded font-bold text-[10px]">
+                              <span className="ml-1.5 px-1.5 py-0.2 bg-brand-200 text-brand-900 rounded font-bold text-[10px]">
                                 Inter-state
                               </span>
                             )}
@@ -455,7 +455,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     )}
 
                     {/* Customer & Address */}
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
+                    <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
                       <div>
                         <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
                           <User size={14} /> Customer Details
@@ -477,18 +477,18 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     </div>
 
                     {/* Staff Notes (VENDOR/ADMIN/SUPER_ADMIN only) */}
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
+                    <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
                       <h3 className="text-xs font-bold text-slate-850 uppercase tracking-wider flex items-center gap-2">
-                        <FileText size={16} className="text-[#9d4ae3]" /> Staff Internal Notes
+                        <FileText size={16} className="text-[#228b22]" /> Staff Internal Notes
                       </h3>
-                      
+
                       {/* Notes List */}
                       <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                         {notes.length === 0 ? (
                           <p className="text-xs text-gray-400 italic">No internal notes added to this order yet.</p>
                         ) : (
                           notes.map((note) => (
-                            <div key={note.id} className="p-2.5 bg-gray-55 rounded-xl border border-gray-100 text-xs">
+                            <div key={note.id} className="p-2.5 bg-gray-55 rounded-md border border-gray-100 text-xs">
                               <p className="text-gray-600 font-semibold leading-snug">{note.note}</p>
                               <p className="text-[9px] text-gray-400 font-bold mt-1">
                                 {new Date(note.createdAt).toLocaleDateString()}
@@ -506,12 +506,12 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           value={newNote}
                           onChange={e => setNewNote(e.target.value.substring(0, 2000))}
                           placeholder="Add internal note..."
-                          className="flex-1 px-3 py-2 border rounded-xl text-xs focus:outline-none focus:border-purple-400"
+                          className="flex-1 px-3 py-2 border rounded-md text-xs focus:outline-none focus:border-brand-400"
                         />
                         <button
                           type="submit"
                           disabled={submittingNote}
-                          className="p-2 bg-[#9d4ae3] hover:bg-[#8236be] text-white rounded-xl transition disabled:opacity-60 flex-shrink-0"
+                          className="p-2 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md transition disabled:opacity-60 flex-shrink-0"
                         >
                           <Plus size={16} />
                         </button>
@@ -529,20 +529,20 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
               <div className="bg-white px-8 py-5 border-t flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 z-10 rounded-b-3xl">
                 {allowedNextStatuses.length > 0 ? (
                   <>
-                    <select 
+                    <select
                       value={selectedStatus}
                       onChange={e => setSelectedStatus(e.target.value)}
-                      className="w-full sm:w-auto px-4 py-2.5 bg-gray-55 border rounded-xl font-bold text-slate-700 outline-none text-xs cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2.5 bg-gray-55 border rounded-md font-bold text-slate-700 outline-none text-xs cursor-pointer"
                     >
                       <option value="">Update Order Status...</option>
                       {allowedNextStatuses.map(status => (
                         <option key={status} value={status}>{statusLabels[status] || status}</option>
                       ))}
                     </select>
-                    <button 
+                    <button
                       onClick={handleStatusUpdate}
                       disabled={!selectedStatus || submittingStatus}
-                      className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-95 text-white rounded-xl font-black transition text-xs disabled:opacity-60"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-[#228b22] hover:opacity-95 text-white rounded-md font-black transition text-xs disabled:opacity-60"
                     >
                       {submittingStatus ? 'Updating...' : 'Save Transition'}
                     </button>

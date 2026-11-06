@@ -70,15 +70,15 @@ export default function InviteAdminModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
+            className="relative bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border border-gray-100"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 px-6 py-5 text-white">
+            <div className="bg-brand-600 px-6 py-5 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold">Invite Admin</h2>
@@ -89,7 +89,7 @@ export default function InviteAdminModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition"
+                  className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-md transition"
                 >
                   <X size={20} />
                 </button>
@@ -101,7 +101,7 @@ export default function InviteAdminModal({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                    First Name <span className="text-fuchsia-500">*</span>
+                    First Name <span className="text-brand-500">*</span>
                   </label>
                   <div className="relative">
                     <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -112,9 +112,9 @@ export default function InviteAdminModal({
                         setFirstName(e.target.value);
                         setErrors(prev => ({ ...prev, firstName: undefined }));
                       }}
-                      className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
+                      className={`w-full pl-10 pr-4 py-3 rounded-md border ${
                         errors.firstName ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
-                      } focus:bg-white focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-200 outline-none transition text-sm`}
+                      } focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm`}
                       placeholder="John"
                       disabled={isInviting}
                     />
@@ -128,7 +128,7 @@ export default function InviteAdminModal({
 
                 <div>
                   <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                    Last Name <span className="text-fuchsia-500">*</span>
+                    Last Name <span className="text-brand-500">*</span>
                   </label>
                   <div className="relative">
                     <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -139,9 +139,9 @@ export default function InviteAdminModal({
                         setLastName(e.target.value);
                         setErrors(prev => ({ ...prev, lastName: undefined }));
                       }}
-                      className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
+                      className={`w-full pl-10 pr-4 py-3 rounded-md border ${
                         errors.lastName ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
-                      } focus:bg-white focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-200 outline-none transition text-sm`}
+                      } focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm`}
                       placeholder="Doe"
                       disabled={isInviting}
                     />
@@ -156,7 +156,7 @@ export default function InviteAdminModal({
 
               <div>
                 <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                  Email Address <span className="text-fuchsia-500">*</span>
+                  Email Address <span className="text-brand-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -167,9 +167,9 @@ export default function InviteAdminModal({
                       setEmail(e.target.value);
                       setErrors(prev => ({ ...prev, email: undefined }));
                     }}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
+                    className={`w-full pl-10 pr-4 py-3 rounded-md border ${
                       errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
-                    } focus:bg-white focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-200 outline-none transition text-sm`}
+                    } focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm`}
                     placeholder="admin@example.com"
                     disabled={isInviting}
                   />
@@ -183,7 +183,7 @@ export default function InviteAdminModal({
 
               <div>
                 <label className="text-xs font-bold text-gray-600 mb-1.5 block">
-                  Phone Number <span className="text-fuchsia-500">*</span>
+                  Phone Number <span className="text-brand-500">*</span>
                 </label>
                 <div className="relative">
                   <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -194,9 +194,9 @@ export default function InviteAdminModal({
                       setPhone(e.target.value);
                       setErrors(prev => ({ ...prev, phone: undefined }));
                     }}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
+                    className={`w-full pl-10 pr-4 py-3 rounded-md border ${
                       errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
-                    } focus:bg-white focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-200 outline-none transition text-sm`}
+                    } focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm`}
                     placeholder="+234 801 234 5678"
                     disabled={isInviting}
                   />
@@ -208,8 +208,8 @@ export default function InviteAdminModal({
                 )}
               </div>
 
-              <div className="bg-fuchsia-50 rounded-xl p-4 border border-fuchsia-100">
-                <p className="text-xs text-fuchsia-700 font-medium leading-relaxed">
+              <div className="bg-brand-50 rounded-md p-4 border border-brand-100">
+                <p className="text-xs text-brand-700 font-medium leading-relaxed">
                   <span className="font-bold">Note:</span> The invited admin will receive an email with instructions to set up their account. They will have full access to all admin features by default.
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function InviteAdminModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition text-sm"
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition text-sm"
                   disabled={isInviting}
                 >
                   Cancel
@@ -226,7 +226,7 @@ export default function InviteAdminModal({
                 <button
                   type="submit"
                   disabled={isInviting}
-                  className="flex-1 py-3 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 disabled:opacity-60 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-fuchsia-100"
+                  className="flex-1 py-3 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white rounded-md font-bold transition flex items-center justify-center gap-2 shadow-sm "
                 >
                   {isInviting ? (
                     <>

@@ -164,17 +164,17 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-white rounded-md shadow-sm flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
 
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight">Subcategories</h2>
-            <p className="text-sm text-[#8236be] font-bold mt-1 bg-fuchsia-50 px-2 py-0.5 rounded inline-block">
+            <p className="text-sm text-[#1c711c] font-bold mt-1 bg-brand-50 px-2 py-0.5 rounded inline-block">
               {category.name}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-xl transition">
+          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
             <X size={20} />
           </button>
         </div>
@@ -193,13 +193,13 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
               value={newSubcategoryName}
               onChange={(e) => setNewSubcategoryName(e.target.value)}
               placeholder="New subcategory name..."
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition"
+              className="flex-1 border border-gray-200 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228b22]/20 focus:border-[#228b22] transition"
               disabled={isAdding}
             />
             <button
               type="submit"
               disabled={isAdding || !newSubcategoryName.trim()}
-              className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-fuchsia-100"
+              className="bg-[#228b22] hover:bg-[#1c711c] text-white px-4 py-2.5 rounded-md font-bold transition flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm "
             >
               {isAdding ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -212,16 +212,16 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
           {/* List */}
           {isLoading ? (
             <div className="flex items-center justify-center py-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#9d4ae3]"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#228b22]"></div>
             </div>
           ) : subcategories.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-xl border border-gray-200 border-dashed">
+            <div className="text-center py-10 bg-white rounded-md border border-gray-200 border-dashed">
               <p className="text-gray-500 font-medium">No subcategories found.</p>
             </div>
           ) : (
             <div className="space-y-2">
               {subcategories.map(sub => (
-                <div key={sub.id} className="bg-white border border-gray-100 rounded-xl p-3 flex items-center justify-between shadow-sm group">
+                <div key={sub.id} className="bg-white border border-gray-100 rounded-md p-3 flex items-center justify-between shadow-sm group">
                   {editingId === sub.id ? (
                     <div className="flex-1 flex gap-2 mr-2">
                       <input
@@ -229,13 +229,13 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         autoFocus
-                        className="flex-1 border border-[#9d4ae3]/30 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20"
+                        className="flex-1 border border-[#228b22]/30 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228b22]/20"
                         onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
                       />
                       <button
                         onClick={saveEdit}
                         disabled={isSavingEdit || !editName.trim()}
-                        className="bg-[#9d4ae3] text-white p-2 rounded-lg hover:bg-[#8236be] transition disabled:opacity-50"
+                        className="bg-[#228b22] text-white p-2 rounded-lg hover:bg-[#1c711c] transition disabled:opacity-50"
                       >
                         {isSavingEdit ? (
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -255,7 +255,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-slate-700 text-sm">{sub.name}</span>
                         {!sub.isActive && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
                             Draft
                           </span>
                         )}
@@ -264,7 +264,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                         {!sub.isActive ? (
                           <button
                             onClick={() => handlePublish(sub.id)}
-                            className="text-xs font-bold px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200/80 rounded-xl transition-all flex items-center gap-1.5"
+                            className="text-xs font-bold px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200/80 rounded-md transition-all flex items-center gap-1.5"
                           >
                             <Check size={14} /> Publish
                           </button>
@@ -272,14 +272,14 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                           <>
                             <button
                               onClick={() => startEditing(sub)}
-                              className="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition border border-blue-100/50 flex items-center justify-center"
+                              className="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition border border-blue-100/50 flex items-center justify-center"
                               title="Edit"
                             >
                               <Edit size={14} />
                             </button>
                             <button
                               onClick={() => setDeletingId(sub.id)}
-                              className="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-xl transition border border-red-100/50 flex items-center justify-center"
+                              className="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition border border-red-100/50 flex items-center justify-center"
                               title="Delete"
                             >
                               <Trash2 size={14} />
@@ -299,9 +299,9 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
       {/* ── Subcategory Delete Confirmation ── */}
       {deletingId && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeletingId(null)} />
-          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
+          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setDeletingId(null)} />
+          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4 ">
               <Trash2 size={22} className="text-red-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Subcategory?</h3>
@@ -311,14 +311,14 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
             <div className="flex gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="flex-1 py-2.5 border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
+                className="flex-1 py-2.5 border border-gray-200 text-slate-700 font-bold rounded-md hover:bg-gray-50 transition disabled:opacity-50"
                 disabled={isDeleting}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deletingId)}
-                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-60 animate-pulse-subtle"
+                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-60 -subtle"
                 disabled={isDeleting}
               >
                 {isDeleting ? (

@@ -7,8 +7,8 @@ import Divider from '@/components/contact/shared/Divider';
 export default function ContactUs() {
   return (
     <div
-      className="font-sans bg-[#fdf8ff] min-h-screen overflow-x-hidden"
-      style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', 'Georgia', serif" }}
+      className="font-sans bg-[#fafbf8] min-h-screen overflow-x-hidden"
+
     >
       {/* ══ HERO ══ */}
       <HeroSection />

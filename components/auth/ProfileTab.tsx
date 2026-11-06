@@ -79,9 +79,9 @@ export const ProfileTab: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Success Message */}
         {success && (
-          <div className="flex items-center gap-3 p-4 bg-[#f3ecfc] border border-[#f3ecfc] rounded-xl">
-            <CheckCircle2 className="w-5 h-5 text-[#9d4ae3]" />
-            <p className="text-sm font-medium text-[#8236be]">
+          <div className="flex items-center gap-3 p-4 bg-[#eff4e9] border border-[#eff4e9] rounded-xl">
+            <CheckCircle2 className="w-5 h-5 text-[#228b22]" />
+            <p className="text-sm font-medium text-[#1c711c]">
               Profile updated successfully!
             </p>
           </div>
@@ -142,7 +142,7 @@ export const ProfileTab: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
               className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
             />
             {user?.isEmailVerified && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f3ecfc] text-[#8236be] text-xs font-medium rounded-full">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#eff4e9] text-[#1c711c] text-xs font-medium rounded-full">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Verified
               </span>
@@ -177,7 +177,7 @@ export const ProfileTab: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
                 <Link
                   href="/vendor/dashboard"
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-[#9d4ae3] hover:bg-[#8236be] text-white font-medium rounded-lg transition-all flex items-center justify-center"
+                  className="px-6 py-2.5 bg-[#228b22] hover:bg-[#1c711c] text-white font-medium rounded-lg transition-all flex items-center justify-center"
                 >
                   Go to my dashboard
                 </Link>

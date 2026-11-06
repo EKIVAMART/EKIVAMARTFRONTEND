@@ -1,3 +1,4 @@
+import RecordStatus from "@/components/admin/RecordStatus";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Search, RefreshCw, Store, MapPin, DollarSign, Tag } from 'lucide-react';
 import { ordersApi } from '@/lib/api';
@@ -19,29 +20,6 @@ interface Order {
   status: string;
   paymentStatus: string;
 }
-
-const statusStyles: Record<string, string> = {
-  PENDING_PAYMENT: 'bg-amber-100 text-amber-800 border-amber-200',
-  pending_payment: 'bg-amber-100 text-amber-800 border-amber-200',
-  PAYMENT_FAILED: 'bg-rose-100 text-rose-800 border-rose-200',
-  payment_failed: 'bg-rose-100 text-rose-800 border-rose-200',
-  CONFIRMED: 'bg-blue-100 text-blue-800 border-blue-200',
-  confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
-  PROCESSING: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  processing: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  SHIPPED: 'bg-purple-100 text-purple-800 border-purple-200',
-  shipped: 'bg-purple-100 text-purple-800 border-purple-200',
-  DELIVERED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  delivered: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  CANCELLED: 'bg-gray-100 text-gray-800 border-gray-200',
-  cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
-  REFUNDED: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
-  refunded: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
-  Ongoing: 'bg-blue-100 text-blue-600',
-  Delivered: 'bg-emerald-100 text-emerald-700',
-  Cancelled: 'bg-gray-100 text-gray-700',
-  Returned: 'bg-orange-100 text-orange-700',
-};
 
 const statusLabels: Record<string, string> = {
   ALL: 'All Orders',
@@ -312,15 +290,15 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
   return (
     <div className="space-y-4">
       {/* ── Filter Controls Header Card ────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm space-y-4">
+      <div className="bg-white rounded-md border border-gray-150 p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-            <Filter size={18} className="text-[#9d4ae3]" />
-            <span>Order Search & Advanced Filters</span>
+            <Filter size={18} className="text-[#228b22]" />
+            <span>Filter orders</span>
           </div>
           <button
             onClick={handleResetFilters}
-            className="text-xs font-bold text-gray-500 hover:text-purple-600 transition flex items-center gap-1"
+            className="text-xs font-bold text-gray-500 hover:text-brand-600 transition flex items-center gap-1"
           >
             <RefreshCw size={12} /> Reset Filters
           </button>
@@ -336,7 +314,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
               value={orderId}
               onChange={e => setOrderId(e.target.value)}
               placeholder="e.g. ORD-10294"
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -348,7 +326,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
             <select
               value={vendorId}
               onChange={e => setVendorId(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500 cursor-pointer"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500 cursor-pointer"
             >
               <option value="">All Vendors</option>
               {loadingVendors ? (
@@ -369,7 +347,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
               value={minAmount}
               onChange={e => setMinAmount(e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -381,7 +359,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
               value={maxAmount}
               onChange={e => setMaxAmount(e.target.value)}
               placeholder="1,000,000"
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -393,7 +371,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
             <select
               value={deliveryState}
               onChange={e => setDeliveryState(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500 cursor-pointer"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500 cursor-pointer"
             >
               <option value="">All 36 States</option>
               {NIGERIAN_STATES.map(st => (
@@ -410,7 +388,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
             <select
               value={sortCombo}
               onChange={e => setSortCombo(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-500 cursor-pointer"
+              className="w-full px-3 py-2 bg-gray-50 border rounded-md text-xs text-slate-800 font-medium focus:outline-none focus:border-brand-500 cursor-pointer"
             >
               {SORT_OPTIONS.map(opt => (
                 <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -424,7 +402,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
           <button
             onClick={() => void executeSearch()}
             disabled={isSearching}
-            className="px-6 py-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:opacity-95 text-white rounded-xl text-xs font-bold shadow-md shadow-fuchsia-100 flex items-center gap-2 transition disabled:opacity-60"
+            className="px-6 py-2.5 bg-[#228b22] hover:opacity-95 text-white rounded-md text-xs font-bold shadow-sm flex items-center gap-2 transition disabled:opacity-60"
           >
             {isSearching ? (
               <>
@@ -441,7 +419,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
       </div>
 
       {/* ── Status Tabs Row ─────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-150 p-2 shadow-sm overflow-x-auto">
+      <div className="border-b border-slate-200 overflow-x-auto">
         <div className="flex items-center gap-1 min-w-max">
           {STATUS_TABS.map(tab => {
             const isActive = activeStatusTab === tab.id;
@@ -449,13 +427,13 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
+                aria-pressed={isActive}
+                className={`px-3 py-3 border-b-2 text-xs font-medium transition whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#9d4ae3] text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-slate-800'
+                    ? 'border-[#176a35] text-[#176a35]'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Tag size={12} className={isActive ? 'text-white' : 'text-gray-400'} />
                 {tab.label}
               </button>
             );
@@ -464,7 +442,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
       </div>
 
       {/* ── Main Orders Data Table ──────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-md border border-gray-150 shadow-sm overflow-hidden">
         {/* Desktop View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
@@ -514,29 +492,15 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${statusStyles[order.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
-                        {statusLabels[order.status] || order.status}
-                      </span>
+                      <RecordStatus value={order.status}>{statusLabels[order.status] || order.status}</RecordStatus>
                     </td>
                     <td className="p-4 text-center">
-                      <span
-                        className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          order.paymentStatus === 'Paid'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : order.paymentStatus === 'Pending'
-                              ? 'bg-amber-100 text-amber-700'
-                              : order.paymentStatus === 'Failed'
-                                ? 'bg-rose-100 text-rose-700'
-                                : 'bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        {order.paymentStatus}
-                      </span>
+                      <RecordStatus value={order.paymentStatus} />
                     </td>
                     <td className="p-4 text-right">
                       <button
                         onClick={() => onViewDetails?.(order)}
-                        className="text-[#9d4ae3] hover:bg-fuchsia-50 px-3 py-1.5 rounded-lg text-xs font-bold transition"
+                        className="text-[#228b22] hover:bg-brand-50 px-3 py-1.5 rounded-lg text-xs font-bold transition"
                       >
                         Details
                       </button>
@@ -558,16 +522,12 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
         <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
           {paginatedData.length > 0 ? (
             paginatedData.map(order => (
-              <div key={order.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+              <div key={order.id} className="bg-white p-5 rounded-md shadow-sm border border-gray-100 space-y-4">
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="font-bold text-slate-800 text-base">{order.id}</span>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${order.paymentStatus === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                      {order.paymentStatus}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold border ${statusStyles[order.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {statusLabels[order.status] || order.status}
-                    </span>
+                    <RecordStatus value={order.paymentStatus} />
+                    <RecordStatus value={order.status}>{statusLabels[order.status] || order.status}</RecordStatus>
                   </div>
                 </div>
 
@@ -598,7 +558,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                   <div className="pt-2 border-t border-gray-50 mt-2">
                     <button
                       onClick={() => onViewDetails?.(order)}
-                      className="w-full text-center bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white py-2.5 rounded-xl text-sm font-bold shadow-md shadow-fuchsia-100 hover:opacity-90 transition"
+                      className="w-full text-center bg-[#228b22] text-white py-2.5 rounded-md text-sm font-bold shadow-sm hover:opacity-90 transition"
                     >
                       View Details
                     </button>
@@ -607,7 +567,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
               </div>
             ))
           ) : (
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
+            <div className="bg-white p-8 rounded-md shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
               No orders found.
             </div>
           )}
@@ -666,7 +626,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                       onClick={() => setCurrentPage(page)}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg transition text-sm font-medium ${
                         currentPage === page
-                          ? 'bg-[#9d4ae3] text-white font-bold shadow-xs'
+                          ? 'bg-[#228b22] text-white font-bold shadow-xs'
                           : 'hover:bg-gray-50 text-gray-500'
                       }`}
                     >

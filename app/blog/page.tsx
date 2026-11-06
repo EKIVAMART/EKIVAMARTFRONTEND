@@ -45,7 +45,7 @@ const GRADIENTS = [
   'from-[#ff7043] via-[#e65100] to-[#1a0016]',
   'from-[#00b8d9] via-[#005f73] to-[#1a0016]',
   'from-[#43a047] via-[#1b5e20] to-[#1a0016]',
-  'from-[#9d4ae3] via-[#6a0dad] to-[#1a0016]',
+  'from-[#228b22] via-[#6a0dad] to-[#1a0016]',
 ];
 
 /* ─── Sub-components ─── */
@@ -125,7 +125,7 @@ const FeaturedCard = ({ post }: { post: MappedBlogPost }) => (
 const PostCard = ({ post, index }: { post: MappedBlogPost; index: number }) => (
   <FadeInSection type="fadeUp" delay={0.05 + (index % 3) * 0.05}>
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <div className="flex flex-col h-full bg-white border border-[#e8e4f0] rounded-3xl overflow-hidden hover:border-[#ad74e8] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+      <div className="flex flex-col h-full bg-white border border-[#e8e4f0] rounded-3xl overflow-hidden hover:border-[#67a652] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
         {/* Top visual block */}
         <div className={`relative h-48 bg-gradient-to-br ${post.gradient} overflow-hidden flex-shrink-0`}>
           {post.featuredImage ? (
@@ -163,11 +163,11 @@ const PostCard = ({ post, index }: { post: MappedBlogPost; index: number }) => (
 
         {/* Content */}
         <div className="flex flex-col flex-1 p-6">
-          <span className="text-[10px] font-black uppercase tracking-[3px] text-[#ad74e8] mb-2">
+          <span className="text-[10px] font-black uppercase tracking-[3px] text-[#67a652] mb-2">
             {post.category}
           </span>
           <h3
-            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-3 flex-1 line-clamp-2"
+            className="text-lg font-extrabold text-[#1a0018] group-hover:text-[#67a652] transition-colors leading-snug mb-3 flex-1 line-clamp-2"
             style={{ fontFamily: "'Georgia', serif" }}
           >
             {post.title}
@@ -175,7 +175,7 @@ const PostCard = ({ post, index }: { post: MappedBlogPost; index: number }) => (
           <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-5">{post.excerpt}</p>
           <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
             <span className="text-xs text-gray-400 font-medium">{post.date}</span>
-            <span className="inline-flex items-center gap-1 text-[#8236be] text-sm font-bold group-hover:gap-2 transition-all">
+            <span className="inline-flex items-center gap-1 text-[#1c711c] text-sm font-bold group-hover:gap-2 transition-all">
               Read <ChevronRight size={14} />
             </span>
           </div>
@@ -216,7 +216,7 @@ export default function BlogPage() {
           const mapped: MappedBlogPost[] = res.posts.map((item: PublicBlogPostSummary, idx: number) => ({
             id: item.id,
             slug: item.slug,
-            category: (item as any).category?.name || 'Faflora Journal',
+            category: (item as any).category?.name || 'EkivaMart Journal',
             tag: (item as any).tags?.[0] || 'Article',
             title: decodeHtmlEntities(item.title),
             excerpt: decodeHtmlEntities(item.excerpt || 'Read article for full details...'),
@@ -229,12 +229,12 @@ export default function BlogPage() {
                 })
               : 'Recent',
             gradient: GRADIENTS[idx % GRADIENTS.length],
-            accentColor: '#9d4ae3',
+            accentColor: '#228b22',
             featured: page === 1 && idx === 0 && !debouncedSearch,
             featuredImage: item.featuredImage?.url,
             author: {
-              name: item.author?.name || 'Faflora Editorial',
-              role: 'Faflora Staff',
+              name: item.author?.name || 'EkivaMart Editorial',
+              role: 'EkivaMart Staff',
               avatar: (item.author?.name || 'FE').substring(0, 2).toUpperCase(),
             },
           }));
@@ -275,12 +275,12 @@ export default function BlogPage() {
         {/* Glow Orbs */}
         <div className="absolute top-[-10%] left-[-8%] w-[50vw] h-[50vw] rounded-full bg-[#8b0d7a] opacity-[0.22] blur-[130px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-[#5c0060] opacity-[0.28] blur-[110px] pointer-events-none" />
-        <div className="absolute top-[10%] right-[5%] w-[28vw] h-[28vw] rounded-full bg-[#ad74e8] opacity-[0.10] blur-[90px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[5%] w-[28vw] h-[28vw] rounded-full bg-[#67a652] opacity-[0.10] blur-[90px] pointer-events-none" />
         {/* Dot pattern */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, #ad74e8 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #67a652 1px, transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -290,7 +290,7 @@ export default function BlogPage() {
             <FadeInSection type="fadeDown" delay={0.1}>
               <div className="inline-flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/15 text-white/75 text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
                 <BookOpen size={11} />
-                Faflora · The Journal
+                EkivaMart · The Journal
               </div>
             </FadeInSection>
 
@@ -351,7 +351,7 @@ export default function BlogPage() {
                 <div className="h-[3px] w-4 rounded-full bg-white/10" />
               </div>
               <p className="mt-5 text-white/60 text-base md:text-lg max-w-2xl leading-relaxed">
-                Expert advice, platform updates, and commerce insights to help every buyer and seller thrive on Faflora.
+                Expert advice, platform updates, and commerce insights to help every buyer and seller thrive on EkivaMart.
               </p>
             </FadeInSection>
 
@@ -367,7 +367,7 @@ export default function BlogPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#ad74e8] transition shadow-lg"
+                  className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#67a652] transition shadow-lg"
                 />
                 {searchQuery && (
                   <button
@@ -398,14 +398,14 @@ export default function BlogPage() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 pb-24 pt-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-3">
-            <Loader2 className="w-9 h-9 animate-spin text-[#ad74e8]" />
-            <p className="text-sm font-medium text-gray-500">Loading articles from Faflora Journal...</p>
+            <Loader2 className="w-9 h-9 animate-spin text-[#67a652]" />
+            <p className="text-sm font-medium text-gray-500">Loading articles from EkivaMart Journal...</p>
           </div>
         ) : posts.length === 0 ? (
           /* EMPTY STATE */
           <FadeInSection type="fadeUp" delay={0.1}>
             <div className="bg-white border border-[#e8b8e4] rounded-3xl p-12 md:p-16 text-center max-w-2xl mx-auto shadow-sm my-8">
-              <div className="w-16 h-16 rounded-2xl bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] flex items-center justify-center mx-auto mb-6">
                 <FileText size={32} />
               </div>
               <h2
@@ -419,7 +419,7 @@ export default function BlogPage() {
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white font-extrabold text-sm px-7 py-3.5 rounded-full hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-extrabold text-sm px-7 py-3.5 rounded-full hover:shadow-lg transition-all"
               >
                 Return to Home <ArrowRight size={15} />
               </Link>
@@ -454,7 +454,7 @@ export default function BlogPage() {
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#ad74e8] hover:text-[#ad74e8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#67a652] hover:text-[#67a652] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronLeft size={15} /> Previous
                     </button>
@@ -466,7 +466,7 @@ export default function BlogPage() {
                           onClick={() => setPage(pageNum)}
                           className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
                             pageNum === page
-                              ? 'bg-[#9d4ae3] text-white'
+                              ? 'bg-[#228b22] text-white'
                               : 'text-gray-600 hover:bg-purple-50'
                           }`}
                         >
@@ -478,7 +478,7 @@ export default function BlogPage() {
                     <button
                       onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                       disabled={page === pagination.pages}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#ad74e8] hover:text-[#ad74e8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 hover:border-[#67a652] hover:text-[#67a652] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       Next <ChevronRight size={15} />
                     </button>
@@ -492,7 +492,7 @@ export default function BlogPage() {
         {/* ─── DIVIDER ─── */}
         <div className="flex items-center gap-3 my-16">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8236be]" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1c711c]" />
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
         </div>
 

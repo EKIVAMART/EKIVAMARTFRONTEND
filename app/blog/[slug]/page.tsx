@@ -66,7 +66,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           setPost({
             id: live.id,
             slug: live.slug,
-            category: (live as any).category?.name || 'Faflora Journal',
+            category: (live as any).category?.name || 'EkivaMart Journal',
             tag: (live as any).tags?.[0] || 'Article',
             title: decodeHtmlEntities(live.title),
             excerpt: decodeHtmlEntities(live.excerpt || ''),
@@ -80,8 +80,8 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               : 'Recent',
             featuredImage: live.featuredImage?.url || null,
             author: {
-              name: live.author?.name || 'Faflora Staff',
-              role: 'Faflora Editorial',
+              name: live.author?.name || 'EkivaMart Staff',
+              role: 'EkivaMart Editorial',
               avatar: (live.author?.name || 'FE').substring(0, 2).toUpperCase(),
             },
           });
@@ -131,7 +131,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
       <div className="font-sans bg-[#fdf8ff] min-h-screen flex items-center justify-center py-20 px-6">
         <div className="max-w-md w-full text-center bg-white border border-[#e8b8e4] rounded-3xl p-8 shadow-xl">
           <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center mx-auto mb-5">
-            <BookOpen size={28} className="text-[#ad74e8]" />
+            <BookOpen size={28} className="text-[#67a652]" />
           </div>
           <h1 className="text-2xl font-black text-[#1a0018] mb-3" style={{ fontFamily: "'Georgia', serif" }}>
             Article Not Found
@@ -141,7 +141,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           </p>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#56154e] text-white font-bold text-sm px-6 py-3.5 rounded-full transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#56154e] text-white font-bold text-sm px-6 py-3.5 rounded-full transition-all shadow-md"
           >
             <ArrowLeft size={16} /> Back to Blog
           </Link>
@@ -154,7 +154,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
     return (
       <div className="font-sans bg-[#1a0016] min-h-screen flex items-center justify-center py-20 px-6 text-white">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border-4 border-[#ad74e8]/20 border-t-[#ad74e8] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#67a652]/20 border-t-[#67a652] rounded-full animate-spin" />
           <span className="text-sm font-bold text-purple-200">Loading article...</span>
         </div>
       </div>
@@ -191,13 +191,13 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
         {/* Ambient glow orbs */}
         <div className="absolute top-[-10%] left-[-8%] w-[45vw] h-[45vw] rounded-full bg-[#8b0d7a] opacity-[0.20] blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[#5c0060] opacity-[0.25] blur-[100px] pointer-events-none" />
-        <div className="absolute top-[10%] right-[10%] w-[25vw] h-[25vw] rounded-full bg-[#ad74e8] opacity-[0.10] blur-[80px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[10%] w-[25vw] h-[25vw] rounded-full bg-[#67a652] opacity-[0.10] blur-[80px] pointer-events-none" />
 
         {/* Grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.02] pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, #ad74e8 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #67a652 1px, transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -234,7 +234,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <FadeInSection type="fadeUp" delay={0.2}>
             <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/15">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white font-black text-sm border-2 border-white/20 shadow-md">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white font-black text-sm border-2 border-white/20 shadow-md">
                   {post.author.avatar}
                 </div>
                 <div>
@@ -278,12 +278,12 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <div className="mt-8 flex items-center justify-between border-t border-gray-200/60 pt-6 px-4">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-1 text-[#ad74e8] hover:text-[#8236be] font-bold text-sm transition-colors"
+              className="inline-flex items-center gap-1 text-[#67a652] hover:text-[#1c711c] font-bold text-sm transition-colors"
             >
               <ArrowLeft size={15} /> Back to Journal
             </Link>
             <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-              Faflora Editorial
+              EkivaMart Editorial
             </span>
           </div>
 
@@ -291,7 +291,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           {relatedPosts.length > 0 && (
             <div className="mt-16">
               <h3
-                className="text-xl md:text-2xl font-black text-[#1a0018] mb-6 border-l-4 border-[#ad74e8] pl-3"
+                className="text-xl md:text-2xl font-black text-[#1a0018] mb-6 border-l-4 border-[#67a652] pl-3"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
                 Keep Reading
@@ -299,7 +299,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 {relatedPosts.map((relPost) => (
                   <Link href={`/blog/${relPost.slug}`} key={relPost.slug} className="group block">
-                    <div className="bg-white border border-[#e8e4f0] rounded-2xl overflow-hidden hover:border-[#ad74e8] hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                    <div className="bg-white border border-[#e8e4f0] rounded-2xl overflow-hidden hover:border-[#67a652] hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                       <div
                         className={`relative h-28 bg-gradient-to-br ${relPost.gradient} p-4 flex items-start justify-between flex-shrink-0 overflow-hidden`}
                       >
@@ -319,12 +319,12 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
                       </div>
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         <h4
-                          className="font-extrabold text-sm text-[#1a0018] group-hover:text-[#ad74e8] transition-colors leading-snug mb-2 line-clamp-2"
+                          className="font-extrabold text-sm text-[#1a0018] group-hover:text-[#67a652] transition-colors leading-snug mb-2 line-clamp-2"
                           style={{ fontFamily: "'Georgia', serif" }}
                         >
                           {relPost.title}
                         </h4>
-                        <span className="text-[10px] text-[#8236be] font-bold flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                        <span className="text-[10px] text-[#1c711c] font-bold flex items-center gap-1 group-hover:gap-1.5 transition-all">
                           Read Post <ArrowRight size={12} />
                         </span>
                       </div>
@@ -344,7 +344,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               }}
             />
             <div className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-[#ff69e0] opacity-[0.12] blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[#8236be] opacity-[0.06] blur-[60px] pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[#1c711c] opacity-[0.06] blur-[60px] pointer-events-none" />
 
             <div className="relative flex flex-col sm:flex-row items-center gap-6 px-8 py-8">
               <div className="flex-1 text-center sm:text-left">

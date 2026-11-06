@@ -43,7 +43,7 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
   <StaggerCard index={index}>
     <Link
       href={`/support/topics/${topic.slug}`}
-      className="group relative overflow-hidden bg-white border border-[#e8b8e4] hover:border-[#8236be] rounded-3xl flex flex-col h-[450px] md:h-[490px] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+      className="group relative overflow-hidden bg-white border border-[#e8b8e4] hover:border-[#1c711c] rounded-3xl flex flex-col h-[450px] md:h-[490px] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
     >
       {/* Image */}
       <div className="relative h-[240px] md:h-[270px] overflow-hidden flex-shrink-0">
@@ -63,7 +63,7 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
       <div className="flex flex-col flex-1 px-7 py-6">
         {/* Fixed-height title area — 2 lines reserved — keeps all cards uniform */}
         <div className="h-[3.6rem] flex items-center mb-2">
-          <h3 className="text-xl font-extrabold text-[#1a0018] group-hover:text-[#9d4ae3] transition-colors leading-tight line-clamp-2">
+          <h3 className="text-xl font-extrabold text-[#1a0018] group-hover:text-[#228b22] transition-colors leading-tight line-clamp-2">
             {topic.title}
           </h3>
         </div>
@@ -73,7 +73,7 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
             {topic.description}
           </p>
         </div>
-        <div className="mt-5 inline-flex items-center gap-2 text-[#8236be] text-sm font-semibold group-hover:gap-3 transition-all">
+        <div className="mt-5 inline-flex items-center gap-2 text-[#1c711c] text-sm font-semibold group-hover:gap-3 transition-all">
           Explore <ArrowRight size={15} />
         </div>
       </div>
@@ -88,8 +88,8 @@ const TopicCard = ({ topic, index }: { topic: Topic; index: number }) => (
 const ContactBanner = () => (
   <FadeInSection type="zoom" delay={0.15}>
     <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#9d4ae3]" />
-      <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#8236be] opacity-20 blur-[80px] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#228b22]" />
+      <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#1c711c] opacity-20 blur-[80px] pointer-events-none" />
       <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#ff69e0] opacity-10 blur-[60px] pointer-events-none" />
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -138,11 +138,11 @@ const SectionHeading = ({
 }) => (
   <FadeInSection type="slideLeft" delay={delay}>
     <div className="flex items-center gap-3 mb-10">
-      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-md">
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-md">
         {icon}
       </div>
       <div>
-        <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#8236be]">
+        <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c]">
           {eyebrow}
         </span>
         <h2
@@ -161,7 +161,7 @@ const Divider = () => (
   <FadeInSection type="fade" delay={0.1}>
     <div className="flex items-center gap-3 my-16">
       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8236be]" />
+      <div className="w-1.5 h-1.5 rounded-full bg-[#1c711c]" />
       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e8b8e4] to-transparent" />
     </div>
   </FadeInSection>
@@ -200,17 +200,17 @@ export default function SupportHome() {
             <line x1="0" y1="280" x2="520" y2="60" stroke="#f0c8ec" strokeWidth="0.4" />
             <line x1="0" y1="340" x2="520" y2="120" stroke="#e8b8e4" strokeWidth="0.3" />
             {/* Dot cluster top-right corner */}
-            <circle cx="498" cy="12" r="4" fill="#8236be" opacity="0.45" />
-            <circle cx="486" cy="24" r="2.5" fill="#9d4ae3" opacity="0.3" />
-            <circle cx="506" cy="26" r="2" fill="#8236be" opacity="0.25" />
-            <circle cx="476" cy="14" r="2" fill="#9d4ae3" opacity="0.2" />
+            <circle cx="498" cy="12" r="4" fill="#1c711c" opacity="0.45" />
+            <circle cx="486" cy="24" r="2.5" fill="#228b22" opacity="0.3" />
+            <circle cx="506" cy="26" r="2" fill="#1c711c" opacity="0.25" />
+            <circle cx="476" cy="14" r="2" fill="#228b22" opacity="0.2" />
             {/* Crosshair accent */}
-            <line x1="230" y1="400" x2="274" y2="400" stroke="#8236be" strokeWidth="0.8" opacity="0.45" />
-            <line x1="252" y1="378" x2="252" y2="422" stroke="#8236be" strokeWidth="0.8" opacity="0.45" />
-            <circle cx="252" cy="400" r="3" fill="#8236be" opacity="0.35" />
+            <line x1="230" y1="400" x2="274" y2="400" stroke="#1c711c" strokeWidth="0.8" opacity="0.45" />
+            <line x1="252" y1="378" x2="252" y2="422" stroke="#1c711c" strokeWidth="0.8" opacity="0.45" />
+            <circle cx="252" cy="400" r="3" fill="#1c711c" opacity="0.35" />
             {/* Small square outline accent */}
             <rect x="340" y="340" width="28" height="28" rx="4" stroke="#e8b8e4" strokeWidth="1" fill="none" />
-            <rect x="346" y="346" width="16" height="16" rx="2" stroke="#8236be" strokeWidth="0.7" fill="none" opacity="0.5" />
+            <rect x="346" y="346" width="16" height="16" rx="2" stroke="#1c711c" strokeWidth="0.7" fill="none" opacity="0.5" />
           </svg>
         </div>
 
@@ -231,7 +231,7 @@ export default function SupportHome() {
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.022]"
           style={{
-            backgroundImage: 'radial-gradient(circle, #9d4ae3 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, #228b22 1px, transparent 1px)',
             backgroundSize: '28px 28px',
           }}
         />
@@ -242,9 +242,9 @@ export default function SupportHome() {
 
             {/* Eyebrow badge */}
             <FadeInSection type="fadeDown" delay={0.1}>
-              <div className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
+              <div className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] text-[10px] font-black uppercase tracking-[4px] px-5 py-2.5 rounded-full mb-8">
                 <HelpCircle size={11} />
-                Faflora · Support Center
+                EkivaMart · Support Center
               </div>
             </FadeInSection>
 
@@ -258,25 +258,25 @@ export default function SupportHome() {
                   text="How can"
                   delay={350}
                   typingSpeed={60}
-                  colorClass="text-[#8236be]"
+                  colorClass="text-[#1c711c]"
                   hideCursorOnComplete
                 />
                 <br />
-                <span className="text-[#9d4ae3]">
+                <span className="text-[#228b22]">
                   <TypingText
                     text="we help"
                     delay={950}
                     typingSpeed={60}
-                    colorClass="text-[#8236be]"
+                    colorClass="text-[#1c711c]"
                     hideCursorOnComplete
                   />
                 </span>
-                <span className="text-[#8236be]">
+                <span className="text-[#1c711c]">
                   <TypingText
                     text=" you?"
                     delay={1430}
                     typingSpeed={60}
-                    colorClass="text-[#9d4ae3]"
+                    colorClass="text-[#228b22]"
                   />
                 </span>
               </h1>
@@ -285,7 +285,7 @@ export default function SupportHome() {
             {/* Rule + subtitle */}
             <FadeInSection type="fadeUp" delay={0.42}>
               <div className="mt-7 flex items-center gap-3">
-                <div className="h-[3px] w-14 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be]" />
+                <div className="h-[3px] w-14 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c]" />
                 <div className="h-[3px] w-8 rounded-full bg-[#e8b8e4]" />
                 <div className="h-[3px] w-4 rounded-full bg-[#f0c8ec]" />
               </div>
@@ -312,7 +312,7 @@ export default function SupportHome() {
                 ].map(({ label, dot }) => (
                   <div
                     key={label}
-                    className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#9d4ae3] text-xs font-semibold px-4 py-2 rounded-full"
+                    className="inline-flex items-center gap-2 bg-[#fdf3fc] border border-[#e8b8e4] text-[#228b22] text-xs font-semibold px-4 py-2 rounded-full"
                   >
                     {dot && (
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

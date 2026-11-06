@@ -1,3 +1,5 @@
+import RecordActions from "@/components/admin/RecordActions";
+import RecordStatus from "@/components/admin/RecordStatus";
 import React, { useState, useMemo } from 'react';
 import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Mail, Phone, Clock, AlertCircle, CheckCircle, XCircle, Eye, Trash2, Power, PowerOff, User, Ban } from 'lucide-react';
 
@@ -74,16 +76,6 @@ const statusStyles = {
 const allStatuses = ['All', 'pending', 'active', 'deactivated', 'blocked', 'deleted'];
 
 /** Tooltip wrapper for desktop — matches ProductTable/UserTable styling */
-const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="relative group/tip">
-    {children}
-    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-md z-50 transition-all">
-      {label}
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
-    </div>
-  </div>
-);
 
 export default function AdminTable({ 
   data, 
@@ -215,19 +207,12 @@ export default function AdminTable({
     return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase() || '?';
   };
 
-  const StatusBadge = ({ status }: { status: AdminUser['status'] }) => {
-    const style = statusStyles[status];
-    const Icon = style.icon;
-    return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${style.className}`}>
-        <Icon size={10} />
-        {style.label}
-      </span>
-    );
-  };
+  const StatusBadge = ({ status }: { status: AdminUser['status'] }) => (
+    <RecordStatus value={status}>{statusStyles[status].label}</RecordStatus>
+  );
 
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+    <div className="bg-white rounded-md border shadow-sm overflow-hidden">
       {/* Action Bar - Desktop */}
       <div className="hidden md:flex justify-end items-center p-4 border-b gap-4 bg-white">
         <div className="flex items-center gap-2">
@@ -294,7 +279,7 @@ export default function AdminTable({
               >
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center text-sm font-bold text-fuchsia-700">
+                    <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center text-sm font-bold text-brand-700">
                       {admin.avatar ? (
                         <img src={admin.avatar} alt={`${admin.firstName} ${admin.lastName}`} className="w-full h-full rounded-full object-cover" />
                       ) : (
@@ -330,89 +315,15 @@ export default function AdminTable({
                   {admin.activatedAt ? formatDate(admin.activatedAt) : '—'}
                 </td>
                 <td className="p-4 text-right">
-                  <div className="flex justify-end gap-1">
-                    {/* View Button */}
-                    <Tooltip label="View Details">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onViewDetails?.(admin); }}
-                        className="p-2 text-fuchsia-600 hover:bg-fuchsia-50 rounded-lg transition"
-                      >
-                        <Eye size={16} />
-                      </button>
-                    </Tooltip>
-
-                    {/* Resend Invite - Only for pending */}
-                    {admin.status === 'pending' && onResendInvite && (
-                      <Tooltip label="Resend Invite">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onResendInvite(admin.id); }}
-                          className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                        >
-                          <Mail size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {/* Deactivate - Only for active */}
-                    {admin.status === 'active' && onDeactivate && (
-                      <Tooltip label="Deactivate">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onDeactivate(admin.id); }}
-                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
-                        >
-                          <PowerOff size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {/* Block - Only for active */}
-                    {admin.status === 'active' && onBlock && (
-                      <Tooltip label="Block Account">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onBlock(admin.id); }}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Ban size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {/* Unblock - Only for blocked */}
-                    {admin.status === 'blocked' && onUnblock && (
-                      <Tooltip label="Unblock Account">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onUnblock(admin.id); }}
-                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        >
-                          <CheckCircle size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {/* Activate (Resend Invite) - Only for deactivated */}
-                    {admin.status === 'deactivated' && onActivate && (
-                      <Tooltip label="Activate Account">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onActivate(admin.id); }}
-                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        >
-                          <Power size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {/* Delete - Not for already deleted */}
-                    {admin.status !== 'deleted' && onDelete && (
-                      <Tooltip label="Delete Permanently">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onDelete(admin.id); }}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </Tooltip>
-                    )}
-                  </div>
+                  <RecordActions name={admin.firstName + ' ' + admin.lastName} actions={[
+  onViewDetails && { label: 'View details', onSelect: () => onViewDetails(admin) },
+  admin.status === 'pending' && onResendInvite && { label: 'Resend invitation', onSelect: () => onResendInvite(admin.id) },
+  admin.status === 'active' && onDeactivate && { label: 'Deactivate account', onSelect: () => onDeactivate(admin.id) },
+  admin.status === 'active' && onBlock && { label: 'Block account', onSelect: () => onBlock(admin.id), destructive: true },
+  admin.status === 'blocked' && onUnblock && { label: 'Unblock account', onSelect: () => onUnblock(admin.id) },
+  admin.status === 'deactivated' && onActivate && { label: 'Activate account', onSelect: () => onActivate(admin.id) },
+  admin.status !== 'deleted' && onDelete && { label: 'Delete account', onSelect: () => onDelete(admin.id), destructive: true },
+]} />
                 </td>
               </tr>
             )) : (
@@ -432,11 +343,11 @@ export default function AdminTable({
           <div 
             key={admin.id} 
             onClick={() => onViewDetails?.(admin)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3 cursor-pointer hover:border-fuchsia-200 transition"
+            className="bg-white p-4 rounded-md shadow-sm border border-gray-100 space-y-3 cursor-pointer hover:border-brand-200 transition"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center text-base font-bold text-fuchsia-700">
+                <div className="w-12 h-12 rounded-md bg-brand-100 flex items-center justify-center text-base font-bold text-brand-700">
                   {getInitials(admin.firstName, admin.lastName)}
                 </div>
                 <div>
@@ -467,53 +378,18 @@ export default function AdminTable({
               )}
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-              <button 
-                onClick={() => onViewDetails?.(admin)} 
-                className="flex-1 py-2 bg-fuchsia-50 text-fuchsia-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-              >
-                <Eye size={14} /> View Details
-              </button>
-
-              {admin.status === 'pending' && onResendInvite && (
-                <button onClick={() => onResendInvite(admin.id)} className="flex-1 py-2 bg-amber-50 text-amber-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <Mail size={14} /> Resend
-                </button>
-              )}
-              
-              {admin.status === 'active' && onDeactivate && (
-                <button onClick={() => onDeactivate(admin.id)} className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <PowerOff size={14} /> Deactivate
-                </button>
-              )}
-              
-              {admin.status === 'active' && onBlock && (
-                <button onClick={() => onBlock(admin.id)} className="flex-1 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <Ban size={14} /> Block
-                </button>
-              )}
-              
-              {admin.status === 'blocked' && onUnblock && (
-                <button onClick={() => onUnblock(admin.id)} className="flex-1 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <CheckCircle size={14} /> Unblock
-                </button>
-              )}
-              
-              {admin.status === 'deactivated' && onActivate && (
-                <button onClick={() => onActivate(admin.id)} className="flex-1 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <Power size={14} /> Activate
-                </button>
-              )}
-              
-              {admin.status !== 'deleted' && onDelete && (
-                <button onClick={() => onDelete(admin.id)} className="flex-1 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <Trash2 size={14} /> Delete
-                </button>
-              )}
-            </div>
+            <RecordActions name={admin.firstName + ' ' + admin.lastName} actions={[
+  onViewDetails && { label: 'View details', onSelect: () => onViewDetails(admin) },
+  admin.status === 'pending' && onResendInvite && { label: 'Resend invitation', onSelect: () => onResendInvite(admin.id) },
+  admin.status === 'active' && onDeactivate && { label: 'Deactivate account', onSelect: () => onDeactivate(admin.id) },
+  admin.status === 'active' && onBlock && { label: 'Block account', onSelect: () => onBlock(admin.id), destructive: true },
+  admin.status === 'blocked' && onUnblock && { label: 'Unblock account', onSelect: () => onUnblock(admin.id) },
+  admin.status === 'deactivated' && onActivate && { label: 'Activate account', onSelect: () => onActivate(admin.id) },
+  admin.status !== 'deleted' && onDelete && { label: 'Delete account', onSelect: () => onDelete(admin.id), destructive: true },
+]} />
           </div>
         )) : (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
+          <div className="bg-white p-8 rounded-md shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
             No sub admins found.
           </div>
         )}

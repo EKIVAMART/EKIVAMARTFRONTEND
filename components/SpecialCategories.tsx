@@ -27,9 +27,9 @@ export default function SpecialCategories() {
       {/* Section Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <span className="h-px w-6 bg-gradient-to-r from-[#9d4ae3] to-transparent rounded-full" />
-          <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#9d4ae3]/80">Deals</span>
-          <span className="h-px w-6 bg-gradient-to-l from-[#9d4ae3] to-transparent rounded-full" />
+          <span className="h-px w-6 bg-gradient-to-r from-[#228b22] to-transparent rounded-full" />
+          <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#228b22]/80">Deals</span>
+          <span className="h-px w-6 bg-gradient-to-l from-[#228b22] to-transparent rounded-full" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Shop the Sale</h2>
         <p className="mt-1 text-sm text-gray-500">Trending deals across top categories</p>

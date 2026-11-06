@@ -44,36 +44,36 @@ interface CategoryCardProps {
 function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, onPublish }: CategoryCardProps) {
   return (
     <div
-      className={`rounded-2xl border flex flex-col overflow-hidden transition-all group relative ${
+      className={`rounded-md border flex flex-col overflow-hidden transition-all group relative ${
         isDraft
-          ? 'bg-white border-amber-200/70 shadow-sm hover:shadow-amber-100 hover:border-amber-300'
-          : 'bg-white border-gray-100 shadow-sm hover:shadow-md hover:border-fuchsia-100'
+          ? 'bg-white border-amber-200/70 shadow-sm hover:hover:border-amber-300'
+          : 'bg-white border-gray-100 shadow-sm hover:shadow-sm hover:border-brand-100'
       }`}
     >
       {/* Floating Status Badge */}
       <div className="absolute top-3 right-3 z-10">
         {isDraft ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200/80 shadow-sm">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200/80 shadow-sm">
             <Clock size={9} /> Draft
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-sm">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-sm">
             <CheckCircle2 size={9} /> Published
           </span>
         )}
       </div>
 
       {/* Status ribbon */}
-      <div className={`h-1.5 w-full ${isDraft ? 'bg-gradient-to-r from-amber-400 to-yellow-300' : 'bg-gradient-to-r from-[#9d4ae3] to-[#8236be]'}`} />
+      <div className={`h-1.5 w-full ${isDraft ? 'bg-amber-400' : 'bg-[#228b22]'}`} />
 
       {/* Body */}
       <div className="p-5 pt-8 flex flex-col items-center text-center flex-1">
         {/* Avatar */}
         <div
-          className={`w-20 h-20 rounded-full overflow-hidden mb-4 ring-4 relative flex items-center justify-center text-white text-3xl font-black uppercase flex-shrink-0 ${
+          className={`w-20 h-20 rounded-md overflow-hidden mb-4 ring-4 relative flex items-center justify-center text-white text-3xl font-black uppercase flex-shrink-0 ${
             isDraft
-              ? 'bg-gradient-to-br from-amber-400 to-yellow-300 ring-amber-50'
-              : 'bg-gradient-to-br from-[#9d4ae3] to-[#8236be] ring-fuchsia-50'
+              ? 'bg-amber-400 ring-amber-50'
+              : 'bg-[#228b22] ring-brand-50'
           }`}
         >
           {category.image ? (
@@ -99,7 +99,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
 
             if (totalSubcategories === 0) {
               return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-50 text-gray-400 border border-gray-100">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-gray-50 text-gray-400 border border-gray-100">
                   <Layers size={10} />
                   0 Subcategories
                 </span>
@@ -109,13 +109,13 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
             return (
               <>
                 {publishedCount > 0 && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-fuchsia-50 text-[#8236be] border border-fuchsia-100 animate-in fade-in duration-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-brand-50 text-[#1c711c] border border-brand-100 animate-in fade-in duration-200">
                     <Layers size={10} />
                     {publishedCount} {publishedCount === 1 ? 'Subcategory' : 'Subcategories'}
                   </span>
                 )}
                 {draftCount > 0 && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 animate-in fade-in duration-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 animate-in fade-in duration-200">
                     <Clock size={10} />
                     {draftCount} {draftCount === 1 ? 'Draft Sub' : 'Draft Subs'}
                   </span>
@@ -126,7 +126,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
 
           {/* No image warning for draft */}
           {isDraft && !category.image && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100 animate-in fade-in duration-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-red-50 text-red-500 border border-red-100 animate-in fade-in duration-200">
               <AlertCircle size={10} /> No Image
             </span>
           )}
@@ -139,7 +139,7 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           <div className="flex flex-col gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); onPublish(category); }}
-              className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-fuchsia-100"
+              className="w-full bg-[#228b22] hover:bg-[#1c711c] text-white py-2 rounded-md text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm "
             >
               <Upload size={13} />
               Publish Category
@@ -147,13 +147,13 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
             <div className="flex gap-2">
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(category); }}
-                className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+                className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-md text-xs font-bold transition flex items-center justify-center gap-1"
               >
                 <Edit size={13} /> Edit
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
-                className="flex-1 bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+                className="flex-1 bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 py-2 rounded-md text-xs font-bold transition flex items-center justify-center gap-1"
               >
                 <Trash2 size={13} /> Delete Draft
               </button>
@@ -163,21 +163,21 @@ function CategoryCard({ category, isDraft, onEdit, onDelete, onSubcategories, on
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); onSubcategories(category); }}
-              className="flex-1 bg-white border border-fuchsia-200 text-[#8236be] hover:bg-fuchsia-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+              className="flex-1 bg-white border border-brand-200 text-[#1c711c] hover:bg-brand-50 py-2 rounded-md text-xs font-bold transition flex items-center justify-center gap-1"
               title="Manage Subcategories"
             >
               <Layers size={13} /> Subcategories
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(category); }}
-              className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1"
+              className="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-2 rounded-md text-xs font-bold transition flex items-center justify-center gap-1"
               title="Edit Category"
             >
               <Edit size={13} /> Edit
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(category.id); }}
-              className="flex-none bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 p-2 rounded-xl transition"
+              className="flex-none bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 p-2 rounded-md transition"
               title="Delete Category"
             >
               <Trash2 size={15} />
@@ -199,7 +199,7 @@ function SectionHeader({
         {icon}
       </div>
       <h3 className="font-black text-slate-700 text-base tracking-tight">{title}</h3>
-      <span className={`ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full ${accent.replace('text-white', 'text-opacity-80')}`}>
+      <span className={`ml-1 text-xs font-bold px-2.5 py-0.5 rounded-md ${accent.replace('text-white', 'text-opacity-80')}`}>
         {count}
       </span>
     </div>
@@ -307,7 +307,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
 
   const openEdit = (cat: Category) => { setEditingCategory(cat); setIsFormOpen(true); };
   const openSubcategories = (cat: Category) => { setViewingCategory(cat); setIsSubcategoryModalOpen(true); };
-  
+
   const handlePublishDirectly = async (cat: Category) => {
     if (!cat.image) {
       toast.error('Please upload an image before publishing this category. Click Edit to add an image.');
@@ -333,8 +333,8 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-6xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
+      <div className="relative w-full max-w-6xl bg-white rounded-md shadow-sm flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
 
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 flex-shrink-0">
@@ -347,11 +347,11 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           <div className="flex items-center gap-3">
             <button
               onClick={() => { setEditingCategory(null); setIsFormOpen(true); }}
-              className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap text-sm"
+              className="bg-[#228b22] hover:bg-[#1c711c] text-white px-4 py-2.5 rounded-md font-bold flex items-center gap-2 transition-all shadow-sm whitespace-nowrap text-sm"
             >
               <Plus size={17} /> New Category
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-xl transition">
+            <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
               <X size={22} />
             </button>
           </div>
@@ -366,7 +366,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search categories by name or description…"
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 text-slate-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9d4ae3]/20 focus:border-[#9d4ae3] transition"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-md text-sm bg-gray-50 text-slate-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#228b22]/20 focus:border-[#228b22] transition"
             />
             {searchQuery && (
               <button
@@ -390,7 +390,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
         <div className="flex-1 overflow-y-auto p-6 bg-[#F8F9FA] space-y-8">
 
           {error && (
-            <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium text-sm flex items-center gap-2">
+            <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-md font-medium text-sm flex items-center gap-2">
               <AlertCircle size={16} className="flex-shrink-0" /> {error}
             </div>
           )}
@@ -398,12 +398,12 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
           {isLoading ? (
             <div className="flex items-center justify-center py-24">
               <div className="flex flex-col items-center gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9d4ae3]" />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#228b22]" />
                 <p className="text-sm text-gray-500 font-medium">Loading categories…</p>
               </div>
             </div>
           ) : totalFiltered === 0 && searchQuery ? (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+            <div className="text-center py-20 bg-white rounded-md border border-dashed border-gray-200">
               <Search size={36} className="mx-auto text-gray-300 mb-3" />
               <h3 className="text-base font-bold text-slate-700">No results found</h3>
               <p className="text-gray-400 text-sm mt-1">Try a different search term.</p>
@@ -413,17 +413,17 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
               {/* ── Published Section ── */}
               <section>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-[#228b22] flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 size={16} className="text-white" />
                   </div>
                   <h3 className="font-black text-slate-700 text-base tracking-tight">Published Categories</h3>
-                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-100 text-[#8236be]">
+                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-brand-100 text-[#1c711c]">
                     {published.length}
                   </span>
                 </div>
 
                 {published.length === 0 ? (
-                  <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl border border-dashed border-gray-200 text-gray-400 text-sm">
+                  <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-md border border-dashed border-gray-200 text-gray-400 text-sm">
                     <Layers size={18} className="flex-shrink-0" />
                     {searchQuery ? 'No published categories match your search.' : 'No published categories yet. Add and publish a category to make it visible.'}
                   </div>
@@ -459,13 +459,13 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
               {/* ── Drafts Section ── */}
               <section>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-300 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center flex-shrink-0">
                     <Clock size={16} className="text-white" />
                   </div>
                   <h3 className="font-black text-slate-700 text-base tracking-tight">
                     {drafts.length === 1 ? 'Draft Category' : 'Draft Categories'}
                   </h3>
-                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-600">
+                  <span className="ml-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-600">
                     {drafts.length}
                   </span>
                   <span className="text-xs text-gray-400 font-medium ml-1">
@@ -474,7 +474,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
                 </div>
 
                 {drafts.length === 0 ? (
-                  <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl border border-dashed border-amber-200 text-amber-400 text-sm">
+                  <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-md border border-dashed border-amber-200 text-amber-400 text-sm">
                     <Clock size={18} className="flex-shrink-0" />
                     {searchQuery ? 'No draft categories match your search.' : 'No draft categories. All categories are published!'}
                   </div>
@@ -502,9 +502,9 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
       {/* ── Delete Confirmation ── */}
       {deletingId && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeletingId(null)} />
-          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
+          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setDeletingId(null)} />
+          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4 ">
               <Trash2 size={22} className="text-red-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Category?</h3>
@@ -514,14 +514,14 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
             <div className="flex gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="flex-1 py-2.5 border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
+                className="flex-1 py-2.5 border border-gray-200 text-slate-700 font-bold rounded-md hover:bg-gray-50 transition disabled:opacity-50"
                 disabled={isDeleting}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deletingId)}
-                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-60"
+                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-60"
                 disabled={isDeleting}
               >
                 {isDeleting ? (

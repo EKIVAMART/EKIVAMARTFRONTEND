@@ -130,8 +130,8 @@ export default function AdminInvitationPage() {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col justify-center items-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
-          <p className="text-sm font-bold text-slate-600 animate-pulse">Validating your invitation...</p>
+          <div className="w-12 h-12 border-4 border-[#228b22]/20 border-t-[#228b22] rounded-full animate-spin" />
+          <p className="text-sm font-bold text-slate-600 ">Validating your invitation...</p>
         </div>
       </div>
     );
@@ -141,11 +141,10 @@ export default function AdminInvitationPage() {
   if (step === 'error') {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-red-500 to-amber-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
-            <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+            <div className="bg-red-50 p-4 rounded-md border border-red-100">
               <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
@@ -157,7 +156,7 @@ export default function AdminInvitationPage() {
           </p>
           <Link
             href="/admin/login"
-            className="inline-block w-full mt-8 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-fuchsia-100"
+            className="inline-block w-full mt-8 bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-md font-bold transition-all shadow-sm "
           >
             Return to Login
           </Link>
@@ -170,11 +169,10 @@ export default function AdminInvitationPage() {
   if (step === 'success') {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
-            <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+            <div className="bg-emerald-50 p-4 rounded-md border border-emerald-100">
               <CheckCircle2 size={48} className="text-emerald-500" />
             </div>
           </div>
@@ -182,8 +180,8 @@ export default function AdminInvitationPage() {
           <p className="text-slate-500 text-sm mt-3 font-medium leading-relaxed">
             Your admin account has been successfully activated. Redirecting to your dashboard...
           </p>
-          <div className="mt-6 w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-pulse" style={{ animation: 'pulse 3s ease-in-out infinite', width: '100%' }}></div>
+          <div className="mt-6 w-full h-1.5 bg-slate-100 rounded-sm overflow-hidden">
+            <div className="h-full bg-emerald-500 rounded-md " style={{ width: '100%' }}></div>
           </div>
         </div>
       </div>
@@ -199,7 +197,7 @@ export default function AdminInvitationPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex mb-6">
             <div className="flex items-center gap-1.5">
-              <Image src="/fa_logo_brand.png" alt="Faflora" width={120} height={32} className="object-contain h-8 w-auto" />
+              <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={120} height={32} className="object-contain h-8 w-auto" />
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
             </div>
           </Link>
@@ -212,11 +210,11 @@ export default function AdminInvitationPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 mb-6">
+        <div className="bg-white rounded-md shadow-sm border border-slate-100 p-8 mb-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error Message */}
             {errorMessage && (
-              <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex gap-3 items-start">
+              <div className="bg-red-50 border border-red-100 rounded-md p-4 flex gap-3 items-start">
                 <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
                 <p className="text-red-700 text-sm font-medium leading-snug">{errorMessage}</p>
               </div>
@@ -233,7 +231,7 @@ export default function AdminInvitationPage() {
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="Create a strong password"
-                  className="w-full bg-white border border-gray-200 hover:border-gray-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 rounded-xl px-4 py-3 text-slate-800 placeholder:text-slate-400 font-medium transition-all outline-none"
+                  className="w-full bg-white border border-gray-200 hover:border-gray-300 focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 rounded-md px-4 py-3 text-slate-800 placeholder:text-slate-400 font-medium transition-all outline-none"
                   minLength={8}
                   maxLength={128}
                   required
@@ -259,7 +257,7 @@ export default function AdminInvitationPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter your password"
-                  className="w-full bg-white border border-gray-200 hover:border-gray-300 focus:border-[#9d4ae3] focus:ring-2 focus:ring-[#9d4ae3]/20 rounded-xl px-4 py-3 text-slate-800 placeholder:text-slate-400 font-medium transition-all outline-none"
+                  className="w-full bg-white border border-gray-200 hover:border-gray-300 focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 rounded-md px-4 py-3 text-slate-800 placeholder:text-slate-400 font-medium transition-all outline-none"
                   minLength={8}
                   maxLength={128}
                   required
@@ -285,7 +283,7 @@ export default function AdminInvitationPage() {
             </div>
 
             {/* Password Requirements */}
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2">
+            <div className="bg-slate-50 border border-slate-100 rounded-md p-4 space-y-2">
               <p className="text-slate-700 text-xs font-bold uppercase tracking-wide">Password Requirements:</p>
               <ul className="space-y-1.5 text-xs text-slate-600">
                 <li className={`flex items-center gap-2 ${password.length >= 8 ? 'text-emerald-600' : ''}`}>
@@ -311,7 +309,7 @@ export default function AdminInvitationPage() {
             <button
               type="submit"
               disabled={isSubmitting || !password || !confirmPassword}
-              className="w-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 disabled:shadow-none"
+              className="w-full bg-[#228b22] hover:bg-[#1c711c] disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 text-white py-3.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:shadow-none"
             >
               {isSubmitting ? (
                 <>
@@ -331,13 +329,13 @@ export default function AdminInvitationPage() {
           <div className="mt-6 pt-6 border-t border-slate-100 text-center space-y-3">
             <p className="text-slate-500 text-xs font-medium">
               By activating this account, you agree to our{' '}
-              <Link href="/terms-and-conditions" className="text-[#9d4ae3] hover:text-[#8236be] transition-colors">
+              <Link href="/terms-and-conditions" className="text-[#228b22] hover:text-[#1c711c] transition-colors">
                 Terms & Conditions
               </Link>
             </p>
             <p className="text-slate-500 text-sm">
               Already set a password?{' '}
-              <Link href="/admin/login" className="text-[#9d4ae3] hover:text-[#8236be] font-bold transition-colors">
+              <Link href="/admin/login" className="text-[#228b22] hover:text-[#1c711c] font-bold transition-colors">
                 Login here
               </Link>
             </p>
@@ -349,7 +347,7 @@ export default function AdminInvitationPage() {
           <p className="text-slate-500 text-sm mb-4">Need help?</p>
           <Link
             href="/admin/login"
-            className="inline-block text-[#9d4ae3] hover:text-[#8236be] font-bold text-sm transition-colors"
+            className="inline-block text-[#228b22] hover:text-[#1c711c] font-bold text-sm transition-colors"
           >
             Go to Admin Login
           </Link>

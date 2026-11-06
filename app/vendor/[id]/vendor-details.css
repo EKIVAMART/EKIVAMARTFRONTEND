@@ -59,7 +59,7 @@
 .vp-cover-photo {
   width: 100%;
   height: 220px;
-  background: linear-gradient(to bottom, #d8b4e2 0%, #8c92ac 100%);
+  background: linear-gradient(to bottom, #bfd4bc 0%, #8c92ac 100%);
   position: relative;
 }
 
@@ -96,8 +96,8 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f3ecfc 0%, #e8dbf8 100%);
-  color: #9d4ae3;
+  background: linear-gradient(135deg, #eff4e9 0%, #dfead5 100%);
+  color: #228b22;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #9d4ae3 0%, #8236be 100%);
+  background: linear-gradient(135deg, #228b22 0%, #1c711c 100%);
   color: white;
   padding: 0.75rem 2.5rem;
   border-radius: 0.75rem;
@@ -395,7 +395,7 @@
 
 .vp-add-to-cart-btn {
   width: 100%;
-  background-color: #9d4ae3;
+  background-color: #228b22;
   color: white;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -579,9 +579,9 @@
 }
 
 .vp-review-add-btn:hover {
-  background-color: #f3ecfc;
-  color: #9d4ae3;
-  border-color: #9d4ae3;
+  background-color: #eff4e9;
+  color: #228b22;
+  border-color: #228b22;
 }
 
 /* Categories Tab */
@@ -608,18 +608,18 @@
 .vp-category-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(157, 74, 227, 0.08);
-  border-color: #e8dbf8;
+  border-color: #dfead5;
 }
 
 .vp-category-icon-wrapper {
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f3ecfc 0%, #e8dbf8 100%);
+  background: linear-gradient(135deg, #eff4e9 0%, #dfead5 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9d4ae3;
+  color: #228b22;
 }
 
 .vp-category-info h3 {
@@ -699,7 +699,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  
+
   .vp-tabs::-webkit-scrollbar {
     display: none;
   }

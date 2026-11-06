@@ -145,10 +145,10 @@ export default function TaxRulesView() {
   return (
     <div className="space-y-6">
       {/* Header & Notice */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-md border shadow-xs">
         <div>
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Percent className="text-[#9d4ae3]" size={24} />
+            <Percent className="text-[#228b22]" size={24} />
             Tax Configuration & Rates
           </h2>
           <p className="text-xs text-gray-500 mt-1">
@@ -159,14 +159,14 @@ export default function TaxRulesView() {
           <button
             onClick={fetchRules}
             disabled={isLoading}
-            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-xl transition border"
+            className="p-2.5 text-gray-500 hover:text-slate-800 hover:bg-gray-100 rounded-md transition border"
             title="Refresh"
           >
             <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#9d4ae3] hover:bg-[#8236be] text-white rounded-xl font-bold text-sm shadow-sm transition"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#228b22] hover:bg-[#1c711c] text-white rounded-md font-bold text-sm shadow-sm transition"
           >
             <Plus size={16} /> Add Tax Rule
           </button>
@@ -174,18 +174,18 @@ export default function TaxRulesView() {
       </div>
 
       {/* Policy Banner */}
-      <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex items-start gap-3">
-        <ShieldAlert className="text-[#9d4ae3]" size={20} />
-        <div className="text-xs text-purple-900 leading-relaxed">
+      <div className="bg-brand-50/80 border border-brand-200/80 rounded-md p-4 flex items-start gap-3">
+        <ShieldAlert className="text-[#228b22]" size={20} />
+        <div className="text-xs text-brand-900 leading-relaxed">
           <p className="font-bold mb-0.5">Flexible Tax Rates Active</p>
-          <p className="text-purple-800/90">
+          <p className="text-brand-800/90">
             Configure jurisdiction and region-specific tax rates to any desired percentage. The matched active rule will be applied to the order subtotal during checkout.
           </p>
         </div>
       </div>
 
       {/* Rules Table */}
-      <div className="bg-white rounded-2xl border shadow-xs overflow-hidden">
+      <div className="bg-white rounded-md border shadow-xs overflow-hidden">
         <div className="p-4 border-b bg-gray-50/50 flex justify-between items-center">
           <h3 className="font-bold text-slate-800 text-sm">Configured Regional Rules</h3>
           <span className="text-xs font-semibold text-gray-500">{taxRules.length} Rules Configured</span>
@@ -193,7 +193,7 @@ export default function TaxRulesView() {
 
         {isLoading ? (
           <div className="p-12 text-center text-gray-400">
-            <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[#9d4ae3]" />
+            <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[#228b22]" />
             <p className="text-sm font-medium">Loading tax rules...</p>
           </div>
         ) : taxRules.length === 0 ? (
@@ -221,7 +221,7 @@ export default function TaxRulesView() {
                 {taxRules.map((rule) => (
                   <tr key={rule.id} className="hover:bg-slate-50/50 transition">
                     <td className="py-4 px-6 font-bold text-slate-800 flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-purple-100 text-[#9d4ae3] text-xs font-black flex items-center justify-center">
+                      <span className="w-6 h-6 rounded-md bg-brand-100 text-[#228b22] text-xs font-black flex items-center justify-center">
                         {rule.country.substring(0, 2)}
                       </span>
                       {rule.country}
@@ -229,13 +229,13 @@ export default function TaxRulesView() {
                     <td className="py-4 px-6 text-gray-600 font-medium">
                       {rule.region || <span className="text-gray-400 italic">All regions (Country-wide)</span>}
                     </td>
-                    <td className="py-4 px-6 font-bold text-[#9d4ae3]">
+                    <td className="py-4 px-6 font-bold text-[#228b22]">
                       {(rule.ratePercentage * 100).toFixed(1)}%
                     </td>
                     <td className="py-4 px-6">
                       <button
                         onClick={() => handleToggleActive(rule)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition ${
                           rule.isActive
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
                             : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
@@ -275,20 +275,20 @@ export default function TaxRulesView() {
       {/* Create / Edit Tax Rule Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border"
+              className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
             >
-              <div className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] px-6 py-4 text-white flex justify-between items-center">
+              <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
                 <h3 className="font-bold text-lg">
                   {editingRule ? 'Edit Tax Rule' : 'Add Regional Tax Rule'}
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 hover:bg-white/20 rounded-xl transition"
+                  className="p-1.5 hover:bg-white/20 rounded-md transition"
                 >
                   ✕
                 </button>
@@ -305,7 +305,7 @@ export default function TaxRulesView() {
                     onChange={(e) => setFormData({ ...formData, country: e.target.value.toUpperCase() })}
                     placeholder="NG"
                     maxLength={3}
-                    className="w-full px-3.5 py-2.5 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] uppercase font-bold disabled:opacity-60"
+                    className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] uppercase font-bold disabled:opacity-60"
                   />
                   <p className="text-[11px] text-gray-400 mt-1">2 or 3 letter ISO country code (e.g. NG, US, UK, GH)</p>
                 </div>
@@ -318,13 +318,13 @@ export default function TaxRulesView() {
                     value={formData.region}
                     onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                     placeholder="e.g. Lagos, Abuja, Rivers (leave blank for country-wide)"
-                    className="w-full px-3.5 py-2.5 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] disabled:opacity-60"
+                    className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] disabled:opacity-60"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Tax Rate (%) * <span className="text-[#9d4ae3] font-semibold">(0% - 100%)</span>
+                    Tax Rate (%) * <span className="text-[#228b22] font-semibold">(0% - 100%)</span>
                   </label>
                   <div className="relative">
                     <input
@@ -335,7 +335,7 @@ export default function TaxRulesView() {
                       step={0.1}
                       value={formData.ratePercentage}
                       onChange={(e) => setFormData({ ...formData, ratePercentage: parseFloat(e.target.value) || 0 })}
-                      className="w-full px-3.5 py-2.5 pr-8 text-sm border rounded-xl bg-slate-50 focus:outline-none focus:border-[#9d4ae3] font-bold text-slate-800"
+                      className="w-full px-3.5 py-2.5 pr-8 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] font-bold text-slate-800"
                     />
                     <span className="absolute right-3.5 top-2.5 text-gray-400 font-bold text-sm">%</span>
                   </div>
@@ -351,7 +351,7 @@ export default function TaxRulesView() {
                         type="checkbox"
                         checked={formData.isActive}
                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                        className="rounded text-[#9d4ae3] focus:ring-[#9d4ae3] w-4 h-4"
+                        className="rounded text-[#228b22] focus:ring-[#228b22] w-4 h-4"
                       />
                       <span className="text-xs font-bold text-slate-700">Tax rule is active</span>
                     </label>
@@ -362,14 +362,14 @@ export default function TaxRulesView() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                    className="px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-md transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-6 py-2.5 text-sm font-bold text-white bg-[#9d4ae3] hover:bg-[#8236be] rounded-xl shadow-sm transition disabled:opacity-50"
+                    className="px-6 py-2.5 text-sm font-bold text-white bg-[#228b22] hover:bg-[#1c711c] rounded-md shadow-sm transition disabled:opacity-50"
                   >
                     {isSaving ? 'Saving...' : editingRule ? 'Update Rule' : 'Create Rule'}
                   </button>

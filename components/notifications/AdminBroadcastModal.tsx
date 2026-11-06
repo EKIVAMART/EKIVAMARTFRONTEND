@@ -100,23 +100,23 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
       case 'super-admin':
         return 'every super-admin';
       default:
-        return 'every registered active user on Faflora';
+        return 'every registered active user on EkivaMart';
     }
   };
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 flex flex-col"
+          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 flex flex-col"
         >
           {/* Header */}
-          <div className="p-6 bg-gradient-to-r from-brand-900 to-brand-700 text-white flex items-center justify-between">
+          <div className="p-6 bg-brand-900 text-white flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white">
+              <div className="w-10 h-10 rounded-md bg-white/15 flex items-center justify-center text-white">
                 <Megaphone className="w-5 h-5" />
               </div>
               <div>
@@ -129,7 +129,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
             <button
               onClick={handleClose}
-              className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition"
+              className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition"
               disabled={isSending}
             >
               <X className="w-5 h-5" />
@@ -140,7 +140,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
           <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
             {resultMsg ? (
               <div className="py-8 text-center space-y-3">
-                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto border border-emerald-100">
+                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-md flex items-center justify-center mx-auto border border-emerald-100">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="font-extrabold text-lg text-neutral-900">Broadcast Dispatched</h4>
@@ -162,7 +162,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                         e.target.value as 'customer' | 'vendor' | 'admin' | 'super-admin' | ''
                       )
                     }
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl px-4 py-3 text-xs font-bold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-4 py-3 text-xs font-bold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
                   >
                     <option value="">All Users (Customers, Vendors, Staff)</option>
                     <option value="customer">Customers Only</option>
@@ -191,7 +191,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     placeholder="e.g. Scheduled System Maintenance This Sunday"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl px-4 py-3 text-xs font-bold text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-4 py-3 text-xs font-bold text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600"
                   />
                   {title.length > 0 && title.trim().length < 3 && (
                     <p className="text-[11px] text-rose-500 font-semibold mt-1">
@@ -219,7 +219,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     placeholder="Write clear announcement details for recipients..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl p-4 text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600 resize-none"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-md p-4 text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600 resize-none"
                   />
                   {message.length > 0 && message.trim().length < 10 && (
                     <p className="text-[11px] text-rose-500 font-semibold mt-1">
@@ -248,7 +248,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                           setScreen(val);
                         }
                       }}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                      className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
                     >
                       <option value="">None (Default)</option>
                       <option value="VendorOrderDetails">Vendor Order Details (VendorOrderDetails)</option>
@@ -272,7 +272,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                         placeholder="Enter custom screen name..."
                         value={screen}
                         onChange={(e) => setScreen(e.target.value)}
-                        className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-800 mt-2 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-neutral-800 mt-2 focus:outline-none focus:ring-2 focus:ring-brand-600"
                       />
                     )}
                   </div>
@@ -286,7 +286,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                       placeholder="e.g. maintenance"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                      className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-600"
                     />
                   </div>
                 </div>
@@ -297,7 +297,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     type="button"
                     disabled={!canProceed}
                     onClick={() => setStep('confirm')}
-                    className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-extrabold text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>Review &amp; Confirm Broadcast</span>
                     <Send className="w-4 h-4" />
@@ -307,7 +307,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
             ) : (
               /* Step 2: Plain English Confirmation Step */
               <div className="py-2 space-y-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto border border-amber-100">
+                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-md flex items-center justify-center mx-auto border border-amber-100">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
 
@@ -324,7 +324,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                   </p>
                 </div>
 
-                <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 text-left space-y-2">
+                <div className="bg-neutral-50 border border-neutral-200 rounded-md p-4 text-left space-y-2">
                   <div>
                     <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                       Title:
@@ -344,7 +344,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     type="button"
                     disabled={isSending}
                     onClick={() => setStep('compose')}
-                    className="flex-1 py-3 border border-neutral-200 rounded-2xl text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
+                    className="flex-1 py-3 border border-neutral-200 rounded-md text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
                   >
                     Back to Edit
                   </button>
@@ -353,7 +353,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     type="button"
                     disabled={isSending}
                     onClick={() => void handleSendBroadcast()}
-                    className="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-xs font-extrabold transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-xs font-extrabold transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isSending ? (
                       <>

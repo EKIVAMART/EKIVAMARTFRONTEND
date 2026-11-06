@@ -16,7 +16,7 @@ const PrimaryButton = ({ text, onClick }: { text: string; onClick?: () => void }
 );
 
 const SectionIcon = ({ icon }: { icon: React.ReactNode }) => (
-  <div className="flex-shrink-0 mt-1 w-11 h-11 rounded-xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center shadow-md shadow-[#9d4ae330]">
+  <div className="flex-shrink-0 mt-1 w-11 h-11 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] text-white flex items-center justify-center shadow-md shadow-[#9d4ae330]">
     {icon}
   </div>
 );
@@ -25,7 +25,7 @@ const SectionTitle = ({ subtitle, title, icon }: { subtitle: string; title: stri
   <div className="mb-8 flex items-start gap-4">
     <SectionIcon icon={icon} />
     <div>
-      <span className="block text-[#8236be] font-bold uppercase tracking-[3px] text-xs mb-1">
+      <span className="block text-[#1c711c] font-bold uppercase tracking-[3px] text-xs mb-1">
         Section {subtitle}
       </span>
       <h3 className="text-2xl md:text-3xl font-extrabold text-[#1a0018] leading-tight">{title}</h3>
@@ -36,7 +36,7 @@ const SectionTitle = ({ subtitle, title, icon }: { subtitle: string; title: stri
 const BulletItem = ({ text }: { text: string }) => (
   <div className="flex items-start gap-3">
     <div className="flex-shrink-0 mt-[7px] w-5 h-5 rounded-full bg-[#f0c8ec] flex items-center justify-center">
-      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be]" />
+      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c]" />
     </div>
     <span className="text-gray-600 text-sm md:text-base leading-relaxed">{text}</span>
   </div>
@@ -44,8 +44,8 @@ const BulletItem = ({ text }: { text: string }) => (
 
 const InfoCard = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-[#fdf3fc] to-[#f9eaf8] border border-[#e8b8e4]">
-    <p className="font-bold text-[#9d4ae3] mb-4 flex items-center gap-2">
-      <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#9d4ae3] to-[#8236be] text-white flex items-center justify-center text-[10px]">!</span>
+    <p className="font-bold text-[#228b22] mb-4 flex items-center gap-2">
+      <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white flex items-center justify-center text-[10px]">!</span>
       {label}
     </p>
     {children}
@@ -54,7 +54,7 @@ const InfoCard = ({ label, children }: { label: string; children: React.ReactNod
 
 const SectionWrapper = ({ children, delay }: { children: React.ReactNode; delay: number }) => (
   <FadeInSection type="fadeUp" delay={delay}>
-    <div className="group relative pl-6 border-l-2 border-[#e8b8e4] hover:border-[#9d4ae3] transition-colors duration-300">
+    <div className="group relative pl-6 border-l-2 border-[#e8b8e4] hover:border-[#228b22] transition-colors duration-300">
       {children}
     </div>
   </FadeInSection>
@@ -66,8 +66,8 @@ export default function TermsAndConditions() {
 
       {/* ── HERO ── */}
       <section className="relative min-h-[80vh] md:min-h-[90vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#9d4ae3]" />
-        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#8236be] opacity-20 blur-[120px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2d0029] via-[#6b0f6b] to-[#228b22]" />
+        <div className="absolute top-[-10%] left-[-8%] w-[55vw] h-[55vw] rounded-full bg-[#1c711c] opacity-20 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#3d0060] opacity-30 blur-[100px] pointer-events-none" />
         <div className="absolute top-[30%] right-[15%] w-[28vw] h-[28vw] rounded-full bg-[#ff69e0] opacity-10 blur-[80px] pointer-events-none" />
         <div className="absolute top-10 right-10 w-56 h-56 rounded-full border border-white/10 pointer-events-none" />
@@ -120,17 +120,17 @@ export default function TermsAndConditions() {
         {/* Intro */}
         <FadeInSection type="fadeUp" delay={0.2} className="pt-12">
           <div className="relative p-8 rounded-2xl bg-gradient-to-br from-[#f9eaf8] to-white border border-[#e8b8e4] shadow-sm">
-            <div className="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center shadow-md">
+            <div className="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center shadow-md">
               <Shield size={14} className="text-white" />
             </div>
             <p className="text-lg text-gray-700 leading-relaxed">
-              <span className="font-bold text-[#9d4ae3]">Faflora</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, Faflora eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, Faflora provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
+              <span className="font-bold text-[#228b22]">EkivaMart</span> stands as Nigeria's premier multivendor online marketplace, designed to revolutionize how local vendors connect with millions of buyers across the country. By centralizing payments, vendor data, and customer data on one powerful, user-friendly platform, EkivaMart eliminates the headaches of running an independent online store while amplifying your reach, sales potential, and business growth. Whether you're a small fashion boutique in Lagos, a handmade crafts artisan in Asaba, a shoe vendor in Abuja, or a beauty products seller in Port Harcourt, EkivaMart provides the infrastructure you need to thrive in Nigeria's booming ecommerce landscape.
             </p>
             <p className="mt-5 text-gray-600 leading-relaxed">
               We handle the heavy lifting so you can focus on what matters most: sourcing quality products, delighting customers, and scaling your brand. Our platform supports seamless shopping experiences with features like easy search, secure transactions, fast nationwide delivery partnerships, and innovative options such as partial or installment payments — allowing customers to buy now and pay later without stress. This flexibility boosts conversion rates and helps vendors move more inventory, especially for higher-value items like clothing, accessories, electronics, home goods, and more.
             </p>
             <p className="mt-5 text-gray-600 leading-relaxed">
-              At its core, Faflora is built on trust, empowerment, and simplicity. We bridge buyers seeking affordable, high-quality, locally made Nigerian products with vendors ready to grow. Shopping on Faflora is seamless, secure, and stylish — customers discover authentic items from trusted local sellers, while vendors gain visibility, analytics, and tools to compete effectively against bigger players.
+              At its core, EkivaMart is built on trust, empowerment, and simplicity. We bridge buyers seeking affordable, high-quality, locally made Nigerian products with vendors ready to grow. Shopping on EkivaMart is seamless, secure, and stylish — customers discover authentic items from trusted local sellers, while vendors gain visibility, analytics, and tools to compete effectively against bigger players.
             </p>
           </div>
         </FadeInSection>
@@ -141,7 +141,7 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.3}>
             <SectionTitle subtitle="1" title="Payments" icon={<CreditCard size={20} />} />
             <p className="text-gray-600">
-              Faflora integrates robust, secure payment gateways tailored for the Nigerian market, supporting popular methods like bank transfers, cards, mobile money, USSD, and flexible partial payment plans. Customers can split payments over time, making premium or bulk purchases accessible without waiting for payday.
+              EkivaMart integrates robust, secure payment gateways tailored for the Nigerian market, supporting popular methods like bank transfers, cards, mobile money, USSD, and flexible partial payment plans. Customers can split payments over time, making premium or bulk purchases accessible without waiting for payday.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Funds are held securely in escrow until delivery confirmation, protecting both buyers and vendors." />
@@ -160,7 +160,7 @@ export default function TermsAndConditions() {
             <div className="mt-6 grid gap-3">
               <BulletItem text="Track performance metrics like views, add-to-carts, orders, revenue trends, top-performing items, and customer feedback." />
               <BulletItem text="Use insights to optimize listings, adjust pricing strategically, run promotions, and identify growth opportunities." />
-              <BulletItem text="No more scattered spreadsheets — Faflora keeps your vendor data organized, secure, and actionable, helping you make data-driven decisions to boost profitability." />
+              <BulletItem text="No more scattered spreadsheets — EkivaMart keeps your vendor data organized, secure, and actionable, helping you make data-driven decisions to boost profitability." />
             </div>
           </SectionWrapper>
 
@@ -168,7 +168,7 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.4}>
             <SectionTitle subtitle="3" title="Customer Data" icon={<Users size={20} />} />
             <p className="text-gray-600">
-              Faflora securely collects and manages buyer information needed for smooth transactions: shipping addresses, order history, preferences, and contact details.
+              EkivaMart securely collects and manages buyer information needed for smooth transactions: shipping addresses, order history, preferences, and contact details.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Powers personalized recommendations, targeted promotions, abandoned cart reminders, and loyalty rewards." />
@@ -181,12 +181,12 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.45}>
             <SectionTitle subtitle="4" title="Payment Liability" icon={<Shield size={20} />} />
             <p className="text-gray-600">
-              One of the biggest advantages of joining Faflora is reduced financial risk for vendors. We manage the entire payment ecosystem, including fraud detection, chargeback handling, and dispute resolution.
+              One of the biggest advantages of joining EkivaMart is reduced financial risk for vendors. We manage the entire payment ecosystem, including fraud detection, chargeback handling, and dispute resolution.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="When a customer pays, funds enter escrow — released to you only after order fulfillment and buyer confirmation (or auto-release after a set period if no issues arise)." />
               <BulletItem text="Protects you from non-payment scams or unauthorized transactions." />
-              <BulletItem text="In cases of valid disputes (e.g., item not received), Faflora facilitates fair resolution, often covering platform-side liabilities." />
+              <BulletItem text="In cases of valid disputes (e.g., item not received), EkivaMart facilitates fair resolution, often covering platform-side liabilities." />
               <BulletItem text="Vendors aren't directly exposed to raw card details or immediate refund demands — we handle processing refunds from escrow where appropriate." />
               <BulletItem text="Competitive, transparent commission rates with scheduled payouts. This structure builds confidence especially for new or small-scale sellers entering ecommerce." />
             </div>
@@ -195,7 +195,7 @@ export default function TermsAndConditions() {
           {/* 5. Vendor Responsibility */}
           <SectionWrapper delay={0.5}>
             <SectionTitle subtitle="5" title="Vendor Responsibility" icon={<Store size={20} />} />
-            <p className="text-gray-600">Success on Faflora thrives on mutual accountability. As a vendor, you commit to:</p>
+            <p className="text-gray-600">Success on EkivaMart thrives on mutual accountability. As a vendor, you commit to:</p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Uploading accurate, honest product listings with clear photos, specifications, pricing, and stock levels to prevent overselling or cancellations." />
               <BulletItem text="Ensuring all items are genuine, high-quality, and meet Nigerian consumer standards — no counterfeits or misleading claims." />
@@ -210,20 +210,20 @@ export default function TermsAndConditions() {
           <SectionWrapper delay={0.55}>
             <SectionTitle subtitle="6" title="Refund Policy" icon={<RefreshCcw size={20} />} />
             <p className="text-gray-600">
-              Customer satisfaction is paramount at Faflora, and our refund policy balances fairness for buyers with protection for honest vendors.
+              Customer satisfaction is paramount at EkivaMart, and our refund policy balances fairness for buyers with protection for honest vendors.
             </p>
             <div className="mt-6 grid gap-3">
               <BulletItem text="Customers may initiate returns/refunds for defective, damaged, incorrect, or non-delivered items — typically within 7–14 days of receipt (exact window displayed per order; always check current faflora.com policy)." />
               <BulletItem text="For vendor errors (wrong item, poor quality), you may cover return shipping, and approved refunds deduct from your escrow or future payouts." />
               <BulletItem text="Valid refunds process back to the original payment method, often within 5–10 business days." />
               <BulletItem text="Change-of-mind returns depend on your individual store policy — some vendors offer them for a competitive edge." />
-              <BulletItem text="Faflora mediates fairly, reviewing evidence like photos or tracking data. Vendors with low dispute rates enjoy better platform perks." />
+              <BulletItem text="EkivaMart mediates fairly, reviewing evidence like photos or tracking data. Vendors with low dispute rates enjoy better platform perks." />
             </div>
             <InfoCard label="Non-refundable items (must be clearly marked in listings):">
               <div className="grid gap-2">
                 {['Personalized or custom-made products', 'Hygiene, beauty, and personal care items', 'Perishable goods'].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm text-gray-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8236be] flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#1c711c] flex-shrink-0" />
                     {item}
                   </div>
                 ))}
@@ -242,7 +242,7 @@ export default function TermsAndConditions() {
               <BulletItem text="Customer data (orders, browsing patterns, aggregate demographics) enables personalized shopping, targeted ads, delivery coordination, and platform improvements." />
               <BulletItem text="All personal information is encrypted, never sold to third parties, and used strictly for legitimate purposes." />
               <BulletItem text="We comply fully with Nigeria's Data Protection Regulation (NDPR) and international best practices, conducting regular audits." />
-              <BulletItem text="Vendors can access their own data reports, but sensitive customer details are safeguarded at all times. This responsible approach builds trust — buyers shop confidently, vendors benefit from better tools, and the entire Faflora community grows sustainably." />
+              <BulletItem text="Vendors can access their own data reports, but sensitive customer details are safeguarded at all times. This responsible approach builds trust — buyers shop confidently, vendors benefit from better tools, and the entire EkivaMart community grows sustainably." />
             </div>
           </SectionWrapper>
 
@@ -259,9 +259,9 @@ export default function TermsAndConditions() {
           <FadeInSection type="fadeUp" delay={0.7} className="pt-16">
             <div className="relative overflow-hidden rounded-[28px] w-full">
               {/* Backgrounds */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#1e0020] via-[#5a0a5a] to-[#9d4ae3]" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1e0020] via-[#5a0a5a] to-[#228b22]" />
               <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(135deg, white 0px, white 1px, transparent 1px, transparent 40px)' }} />
-              <div className="absolute top-[-40%] left-[-10%] w-[55%] h-[200%] rounded-full bg-[#8236be] opacity-18 blur-[90px] pointer-events-none" />
+              <div className="absolute top-[-40%] left-[-10%] w-[55%] h-[200%] rounded-full bg-[#1c711c] opacity-18 blur-[90px] pointer-events-none" />
               <div className="absolute bottom-[-40%] right-[-5%] w-[40%] h-[180%] rounded-full bg-[#3d0060] opacity-28 blur-[80px] pointer-events-none" />
               <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full border border-white/[0.07] pointer-events-none" />
               <div className="absolute -top-7 -right-7 w-44 h-44 rounded-full border border-white/[0.07] pointer-events-none" />
@@ -283,7 +283,7 @@ export default function TermsAndConditions() {
                   </h4>
 
                   <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl">
-                    Joining Faflora means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, Faflora isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
+                    Joining EkivaMart means partnering with a platform that's truly Nigerian-focused — empowering local creators, supporting small businesses, and making online shopping accessible and enjoyable for everyone. With millions of potential customers, flexible payments, powerful tools, and strong protections, EkivaMart isn't just another marketplace — it's your gateway to exponential growth in Nigeria's digital economy.
                   </p>
 
                   {/* Stats strip */}
@@ -304,7 +304,7 @@ export default function TermsAndConditions() {
                   </div>
 
                   <p className="text-white/30 text-xs leading-relaxed max-w-md border-l-2 border-white/10 pl-3">
-                    By continuing to browse or use Faflora, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
+                    By continuing to browse or use EkivaMart, you acknowledge that you have read and accepted these Terms of Service and Privacy Policy.
                   </p>
                 </div>
 

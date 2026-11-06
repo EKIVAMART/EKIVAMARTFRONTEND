@@ -77,7 +77,7 @@ const CategoryCard = ({ category, row }: { category: any; row: 0 | 1 }) => {
           />
         )}
       </div>
-      <p className="mt-2 text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#9d4ae3] group-hover:scale-110 group-hover:mt-4 transition-all duration-300 whitespace-nowrap max-w-[96px] sm:max-w-[120px] truncate origin-top group-hover:whitespace-normal group-hover:max-w-[160px] group-hover:overflow-visible group-hover:text-clip">
+      <p className="mt-2 text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#228b22] group-hover:scale-110 group-hover:mt-4 transition-all duration-300 whitespace-nowrap max-w-[96px] sm:max-w-[120px] truncate origin-top group-hover:whitespace-normal group-hover:max-w-[160px] group-hover:overflow-visible group-hover:text-clip">
         {category.name}
       </p>
     </Link>

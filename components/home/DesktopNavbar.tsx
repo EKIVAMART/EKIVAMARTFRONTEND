@@ -1,5 +1,7 @@
 'use client';
 
+import ShoppingNavLink from './ShoppingNavLink';
+import { UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -21,68 +23,6 @@ function CollapseMenuIcon() {
       <rect x="2" y="9.25" width="10" height="1.5" rx="0.75" fill="currentColor" />
       <rect x="2" y="14.5" width="10" height="1.5" rx="0.75" fill="currentColor" />
       <path d="M15 7l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function HeartIcon({ filled }: { filled?: boolean }) {
-  return (
-    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.94 12 5C12.2 3.94 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
-        fill={filled ? '#9d4ae3' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CartIcon({ filled }: { filled?: boolean }) {
-  return (
-    <svg
-      width="25"
-      height="25"
-      viewBox="0 0 23 21"
-      shapeRendering="crispEdges"
-      aria-hidden
-    >
-      <g fill={filled ? '#9d4ae3' : 'currentColor'}>
-        <rect x="0" y="0" width="1" height="1" />
-        <rect x="0" y="1" width="2" height="1" />
-        <rect x="0" y="2" width="2" height="1" />
-        <rect x="1" y="3" width="1" height="1" />
-        <rect x="1" y="4" width="20" height="1" />
-        <rect x="1" y="5" width="22" height="1" />
-        <rect x="1" y="6" width="2" height="1" />
-        <rect x="21" y="6" width="2" height="1" />
-        <rect x="2" y="7" width="1" height="1" />
-        <rect x="21" y="7" width="2" height="1" />
-        <rect x="2" y="8" width="1" height="1" />
-        <rect x="21" y="8" width="2" height="1" />
-        <rect x="2" y="9" width="2" height="1" />
-        <rect x="21" y="9" width="2" height="1" />
-        <rect x="2" y="10" width="2" height="1" />
-        <rect x="21" y="10" width="1" height="1" />
-        <rect x="3" y="11" width="1" height="1" />
-        <rect x="21" y="11" width="1" height="1" />
-        <rect x="3" y="12" width="1" height="1" />
-        <rect x="9" y="12" width="7" height="1" />
-        <rect x="20" y="12" width="2" height="1" />
-        <rect x="3" y="13" width="2" height="1" />
-        <rect x="20" y="13" width="1" height="1" />
-        <rect x="4" y="14" width="1" height="1" />
-        <rect x="19" y="14" width="2" height="1" />
-        <rect x="4" y="15" width="3" height="1" />
-        <rect x="18" y="15" width="2" height="1" />
-        <rect x="6" y="16" width="13" height="1" />
-        <rect x="8" y="19" width="2" height="1" />
-        <rect x="14" y="19" width="2" height="1" />
-        <rect x="9" y="20" width="1" height="1" />
-        <rect x="15" y="20" width="1" height="1" />
-      </g>
     </svg>
   );
 }
@@ -131,8 +71,8 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center">
             <Image
-              src="/fa_logo_brand.png"
-              alt="Faflora"
+              src="/brand/ekivamart-logo.svg"
+              alt="EkivaMart"
               width={120}
               height={40}
               className="h-10 w-auto object-contain"
@@ -169,35 +109,11 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
             </button>
           </div>
 
-          {/* Action icons — custom SVGs with no circular borders or background */}
+          {/* Shopping and account actions */}
           <div className="flex shrink-0 items-center gap-4">
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              className={`relative flex items-center justify-center p-1 transition-colors ${
-                onWishlist ? 'text-brand-600' : 'text-neutral-600 hover:text-brand-600'
-              }`}
-              aria-label="Wishlist"
-            >
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-sm">
-                {wishlistCount}
-              </span>
-              <HeartIcon filled={onWishlist} />
-            </Link>
+            <ShoppingNavLink href="/wishlist" active={onWishlist} count={wishlistCount} />
 
-            {/* Cart */}
-            <Link
-              href="/cart"
-              className={`relative flex items-center justify-center p-1 transition-colors ${
-                onCart ? 'text-brand-600' : 'text-neutral-600 hover:text-brand-600'
-              }`}
-              aria-label="Cart"
-            >
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white shadow-sm">
-                {cartCount}
-              </span>
-              <CartIcon filled={onCart} />
-            </Link>
+            <ShoppingNavLink href="/cart" active={onCart} count={cartCount} />
 
             {/* In-App Notifications Bell (Renders strictly for authenticated users) */}
             <NotificationBell />
@@ -221,15 +137,9 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
                 onClick={onOpenLogin}
                 className="flex items-center gap-2.5 group cursor-pointer hover:opacity-85 transition-all text-left"
               >
-                <Image
-                  src="/icons/Frame.png"
-                  alt="Account"
-                  width={30}
-                  height={30}
-                  className="rounded-full border border-neutral-200"
-                />
+                <UserRound aria-hidden="true" size={22} strokeWidth={1.75} className="text-stone-700" />
                 <span className="text-sm leading-tight text-neutral-700">
-                  Get Started<br />
+                  Sign in<br />
                   <span className="font-semibold text-neutral-900 group-hover:text-brand-600 transition-colors">Orders &amp; Account</span>
                 </span>
               </button>

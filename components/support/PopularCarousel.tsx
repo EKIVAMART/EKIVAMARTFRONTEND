@@ -155,9 +155,9 @@ export default function PopularCarousel() {
           <button
             onClick={() => goTo(current - 1)}
             aria-label="Previous article"
-            className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#9d4ae3] shadow-sm transition-colors"
+            className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#228b22] shadow-sm transition-colors"
           >
-            <ChevronLeft size={20} className="text-[#9d4ae3]" />
+            <ChevronLeft size={20} className="text-[#228b22]" />
           </button>
         )}
 
@@ -166,17 +166,17 @@ export default function PopularCarousel() {
           <div style={slideStyle()}>
             <Link
               href={`/support/topics/${item.topicSlug}/${item.slug}`}
-              className="group flex flex-col relative overflow-hidden bg-white border border-[#e8b8e4] hover:border-[#8236be] rounded-3xl p-8 md:p-10 transition-colors duration-300 hover:shadow-xl min-h-[180px]"
+              className="group flex flex-col relative overflow-hidden bg-white border border-[#e8b8e4] hover:border-[#1c711c] rounded-3xl p-8 md:p-10 transition-colors duration-300 hover:shadow-xl min-h-[180px]"
             >
               {/* Hover bloom */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-[#fdf3fc]/70 to-transparent" />
 
               {/* Icon */}
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#9d4ae3] to-[#8236be] flex items-center justify-center text-white shadow-md mb-6">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-md mb-6">
                 {getArticleIcon(item.topicSlug)}
               </div>
 
-              <p className="text-xl md:text-2xl font-semibold text-gray-900 group-hover:text-[#9d4ae3] transition-colors leading-snug max-w-2xl">
+              <p className="text-xl md:text-2xl font-semibold text-gray-900 group-hover:text-[#228b22] transition-colors leading-snug max-w-2xl">
                 {item.title}
               </p>
 
@@ -185,7 +185,7 @@ export default function PopularCarousel() {
                   <Clock size={13} />
                   Updated April 06, 2026
                 </div>
-                <div className="inline-flex items-center gap-2 text-[#8236be] text-sm font-semibold group-hover:gap-3 transition-all">
+                <div className="inline-flex items-center gap-2 text-[#1c711c] text-sm font-semibold group-hover:gap-3 transition-all">
                   Read article <ArrowRight size={15} />
                 </div>
               </div>
@@ -198,9 +198,9 @@ export default function PopularCarousel() {
           <button
             onClick={() => goTo(current + 1)}
             aria-label="Next article"
-            className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#9d4ae3] shadow-sm transition-colors"
+            className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-white border border-[#e8b8e4] hover:border-[#228b22] shadow-sm transition-colors"
           >
-            <ChevronRight size={20} className="text-[#9d4ae3]" />
+            <ChevronRight size={20} className="text-[#228b22]" />
           </button>
         )}
 
@@ -213,8 +213,8 @@ export default function PopularCarousel() {
               aria-label={`Go to article ${i + 1}`}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'w-6 h-2.5 bg-gradient-to-r from-[#9d4ae3] to-[#8236be]'
-                  : 'w-2.5 h-2.5 bg-[#e8b8e4] hover:bg-[#8236be]/50'
+                  ? 'w-6 h-2.5 bg-gradient-to-r from-[#228b22] to-[#1c711c]'
+                  : 'w-2.5 h-2.5 bg-[#e8b8e4] hover:bg-[#1c711c]/50'
               }`}
             />
           ))}

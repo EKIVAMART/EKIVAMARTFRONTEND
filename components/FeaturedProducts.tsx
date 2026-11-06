@@ -174,9 +174,9 @@ const FeaturedProducts = () => {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <span className="h-px w-6 bg-gradient-to-r from-[#9d4ae3] to-transparent rounded-full" />
-            <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#9d4ae3]/80">Picks</span>
-            <span className="h-px w-6 bg-gradient-to-l from-[#9d4ae3] to-transparent rounded-full" />
+            <span className="h-px w-6 bg-gradient-to-r from-[#228b22] to-transparent rounded-full" />
+            <span className="text-[10px] font-black uppercase tracking-[3.5px] text-[#228b22]/80">Picks</span>
+            <span className="h-px w-6 bg-gradient-to-l from-[#228b22] to-transparent rounded-full" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Featured Products</h2>
           <p className="mt-1 text-sm text-gray-500">Handpicked for you — swipe to explore</p>
@@ -192,7 +192,7 @@ const FeaturedProducts = () => {
                 onClick={() => scroll('left')}
                 disabled={!canScrollLeft}
                 className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${canScrollLeft
-                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#9d4ae3]/30 text-[#9d4ae3] cursor-pointer'
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#228b22]/30 text-[#228b22] cursor-pointer'
                     : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
                   }`}
                 aria-label="Scroll left"
@@ -236,7 +236,7 @@ const FeaturedProducts = () => {
                     ? product.images.find(img => img.isPrimary)?.url || product.images[0].url
                     : '/placeholder.png';
                   const prodCat = typeof product.category === 'object' ? product.category?.name : (product.category);
-                  const storeName = product.storeName || product.store?.name || product.storeId || 'Faflora Store';
+                  const storeName = product.storeName || product.store?.name || product.storeId || 'EkivaMart Store';
                   const storeSlug = product.storeSlug || product.store?.slug || '';
 
                   return (
@@ -269,7 +269,7 @@ const FeaturedProducts = () => {
                 onClick={() => scroll('right')}
                 disabled={!canScrollRight}
                 className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 hidden sm:flex items-center justify-center rounded-full p-2 transition-all border duration-300 ${canScrollRight
-                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#9d4ae3]/30 text-[#9d4ae3] cursor-pointer'
+                    ? 'bg-white shadow-md hover:shadow-lg hover:bg-gray-50 active:scale-95 border-[#228b22]/30 text-[#228b22] cursor-pointer'
                     : 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed opacity-50'
                   }`}
                 aria-label="Scroll right"

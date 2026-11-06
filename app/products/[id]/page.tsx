@@ -319,7 +319,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   };
 
   const categoryName = typeof product.category === 'object' ? product.category?.name : (product.category || 'Shop');
-  const storeName = product.store?.name || product.storeId || 'Faflora Store';
+  const storeName = product.store?.name || product.storeId || 'EkivaMart Store';
 
   // Format metadata keys for technical specifications table
   const metadataRows = Object.entries(product.metadata || {}).filter(([key]) => {
@@ -338,9 +338,9 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       toast.error('This product is out of stock');
       return;
     }
-    
+
     // dispatch(openNoteModal({ productId: product.id, quantity }));
-    
+
     // direct add to cart with no note modal
     dispatch(addItemToCartApi({ productId: product.id, quantity }));
     toast.success('Added to cart!');
@@ -419,7 +419,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         <div className="pd-details-section">
           <div className="pd-info">
             {/* Category tag */}
-            <span className="text-xs font-bold text-[#9d4ae3] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#228b22] uppercase tracking-wider">
               {categoryName}
             </span>
 
@@ -489,7 +489,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               )}
               {locationStr && (
                 <div className="col-span-2 border-t border-gray-200/50 pt-2.5 mt-1 flex items-center gap-1.5">
-                  <MapPin size={14} className="text-[#9d4ae3] shrink-0" />
+                  <MapPin size={14} className="text-[#228b22] shrink-0" />
                   <span className="text-gray-400 font-bold uppercase tracking-wider text-[10px] sm:text-xs">Location:</span>
                   <span className="font-bold text-gray-800 text-xs sm:text-sm">{locationStr}</span>
                 </div>
@@ -626,30 +626,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
         <div className="pd-tabs-content">
           {activeTab === 'description' && (
-            <div className="pd-tab-pane">
-              {(() => {
-                const raw = product.description || 'No description provided.';
-                // Split into sentences (period, !, ? followed by space or end)
-                const sentences = raw.match(/[^.!?]+[.!?]+[\s]*/g) || [raw];
-                const mid = Math.ceil(sentences.length / 2);
-                const firstHalf = sentences.slice(0, mid).join('').trim();
-                const secondHalf = sentences.slice(mid).join('').trim();
-                return (
-                  <>
-                    <div
-                      className="pd-desc-block pd-desc-block--primary"
-                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(firstHalf) }}
-                    />
-                    {secondHalf && (
-                      <div
-                        className="pd-desc-block pd-desc-block--secondary"
-                        dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(secondHalf) }}
-                      />
-                    )}
-                  </>
-                );
-              })()}
-            </div>
+            <article className="pd-reading" aria-label="Product description">
+              {(product.description?.trim() || 'No description provided.').split(/\n\s*\n/).map((block, index) => (
+                <div key={index} dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(block.trim()) }} />
+              ))}
+            </article>
           )}
 
           {activeTab === 'additional' && (
@@ -804,7 +785,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                     {(() => {
                       const relPriceVal = typeof related.price === 'object' && related.price !== null ? (related.price as any).amount : (related.price ?? 0);
                       return (
-                        <p className="pd-related-price mt-auto text-[#9d4ae3] font-extrabold text-base">
+                        <p className="pd-related-price mt-auto text-[#228b22] font-extrabold text-base">
                           ₦ {relPriceVal.toLocaleString()}
                         </p>
                       );

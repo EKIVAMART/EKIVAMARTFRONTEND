@@ -666,7 +666,6 @@ function AdminPageContent() {
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -1543,8 +1542,8 @@ function AdminPageContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
-          <p className="text-sm font-bold text-slate-600 animate-pulse">Verifying credentials...</p>
+          <div className="w-12 h-12 border-4 border-[#228b22]/20 border-t-[#228b22] rounded-full animate-spin" />
+          <p className="text-sm font-bold text-slate-600 ">Verifying credentials...</p>
         </div>
       </div>
     );
@@ -1553,12 +1552,11 @@ function AdminPageContent() {
   if (!hasToken && !authUser) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-amber-400 to-red-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
-            <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-              <svg className="w-12 h-12 text-amber-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-amber-50 p-4 rounded-md border border-amber-100">
+              <svg className="w-12 h-12 text-amber-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
@@ -1569,7 +1567,7 @@ function AdminPageContent() {
           </p>
           <button
             onClick={() => router.push('/admin/login')}
-            className="w-full mt-8 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+            className="w-full mt-8 bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-sm "
           >
             Sign In Again
           </button>
@@ -1581,12 +1579,11 @@ function AdminPageContent() {
   if (authUser && !hasAdminRole) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gradient-to-r from-[#9d4ae3] to-[#8236be] rounded-full blur-[120px] opacity-15 pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
-            <div className="bg-fuchsia-50 p-4 rounded-2xl border border-fuchsia-100">
-              <svg className="w-12 h-12 text-[#9d4ae3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-brand-50 p-4 rounded-md border border-brand-100">
+              <svg className="w-12 h-12 text-[#228b22]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -1597,7 +1594,7 @@ function AdminPageContent() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="w-full mt-8 bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100"
+            className="w-full mt-8 bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-sm "
           >
             Go to Home
           </button>
@@ -1616,38 +1613,12 @@ function AdminPageContent() {
       <div className="md:hidden bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-1.5 shrink-0">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/fa_logo_brand.png" alt="Faflora" width={100} height={28} className="object-contain" />
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">Admin</span>
+            <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={100} height={28} className="object-contain" />
           </Link>
         </div>
         <div className="flex items-center gap-4">
           <NotificationBell />
-          <div className="relative">
-            <div
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm cursor-pointer border border-teal-200 shadow-sm"
-            >
-              {authUser?.firstName?.[0] || 'A'}
-            </div>
-            {isProfileOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
-                <div className="absolute right-0 mt-3 w-56 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-4 py-3 border-b bg-gray-50/50">
-                    <p className="text-sm font-bold text-slate-800">{authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}</p>
-                    <p className="text-xs text-gray-500 font-medium truncate">{authUser?.email || 'admin@faflora.com'}</p>
-                  </div>
-                  <button className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-gray-50 transition">
-                    Account Settings
-                  </button>
-                  <button className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition border-t">
-                    Sign Out
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-gray-700 hover:bg-gray-100 rounded-xl transition -mr-2">
+          <button aria-label="Open navigation" onClick={() => setIsSidebarOpen(true)} className="p-2 text-gray-700 hover:bg-gray-100 rounded-md -mr-2">
             <Menu size={24} />
           </button>
         </div>
@@ -1660,26 +1631,21 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-gray-200/60">
-          <div>
-            <span className="text-xs font-bold text-[#9d4ae3] bg-fuchsia-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-              Admin Portal
-            </span>
-          </div>
+        <div className="hidden md:flex items-center justify-end mb-5 pb-3 border-b border-gray-200/60">
           <div className="flex items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-600 text-sm border border-teal-200 shadow-sm">
+              <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center font-semibold text-slate-700 text-sm border border-slate-200">
                 {authUser?.firstName?.[0] || 'A'}
               </div>
               <div className="text-left">
-                <p className="text-xs font-bold text-slate-800 leading-tight">
+                <p className="text-xs font-semibold text-slate-800 leading-tight">
                   {authUser?.firstName || 'Admin'} {authUser?.lastName || 'User'}
                 </p>
-                <p className="text-[10px] text-gray-400 font-medium truncate max-w-[140px]">
-                  {authUser?.email || 'admin@faflora.com'}
+                <p className="text-[11px] text-gray-500 truncate max-w-[180px]">
+                  Admin · {authUser?.email || 'Account'}
                 </p>
               </div>
             </div>
@@ -1699,12 +1665,11 @@ function AdminPageContent() {
           <>
             <header className="flex justify-between items-center mb-8">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">User Management</h2>
-                <p className="text-sm text-gray-500 font-medium">View and manage all registered platform users</p>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">Users</h2>
               </div>
             </header>
 
-            <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-fuchsia-400 focus-within:ring-2 focus-within:ring-fuchsia-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -1716,7 +1681,7 @@ function AdminPageContent() {
             </div>
 
             {usersLoadError && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 mb-4">
+              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 mb-4">
                 {usersLoadError}
               </div>
             )}
@@ -1747,39 +1712,34 @@ function AdminPageContent() {
           </>
         ) : (
           <>
-            <header className="flex justify-between items-center mb-8">
+            <header className="flex flex-wrap justify-between items-center gap-3 mb-5">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter capitalize">{activeTab} Management</h2>
-                <p className="text-sm text-gray-500 font-medium">Control and oversee your marketplace data</p>
+                <h1 className="text-2xl font-semibold text-slate-900 capitalize">{activeTab}</h1>
               </div>
               {activeTab === 'products' && (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <button
                     onClick={() => setIsCategoriesModalOpen(true)}
-                    className="bg-white text-[#8236be] border border-[#9d4ae3]/30 hover:border-[#9d4ae3] hover:bg-fuchsia-50 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm whitespace-nowrap"
+                    className="min-h-10 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-4 text-sm font-medium whitespace-nowrap"
                   >
-                    All Categories
+                    Manage categories
                   </button>
                   <button
                     onClick={() => openModal()}
-                    className="bg-gradient-to-r from-[#9d4ae3] to-[#8236be] hover:from-[#8236be] hover:to-[#692a99] text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-fuchsia-100 whitespace-nowrap"
+                    className="min-h-10 bg-[#176a35] hover:bg-[#12582b] text-white px-4 text-sm font-medium flex items-center justify-center gap-2 whitespace-nowrap"
                   >
-                    <Plus size={18} /> Add Product
+                    <Plus size={16} /> Add product
                   </button>
                 </div>
               )}
             </header>
 
-            {activeTab !== 'orders' && (
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#9d4ae3] focus-within:ring-2 focus-within:ring-[#9d4ae3]/20 transition-all">
+            {activeTab === 'products' && (
+              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
                   type="text"
-                  placeholder={
-                    activeTab === 'blog'
-                      ? 'Search blog articles by title, excerpt or author…'
-                      : `Search across ${activeTab}...`
-                  }
+                  placeholder={`Search ${activeTab}…`}
                   className="flex-1 outline-none text-sm font-medium focus:!ring-0 focus:!border-transparent"
                   value={searchQuery}
                   onChange={(e) => {
@@ -1798,7 +1758,7 @@ function AdminPageContent() {
                     setFilterCategoryId(e.target.value);
                     setProductPage(1);
                   }}
-                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1"
+                  className="p-3 rounded-md border border-gray-200 bg-white text-sm font-medium focus:border-[#228b22] focus:ring-1 focus:ring-[#228b22] outline-none transition flex-1"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((c) => (
@@ -1806,20 +1766,19 @@ function AdminPageContent() {
                   ))}
                 </select>
 
-                <select
+                {filterCategoryId !== 'all' && <select
                   value={filterSubcategoryId}
                   onChange={(e) => {
                     setFilterSubcategoryId(e.target.value);
                     setProductPage(1);
                   }}
-                  disabled={filterCategoryId === 'all'}
-                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+                  className="p-3 rounded-md border border-gray-200 bg-white text-sm font-medium focus:border-[#228b22] focus:ring-1 focus:ring-[#228b22] outline-none transition flex-1 disabled:bg-gray-50 disabled:text-gray-400"
                 >
                   <option value="all">All Subcategories</option>
                   {filterSubcategories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
-                </select>
+                </select>}
 
                 <select
                   value={filterVendorId}
@@ -1827,7 +1786,7 @@ function AdminPageContent() {
                     setFilterVendorId(e.target.value);
                     setProductPage(1);
                   }}
-                  className="p-3 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:border-[#9d4ae3] focus:ring-1 focus:ring-[#9d4ae3] outline-none transition flex-1"
+                  className="p-3 rounded-md border border-gray-200 bg-white text-sm font-medium focus:border-[#228b22] focus:ring-1 focus:ring-[#228b22] outline-none transition flex-1"
                 >
                   <option value="all">All Vendors</option>
                   {filterVendors.map((vendor) => (
@@ -1840,7 +1799,7 @@ function AdminPageContent() {
             {activeTab === 'products' && (
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
-                  <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${productLoadError
+                  <div className={`rounded-md border px-4 py-3 text-sm font-medium ${productLoadError
                     ? 'border-amber-200 bg-amber-50 text-amber-700'
                     : 'border-gray-200 bg-white text-gray-500'
                     }`}>
@@ -1868,18 +1827,18 @@ function AdminPageContent() {
               </div>
             )}
             {activeTab === 'vendors' && (
-              <VendorManagementView isSuperAdmin={false} currentUserId={currentUserId} globalSearchQuery={searchQuery} />
+              <VendorManagementView isSuperAdmin={false} currentUserId={currentUserId} />
             )}
             {activeTab === 'orders' && (
               <div className="space-y-4">
                 {ordersLoadError && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                     {ordersLoadError}
                   </div>
                 )}
                 {isLoadingOrders ? (
                   <div className="flex items-center justify-center py-20">
-                    <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
                   </div>
                 ) : (
                   <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />
@@ -1890,7 +1849,7 @@ function AdminPageContent() {
               <TaxRulesManagement />
             )}
             {activeTab === 'blog' && (
-              <BlogManagementView globalSearchQuery={searchQuery} />
+              <BlogManagementView />
             )}
           </>
         )}
@@ -1951,7 +1910,7 @@ export default function AdminPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-[#9d4ae3]/20 border-t-[#9d4ae3] rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#228b22]/20 border-t-[#228b22] rounded-full animate-spin" />
         </div>
       }
     >

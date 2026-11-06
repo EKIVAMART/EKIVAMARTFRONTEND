@@ -34,19 +34,19 @@ export default function BlogViewModal({
     switch (status) {
       case 'published':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-700 uppercase tracking-wider">
             Published
           </span>
         );
       case 'draft':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-700 uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-700 uppercase tracking-wider">
             Draft
           </span>
         );
       case 'unpublished':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-700 uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-md text-xs font-black bg-slate-100 text-slate-700 uppercase tracking-wider">
             Unpublished
           </span>
         );
@@ -57,17 +57,17 @@ export default function BlogViewModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 sm:p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]"
+          className="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]"
         >
           {/* Header */}
           <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-md bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
                 <BookOpen size={20} />
               </div>
               <div>
@@ -88,7 +88,7 @@ export default function BlogViewModal({
                 <Link
                   href={`/blog/${post.slug}`}
                   target="_blank"
-                  className="px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition flex items-center gap-1.5"
                 >
                   <ExternalLink size={14} />
                   <span>View Public</span>
@@ -96,7 +96,7 @@ export default function BlogViewModal({
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+                className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
               >
                 <X size={20} />
               </button>
@@ -107,7 +107,7 @@ export default function BlogViewModal({
           <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
             {/* Featured Image */}
             {post.featuredImage?.url && (
-              <div className="rounded-3xl overflow-hidden max-h-72 border border-neutral-200">
+              <div className="rounded-md overflow-hidden max-h-72 border border-neutral-200">
                 <img
                   src={post.featuredImage.url}
                   alt={decodeHtmlEntities(post.title)}
@@ -157,7 +157,7 @@ export default function BlogViewModal({
 
             {/* Hand-written / Auto Excerpt */}
             {post.excerpt && (
-              <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80 italic text-slate-700 text-sm font-medium">
+              <div className="p-4 rounded-md bg-neutral-50 border border-neutral-200/80 italic text-slate-700 text-sm font-medium">
                 "{decodeHtmlEntities(post.excerpt)}"
               </div>
             )}
@@ -172,7 +172,7 @@ export default function BlogViewModal({
 
             {/* SEO Info Box */}
             {(post.seoTitle || post.seoDescription) && (
-              <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2 mt-8">
+              <div className="p-4 rounded-md bg-slate-900 text-white space-y-2 mt-8">
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
                   <Globe size={14} />
                   <span>Google Search Result Snippet Preview</span>
