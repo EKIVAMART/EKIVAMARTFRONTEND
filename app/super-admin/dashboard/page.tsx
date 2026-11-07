@@ -105,6 +105,7 @@ type ProductRecord = {
   id?: string | number;
   _id?: string;
   vendorId?: string;
+  vendorProfileId?: string;
   categoryId?: string;
   name?: string;
   title?: string;
@@ -380,6 +381,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
   return {
     id: String(id),
     vendorId: record.vendorId || '',
+    vendorProfileId: record.vendorProfileId || '',
     categoryId: getCategoryId(record),
     name,
     preview: record.preview || '',
@@ -712,7 +714,7 @@ function AdminPageContent() {
   const [filterSubcategoryId, setFilterSubcategoryId] = useState('all');
   const [filterSubcategories, setFilterSubcategories] = useState<ProductCategoryOption[]>([]);
   const [filterVendorId, setFilterVendorId] = useState('all');
-  const [filterVendors, setFilterVendors] = useState<Array<{ value: string; label: string; vendorProfileId?: string; vendorId?: string }>>([]);
+  const [filterVendors, setFilterVendors] = useState<Array<{ value: string; label: string }>>([]);
   const [subcategoryMap, setSubcategoryMap] = useState<Map<string, { categoryName: string; subCategoryName: string }>>(new Map());
 
   const SUPER_ADMIN_ROLES = ['SUPER-ADMIN', 'super-admin', 'SUPER_ADMIN'];
@@ -998,10 +1000,8 @@ function AdminPageContent() {
         const mappedStores = (Array.isArray(stores) ? stores : [])
           .filter((store: any) => store?.storeName || store?.storeSlug || store?.id)
           .map((store: any) => ({
-            value: store.vendorProfileId || store.vendorId || store.id || '',
+            value: store.vendorProfileId || store.id || '',
             label: store.storeName || store.storeSlug || 'Unnamed Store',
-            vendorProfileId: store.vendorProfileId || '',
-            vendorId: store.vendorId || store.userId || store.vendorProfileId || store.id || '',
           }))
           .filter((store) => Boolean(store.value));
 
@@ -1015,12 +1015,10 @@ function AdminPageContent() {
         if (isMounted) {
           setFilterVendors(
             vendors
-              .filter((v: any) => v.storeName || v.userId || v.vendorProfileId || v.vendorId)
+              .filter((v: any) => v.storeName || v.vendorProfileId || v.id)
               .map((v: any) => ({
-                value: v.vendorProfileId || v.vendorId || v.userId || '',
+                value: v.vendorProfileId || v.id || '',
                 label: v.storeName || 'Unnamed Store',
-                vendorProfileId: v.vendorProfileId || '',
-                vendorId: v.vendorId || v.userId || '',
               }))
               .filter((option) => Boolean(option.value))
           );
@@ -1038,15 +1036,12 @@ function AdminPageContent() {
     setProductLoadError('');
 
     try {
-      const selectedVendor = filterVendors.find((vendor) => vendor.value === filterVendorId);
-      const vendorProfileId = filterVendorId !== 'all' ? selectedVendor?.vendorProfileId : undefined;
-      const vendorId = filterVendorId !== 'all' ? selectedVendor?.vendorId : undefined;
+      const vendorId = filterVendorId !== 'all' ? filterVendorId : undefined;
       const response = await productApi.getAllProducts({
         page: productPage,
         limit: PRODUCT_PAGE_LIMIT,
         searchQuery: searchQuery || undefined,
         categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
-        ...(vendorProfileId ? { vendorProfileId } : {}),
         ...(vendorId ? { vendorId } : {}),
         sortBy: 'createdAt',
         sortOrder: 'desc',
@@ -1082,15 +1077,12 @@ function AdminPageContent() {
       setProductLoadError('');
 
       try {
-        const selectedVendor = filterVendors.find((vendor) => vendor.value === filterVendorId);
-        const vendorProfileId = filterVendorId !== 'all' ? selectedVendor?.vendorProfileId : undefined;
-        const vendorId = filterVendorId !== 'all' ? selectedVendor?.vendorId : undefined;
+        const vendorId = filterVendorId !== 'all' ? filterVendorId : undefined;
         const response = await productApi.getAllProducts({
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
           categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
-          ...(vendorProfileId ? { vendorProfileId } : {}),
           ...(vendorId ? { vendorId } : {}),
           sortBy: 'createdAt',
           sortOrder: 'desc',
@@ -1574,7 +1566,7 @@ function AdminPageContent() {
     try {
       const productFormData = {
         ...formData,
-        vendorProfileId: formData.vendorProfileId || formData.vendorId,
+        vendorProfileId: formData.vendorProfileId,
       };
 
       if (!productFormData.vendorProfileId) {

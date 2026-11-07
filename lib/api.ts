@@ -570,8 +570,8 @@ export type ReturnWindow = 3 | 7 | 14 | 30;
 
 export interface ProductSearchParams {
   categoryId?: string;
+  /** Store profile ID used to filter product searches. */
   vendorId?: string;
-  vendorProfileId?: string;
   status?: ProductStatus;
   condition?: ProductCondition;
   brand?: string;
@@ -680,6 +680,7 @@ export const productApi = {
     try {
       const { skipAuth, q, inStockOnly, ...rest } = params as any;
       const normalized: Record<string, any> = { ...rest };
+      delete normalized.vendorProfileId;
 
       if (q && !normalized.searchQuery) normalized.searchQuery = q;
       if (inStockOnly !== undefined && normalized.inStock === undefined) {
@@ -774,12 +775,13 @@ export const productApi = {
     searchQuery?: string;
     categoryId?: string;
     status?: string;
-    vendorProfileId?: string;
+    /** Store profile ID. */
     vendorId?: string;
   } = {}) {
     try {
       const { q, inStockOnly, ...rest } = params as any;
       const normalized: Record<string, any> = { ...rest };
+      delete normalized.vendorProfileId;
 
       if (q && !normalized.searchQuery) normalized.searchQuery = q;
       if (inStockOnly !== undefined && normalized.inStock === undefined) {
@@ -914,6 +916,7 @@ export const productApi = {
     try {
       const { q, inStockOnly, ...rest } = params;
       const normalized: Record<string, any> = { ...rest };
+      delete normalized.vendorProfileId;
 
       if (q && !normalized.searchQuery) normalized.searchQuery = q;
       if (inStockOnly !== undefined && normalized.inStock === undefined) {

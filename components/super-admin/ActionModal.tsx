@@ -447,6 +447,9 @@ export default function ActionModal({
     setSaveErrors([]);
 
     try {
+      if (!isVendorRole && (isLoadingStores || !stores.some(store => store.id === formData.vendorProfileId))) {
+        throw new Error(isLoadingStores ? 'Please wait for stores to load.' : 'Please select an available store for this product.');
+      }
       // ─── Step 4 Image Upload Flow ──────────────────────────────────────────
       // Collect all staged images that have local File objects (batch upload)
       const uploadedImages: Array<{ url: string; altText: string; isPrimary: boolean; order: number }> = [];
@@ -563,7 +566,7 @@ export default function ActionModal({
               disabled={isLoadingStores}
             >
               <option value="">
-                {isLoadingStores ? 'Loading stores...' : 'Default (EkivaMart Official Store)'}
+                {isLoadingStores ? 'Loading stores...' : stores.length === 0 ? 'No approved stores available' : 'Select a store'}
               </option>
               {stores.map(s => (
                 <option key={s.id} value={s.id}>{s.storeName}{s.isEkivaMartOfficialStore ? ' (Official)' : ''}</option>
@@ -987,32 +990,38 @@ export default function ActionModal({
     return () => { isMounted = false; };
   }, [formData.categoryId]);
 
-  // Fetch approved stores for admin product-creation dropdown (GET /products/stores)
+  // Store IDs come from the backend; never substitute the current user's ID.
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || isVendorRole) return;
     let isMounted = true;
+    setStores([]);
+    setIsLoadingStores(true);
     const fetchStores = async () => {
-      setIsLoadingStores(true);
       try {
         const list = await productApi.getStores();
-        if (isMounted) setStores(Array.isArray(list) ? list : []);
+        if (isMounted) setStores(Array.isArray(list) ? list.filter(store => Boolean(store.id)) : []);
       } catch {
-        if (isMounted) setStores([]);
+        if (isMounted) {
+          setStores([]);
+          setSaveErrors(['Could not load stores. Close and reopen this form to try again.']);
+        }
       } finally {
         if (isMounted) setIsLoadingStores(false);
       }
     };
     void fetchStores();
     return () => { isMounted = false; };
-  }, [isOpen]);
+  }, [isOpen, isVendorRole]);
 
   useEffect(() => {
     let isMounted = true;
     if (isOpen) {
+      setSaveErrors([]);
       if (editingItem) {
         setFormData({
           id: editingItem.id || '',
-          vendorId: editingItem.vendorId || currentUserId,
+          vendorId: editingItem.vendorId || '',
+          vendorProfileId: editingItem.vendorProfileId,
           name: editingItem.name || '',
           preview: editingItem.preview || '',
           description: editingItem.description || '',
@@ -1085,7 +1094,8 @@ export default function ActionModal({
       } else {
         setFormData({
           id: '',
-          vendorId: currentUserId,
+          vendorId: '',
+          vendorProfileId: undefined,
           name: '',
           preview: '',
           description: '',
@@ -1125,6 +1135,18 @@ export default function ActionModal({
     }
     return () => { isMounted = false; };
   }, [isOpen, editingItem, currentUserId]);
+
+  useEffect(() => {
+    if (!isOpen || isVendorRole || editingItem || isLoadingStores) return;
+    const officialStore = stores.find(store => store.isEkivaMartOfficialStore)
+      ?? stores.find(store => store.storeSlug === 'ekivamart-official-store')
+      ?? stores.find(store => store.storeName.trim().toLowerCase() === 'ekivamart official store');
+    setFormData(prev => {
+      if (stores.some(store => store.id === prev.vendorProfileId)) return prev;
+      const vendorProfileId = officialStore?.id;
+      return prev.vendorProfileId === vendorProfileId ? prev : { ...prev, vendorProfileId };
+    });
+  }, [isOpen, isVendorRole, editingItem, isLoadingStores, stores, currentUserId]);
 
   useEffect(() => {
     if (formData.compareAtPrice >= 0 && discountPercent >= 0) {
@@ -1432,8 +1454,8 @@ export default function ActionModal({
                             Store / Vendor <span className="text-[#228b22] ml-1">*</span>
                           </label>
                           <select
-                            value={formData.vendorId}
-                            onChange={e => updateField('vendorId', e.target.value)}
+                            value={formData.vendorProfileId || ''}
+                            onChange={e => updateField('vendorProfileId', e.target.value)}
                             className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-medium"
                             disabled={isLoadingStores}
                           >
