@@ -1,17 +1,19 @@
-import { getDatabase } from '@/lib/mongodb';
-
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
-  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return Response.json({ error: 'Enter a valid email address.' }, { status: 400 });
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (baseUrl) {
+    try {
+      const response = await fetch(`${baseUrl.replace(/\/$/, '')}/newsletter/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: await request.text(),
+        signal: AbortSignal.timeout(5000),
+      });
+      const { success, message } = await response.json();
+      if (response.ok) return Response.json({ success });
+      if (response.status < 500) return Response.json({ error: message }, { status: response.status });
+    } catch {
+      // Return the same public error when the backend cannot be reached.
+    }
   }
-  try {
-    const db = await getDatabase();
-    await db.collection<{ _id: string; subscribedAt: Date }>('newsletterSubscribers')
-      .updateOne({ _id: email }, { $setOnInsert: { subscribedAt: new Date() } }, { upsert: true });
-    return Response.json({ success: true });
-  } catch {
-    return Response.json({ error: 'Subscriptions are temporarily unavailable. Please try again later.' }, { status: 503 });
-  }
+  return Response.json({ error: 'Subscriptions are temporarily unavailable. Please try again later.' }, { status: 503 });
 }

@@ -8,7 +8,6 @@ import { fetchCartCount, fetchCart } from '@/lib/features/cart/cartSlice';
 import { setUser } from '@/lib/features/auth/authSlice';
 
 import { departments, departmentSlug } from '@/lib/data/departments';
-import TopBar from './TopBar';
 import DesktopNavbar from './DesktopNavbar';
 import MobileHeader from './MobileHeader';
 import MobileCategorySidebar from './MobileCategorySidebar';
@@ -27,7 +26,6 @@ const navigationDepartments = departments.map(name => {
 
 export default function Navbar() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [topBarHidden, setTopBarHidden] = useState(false);
   const [categories, setCategories] = useState<any[]>(navigationDepartments);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -141,36 +139,15 @@ export default function Navbar() {
     return () => { isMounted = false; };
   }, []);
 
-  // Hide TopBar on scroll (desktop) — mobile rows stay fixed via sticky header
-  useEffect(() => {
-    let lastY = 0;
-    function handleScroll() {
-      const y = window.scrollY;
-      setTopBarHidden(y > 50);
-      lastY = y;
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <>
-      {/* Row 1: TopBar — scrolls out of view naturally without causing sticky layout shifts */}
-      <TopBar />
-
-      {/*
-        The <header> is sticky so rows 2 & 3 stay visible while scrolling.
-        On mobile and desktop, the sticky header height remains constant, avoiding scrolling jitter.
-      */}
       <header className="!sticky top-0 z-50 w-full bg-white shadow-sm">
-        {/* Rows 2 & 3: Desktop navbar */}
         <DesktopNavbar
           categories={categories}
           onOpenLogin={() => setIsLoginModalOpen(true)}
           onOpenProfile={() => setIsProfileModalOpen(true)}
         />
 
-        {/* Rows 2 & 3: Mobile header */}
         <MobileHeader
           categories={categories}
           onOpenCategories={() => setMobileSidebarOpen(true)}

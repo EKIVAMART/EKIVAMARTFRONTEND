@@ -1,5 +1,6 @@
 'use client';
 import RecordStatus from "@/components/admin/RecordStatus";
+import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -339,6 +340,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
           <span><strong className="font-semibold text-slate-900">{fmtNGN(kpiData.withdrawnTotal?.totalAllTime)}</strong> withdrawn all time</span>
         </div>}
       </section>
+
+      <NewsletterSubscriberCount />
 
             {/* ── 5. EARNINGS TIME-SERIES LINE GRAPH & 6. ORDERS BAR CHART ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

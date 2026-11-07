@@ -6,6 +6,7 @@ const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display
 import StoreProvider from './StoreProvider';
 import LayoutWrapper from '@/components/LayoutWrapper';
 import SupportLauncher from '@/components/SupportLauncher';
+import TawkWidget from '@/components/TawkWidget';
 
 export default function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default function RootLayout({
         <StoreProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
           <SupportLauncher />
+          <TawkWidget />
           {/* Portal target for modals and overlays */}
           <div id="modal-root" />
         </StoreProvider>

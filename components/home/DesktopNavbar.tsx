@@ -5,9 +5,10 @@ import { UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useAppSelector, useCartCount } from '@/lib/hooks';
 import CategoryDropdown from './CategoryDropdown';
+import MarketplaceNav from './MarketplaceNav';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface DesktopNavbarProps {
@@ -31,9 +32,6 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
   const catBtnRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -45,18 +43,6 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
 
   const onWishlist = pathname === '/wishlist';
   const onCart = pathname === '/cart';
-
-  function checkScroll() {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 5);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-  }
-
-  function scrollByAmount(direction: 1 | -1) {
-    scrollRef.current?.scrollBy({ left: direction * 240, behavior: 'smooth' });
-    setTimeout(checkScroll, 350);
-  }
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
@@ -174,11 +160,7 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
           </div>
 
           {/* Scrollable category name strip */}
-          <div
-            ref={scrollRef}
-            onScroll={checkScroll}
-            className="flex flex-1 gap-7 overflow-x-auto scrollbar-hide scroll-smooth py-1 min-w-0"
-          >
+          <div className="flex flex-1 gap-7 overflow-x-auto scrollbar-hide py-1 min-w-0">
             {categories.map((category) => (
               <Link
                 key={category.id}
@@ -190,33 +172,7 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
             ))}
           </div>
 
-          {/* Scroll buttons on the far right with slightly more space in between them (gap-2.5) */}
-          <div className="flex items-center gap-2.5 shrink-0 ml-4">
-            <button
-              type="button"
-              onClick={() => scrollByAmount(-1)}
-              aria-label="Scroll categories left"
-              className={`flex items-center justify-center w-8 h-8 rounded-l-lg border border-r-0 transition-all font-bold text-base ${
-                canScrollLeft
-                  ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-600 cursor-pointer'
-                  : 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
-              }`}
-            >
-              &#8249;
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByAmount(1)}
-              aria-label="Scroll categories right"
-              className={`flex items-center justify-center w-8 h-8 rounded-r-lg border transition-all font-bold text-base ${
-                canScrollRight
-                  ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-600 cursor-pointer active:scale-95'
-                  : 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
-              }`}
-            >
-              &#8250;
-            </button>
-          </div>
+          <MarketplaceNav />
         </div>
       </div>
     </div>
