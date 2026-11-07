@@ -814,7 +814,6 @@ function VendorDashboardContent() {
         searchQuery: searchQuery || undefined,
         categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
         status: undefined,
-        vendorProfileId,
         vendorId: vendorProfileId,
       });
       const fetched = getProductList(response)
