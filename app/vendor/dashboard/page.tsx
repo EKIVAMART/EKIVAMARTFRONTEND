@@ -795,22 +795,17 @@ function VendorDashboardContent() {
     setIsLoadingProducts(true);
     setProductLoadError('');
     try {
-      let vendorProfileId = '';
-      let fallbackVendorId = currentUserId || '';
-
-      try {
-        const storeProfileResponse = await vendorDashboardApi.getStoreProfile();
-        const storeProfileData = (storeProfileResponse as any)?.data ?? storeProfileResponse;
-        vendorProfileId = String(
-          storeProfileData?.vendorProfileId ||
-          storeProfileData?.id ||
-          storeProfileData?.store?.vendorProfileId ||
-          storeProfileData?.store?.id ||
-          ''
-        );
-        fallbackVendorId = String(storeProfileData?.vendorId || currentUserId || '');
-      } catch {
-        vendorProfileId = '';
+      const storeProfileResponse = await vendorDashboardApi.getStoreProfile();
+      const storeProfileData = (storeProfileResponse as any)?.data ?? storeProfileResponse;
+      const vendorProfileId = String(
+        storeProfileData?.vendorProfileId ||
+        storeProfileData?.id ||
+        storeProfileData?.store?.vendorProfileId ||
+        storeProfileData?.store?.id ||
+        ''
+      );
+      if (!vendorProfileId) {
+        throw new Error('Could not identify your store. Please try again.');
       }
 
       const response = await productApi.getVendorProducts({
@@ -819,8 +814,8 @@ function VendorDashboardContent() {
         searchQuery: searchQuery || undefined,
         categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
         status: undefined,
-        vendorProfileId: vendorProfileId || undefined,
-        vendorId: fallbackVendorId || undefined,
+        vendorProfileId,
+        vendorId: vendorProfileId,
       });
       const fetched = getProductList(response)
         .map(normalizeProduct)
@@ -839,7 +834,7 @@ function VendorDashboardContent() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [productPage, searchQuery, filterCategoryId, filterSubcategoryId, currentUserId]);
+  }, [productPage, searchQuery, filterCategoryId, filterSubcategoryId]);
 
   useEffect(() => {
     if (isCheckingAuth || !isVendor) return;
