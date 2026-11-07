@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Compass } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 export default function ExploreMenu() {
@@ -19,10 +19,14 @@ export default function ExploreMenu() {
       menu.current.querySelector('summary')?.focus();
     }
   }}>
-    <summary>Explore EkivaMart <ChevronDown size={14} aria-hidden="true" /></summary>
-    <nav aria-label="Explore EkivaMart" onClick={() => { if (menu.current) menu.current.open = false; }}>
-      <Link href="/stores">Featured stores</Link>
-      <Link href="/why-ekivamart">Why shop with EkivaMart?</Link>
-    </nav>
+    <summary className="ek-market-nav-item">
+      <Compass size={16} aria-hidden="true" />
+      <span>Explore<span className="ek-market-nav-wide"> EkivaMart</span></span>
+      <ChevronDown className="ek-explore-chevron" size={13} aria-hidden="true" />
+    </summary>
+    <div className="ek-explore-links">
+      <Link href="/stores" onClick={() => { if (menu.current) menu.current.open = false; }}>Featured stores</Link>
+      <Link href="/why-ekivamart" onClick={() => { if (menu.current) menu.current.open = false; }}>Why shop with EkivaMart?</Link>
+    </div>
   </details>;
 }

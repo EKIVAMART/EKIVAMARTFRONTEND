@@ -1,5 +1,7 @@
 'use client';
 
+import MarketplaceNav from './MarketplaceNav';
+
 import ShoppingNavLink from './ShoppingNavLink';
 import { UserRound } from 'lucide-react';
 import Image from 'next/image';
@@ -182,7 +184,9 @@ export default function MobileHeader({
         </div>
       </div>
 
-      {/* ── Row 3: Horizontal category names strip (no underline, no scroll buttons, allow swipe scrolling) ── */}
+      <MarketplaceNav />
+
+      {/* ── Horizontal category names strip ── */}
       <div className="w-full bg-white flex flex-col border-t border-neutral-100">
         <div
           ref={catScrollRef}

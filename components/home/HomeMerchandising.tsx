@@ -10,7 +10,7 @@ import { departmentSlug, departments } from '@/lib/data/departments';
 import ProductCard from './ProductCard';
 
 function Shelf({ title, items, empty, id, children, href }: {
-  title: string; items: CatalogItem[]; empty: string; id?: string; children?: ReactNode; href?: string;
+  title: string; items: CatalogItem[]; empty: ReactNode; id?: string; children?: ReactNode; href?: string;
 }) {
   return <MarketplaceRail title={title} products id={id} caption={children} href={href} linkLabel={href ? 'View category' : 'Shop all products'}>
     {items.length ? items.slice(0, 10).map(item =>
@@ -43,11 +43,17 @@ export default function HomeMerchandising({ children }: { children: ReactNode })
     const timeout = window.setTimeout(() => setSaleTime(Date.now()), Math.min(2147483647, Math.max(1, nextEnd - Date.now())));
     return () => window.clearTimeout(timeout);
   }, [items, saleTime]);
-  if (state !== 'ready') return <>{children}<p role="status">{state === 'loading' ? 'Loading marketplace collections…' : 'Marketplace collections are temporarily unavailable.'}</p></>;
-  const newest = [...items].sort((a,b) => b.added - a.added);
-  const popular = [...items].sort((a,b) => b.sold - a.sold || b.reviewCount - a.reviewCount);
   const offers = items.filter(p => p.discountPercent && (!p.saleEnd || p.saleEnd > saleTime)).sort((a,b) => (b.discountPercent ?? 0) - (a.discountPercent ?? 0));
   const end = Math.min(...offers.slice(0,10).filter(p => p.saleEnd).map(p => p.saleEnd));
+  const offerMessage = state === 'ready' ? 'Check back for new offers.' : (
+    <span role="status">{state === 'loading' ? 'Loading marketplace offers…' : 'Marketplace offers are temporarily unavailable.'}</span>
+  );
+  const offerShelf = <Shelf id="special-offers" title="Flash sales & special offers" items={offers} empty={offerMessage}>
+    {Number.isFinite(end) && <SaleClock end={end} />}
+  </Shelf>;
+  if (state !== 'ready') return <>{offerShelf}{children}</>;
+  const newest = [...items].sort((a,b) => b.added - a.added);
+  const popular = [...items].sort((a,b) => b.sold - a.sold || b.reviewCount - a.reviewCount);
   const seen = new Set<string>();
   const featured = [...items].sort((a,b) => Number(b.featured)-Number(a.featured)).filter(p => {
     const key = p.categoryKey + '|' + p.storeName;
@@ -69,7 +75,7 @@ export default function HomeMerchandising({ children }: { children: ReactNode })
   const spotlight = [...stocked.slice(rotation), ...stocked.slice(0, rotation)].slice(0, 5);
   const saleDepartments = stocked.filter(name => byDepartment.get(departmentSlug(name))?.some(p => offers.includes(p)));
   return <>
-    <Shelf id="special-offers" title="Flash sales & special offers" items={offers} empty="Check back for new offers.">{Number.isFinite(end) && <SaleClock end={end} />}</Shelf>
+    {offerShelf}
     <Shelf title="Trending now" items={popular} empty="Popular products will appear here." />
     {children}
     <Shelf title="Featured products" items={featured} empty="Our next selection is on its way." />

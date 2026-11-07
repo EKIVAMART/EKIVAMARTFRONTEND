@@ -1,11 +1,10 @@
-import AboutUs from '@/components/AboutUs'
+import AboutUs from '@/components/AboutUs';
 
-const page = () => {
-    return (
-        <div>
-            <AboutUs/>
-        </div>
-    )
+export const metadata = {
+  title: 'About Us | EkivaMart',
+  description: 'Meet EkivaMart, a marketplace connecting shoppers with independent stores across Nigeria.',
+};
+
+export default function AboutUsPage() {
+  return <AboutUs />;
 }
-
-export default page

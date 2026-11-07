@@ -1,5 +1,6 @@
 'use client';
 import RecordStatus from "@/components/admin/RecordStatus";
+import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
 
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -251,6 +252,8 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
           loading={loadingStats}
         />
       </div>
+
+      <NewsletterSubscriberCount />
 
       {/* ── 3.2 Order Analytics (GET /admin/dashboard/order-analytics) ── */}
       <div

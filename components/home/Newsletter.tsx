@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { axiosInstance } from '@/lib/axios';
 
 export default function Newsletter() {
   const [pending, setPending] = useState(false);
@@ -11,11 +12,13 @@ export default function Newsletter() {
     setPending(true); setMessage('');
     try {
       const email = new FormData(form).get('email');
-      const response = await fetch('/api/newsletter', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email }) });
-      if (!response.ok) throw new Error((await response.json()).error);
+      await axiosInstance.post('/newsletter/subscribe', { email }, { headers: { skipAuth: 'true' } });
       form.reset(); setMessage('You’re subscribed to EkivaMart updates.');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Please try again later.');
+      const status = (error as { response?: { status?: number } } | null)?.response?.status;
+      if (status === 400) setMessage('Enter a valid email address.');
+      else if (status === 429) setMessage('Too many signup attempts. Please try again later.');
+      else setMessage('Subscriptions are temporarily unavailable. Please try again later.');
     } finally { setPending(false); }
   }
   return <section className="ek-newsletter"><div><span className="ek-kicker">Newsletter</span><h2>The marketplace edit</h2><p>New arrivals, store discoveries and app launch news in your inbox.</p></div>

@@ -19,16 +19,8 @@ export default function Home(){return <div className="ek-home">
       <Image src="/images/collections/lagos.webp" alt="A woman in a patterned terracotta jacket wearing ivory headphones and carrying a woven bag" fill priority sizes="(max-width:767px) 100vw, (max-width:1360px) 82vw, 1063px"/>
     </div>
   </section>
-  <CategoryRail>
-      {departments.map(name => {
-        const slug = departmentSlug(name);
-        return (
-          <Link className="ek-category" key={slug} href={`/categories/${slug}`}>
-            <div className="ek-category-image"><Image src={`/images/departments/${slug}.webp`} alt="" fill sizes="(max-width:767px) 25vw, 14vw"/></div>
-            {name}
-          </Link>
-        );
-      })}
+  <CategoryRail loopCards={renderCategoryCards(true)}>
+    {renderCategoryCards()}
   </CategoryRail>
   <HomeMerchandising>
   <section className="ek-promo" aria-label="Explore collections">
@@ -53,3 +45,22 @@ export default function Home(){return <div className="ek-home">
   </section>
   <Newsletter />
 </div>}
+
+function renderCategoryCards(copy = false) {
+  return departments.map(name => {
+    const slug = departmentSlug(name);
+    return (
+      <Link
+        className={copy ? 'ek-category ek-category-copy' : 'ek-category'}
+        key={slug}
+        href={`/categories/${slug}`}
+        aria-hidden={copy || undefined}
+        tabIndex={copy ? -1 : undefined}
+        prefetch={copy ? false : undefined}
+      >
+        <div className="ek-category-image"><Image src={`/images/departments/${slug}.webp`} alt="" fill sizes="(max-width:767px) 25vw, 14vw"/></div>
+        {name}
+      </Link>
+    );
+  });
+}
