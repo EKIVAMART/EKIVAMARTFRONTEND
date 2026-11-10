@@ -91,7 +91,7 @@ export default function CartPage() {
   // Saved Addresses & Regional Tax state
   const [savedAddresses, setSavedAddresses] = useState<SavedAddressItem[]>([]);
   const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null);
-  const [useSavedAddress, setUseSavedAddress] = useState<boolean>(true);
+  const [useSavedAddress, setUseSavedAddress] = useState<boolean>(false);
   const [saveAddressToProfile, setSaveAddressToProfile] = useState<boolean>(false);
   const [loadingAddresses, setLoadingAddresses] = useState<boolean>(false);
   // Tracks whether addresses have been fetched at least once (avoids double-fetch on mount)
@@ -190,7 +190,7 @@ export default function CartPage() {
   }, [mounted, isAuthenticated, dispatch]);
 
   // Live order quote fetcher
-  const fetchOrderQuote = async () => {
+  const fetchOrderQuote = async (isCurrent: () => boolean) => {
     const selected = activeItems.filter((item) => item.isSelected);
     if (selected.length === 0) {
       setQuoteData(null);
@@ -207,7 +207,7 @@ export default function CartPage() {
         destState = addr.state || '';
         savedAddrId = addr.id;
       }
-    } else if (shippingAddress.state) {
+    } else if (!useSavedAddress && shippingAddress.state) {
       destState = shippingAddress.state;
       customAddr = {
         fullName: shippingAddress.fullName,
@@ -221,7 +221,10 @@ export default function CartPage() {
       };
     }
 
-    if (!destState) {
+    if (!destState || (!savedAddrId && [
+      shippingAddress.fullName, shippingAddress.addressLine1, shippingAddress.city,
+      shippingAddress.postalCode, shippingAddress.country, shippingAddress.phoneNumber,
+    ].some((value) => !value.trim()))) {
       setQuoteData(null);
       return;
     }
@@ -236,6 +239,7 @@ export default function CartPage() {
         savedAddressId: savedAddrId,
       });
 
+      if (!isCurrent()) return;
       if (res?.success && res.data) {
         setQuoteData(res.data);
         setQuoteError(null);
@@ -244,28 +248,37 @@ export default function CartPage() {
         setQuoteError(errorMsg);
       }
     } catch (err: any) {
+      if (!isCurrent()) return;
       const backendMsg =
         err?.response?.data?.message || err?.message || 'Delivery route is not configured for this state';
       setQuoteError(backendMsg);
     } finally {
-      setLoadingQuote(false);
+      if (isCurrent()) setLoadingQuote(false);
     }
   };
 
-  // Re-quote whenever checkout is active and address or items change
+  // Invalidate in-flight responses immediately when any quote input changes.
   useEffect(() => {
-    if (isCheckingOut) {
-      const timer = setTimeout(() => {
-        void fetchOrderQuote();
-      }, 300);
-      return () => clearTimeout(timer);
-    }
+    let current = true;
+    // Clear the external quote before the debounce so an old destination cannot be paid for.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQuoteData(null);
+    setQuoteError(null);
+    setLoadingQuote(false);
+    const timer = isCheckingOut ? setTimeout(() => {
+      void fetchOrderQuote(() => current);
+    }, 300) : undefined;
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isCheckingOut,
     useSavedAddress,
     selectedSavedAddressId,
-    shippingAddress.state,
+    savedAddresses,
+    shippingAddress,
     activeItems,
   ]);
 
@@ -477,6 +490,11 @@ export default function CartPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (loadingAddresses || loadingQuote || !quoteData || quoteError || isProcessing) {
+      toast.error('Please complete your address and wait for a valid delivery quote.');
+      return;
+    }
 
     if (!paymentMethod) {
       toast.error('Please select a payment method.');
@@ -1258,7 +1276,7 @@ export default function CartPage() {
                                   required
                                   value={shippingAddress.city}
                                   onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                                  placeholder="Lekki"
+                                  placeholder="Warri"
                                   className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition-all bg-slate-50/50"
                                 />
                               </div>
@@ -1487,7 +1505,7 @@ export default function CartPage() {
 
                     <button
                       type="submit"
-                      disabled={isProcessing || Boolean(quoteError) || (Boolean(quoteData) === false && Boolean(summary?.deliveryError))}
+                      disabled={isProcessing || loadingAddresses || loadingQuote || !quoteData || Boolean(quoteError)}
                       className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-4 rounded-xl mt-6 hover:from-emerald-600 hover:to-green-700 transition shadow-lg shadow-emerald-50 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingBag size={18} />

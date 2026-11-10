@@ -1081,11 +1081,11 @@ export interface WaitlistSubscriber {
   firstName: string;
   lastName: string;
   fullName: string;
-  phoneNumber: string;
-  role: 'customer' | 'vendor';
+  phoneNumber: string | null;
+  role: 'customer' | 'vendor' | null;
   interestTags: string[];
   status: 'active' | 'unsubscribed' | 'bounced';
-  referralSource: string;
+  referralSource: string | null;
   createdAt: string;
 }
 
