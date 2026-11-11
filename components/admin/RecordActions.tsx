@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Award, CircleSlash, CreditCard, Eye, MessageSquare, MoreHorizontal, Pencil, RotateCcw, Send, Settings2, Trash2, UserRoundCheck } from 'lucide-react';
+import { Award, CircleSlash, CreditCard, Eye, EyeOff, MessageSquare, MoreHorizontal, Pencil, RotateCcw, Send, Settings2, Trash2, UserRoundCheck } from 'lucide-react';
 
 export interface RecordAction {
   label: string;
@@ -20,6 +20,7 @@ function ActionIcon({ label }: { label: string }) {
   if (value.includes('suspend') || value.includes('ban') || value.includes('reject') || value.includes('block')) return <CircleSlash size={16} aria-hidden="true" />;
   if (value.includes('payout')) return <CreditCard size={16} aria-hidden="true" />;
   if (value.includes('override') || value.includes('rate')) return <Settings2 size={16} aria-hidden="true" />;
+  if (value.includes('unpublish')) return <EyeOff size={16} aria-hidden="true" />;
   if (value.includes('publish')) return <Send size={16} aria-hidden="true" />;
   return <Eye size={16} aria-hidden="true" />;
 }

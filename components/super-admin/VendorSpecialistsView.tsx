@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Eye, Trash2, Edit2, RefreshCw, Plus, Search, Filter,
+  Trash2, Edit2, RefreshCw, Plus, Search, Filter,
   ChevronLeft, ChevronRight, Phone, MapPin, X, User,
   CheckCircle2, XCircle, Calendar, Clock, ToggleLeft, ToggleRight,
   AlertTriangle, Info, Truck,
@@ -17,6 +17,7 @@ import {
   STATE_ENUM_VALUES,
 } from '@/lib/api';
 import toast from 'react-hot-toast';
+import RecordActions from '@/components/admin/RecordActions';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -50,17 +51,6 @@ function formatDateTime(iso?: string | null): string {
     return '—';
   }
 }
-
-const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="relative group/tip">
-    {children}
-    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-sm z-50">
-      {label}
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
-    </div>
-  </div>
-);
 
 const DetailRow = ({
   icon: Icon, label, value, valueClass = '',
@@ -722,7 +712,16 @@ export default function VendorSpecialistsView() {
                   {filtered.map((s) => (
                     <tr
                       key={s.id}
-                      className="border-b last:border-0 hover:bg-gray-50/50 transition-colors group"
+                      tabIndex={0}
+                      aria-label={`View ${s.name} details`}
+                      onClick={() => handleOpenView(s)}
+                      onKeyDown={(event) => {
+                        if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault();
+                          handleOpenView(s);
+                        }
+                      }}
+                      className="group cursor-pointer border-b transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700 last:border-0"
                     >
                       {/* Name + Phone */}
                       <td className="p-4">
@@ -731,13 +730,7 @@ export default function VendorSpecialistsView() {
                             <Truck size={16} className="text-[#228b22]" />
                           </div>
                           <div>
-                            <p
-                              className="font-bold text-slate-800 text-sm group-hover:text-[#228b22] transition-colors cursor-pointer flex items-center gap-1"
-                              onClick={() => handleOpenView(s)}
-                            >
-                              {s.name}
-                              <Eye size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </p>
+                            <p className="text-sm font-bold text-slate-800 transition-colors group-hover:text-emerald-800">{s.name}</p>
                             <div className="flex items-center gap-1 text-[11px] text-gray-400 font-medium mt-0.5">
                               <Phone size={10} />
                               {s.contactPhone}
@@ -757,7 +750,7 @@ export default function VendorSpecialistsView() {
                       {/* Status toggle */}
                       <td className="p-4 text-center">
                         <button
-                          onClick={() => handleToggleActive(s)}
+                          onClick={(event) => { event.stopPropagation(); handleToggleActive(s); }}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter transition border ${
                             s.isActive
                               ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
@@ -778,38 +771,11 @@ export default function VendorSpecialistsView() {
 
                       {/* Actions */}
                       <td className="p-4 text-right">
-                        <div className="flex justify-end gap-1">
-                          <Tooltip label="View details">
-                            <button
-                              type="button"
-                              aria-label={`View ${s.name}`}
-                              onClick={() => handleOpenView(s)}
-                              className="p-2 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Eye size={16} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Edit specialist">
-                            <button
-                              type="button"
-                              aria-label={`Edit ${s.name}`}
-                              onClick={() => handleOpenEdit(s)}
-                              className="p-2 text-gray-400 hover:text-slate-900 hover:bg-blue-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Delete specialist">
-                            <button
-                              type="button"
-                              aria-label={`Delete ${s.name}`}
-                              onClick={() => handleDeleteRequest(s.id, s.name)}
-                              className="p-2 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </Tooltip>
-                        </div>
+                        <RecordActions name={s.name} actions={[
+                          { label: 'View details', onSelect: () => handleOpenView(s) },
+                          { label: 'Edit specialist', onSelect: () => handleOpenEdit(s) },
+                          { label: 'Delete specialist', onSelect: () => handleDeleteRequest(s.id, s.name), destructive: true },
+                        ]} />
                       </td>
                     </tr>
                   ))}
@@ -820,7 +786,7 @@ export default function VendorSpecialistsView() {
             {/* Mobile card view */}
             <div className="md:hidden flex flex-col p-4 space-y-3 bg-gray-50/50">
               {filtered.map((s) => (
-                <div key={s.id} className="bg-white p-4 rounded-md shadow-sm border border-gray-100">
+                <div key={s.id} role="button" tabIndex={0} aria-label={`View ${s.name} details`} onClick={() => handleOpenView(s)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); handleOpenView(s); } }} className="cursor-pointer rounded-md border border-gray-100 bg-white p-4 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center shrink-0">
@@ -834,7 +800,7 @@ export default function VendorSpecialistsView() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleToggleActive(s)}
+                      onClick={(event) => { event.stopPropagation(); handleToggleActive(s); }}
                       className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase border transition ${
                         s.isActive
                           ? 'bg-emerald-50 text-slate-700 border-emerald-200'
@@ -849,11 +815,11 @@ export default function VendorSpecialistsView() {
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200">
                       <MapPin size={10} /> {formatStateLabel(s.state)}
                     </span>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleOpenView(s)} className="p-1.5 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-lg transition"><Eye size={15} /></button>
-                      <button onClick={() => handleOpenEdit(s)} className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-blue-50 rounded-lg transition"><Edit2 size={15} /></button>
-                      <button onClick={() => handleDeleteRequest(s.id, s.name)} className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-lg transition"><Trash2 size={15} /></button>
-                    </div>
+                    <RecordActions name={s.name} actions={[
+                      { label: 'View details', onSelect: () => handleOpenView(s) },
+                      { label: 'Edit specialist', onSelect: () => handleOpenEdit(s) },
+                      { label: 'Delete specialist', onSelect: () => handleDeleteRequest(s.id, s.name), destructive: true },
+                    ]} />
                   </div>
                 </div>
               ))}
