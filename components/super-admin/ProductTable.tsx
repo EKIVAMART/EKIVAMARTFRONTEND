@@ -60,6 +60,9 @@ interface ProductTableProps {
   onPageChange?: (page: number) => void;
   isLoading?: boolean;
   showReviewRepliesButton?: boolean;
+  /** When provided, sorting is controlled by the parent (e.g. sent to the server). */
+  sortBy?: string;
+  onSortByChange?: (sortBy: string) => void;
 }
 
 const getStatusBadge = (status?: Product['status']) => {
@@ -115,9 +118,16 @@ export default function ProductTable({
   onPageChange,
   isLoading = false,
   showReviewRepliesButton = false,
+  sortBy: controlledSortBy,
+  onSortByChange,
 }: ProductTableProps) {
   const [localPage, setLocalPage] = useState(1);
-  const [sortBy, setSortBy] = useState<string>('createdAt-desc');
+  const [localSortBy, setLocalSortBy] = useState<string>('createdAt-desc');
+  const sortBy = controlledSortBy ?? localSortBy;
+  const setSortBy = (value: string) => {
+    if (onSortByChange) onSortByChange(value);
+    else setLocalSortBy(value);
+  };
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);

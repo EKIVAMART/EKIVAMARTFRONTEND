@@ -151,28 +151,42 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
   }, []);
 
   // Execute Search API call
-  const executeSearch = useCallback(async (overrides?: { status?: string }) => {
+  const executeSearch = useCallback(async (overrides?: {
+    status?: string;
+    orderId?: string;
+    vendorId?: string;
+    minAmount?: string;
+    maxAmount?: string;
+    deliveryState?: string;
+    sortCombo?: string;
+  }) => {
     setIsSearching(true);
     setCurrentPage(1);
 
     const rawTarget = overrides?.status !== undefined ? overrides.status : activeStatusTab;
     const targetStatus = rawTarget === 'ALL' ? 'ALL' : rawTarget.toLowerCase();
-    const [sortBy, sortOrder] = sortCombo.split(':');
+    // Explicit overrides win over state so callers (e.g. reset) don't search with stale values.
+    const effOrderId = overrides?.orderId ?? orderId;
+    const effVendorId = overrides?.vendorId ?? vendorId;
+    const effMinAmount = overrides?.minAmount ?? minAmount;
+    const effMaxAmount = overrides?.maxAmount ?? maxAmount;
+    const effDeliveryState = overrides?.deliveryState ?? deliveryState;
+    const [sortBy, sortOrder] = (overrides?.sortCombo ?? sortCombo).split(':');
 
     const searchParams: Record<string, any> = {
       page: 1,
       limit: 50,
-      orderId: orderId.trim() || undefined,
-      vendorId: vendorId || undefined,
-      minAmount: minAmount !== '' ? Number(minAmount) : undefined,
-      maxAmount: maxAmount !== '' ? Number(maxAmount) : undefined,
-      deliveryState: deliveryState || undefined,
+      orderId: effOrderId.trim() || undefined,
+      vendorId: effVendorId || undefined,
+      minAmount: effMinAmount !== '' ? Number(effMinAmount) : undefined,
+      maxAmount: effMaxAmount !== '' ? Number(effMaxAmount) : undefined,
+      deliveryState: effDeliveryState || undefined,
       status: targetStatus !== 'ALL' ? targetStatus : undefined,
       sortBy: sortBy || 'created_at',
       sortOrder: sortOrder || 'desc',
     };
 
-    if (globalQuery && !orderId) {
+    if (globalQuery && !effOrderId) {
       searchParams.searchQuery = globalQuery;
     }
 
@@ -253,7 +267,15 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
     setDeliveryState('');
     setActiveStatusTab('ALL');
     setSortCombo('created_at:desc');
-    void executeSearch({ status: 'ALL' });
+    void executeSearch({
+      status: 'ALL',
+      orderId: '',
+      vendorId: '',
+      minAmount: '',
+      maxAmount: '',
+      deliveryState: '',
+      sortCombo: 'created_at:desc',
+    });
   };
 
   // Local Client Filtering Fallback when offline or using static data

@@ -703,6 +703,7 @@ function AdminPageContent() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productLoadError, setProductLoadError] = useState('');
   const [productPage, setProductPage] = useState(1);
+  const [productSortBy, setProductSortBy] = useState('createdAt-desc');
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
   const [productTotal, setProductTotal] = useState(0);
   const [productTotalPages, setProductTotalPages] = useState(1);
@@ -1081,14 +1082,17 @@ function AdminPageContent() {
 
       try {
         const vendorId = filterVendorId !== 'all' ? filterVendorId : undefined;
+        const [rawSortField, rawSortOrder] = productSortBy.split('-');
+        const productSortField = (['createdAt', 'updatedAt', 'price', 'name'].includes(rawSortField) ? rawSortField : 'createdAt') as 'createdAt' | 'updatedAt' | 'price' | 'name';
+        const productSortOrder = rawSortOrder === 'asc' ? 'asc' : 'desc';
         const response = await productApi.getAllProducts({
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
           categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
           ...(vendorId ? { vendorId } : {}),
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
+          sortBy: productSortField,
+          sortOrder: productSortOrder,
         });
         const fetchedProducts = getProductList(response)
           .map(normalizeProduct)
@@ -1121,7 +1125,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId, filterVendorId]);
+  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId, filterVendorId, productSortBy]);
 
   const resolveAmount = (value: any): number => {
     if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -1891,7 +1895,7 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
+      <div className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
         <div className="hidden md:flex items-center justify-end mb-5 pb-3 border-b border-gray-200/60">
           <div className="flex items-center gap-4">
@@ -2134,6 +2138,8 @@ function AdminPageContent() {
                   onPageChange={setProductPage}
                   isLoading={isLoadingProducts}
                   showReviewRepliesButton
+                  sortBy={productSortBy}
+                  onSortByChange={(value) => { setProductSortBy(value); setProductPage(1); }}
                 />
               </div>
             )}
@@ -2236,7 +2242,7 @@ function AdminPageContent() {
           onUnblock={handleUnblockUser}
           onDelete={handleDeleteUser}
         />
-      </main>
+      </div>
     </div>
   );
 }

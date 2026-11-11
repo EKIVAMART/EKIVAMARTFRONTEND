@@ -258,7 +258,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-[#F8F9FA] w-full max-w-5xl rounded-md shadow-sm overflow-hidden border border-gray-150 md:max-h-[90vh] max-h-full flex flex-col"
+            className="ek-print-invoice bg-[#F8F9FA] w-full max-w-5xl rounded-md shadow-sm overflow-hidden border border-gray-150 md:max-h-[90vh] max-h-full flex flex-col"
           >
             {/* Header */}
             <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
@@ -275,14 +275,15 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                   <Calendar size={14} /> Placed on {order?.createdAt && !Number.isNaN(new Date(order.createdAt).getTime()) ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="ek-print-hide flex items-center gap-3">
                 <button
+                  type="button"
                   onClick={() => window.print()}
                   className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-md font-bold transition text-xs"
                 >
                   <Printer size={15} /> Print Invoice
                 </button>
-                <button onClick={onClose} className="p-3 hover:bg-white/20 rounded-md transition-colors">
+                <button type="button" onClick={onClose} aria-label="Close order details" className="p-3 hover:bg-white/20 rounded-md transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -477,7 +478,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     </div>
 
                     {/* Staff Notes (VENDOR/ADMIN/SUPER_ADMIN only) */}
-                    <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
+                    <div className="ek-print-hide bg-white rounded-md border p-6 shadow-sm space-y-4">
                       <h3 className="text-xs font-bold text-slate-850 uppercase tracking-wider flex items-center gap-2">
                         <FileText size={16} className="text-[#228b22]" /> Staff Internal Notes
                       </h3>
@@ -526,7 +527,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
             {/* Footer Action (Status Transition) */}
             {order && (
-              <div className="bg-white px-8 py-5 border-t flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 z-10 rounded-b-3xl">
+              <div className="ek-print-hide bg-white px-8 py-5 border-t flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 z-10 rounded-b-3xl">
                 {allowedNextStatuses.length > 0 ? (
                   <>
                     <select

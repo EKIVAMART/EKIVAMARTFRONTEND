@@ -161,21 +161,17 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
     const fetchAdmins = async () => {
       try {
         const response = await authApi.searchUsers({ role: 'admin', page: 1, limit: 100 });
-        if (response?.success && response.data) {
-          const list = response.data.users || response.data.data || [];
-          setAdminsList(list);
-        } else {
-          // Mock list if API fails
-          setAdminsList([
-            { id: 'mock-uuid-123456789', firstName: 'Sarah', lastName: 'Connor', email: 'sarah@faflora.com' },
-            { id: 'admin-id-456', firstName: 'Orlando', lastName: 'Diggs', email: 'orlando@faflora.com' }
-          ]);
-        }
+        const data = response?.data;
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.users)
+            ? data.users
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+        setAdminsList(list.map((admin: any) => ({ ...admin, id: String(admin.id || admin._id || '') })).filter((admin: any) => admin.id));
       } catch {
-        setAdminsList([
-          { id: 'mock-uuid-123456789', firstName: 'Sarah', lastName: 'Connor', email: 'sarah@faflora.com' },
-          { id: 'admin-id-456', firstName: 'Orlando', lastName: 'Diggs', email: 'orlando@faflora.com' }
-        ]);
+        setAdminsList([]);
       }
     };
     fetchAdmins();
@@ -229,7 +225,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
   const fetchAssignedCount = async () => {
     try {
       const response = await adminVendorApi.listVendors({
-        assignedAdminId: currentUserId || 'mock-uuid-123456789',
+        assignedAdminId: currentUserId || undefined,
         limit: 100,
         page: 1
       });
@@ -270,7 +266,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
             case 'assigned':
               response = await adminVendorApi.listVendors({
                 ...baseParams,
-                assignedAdminId: currentUserId || 'mock-uuid-123456789'
+                assignedAdminId: currentUserId || undefined
               });
               break;
             case 'pending':
@@ -1444,7 +1440,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {comm.gatewayFeeRate}%
                       </td>
                       <td className="p-4 text-xs font-bold text-slate-600">
-                        {comm.createdBy === 'admin-id-123' ? 'Sarah Connor (Super Admin)' : comm.createdBy}
+                        {(() => {
+                          const creator = adminsList.find((a) => a.id === comm.createdBy);
+                          return creator ? `${creator.firstName} ${creator.lastName}`.trim() : comm.createdBy;
+                        })()}
                       </td>
                       <td className="p-4 text-xs text-gray-400 font-medium">
                         {new Date(comm.updatedAt).toLocaleDateString()}
@@ -2168,7 +2167,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                     onChange={(e) => setSelectedAdminId(e.target.value)}
                     className="w-full p-3 rounded-md border bg-slate-50 font-semibold text-xs text-slate-700 outline-none focus:bg-white focus:ring-2 ring-brand-100 transition"
                   >
-                    <option value="">Select admin...</option>
+                    <option value="">{adminsList.length ? 'Select admin...' : 'No admins available'}</option>
                     {adminsList.map((admin) => (
                       <option key={admin.id} value={admin.id}>
                         {admin.firstName} {admin.lastName} ({admin.email})

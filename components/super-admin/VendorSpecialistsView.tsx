@@ -235,7 +235,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
 
   useEffect(() => {
     if (editingSpecialist) {
-      setForm({ name: editingSpecialist.name, contactPhone: editingSpecialist.contactPhone, state: editingSpecialist.state });
+      setForm({ name: editingSpecialist.name, contactPhone: editingSpecialist.contactPhone, state: (String(editingSpecialist.state || '').toLowerCase() as StateEnumValue) });
       setIsActiveForm(editingSpecialist.isActive);
     } else {
       setForm({ name: '', contactPhone: '', state: '' });
@@ -781,6 +781,8 @@ export default function VendorSpecialistsView() {
                         <div className="flex justify-end gap-1">
                           <Tooltip label="View details">
                             <button
+                              type="button"
+                              aria-label={`View ${s.name}`}
                               onClick={() => handleOpenView(s)}
                               className="p-2 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-md transition-all active:scale-90"
                             >
@@ -789,6 +791,8 @@ export default function VendorSpecialistsView() {
                           </Tooltip>
                           <Tooltip label="Edit specialist">
                             <button
+                              type="button"
+                              aria-label={`Edit ${s.name}`}
                               onClick={() => handleOpenEdit(s)}
                               className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all active:scale-90"
                             >
@@ -797,6 +801,8 @@ export default function VendorSpecialistsView() {
                           </Tooltip>
                           <Tooltip label="Delete specialist">
                             <button
+                              type="button"
+                              aria-label={`Delete ${s.name}`}
                               onClick={() => handleDeleteRequest(s.id, s.name)}
                               className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all active:scale-90"
                             >
