@@ -237,7 +237,7 @@ export default function WaitlistView() {
       sub.lastName || '',
       sub.fullName || '',
       sub.phoneNumber || '',
-      sub.role,
+      sub.role || 'ANOMALY: missing role',
       sub.status,
       sub.referralSource || '',
       new Date(sub.createdAt).toLocaleString()
@@ -731,6 +731,7 @@ export default function WaitlistView() {
                     <td className="p-4 text-sm text-slate-500">{sub.phoneNumber || '—'}</td>
                     <td className="p-4 text-center">
                       <RecordStatus value={sub.role} />
+                      {!sub.role && <span className="block text-xs font-semibold text-amber-700">Anomaly: missing role — review required</span>}
                     </td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1">

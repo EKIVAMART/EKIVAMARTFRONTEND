@@ -223,9 +223,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
   // Fetch Assigned count to display dynamically on "Assigned to You" Tab
   const fetchAssignedCount = async () => {
+    if (!currentUserId) { setAssignedCount(0); return; }
     try {
       const response = await adminVendorApi.listVendors({
-        assignedAdminId: currentUserId || undefined,
+        assignedAdminId: currentUserId,
         limit: 100,
         page: 1
       });
@@ -233,7 +234,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
         setAssignedCount(response.data?.pagination?.total || response.data?.vendors?.length || 0);
       }
     } catch {
-      setAssignedCount(2); // Mock count
+      setAssignedCount(0);
     }
   };
 
@@ -243,6 +244,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
   // Fetch Main Data based on active section and tab
   const fetchData = async () => {
+    if (activeSection === 'applications' && activeTab === 'assigned' && !currentUserId) {
+      setVendors([]);
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -266,7 +271,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
             case 'assigned':
               response = await adminVendorApi.listVendors({
                 ...baseParams,
-                assignedAdminId: currentUserId || undefined
+                assignedAdminId: currentUserId
               });
               break;
             case 'pending':
@@ -365,7 +370,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
   useEffect(() => {
     fetchData();
-  }, [activeSection, activeTab, page, searchQuery, vendorTypeFilter, trustLevelFilter, selectedAuditVendorId]);
+  }, [activeSection, activeTab, page, searchQuery, vendorTypeFilter, trustLevelFilter, selectedAuditVendorId, currentUserId]);
 
   // Reset page when switching categories
   useEffect(() => {

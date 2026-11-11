@@ -36,7 +36,8 @@ body:has(.ek-workspace) :is(button,a,input,select,textarea,[tabindex]):focus-vis
 @keyframes ek-chat-blink { 50% { transform:scaleY(.12); } }
 body:has(.ek-workspace) :is(.ek-support-launcher,.ek-chat-launcher){display:none}
 @media(max-width:767px){
-  :is(.ek-support-launcher,.ek-chat-launcher){bottom:calc(76px + env(safe-area-inset-bottom));gap:6px;padding-right:11px;font-size:12px}
+  :is(.ek-support-launcher,.ek-chat-launcher){bottom:calc(16px + env(safe-area-inset-bottom));width:48px;height:48px;min-height:48px;justify-content:center;gap:0;padding:5px}
+  :is(.ek-support-launcher,.ek-chat-launcher)>span:last-child{display:none}
   .ek-support-launcher{left:calc(12px + env(safe-area-inset-left))}
   .ek-chat-launcher{right:calc(12px + env(safe-area-inset-right))}
 }

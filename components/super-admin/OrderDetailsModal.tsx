@@ -364,7 +364,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           </div>
                         )}
                         <div className="pt-3 mt-3 border-t flex justify-between items-center">
-                          <span className="text-base font-bold text-slate-800">Total Paid</span>
+                          <span className="text-base font-bold text-slate-800">Order total</span>
                           <span className="text-xl font-black text-[#228b22] flex items-center gap-0.5">
                             <NairaIcon size={16} />
                             {order.totalAmount?.formatted?.replace('₦', '') || order.totalAmount?.amount?.toLocaleString()}

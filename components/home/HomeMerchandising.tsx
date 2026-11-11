@@ -8,6 +8,7 @@ import MarketplaceRail from './CategoryRail';
 import Link from 'next/link';
 import { departmentSlug, departments } from '@/lib/data/departments';
 import ProductCard from './ProductCard';
+import DepartmentShelves from './DepartmentShelves';
 
 function Shelf({ title, items, empty, id, children, href }: {
   title: string; items: CatalogItem[]; empty: ReactNode; id?: string; children?: ReactNode; href?: string;
@@ -83,6 +84,7 @@ export default function HomeMerchandising({ children }: { children: ReactNode })
       const slug = departmentSlug(name);
       return <Shelf key={slug} title={name} href={`/categories/${slug}`} items={byDepartment.get(slug)!} empty="" />;
     })}
+    <DepartmentShelves items={items} />
     <Shelf title="New arrivals" items={newest} empty="New products will appear here." />
     <Shelf title="Recommended for you" items={related.length ? related : featured.slice(4).concat(featured.slice(0,4))} empty="Explore the marketplace to discover more products.">
       <p className="ek-shelf-caption">{related.length ? 'Inspired by your wishlist.' : 'Discover more from across the marketplace.'}</p>

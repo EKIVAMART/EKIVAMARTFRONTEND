@@ -10,6 +10,7 @@ import { setUser } from '@/lib/features/auth/authSlice';
 import { departments, departmentSlug } from '@/lib/data/departments';
 import DesktopNavbar from './DesktopNavbar';
 import MobileHeader from './MobileHeader';
+import MobileSecondaryNav from './MobileSecondaryNav';
 import MobileCategorySidebar from './MobileCategorySidebar';
 
 import { LoginModal } from '@/components/auth/LoginModal';
@@ -149,8 +150,6 @@ export default function Navbar() {
         />
 
         <MobileHeader
-          categories={categories}
-          onOpenCategories={() => setMobileSidebarOpen(true)}
           onOpenLogin={() => setIsLoginModalOpen(true)}
           onOpenProfile={() => setIsProfileModalOpen(true)}
         />
@@ -164,6 +163,8 @@ export default function Navbar() {
         />
 
       </header>
+
+      <MobileSecondaryNav onOpenCategories={() => setMobileSidebarOpen(true)} />
 
       {/* Auth modals */}
       <LoginModal

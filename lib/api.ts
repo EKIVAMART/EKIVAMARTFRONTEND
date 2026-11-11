@@ -1557,7 +1557,7 @@ export const cartApi = {
       addressLine2?: string;
       city: string;
       state: string;
-      postalCode: string;
+      postalCode?: string;
       country: string;
       phoneNumber: string;
     };
@@ -1569,7 +1569,7 @@ export const cartApi = {
     addressLine2?: string;
     city: string;
     state: string;
-    postalCode: string;
+    postalCode?: string;
     country: string;
     phoneNumber: string;
   }, notes?: string): Promise<ApiResponse<any>> {
@@ -2400,7 +2400,7 @@ export interface SavedAddressPayload {
   addressLine2?: string;
   city: string;
   state: string;
-  postalCode: string;
+  postalCode?: string;
   country: string;
   phoneNumber: string;
 }
@@ -2573,7 +2573,7 @@ export interface OrderData {
     addressLine2?: string;
     city: string;
     state: string;
-    postalCode: string;
+    postalCode?: string;
     country: string;
     phoneNumber: string;
     formatted?: string;

@@ -520,7 +520,6 @@ export default function CartPage() {
         !shippingAddress.addressLine1 ||
         !shippingAddress.city ||
         !shippingAddress.state ||
-        !shippingAddress.postalCode ||
         !shippingAddress.phoneNumber
       ) {
         toast.error('Please fill in all required shipping address fields.');
@@ -1306,10 +1305,9 @@ export default function CartPage() {
 
                             <div className="grid grid-cols-2 gap-3">
                               <div>
-                                <label className="text-xs font-bold text-slate-600 block mb-1">Postal Code *</label>
+                                <label className="text-xs font-bold text-slate-600 block mb-1">Postal Code (optional)</label>
                                 <input
                                   type="text"
-                                  required
                                   value={shippingAddress.postalCode}
                                   onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
                                   placeholder="105102"
