@@ -231,13 +231,13 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
   return (
     <AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px] ">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="bg-white w-full max-w-md rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden"
+            className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
           >
             {/* ── Progress bar ── */}
             <div className="h-1.5 bg-slate-100 w-full">

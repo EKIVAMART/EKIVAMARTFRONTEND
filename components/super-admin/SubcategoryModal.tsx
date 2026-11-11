@@ -164,8 +164,8 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white rounded-md shadow-sm flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
 
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
           <div>
@@ -299,8 +299,8 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
       {/* ── Subcategory Delete Confirmation ── */}
       {deletingId && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setDeletingId(null)} />
-          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setDeletingId(null)} />
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
             <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4 ">
               <Trash2 size={22} className="text-slate-600" />
             </div>

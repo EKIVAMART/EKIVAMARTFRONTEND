@@ -130,12 +130,12 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 ">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-3xl rounded-md shadow-sm overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
+            className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
           >
             {/* Header */}
             <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between">

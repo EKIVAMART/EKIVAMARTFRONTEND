@@ -105,7 +105,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-white rounded-md shadow-sm w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
+          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -308,12 +308,12 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
+            className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border"
           >
             <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -436,12 +436,12 @@ interface DeleteConfirmProps {
 
 function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteConfirmProps) {
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
+        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl border p-6 text-center"
       >
         <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4">
           <Trash2 size={24} className="text-slate-500" />

@@ -1574,12 +1574,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* FULL VENDOR DETAIL MODAL CONTAINER */}
       <AnimatePresence>
         {detailVendorId && detailData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-5xl rounded-[2rem] shadow-sm overflow-hidden border max-h-full flex flex-col relative"
+              className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border max-h-full flex flex-col relative"
             >
               {/* Header */}
               <div className="bg-[#184b3d] px-6 py-4 text-white flex items-center justify-between shrink-0">
@@ -2003,12 +2003,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* ADMIN ASSIGN REVIEWER MODAL */}
       <AnimatePresence>
         {assignVendorTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">Assign Application Reviewer</h3>
@@ -2059,12 +2059,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* DOUBLE CONFIRM ASSIGN MODAL */}
       <AnimatePresence>
         {confirmAssignModal && assignVendorTarget && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 ">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-[2rem] shadow-sm p-6 text-center border"
+              className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center border"
             >
               <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-md flex items-center justify-center mx-auto mb-4 border border-brand-100">
                 <UserCheck size={24} />
@@ -2101,12 +2101,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* TRUST LEVEL UPGRADE DIALOG */}
       <AnimatePresence>
         {trustLevelVendor && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">Adjust Seller Trust Level</h3>
@@ -2158,12 +2158,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* COMMISSION RATE MANAGE MODAL (Super Admin) */}
       <AnimatePresence>
         {commissionModal.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">
@@ -2285,12 +2285,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* GENERIC ACTION NOTE / REASON MODALS (Scale transition animation) */}
       <AnimatePresence>
         {actionType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
             >
               {/* Header */}
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
@@ -2440,12 +2440,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* CUSTOM CONFIRM MODAL (Replaces alerts and window.confirm) */}
       <AnimatePresence>
         {confirmModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">{confirmModal.title}</h3>
@@ -2485,12 +2485,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* BULK ACTION SKIPPED DETAILS WARNING MODAL */}
       <AnimatePresence>
         {skippedModal && skippedModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-lg rounded-md shadow-sm border overflow-hidden"
+              className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
@@ -2597,12 +2597,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* DOCUMENT REVIEW REASON MODAL */}
       <AnimatePresence>
         {docReviewModal && docReviewModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base">

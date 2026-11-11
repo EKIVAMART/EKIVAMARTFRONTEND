@@ -815,8 +815,8 @@ export default function WaitlistView() {
       {/* ── Modal: Launch Settings Config ── */}
       {isLaunchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 " onClick={() => setIsLaunchModalOpen(false)} />
-          <div className="relative w-full max-w-xl bg-white rounded-md shadow-sm flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={() => setIsLaunchModalOpen(false)} />
+          <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
@@ -970,8 +970,8 @@ export default function WaitlistView() {
       {/* ── Modal: Send email Composer ── */}
       {isBroadcastModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 " onClick={closeBroadcastModal} />
-          <div className="relative w-full max-w-5xl bg-white rounded-md shadow-sm flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={closeBroadcastModal} />
+          <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
@@ -1389,8 +1389,8 @@ export default function WaitlistView() {
       {/* ── Modal: Confirm Launch config save ── */}
       {isLaunchConfirmOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsLaunchConfirmOpen(false)} />
-          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsLaunchConfirmOpen(false)} />
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
             <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22]">
               <Settings size={22} />
             </div>
@@ -1431,8 +1431,8 @@ export default function WaitlistView() {
       {/* ── Modal: Confirm Broadcast Send ── */}
       {isBroadcastConfirmOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsBroadcastConfirmOpen(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsBroadcastConfirmOpen(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
             <div className="w-12 h-12 rounded-md bg-rose-100 text-slate-600 flex items-center justify-center mx-auto mb-4">
               <Send size={20} />
             </div>

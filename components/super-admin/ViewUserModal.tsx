@@ -104,7 +104,7 @@ export default function ViewUserModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="relative bg-white rounded-md shadow-sm w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">

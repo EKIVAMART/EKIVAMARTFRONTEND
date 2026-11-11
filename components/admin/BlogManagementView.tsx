@@ -644,8 +644,8 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Delete Confirmation Modal */}
       {postToDelete && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
             <div className="w-14 h-14 rounded-md bg-rose-50 text-slate-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
               <Trash2 size={28} />
             </div>
@@ -686,8 +686,8 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Unpublish Confirmation Modal */}
       {postToUnpublish && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
             <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200">
               <EyeOff size={28} />
             </div>

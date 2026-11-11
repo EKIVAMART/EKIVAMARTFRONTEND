@@ -240,8 +240,8 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white rounded-md shadow-sm flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={onClose} />
+      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">

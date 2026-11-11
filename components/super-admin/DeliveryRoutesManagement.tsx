@@ -694,7 +694,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 border border-gray-150 z-10"
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 border border-gray-150 z-10"
             >
               <div className="flex items-center justify-between border-b pb-3 mb-4">
                 <h3 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
@@ -867,7 +867,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+              className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] backdrop-blur-xs"
               onClick={() => setConfirmAction(null)}
             />
 
@@ -875,7 +875,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 border border-red-100 z-10 text-center"
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 border border-red-100 z-10 text-center"
             >
               <div className="w-12 h-12 rounded-md bg-red-50 text-slate-500 flex items-center justify-center mx-auto mb-3">
                 <AlertTriangle size={24} />

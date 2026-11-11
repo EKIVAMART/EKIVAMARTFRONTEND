@@ -275,12 +275,12 @@ export default function TaxRulesView() {
       {/* Create / Edit Tax Rule Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
+              className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border"
             >
               <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
                 <h3 className="font-bold text-lg">

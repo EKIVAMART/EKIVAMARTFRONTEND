@@ -329,8 +329,8 @@ export default function ReviewModerationPanel() {
 
       {/* Flag review dialog box */}
       {flaggingReviewId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white w-full max-w-sm rounded-md shadow-sm p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6">
             <h3 className="font-bold text-base text-slate-800 mb-2">Flag Review</h3>
             <p className="text-xs text-gray-500 mb-4 font-semibold">Flagged reviews are listed for admin investigations. Provide flag reason:</p>
 

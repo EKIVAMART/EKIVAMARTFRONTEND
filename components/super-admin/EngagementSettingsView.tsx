@@ -151,12 +151,12 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
 function RunNowModal({ result, onClose }: RunNowModalProps) {
   if (!result) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
+        className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
       >
         <div className="bg-[#228b22] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-white">
@@ -202,12 +202,12 @@ interface ConfirmRunNowModalProps {
 
 function ConfirmRunNowModal({ onConfirm, onCancel, isRunning }: ConfirmRunNowModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
+        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl border p-6 text-center"
       >
         <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
           <AlertTriangle size={26} className="text-slate-500" />
@@ -590,7 +590,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                 ) : (
                   /* Live Email Preview Tab */
                   <div className="p-5 bg-slate-100 min-h-[350px]">
-                    <div className="max-w-xl mx-auto bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                       {/* Fake Email Header */}
                       <div className="bg-slate-50 border-b border-slate-200 p-4 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-slate-500">

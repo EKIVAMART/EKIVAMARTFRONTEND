@@ -43,12 +43,12 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative bg-white w-full max-w-2xl rounded-md shadow-sm overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col"
+          className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col"
         >
           {/* Header */}
           <div className="bg-brand-600 px-6 py-5 text-white">
