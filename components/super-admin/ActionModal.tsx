@@ -259,7 +259,7 @@ const ChipSelector = ({
         {selectedValues.map((val, idx) => (
           <span key={`${val}-${idx}`} className="bg-[#e3ebdf] text-[#1c711c] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
-            <button type="button" onClick={() => handleRemove(val)} className="text-[#1c711c] hover:text-red-500 transition">
+            <button type="button" onClick={() => handleRemove(val)} className="text-[#1c711c] hover:text-slate-900 transition">
               <X size={13} strokeWidth={3} />
             </button>
           </span>
@@ -1361,16 +1361,16 @@ export default function ActionModal({
           >
             <AnimatePresence>
               {saveErrors.length > 0 && (
-                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-red-700 shadow-sm">
+                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
+                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-slate-600"><AlertCircle size={20} /></div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-800">Please fix these details before saving.</p>
+                      <p className="font-bold text-slate-800">Please fix these details before saving.</p>
                       <ul className="mt-2 list-disc space-y-1 pl-4">
                         {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
                       </ul>
                     </div>
-                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
+                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-slate-500 transition hover:bg-red-50"><X size={18} /></button>
                   </div>
                 </motion.div>
               )}
@@ -1618,7 +1618,7 @@ export default function ActionModal({
                           <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white focus-within:ring-2 focus-within:border-[#228b22] focus-within:ring-[#228b22]/20 ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
                               <span key={`tag-${t}-${idx}`} className="bg-[#e3ebdf] text-[#228b22] text-xs font-bold px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
-                                {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                                {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-slate-900 transition" onClick={() => removeTag(t)} />
                               </span>
                             ))}
                             <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
@@ -1944,7 +1944,7 @@ export default function ActionModal({
                               <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
                                 const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
                               }} className="flex-1 p-3 rounded-md border bg-white text-sm outline-none font-medium" />
-                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-md transition">
+                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-slate-500 hover:bg-red-50 rounded-md transition">
                                 <Trash2 size={18} />
                               </button>
                             </div>
@@ -1964,7 +1964,7 @@ export default function ActionModal({
                         {seoExpanded && (
                           <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
                             <div className="flex justify-end">
-                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-md hover:bg-[#e1eff8] transition">
+                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-slate-600 px-3.5 py-2 rounded-md hover:bg-[#e1eff8] transition">
                                 Auto-Generate from Product Data
                               </button>
                             </div>
@@ -2162,7 +2162,7 @@ export default function ActionModal({
                                 <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#228b22] rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
                                 </button>
-                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-md text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-slate-600 hover:bg-red-50 rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Trash2 size={16} /> Delete
                                 </button>
                               </div>
@@ -2191,7 +2191,7 @@ export default function ActionModal({
                       {imageToDelete && (
                         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
                           <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-sm animate-in zoom-in-95">
-                            <div className="w-12 h-12 bg-red-100 text-red-500 rounded-md flex items-center justify-center mb-4 mx-auto">
+                            <div className="w-12 h-12 bg-red-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto">
                               <Trash2 size={24} />
                             </div>
                             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Delete Image?</h4>
@@ -2287,7 +2287,7 @@ export default function ActionModal({
             </div>
 
             <div className="mb-6">
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text <span className="text-red-500">*</span></label>
+              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text <span className="text-slate-500">*</span></label>
               <input
                 type="text"
                 value={imageToReplace.alt}
@@ -2310,7 +2310,7 @@ export default function ActionModal({
       {showCancelConfirm && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
-            <div className="w-12 h-12 bg-orange-100 text-orange-500 rounded-md flex items-center justify-center mb-4 mx-auto">
+            <div className="w-12 h-12 bg-orange-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto">
               <AlertCircle size={24} />
             </div>
             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Unsaved Changes</h4>

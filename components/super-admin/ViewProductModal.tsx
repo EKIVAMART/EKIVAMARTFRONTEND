@@ -99,14 +99,14 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
     const isPublished = status === 'active' || status === 'published';
     if (isPublished) {
       return (
-        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
+        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-slate-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           Published
         </span>
       );
     }
     return (
-      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase border border-amber-200/80">
+      <span className="text-[10px] font-bold text-slate-600 bg-amber-50 px-2 py-0.5 rounded uppercase border border-amber-200/80">
         {status.replaceAll('_', ' ')}
       </span>
     );

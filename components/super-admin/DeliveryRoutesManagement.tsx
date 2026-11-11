@@ -558,7 +558,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                             </button>
                             <button
                               onClick={() => triggerDelete(route)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                              className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-lg transition"
                               title="Delete route"
                             >
                               <Trash2 size={14} />
@@ -651,7 +651,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                             <span className="font-bold text-slate-600 block">
                               ₦{reverse.fee.toLocaleString()}
                             </span>
-                            <span className="text-[9px] text-amber-600 font-bold block mt-0.5">
+                            <span className="text-[9px] text-slate-600 font-bold block mt-0.5">
                               uses reverse
                             </span>
                           </td>
@@ -877,7 +877,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               exit={{ opacity: 0, scale: 0.95 }}
               className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 border border-red-100 z-10 text-center"
             >
-              <div className="w-12 h-12 rounded-md bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-md bg-red-50 text-slate-500 flex items-center justify-center mx-auto mb-3">
                 <AlertTriangle size={24} />
               </div>
 
@@ -886,8 +886,8 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               </h3>
 
               <div className="bg-amber-50 border border-amber-200 rounded-md p-3 my-3 text-left">
-                <p className="text-xs text-amber-800 font-bold mb-1">Impact Warning:</p>
-                <p className="text-[11px] text-amber-700 leading-snug">
+                <p className="text-xs text-slate-800 font-bold mb-1">Impact Warning:</p>
+                <p className="text-[11px] text-slate-700 leading-snug">
                   Customers ordering items shipping between{' '}
                   <span className="font-extrabold">{confirmAction.route.originState}</span> and{' '}
                   <span className="font-extrabold">{confirmAction.route.destinationState}</span> will be unable to check out until this route is active!

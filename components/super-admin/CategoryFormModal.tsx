@@ -263,7 +263,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
 
         <div className="flex-1 overflow-y-auto p-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-600 border border-red-200 rounded-md font-medium text-sm flex items-start gap-3">
+            <div className="mb-6 p-4 bg-red-50 text-slate-600 border border-red-200 rounded-md font-medium text-sm flex items-start gap-3">
               <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
               {error}
             </div>
@@ -275,8 +275,8 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">
                 Category Image
-                {!editingCategory && <span className="text-red-500"> *</span>}
-                {editingCategory && !currentImageUrl && <span className="text-red-500"> *</span>}
+                {!editingCategory && <span className="text-slate-500"> *</span>}
+                {editingCategory && !currentImageUrl && <span className="text-slate-500"> *</span>}
                 <span className="text-xs font-normal text-gray-500 ml-1">
                   {editingCategory ? '(required to publish)' : '(required)'}
                 </span>
@@ -314,7 +314,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
                             handleDeleteImage();
                           }}
                           disabled={isLoading}
-                          className="text-xs font-bold text-red-600 hover:text-red-700 px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
+                          className="text-xs font-bold text-slate-600 hover:text-slate-900 px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
                         >
                           Delete Image
                         </button>
@@ -343,7 +343,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             {/* ── Name ── */}
             <div>
               <label htmlFor="catName" className="block text-sm font-bold text-slate-700 mb-2">
-                Category Name <span className="text-red-500">*</span>
+                Category Name <span className="text-slate-500">*</span>
               </label>
               <input
                 id="catName"
@@ -359,7 +359,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
             {/* ── Description ── */}
             <div>
               <label htmlFor="catDesc" className="block text-sm font-bold text-slate-700 mb-2">
-                Description <span className="text-red-500">*</span>
+                Description <span className="text-slate-500">*</span>
               </label>
               <textarea
                 id="catDesc"

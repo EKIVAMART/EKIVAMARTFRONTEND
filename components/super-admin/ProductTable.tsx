@@ -409,7 +409,7 @@ export default function ProductTable({
                     ₦{p.price.toLocaleString('en-NG')}
                   </td>
                   <td className="p-4 text-center">
-                    <span className={`text-xs whitespace-nowrap ${p.stock <= 5 ? 'text-amber-700 font-semibold' : 'text-slate-600'}`}>
+                    <span className={`text-xs whitespace-nowrap ${p.stock <= 5 ? 'text-slate-700 font-semibold' : 'text-slate-600'}`}>
                       {p.stock === 0 ? 'Out of stock' : `${p.stock} available`}
                     </span>
                   </td>
@@ -506,7 +506,7 @@ export default function ProductTable({
                             e.stopPropagation();
                             onDelete(p.id);
                           }}
-                          className="p-2 text-slate-600 hover:bg-rose-50 hover:text-rose-700"
+                          className="p-2 text-slate-600 hover:bg-rose-50 hover:text-slate-900"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -545,7 +545,7 @@ export default function ProductTable({
                             Loading reviews...
                           </div>
                         ) : reviewsError ? (
-                          <div className="text-sm text-rose-600 py-2">{reviewsError}</div>
+                          <div className="text-sm text-slate-600 py-2">{reviewsError}</div>
                         ) : reviews.length === 0 ? (
                           <div className="text-sm text-slate-500 py-2">No reviews have been posted for this product yet.</div>
                         ) : (
@@ -564,14 +564,14 @@ export default function ProductTable({
                                           <Star
                                             key={index}
                                             size={12}
-                                            className={index < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}
+                                            className={index < review.rating ? 'fill-amber-400 text-slate-400' : 'text-gray-200'}
                                           />
                                         ))}
                                       </div>
                                     </div>
                                   </div>
                                   {review.isVerifiedPurchase && (
-                                    <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                                    <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700">
                                       Verified Purchase
                                     </span>
                                   )}
@@ -774,7 +774,7 @@ export default function ProductTable({
                       e.stopPropagation();
                       onView(p);
                     }}
-                    className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 rounded-md transition text-xs font-bold"
+                    className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-slate-900 rounded-md transition text-xs font-bold"
                   >
                     <Eye size={16} /> View
                   </button>
@@ -784,7 +784,7 @@ export default function ProductTable({
                     e.stopPropagation();
                     onEdit(p);
                   }}
-                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-md transition text-xs font-bold"
+                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-slate-900 rounded-md transition text-xs font-bold"
                 >
                   <Edit3 size={16} /> Edit
                 </button>
@@ -793,7 +793,7 @@ export default function ProductTable({
                     e.stopPropagation();
                     onDelete(p.id);
                   }}
-                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-md transition text-xs font-bold"
+                  className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-slate-900 rounded-md transition text-xs font-bold"
                 >
                   <Trash2 size={16} /> Delete
                 </button>
@@ -827,7 +827,7 @@ export default function ProductTable({
                       Loading reviews...
                     </div>
                   ) : reviewsError ? (
-                    <div className="text-sm text-rose-600 py-2">{reviewsError}</div>
+                    <div className="text-sm text-slate-600 py-2">{reviewsError}</div>
                   ) : reviews.length === 0 ? (
                     <div className="text-sm text-slate-500 py-2">No reviews have been posted for this product yet.</div>
                   ) : (
@@ -846,14 +846,14 @@ export default function ProductTable({
                                     <Star
                                       key={index}
                                       size={12}
-                                      className={index < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}
+                                      className={index < review.rating ? 'fill-amber-400 text-slate-400' : 'text-gray-200'}
                                     />
                                   ))}
                                 </div>
                               </div>
                             </div>
                             {review.isVerifiedPurchase && (
-                              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700">
                                 Verified Purchase
                               </span>
                             )}

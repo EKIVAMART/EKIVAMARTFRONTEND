@@ -894,13 +894,13 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 <span className="text-xs text-slate-600">{selectedVendorIds.length} selected</span>
                 <button
                   onClick={handleBulkApprove}
-                  className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
+                  className="bg-emerald-50 text-slate-700 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
                 >
                   <Check size={14} /> Bulk Approve
                 </button>
                 <button
                   onClick={handleBulkReject}
-                  className="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
+                  className="bg-rose-50 text-slate-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-md text-xs font-bold transition flex items-center gap-1"
                 >
                   <X size={14} /> Bulk Reject
                 </button>
@@ -948,7 +948,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 className={`px-5 py-4 text-xs font-bold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   activeTab === tab.id
                     ? tab.id === 'banned'
-                      ? 'border-red-500 text-red-600 bg-red-50/30 font-black'
+                      ? 'border-red-500 text-slate-600 bg-red-50/30 font-black'
                       : 'border-[#228b22] text-[#228b22] bg-brand-50/20 font-black'
                     : 'border-transparent text-gray-500 hover:text-slate-700 hover:bg-slate-50/50'
                 }`}
@@ -960,7 +960,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 {tab.id === 'approved' && <Award size={13} />}
                 {tab.id === 'rejected' && <X size={13} />}
                 {tab.id === 'suspended' && <Ban size={13} />}
-                {tab.id === 'banned' && <ShieldAlert size={13} className="text-red-500" />}
+                {tab.id === 'banned' && <ShieldAlert size={13} className="text-slate-500" />}
                 {tab.label}
               </button>
             ))}
@@ -976,7 +976,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-              <div className="bg-red-50 p-4 rounded-md border border-red-100 text-red-500 mb-4 ">
+              <div className="bg-red-50 p-4 rounded-md border border-red-100 text-slate-500 mb-4 ">
                 <ShieldAlert size={36} />
               </div>
               <h3 className="text-base font-black text-slate-800">Operational Failure</h3>
@@ -1111,12 +1111,12 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {searchQuery && (
                           <td className="p-4 text-center">
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border ${
-                              vendor.applicationStatus === 'approved' ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                              : vendor.applicationStatus === 'rejected' ? 'bg-rose-100 text-rose-700 border-rose-200'
-                              : vendor.applicationStatus === 'suspended' ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : vendor.applicationStatus === 'banned' ? 'bg-red-100 text-red-700 border-red-200'
+                              vendor.applicationStatus === 'approved' ? 'bg-emerald-100 text-slate-700 border-emerald-200'
+                              : vendor.applicationStatus === 'rejected' ? 'bg-rose-100 text-slate-700 border-rose-200'
+                              : vendor.applicationStatus === 'suspended' ? 'bg-amber-100 text-slate-700 border-amber-200'
+                              : vendor.applicationStatus === 'banned' ? 'bg-red-100 text-slate-700 border-red-200'
                               : vendor.applicationStatus === 'in_review' ? 'bg-brand-100 text-brand-700 border-brand-200'
-                              : vendor.applicationStatus === 'requires_resubmission' ? 'bg-orange-100 text-orange-700 border-orange-200'
+                              : vendor.applicationStatus === 'requires_resubmission' ? 'bg-orange-100 text-slate-700 border-orange-200'
                               : 'bg-slate-100 text-slate-600 border-slate-200'
                             }`}>
                               {(vendor.applicationStatus || 'pending').replace(/_/g, ' ')}
@@ -1127,8 +1127,8 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           <td className="p-4 text-center">
                             <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase border ${
                               (vendor as any).isUrgent
-                                ? 'bg-rose-100 text-rose-700 border-rose-200 '
-                                : 'bg-amber-100 text-amber-700 border-amber-200'
+                                ? 'bg-rose-100 text-slate-700 border-rose-200 '
+                                : 'bg-amber-100 text-slate-700 border-amber-200'
                             }`}>
                               {vendor.daysWaiting !== null && vendor.daysWaiting !== undefined ? `${vendor.daysWaiting} days` : '0 days'}
                             </span>
@@ -1138,7 +1138,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {/* Rejection Reason (At a glance column) */}
                         {activeTab === 'rejected' && (
                           <td className="p-4">
-                            <p className="text-xs font-medium text-rose-600 max-w-xs truncate" title={vendor.rejectionReason || ''}>
+                            <p className="text-xs font-medium text-slate-600 max-w-xs truncate" title={vendor.rejectionReason || ''}>
                               {vendor.rejectionReason || 'No reason provided.'}
                             </p>
                           </td>
@@ -1147,7 +1147,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {/* Suspension Reason (At a glance column) */}
                         {activeTab === 'suspended' && (
                           <td className="p-4">
-                            <p className="text-xs font-medium text-amber-600 max-w-xs truncate" title={vendor.rejectionReason || ''}>
+                            <p className="text-xs font-medium text-slate-600 max-w-xs truncate" title={vendor.rejectionReason || ''}>
                               {vendor.rejectionReason || 'No reason provided.'}
                             </p>
                           </td>
@@ -1156,7 +1156,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {/* Banned Reason column */}
                         {activeTab === 'banned' && (
                           <td className="p-4">
-                            <p className="text-xs font-medium text-red-600 max-w-xs truncate" title={(vendor as any).banReason || vendor.rejectionReason || ''}>
+                            <p className="text-xs font-medium text-slate-600 max-w-xs truncate" title={(vendor as any).banReason || vendor.rejectionReason || ''}>
                               {(vendor as any).banReason || vendor.rejectionReason || 'No reason provided.'}
                             </p>
                           </td>
@@ -1224,7 +1224,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                                 </button>
                                 <button
                                   onClick={() => { setActionVendor(vendor); setActionType('suspend'); setActionReason(''); }}
-                                  className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-md transition"
+                                  className="p-1.5 text-slate-500 hover:bg-amber-50 rounded-md transition"
                                   title="Suspend Seller"
                                 >
                                   <Ban size={15} />
@@ -1236,7 +1236,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                             {activeTab === 'suspended' && (
                               <button
                                 onClick={() => handleReactivateVendor(vendor)}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold transition flex items-center gap-1"
+                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-slate-700 rounded-md text-xs font-bold transition flex items-center gap-1"
                                 title="Reactivate Store"
                               >
                                 <Check size={12} /> Reactivate
@@ -1247,7 +1247,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                             {activeTab === 'banned' && isSuperAdmin && (
                               <button
                                 onClick={() => { setActionVendor(vendor); setActionType('unban'); setActionReason(''); }}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold transition flex items-center gap-1"
+                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-slate-700 rounded-md text-xs font-bold transition flex items-center gap-1"
                                 title="Unban Vendor"
                               >
                                 <Check size={12} /> Unban
@@ -1274,10 +1274,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                             {isSuperAdmin && activeTab !== 'banned' && (
                               <button
                                 onClick={() => { setActionVendor(vendor); setActionType('ban'); setActionReason(''); }}
-                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition"
+                                className="p-1.5 text-slate-500 hover:bg-red-50 rounded-md transition"
                                 title="Ban Permanently"
                               >
-                                <Ban size={14} className="text-red-500" />
+                                <Ban size={14} className="text-slate-500" />
                               </button>
                             )}
                           </div>
@@ -1332,10 +1332,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                       <td className="p-4 text-center">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                           withdrawal.status === 'completed'
-                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                            ? 'bg-emerald-100 text-slate-700 border-emerald-200'
                             : withdrawal.status === 'pending'
-                              ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : 'bg-rose-100 text-rose-700 border-rose-200'
+                              ? 'bg-amber-100 text-slate-700 border-amber-200'
+                              : 'bg-rose-100 text-slate-700 border-rose-200'
                         }`}>
                           {withdrawal.status}
                         </span>
@@ -1424,7 +1424,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           </div>
                         ) : (
                           <div>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 text-amber-700 text-xs font-bold rounded-lg uppercase tracking-wider">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 text-slate-700 text-xs font-bold rounded-lg uppercase tracking-wider">
                               Category Specific Scope
                             </span>
                             <p className="text-xs text-gray-500 mt-1 font-semibold">
@@ -1460,7 +1460,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                               categoryId: comm.categoryId || '',
                               vendorId: comm.vendorId || ''
                             })}
-                            className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-md transition"
+                            className="p-1.5 text-slate-500 hover:bg-blue-50 rounded-md transition"
                             title="Edit Config Rates"
                           >
                             <Settings size={16} />
@@ -1469,7 +1469,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           {(comm.categoryId || comm.vendorId) && (
                             <button
                               onClick={() => handleCommissionDelete(comm.id)}
-                              className="p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition"
+                              className="p-1.5 text-slate-400 hover:bg-red-50 hover:text-slate-900 rounded-md transition"
                               title="Delete Config Rate"
                             >
                               <Trash2 size={16} />
@@ -1499,9 +1499,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         <span className="font-extrabold text-slate-800 text-sm">{rev.vendorStoreName || 'Store Review'}</span>
                         <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">Order #{rev.orderId}</span>
                         {rev.productId && (
-                          <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded">Product: {rev.productId}</span>
+                          <span className="text-[10px] text-slate-600 font-bold bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded">Product: {rev.productId}</span>
                         )}
-                        <span className="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[10px] text-slate-600 font-bold bg-red-50 border border-red-100 px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
                           <AlertCircle size={10} /> Flagged: {rev.flaggedReason}
                         </span>
                         {rev.isHidden && (
@@ -1517,7 +1517,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                       )}
 
                       {/* Stars Rating */}
-                      <div className="flex items-center gap-0.5 text-amber-400">
+                      <div className="flex items-center gap-0.5 text-slate-400">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <span key={i} className={`text-base ${i < rev.rating ? 'opacity-100' : 'opacity-20'}`}>★</span>
                         ))}
@@ -1557,21 +1557,21 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                       {rev.isHidden ? (
                         <button
                           onClick={() => handleReviewModerate(rev.id, 'unhide')}
-                          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md border border-emerald-100 transition flex items-center gap-1"
+                          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-slate-700 text-xs font-bold rounded-md border border-emerald-100 transition flex items-center gap-1"
                         >
                           Unhide Review
                         </button>
                       ) : (
                         <button
                           onClick={() => handleReviewModerate(rev.id, 'hide')}
-                          className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold rounded-md border border-amber-100 transition flex items-center gap-1"
+                          className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-slate-700 text-xs font-bold rounded-md border border-amber-100 transition flex items-center gap-1"
                         >
                           Hide Review
                         </button>
                       )}
                       <button
                         onClick={() => handleReviewModerate(rev.id, 'delete')}
-                        className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-md transition"
+                        className="p-2 text-slate-500 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-md transition"
                         title="Permanently Delete Review"
                       >
                         <Trash2 size={16} />
@@ -1632,9 +1632,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           <td className="p-4">
                             <span className={`inline-flex px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${
                               log.action.includes('APPROVE')
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                                ? 'bg-emerald-50 text-slate-700 border border-emerald-100'
                                 : log.action.includes('REJECT') || log.action.includes('BAN')
-                                  ? 'bg-rose-50 text-rose-700 border border-rose-100'
+                                  ? 'bg-rose-50 text-slate-700 border border-rose-100'
                                   : 'bg-brand-50 text-brand-700 border border-brand-100'
                             }`}>
                               {log.action}
@@ -1875,15 +1875,15 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                               <div className="flex items-center gap-2 mt-2">
                                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${
                                   doc.status === 'verified'
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                    ? 'bg-emerald-50 text-slate-700 border-emerald-100'
                                     : doc.status === 'pending'
-                                      ? 'bg-amber-50 text-amber-700 border-amber-100'
-                                      : 'bg-rose-50 text-rose-700 border-rose-100'
+                                      ? 'bg-amber-50 text-slate-700 border-amber-100'
+                                      : 'bg-rose-50 text-slate-700 border-rose-100'
                                 }`}>
                                   Status: {doc.status}
                                 </span>
                                 {doc.rejectionReason && (
-                                  <span className="text-[10px] text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">
+                                  <span className="text-[10px] text-slate-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">
                                     Reason: {doc.rejectionReason}
                                   </span>
                                 )}
@@ -1920,21 +1920,21 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                               <div className="flex items-center gap-1.5">
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'verified')}
-                                  className="p-2 text-emerald-700 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 rounded-md transition"
+                                  className="p-2 text-slate-700 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 rounded-md transition"
                                   title="Approve / Verify Document"
                                 >
                                   <Check size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'rejected')}
-                                  className="p-2 text-rose-700 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded-md transition"
+                                  className="p-2 text-slate-700 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded-md transition"
                                   title="Reject Document"
                                 >
                                   <X size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDocumentReview(doc.id, 'requires_resubmission')}
-                                  className="p-2 text-amber-700 bg-amber-50 border border-amber-100 hover:bg-amber-100 rounded-md transition"
+                                  className="p-2 text-slate-700 bg-amber-50 border border-amber-100 hover:bg-amber-100 rounded-md transition"
                                   title="Request Resubmission"
                                 >
                                   <RefreshCw size={14} />
@@ -2118,7 +2118,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button
                       onClick={() => { setActionVendor(detailData.profile); setActionType('reject'); }}
-                      className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-md text-xs font-black transition-all"
+                      className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-slate-700 rounded-md text-xs font-black transition-all"
                     >
                       Reject Application
                     </button>
@@ -2128,7 +2128,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   {detailData.profile.applicationStatus === 'in_review' && (
                     <button
                       onClick={() => { setActionVendor(detailData.profile); setActionType('resubmission'); }}
-                      className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 rounded-md text-xs font-black transition-all"
+                      className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-slate-700 rounded-md text-xs font-black transition-all"
                     >
                       Request Corrections
                     </button>
@@ -2348,17 +2348,17 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                     return (
                       <>
                         {globalConfigExists ? (
-                          <div className="p-3 bg-rose-50 border border-rose-100 rounded-md text-xs text-rose-700 font-medium leading-relaxed">
+                          <div className="p-3 bg-rose-50 border border-rose-100 rounded-md text-xs text-slate-700 font-medium leading-relaxed">
                             <strong>⚠ Global config already exists.</strong> You must specify a <em>Category</em> or <em>Vendor</em> scope for this new configuration — another global config cannot be created.
                           </div>
                         ) : (
-                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-md text-xs text-emerald-700 font-medium leading-relaxed">
+                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-md text-xs text-slate-700 font-medium leading-relaxed">
                             <strong>No global config yet.</strong> Leave both fields blank to create the <em>Global</em> platform default, or select a scope to limit this config to a specific category or vendor.
                           </div>
                         )}
                         <div className="space-y-1">
                           <label className="text-[10px] font-bold text-slate-400 uppercase">
-                            Category Scope {scopeRequired ? <span className="text-red-500">*</span> : '(Optional)'}
+                            Category Scope {scopeRequired ? <span className="text-slate-500">*</span> : '(Optional)'}
                           </label>
                           <select
                             value={commissionModal.categoryId}
@@ -2376,7 +2376,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         </div>
                         <div className="space-y-1">
                           <label className="text-[10px] font-bold text-slate-400 uppercase">
-                            Vendor Scope {scopeRequired ? <span className="text-red-500">*</span> : '(Optional)'}
+                            Vendor Scope {scopeRequired ? <span className="text-slate-500">*</span> : '(Optional)'}
                           </label>
                           <select
                             value={commissionModal.vendorId}
@@ -2393,7 +2393,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           </select>
                         </div>
                         {scopeRequired && !commissionModal.categoryId && !commissionModal.vendorId && (
-                          <p className="text-[10px] text-red-500 font-semibold">
+                          <p className="text-[10px] text-slate-500 font-semibold">
                             At least one scope (category or vendor) is required when a global config already exists.
                           </p>
                         )}
@@ -2634,7 +2634,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
             >
               <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                  <AlertTriangle className="text-amber-500" size={18} /> Bulk Action Summary (Skipped Warnings)
+                  <AlertTriangle className="text-slate-500" size={18} /> Bulk Action Summary (Skipped Warnings)
                 </h3>
                 <button
                   onClick={() => setSkippedModal(null)}
@@ -2646,9 +2646,9 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
               <div className="p-6 space-y-4 max-h-[350px] overflow-y-auto">
                 <p className="text-xs text-gray-500 font-semibold leading-relaxed">
                   Bulk {skippedModal.action === 'approved' ? 'approval' : 'rejection'} completed.
-                  {skippedModal.approved !== undefined && <span className="block mt-1 text-emerald-600 font-bold">Successfully Approved: {skippedModal.approved}</span>}
-                  {skippedModal.rejected !== undefined && <span className="block mt-1 text-emerald-600 font-bold">Successfully Rejected: {skippedModal.rejected}</span>}
-                  <span className="block text-rose-600 font-bold">Skipped/Failed: {skippedModal.skipped}</span>
+                  {skippedModal.approved !== undefined && <span className="block mt-1 text-slate-600 font-bold">Successfully Approved: {skippedModal.approved}</span>}
+                  {skippedModal.rejected !== undefined && <span className="block mt-1 text-slate-600 font-bold">Successfully Rejected: {skippedModal.rejected}</span>}
+                  <span className="block text-slate-600 font-bold">Skipped/Failed: {skippedModal.skipped}</span>
                 </p>
                 <div className="space-y-2.5">
                   <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ineligible Vendor Details:</h4>
@@ -2657,7 +2657,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                     return (
                       <div key={idx} className="p-3 bg-rose-50 border border-rose-100 rounded-md space-y-1">
                         <p className="text-xs font-bold text-slate-700">{name}</p>
-                        <p className="text-[11px] font-semibold text-rose-600 leading-relaxed">{detail.reason}</p>
+                        <p className="text-[11px] font-semibold text-slate-600 leading-relaxed">{detail.reason}</p>
                       </div>
                     );
                   })}

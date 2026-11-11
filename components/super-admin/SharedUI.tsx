@@ -11,7 +11,7 @@ export const SidebarLink = ({ icon, label, active, onClick }: { icon: React.Reac
 export const AdminInput = ({ label, type = "text", defaultValue, placeholder }: any) => (
   <div className="space-y-1">
     <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
-      {label} <HelpCircle size={12} className="text-[#00A8B5]" />
+      {label} <HelpCircle size={12} className="text-slate-600" />
     </label>
     <input
       type={type}

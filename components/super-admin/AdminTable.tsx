@@ -48,12 +48,12 @@ interface AdminTableProps {
 const statusStyles = {
   pending: {
     label: 'Pending Invite',
-    className: 'bg-amber-100 text-amber-600 border-amber-200',
+    className: 'bg-amber-100 text-slate-600 border-amber-200',
     icon: Clock
   },
   active: {
     label: 'Active',
-    className: 'bg-emerald-100 text-emerald-600 border-emerald-200',
+    className: 'bg-emerald-100 text-slate-600 border-emerald-200',
     icon: CheckCircle
   },
   deactivated: {
@@ -63,7 +63,7 @@ const statusStyles = {
   },
   blocked: {
     label: 'Blocked',
-    className: 'bg-red-100 text-red-600 border-red-200',
+    className: 'bg-red-100 text-slate-600 border-red-200',
     icon: Ban
   },
   deleted: {

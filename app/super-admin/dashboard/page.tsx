@@ -1820,7 +1820,7 @@ function AdminPageContent() {
         <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-md border border-red-100">
-              <svg className="w-12 h-12 text-red-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-12 h-12 text-slate-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
@@ -1947,7 +1947,7 @@ function AdminPageContent() {
             </div>
 
             {usersLoadError && (
-              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 mb-4">
+              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-slate-700 mb-4">
                 {usersLoadError}
               </div>
             )}
@@ -2115,7 +2115,7 @@ function AdminPageContent() {
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
                   <div className={`rounded-md border px-4 py-3 text-sm font-medium ${productLoadError
-                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    ? 'border-amber-200 bg-amber-50 text-slate-700'
                     : 'border-gray-200 bg-white text-gray-500'
                     }`}>
                     {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
@@ -2149,7 +2149,7 @@ function AdminPageContent() {
             {activeTab === 'orders' && (
               <div className="space-y-4">
                 {ordersLoadError && (
-                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-slate-700">
                     {ordersLoadError}
                   </div>
                 )}

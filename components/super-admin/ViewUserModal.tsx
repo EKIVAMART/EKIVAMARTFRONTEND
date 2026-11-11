@@ -154,18 +154,18 @@ export default function ViewUserModal({
                 <div className="bg-gray-50/50 rounded-md p-2">
                   <DetailRow icon={ShieldCheck} label="Email Verification" value={
                     user.isEmailVerified ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <CheckCircle2 size={13} /> Verified
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-amber-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <XCircle size={13} /> Not Verified
                       </span>
                     )
                   } />
                   <DetailRow icon={Lock} label="Two-Factor Auth" value={
                     user.isTwoFactorEnabled ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <CheckCircle2 size={13} /> Enabled
                       </span>
                     ) : (
@@ -195,7 +195,7 @@ export default function ViewUserModal({
                 {userStatus === 'active' && onBlock && (
                   <button
                     onClick={() => { onBlock(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-600 rounded-md text-sm font-bold transition"
                   >
                     <Ban size={15} /> Block User
                   </button>
@@ -203,7 +203,7 @@ export default function ViewUserModal({
                 {userStatus === 'blocked' && onUnblock && (
                   <button
                     onClick={() => { onUnblock(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-slate-600 rounded-md text-sm font-bold transition"
                   >
                     <CheckCircle2 size={15} /> Unblock User
                   </button>
@@ -211,7 +211,7 @@ export default function ViewUserModal({
                 {onDelete && (
                   <button
                     onClick={() => { onDelete(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-500 rounded-md text-sm font-bold transition"
                   >
                     <XCircle size={15} /> Delete Account
                   </button>

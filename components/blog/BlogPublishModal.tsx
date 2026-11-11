@@ -103,7 +103,7 @@ export default function BlogPublishModal({
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-md bg-emerald-50 text-slate-600 flex items-center justify-center font-bold">
                 <Send size={20} />
               </div>
               <div>
@@ -124,11 +124,11 @@ export default function BlogPublishModal({
           </div>
 
           {/* Banner */}
-          <div className="bg-emerald-50/60 border border-emerald-100 rounded-md p-4 flex items-start gap-3 text-emerald-950">
-            <Sparkles size={18} className="text-emerald-600 shrink-0 mt-0.5" />
+          <div className="bg-emerald-50/60 border border-emerald-100 rounded-md p-4 flex items-start gap-3 text-slate-950">
+            <Sparkles size={18} className="text-slate-600 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed">
               <p className="font-extrabold">Ready to go live?</p>
-              <p className="text-emerald-700 font-medium">
+              <p className="text-slate-700 font-medium">
                 Publishing makes this story immediately visible to all visitors on the public EkivaMart website.
               </p>
             </div>

@@ -110,7 +110,7 @@ export default function SuperAdminLoginPage() {
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-medium">
+          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-slate-600 text-sm font-medium">
             <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
             {error}
           </div>

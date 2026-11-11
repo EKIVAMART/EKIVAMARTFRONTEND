@@ -53,7 +53,7 @@ export function NotificationItem({
       case 'ORDER_CONFIRMED':
       case 'NEW_ORDER_FOR_VENDOR':
         return {
-          icon: <Package className="w-4 h-4 text-emerald-600" />,
+          icon: <Package className="w-4 h-4 text-slate-600" />,
           bg: 'bg-emerald-50 border-emerald-100',
           dot: 'bg-emerald-500',
         };
@@ -61,14 +61,14 @@ export function NotificationItem({
       case 'ORDER_PROCESSING':
       case 'ORDER_SHIPPED':
         return {
-          icon: <Truck className="w-4 h-4 text-sky-600" />,
+          icon: <Truck className="w-4 h-4 text-slate-600" />,
           bg: 'bg-sky-50 border-sky-100',
           dot: 'bg-sky-500',
         };
 
       case 'ORDER_DELIVERED':
         return {
-          icon: <CheckCircle2 className="w-4 h-4 text-teal-600" />,
+          icon: <CheckCircle2 className="w-4 h-4 text-slate-600" />,
           bg: 'bg-teal-50 border-teal-100',
           dot: 'bg-teal-500',
         };
@@ -76,7 +76,7 @@ export function NotificationItem({
       case 'PAYMENT_SUCCESS':
       case 'PAYOUT_PROCESSED':
         return {
-          icon: <CreditCard className="w-4 h-4 text-indigo-600" />,
+          icon: <CreditCard className="w-4 h-4 text-slate-600" />,
           bg: 'bg-indigo-50 border-indigo-100',
           dot: 'bg-indigo-500',
         };
@@ -85,7 +85,7 @@ export function NotificationItem({
       case 'PAYOUT_FAILED':
       case 'ORDER_CANCELLED':
         return {
-          icon: <AlertTriangle className="w-4 h-4 text-rose-600" />,
+          icon: <AlertTriangle className="w-4 h-4 text-slate-600" />,
           bg: 'bg-rose-50 border-rose-100',
           dot: 'bg-rose-500',
         };
@@ -96,14 +96,14 @@ export function NotificationItem({
       case 'REFUND_PROCESSED':
       case 'REFUND_NEEDS_REVIEW':
         return {
-          icon: <RotateCcw className="w-4 h-4 text-amber-600" />,
+          icon: <RotateCcw className="w-4 h-4 text-slate-600" />,
           bg: 'bg-amber-50 border-amber-100',
           dot: 'bg-amber-500',
         };
 
       case 'REVIEW_RECEIVED':
         return {
-          icon: <Star className="w-4 h-4 text-amber-500" />,
+          icon: <Star className="w-4 h-4 text-slate-500" />,
           bg: 'bg-amber-50 border-amber-100',
           dot: 'bg-amber-500',
         };
@@ -112,7 +112,7 @@ export function NotificationItem({
       case 'VENDOR_APPLICATION_APPROVED':
       case 'VENDOR_APPLICATION_REJECTED':
         return {
-          icon: <UserCheck className="w-4 h-4 text-purple-600" />,
+          icon: <UserCheck className="w-4 h-4 text-slate-600" />,
           bg: 'bg-purple-50 border-purple-100',
           dot: 'bg-purple-500',
         };
@@ -120,7 +120,7 @@ export function NotificationItem({
       case 'REVIEW_FLAGGED':
       case 'VENDOR_ACCOUNT_SUSPENDED':
         return {
-          icon: <ShieldAlert className="w-4 h-4 text-rose-600" />,
+          icon: <ShieldAlert className="w-4 h-4 text-slate-600" />,
           bg: 'bg-rose-50 border-rose-100',
           dot: 'bg-rose-500',
         };

@@ -34,13 +34,13 @@ export default function BlogViewModal({
     switch (status) {
       case 'published':
         return (
-          <span className="px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-700 uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-slate-700 uppercase tracking-wider">
             Published
           </span>
         );
       case 'draft':
         return (
-          <span className="px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-700 uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-slate-700 uppercase tracking-wider">
             Draft
           </span>
         );
@@ -145,7 +145,7 @@ export default function BlogViewModal({
               {post.publishedAt && (
                 <>
                   <div className="w-1 h-1 rounded-full bg-neutral-300" />
-                  <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                  <div className="flex items-center gap-1.5 text-slate-700 font-bold">
                     <span>
                       Published:{' '}
                       {new Date(post.publishedAt).toLocaleDateString()}
@@ -173,12 +173,12 @@ export default function BlogViewModal({
             {/* SEO Info Box */}
             {(post.seoTitle || post.seoDescription) && (
               <div className="p-4 rounded-md bg-slate-900 text-white space-y-2 mt-8">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                   <Globe size={14} />
                   <span>Google Search Result Snippet Preview</span>
                 </div>
                 {post.seoTitle && (
-                  <h4 className="text-sm font-bold text-sky-400 hover:underline cursor-pointer">
+                  <h4 className="text-sm font-bold text-slate-400 hover:underline cursor-pointer">
                     {decodeHtmlEntities(post.seoTitle)}
                   </h4>
                 )}

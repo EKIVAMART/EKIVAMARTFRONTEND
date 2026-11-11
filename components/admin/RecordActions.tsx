@@ -28,7 +28,7 @@ export default function RecordActions({ name, actions }: {
               <button
                 type="button"
                 onClick={action.onSelect}
-                className={`block w-full rounded-sm px-3 py-2 text-left text-sm data-focus:bg-slate-100 ${action.destructive ? 'text-red-700' : 'text-slate-700'}`}
+                className={`block w-full rounded-sm px-3 py-2 text-left text-sm data-focus:bg-slate-100 ${action.destructive ? 'text-slate-700' : 'text-slate-700'}`}
               >
                 {action.label}
               </button>

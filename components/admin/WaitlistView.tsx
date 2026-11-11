@@ -836,7 +836,7 @@ export default function WaitlistView() {
 
               {/* Date Input */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 block">Launch Date (Future Only) <span className="text-red-500">*</span></label>
+                <label className="text-sm font-bold text-slate-700 block">Launch Date (Future Only) <span className="text-slate-500">*</span></label>
                 <input
                   type="datetime-local"
                   required
@@ -851,7 +851,7 @@ export default function WaitlistView() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-bold text-slate-700">Display Title</label>
-                  <span className={`text-xs font-semibold ${launchForm.title.length > 255 ? 'text-red-500' : 'text-slate-400'}`}>
+                  <span className={`text-xs font-semibold ${launchForm.title.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                     {launchForm.title.length}/255
                   </span>
                 </div>
@@ -869,7 +869,7 @@ export default function WaitlistView() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-bold text-slate-700">Display Subtitle</label>
-                  <span className={`text-xs font-semibold ${launchForm.subtitle.length > 500 ? 'text-red-500' : 'text-slate-400'}`}>
+                  <span className={`text-xs font-semibold ${launchForm.subtitle.length > 500 ? 'text-slate-500' : 'text-slate-400'}`}>
                     {launchForm.subtitle.length}/500
                   </span>
                 </div>
@@ -907,9 +907,9 @@ export default function WaitlistView() {
                 <div className="space-y-1.5 animate-in slide-in-from-top-3 duration-250">
                   <div className="flex justify-between items-center">
                     <label className="text-sm font-bold text-slate-700 block">
-                      Broadcast Reason <span className="text-red-500">*</span>
+                      Broadcast Reason <span className="text-slate-500">*</span>
                     </label>
-                    <span className={`text-xs font-semibold ${launchForm.broadcastReason.length > 1000 ? 'text-red-500' : 'text-slate-400'}`}>
+                    <span className={`text-xs font-semibold ${launchForm.broadcastReason.length > 1000 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {launchForm.broadcastReason.length}/1000
                     </span>
                   </div>
@@ -997,7 +997,7 @@ export default function WaitlistView() {
                 {/* Recipient Audience Selector */}
                 <div className="space-y-2">
                   <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
-                    Target Audience Group <span className="text-rose-500">*</span>
+                    Target Audience Group <span className="text-slate-500">*</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     <button
@@ -1040,9 +1040,9 @@ export default function WaitlistView() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                      Subject Line <span className="text-rose-500">*</span>
+                      Subject Line <span className="text-slate-500">*</span>
                     </label>
-                    <span className={`text-[11px] font-semibold ${broadcastForm.subject.length > 255 ? 'text-rose-500' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] font-semibold ${broadcastForm.subject.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {broadcastForm.subject.length}/255
                     </span>
                   </div>
@@ -1062,7 +1062,7 @@ export default function WaitlistView() {
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                       Preview Text (Inbox Snippet)
                     </label>
-                    <span className={`text-[11px] font-semibold ${broadcastForm.previewText.length > 255 ? 'text-rose-500' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] font-semibold ${broadcastForm.previewText.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {broadcastForm.previewText.length}/255
                     </span>
                   </div>
@@ -1118,7 +1118,7 @@ export default function WaitlistView() {
                   </div>
 
                   {uploadError && (
-                    <p className="text-xs text-rose-500 font-bold flex items-center gap-1 mt-1">
+                    <p className="text-xs text-slate-500 font-bold flex items-center gap-1 mt-1">
                       <AlertCircle size={14} /> {uploadError}
                     </p>
                   )}
@@ -1151,12 +1151,12 @@ export default function WaitlistView() {
                                     onClick={() => handleSetAsHeroBanner(img.imageUrl)}
                                     className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition flex items-center gap-1 ${
                                       isHero
-                                        ? 'bg-amber-100 text-amber-700 border-amber-300'
+                                        ? 'bg-amber-100 text-slate-700 border-amber-300'
                                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
                                     }`}
                                     title="Set as hero banner image at top of email"
                                   >
-                                    <Star size={10} className={isHero ? 'fill-amber-500 text-amber-500' : ''} />
+                                    <Star size={10} className={isHero ? 'fill-amber-500 text-slate-500' : ''} />
                                     {isHero ? 'Hero Banner' : 'Set Hero'}
                                   </button>
                                   <button
@@ -1172,7 +1172,7 @@ export default function WaitlistView() {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveImage(img.imageUrl)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-rose-50 rounded-lg transition"
                                 title="Remove image"
                               >
                                 <Trash2 size={14} />
@@ -1189,7 +1189,7 @@ export default function WaitlistView() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
-                      Email Body (HTML) <span className="text-rose-500">*</span>
+                      Email Body (HTML) <span className="text-slate-500">*</span>
                     </label>
                     <button
                       type="button"
@@ -1396,7 +1396,7 @@ export default function WaitlistView() {
             <h4 className="text-lg font-black text-slate-800 mb-2">Save Launch Configuration?</h4>
             <p className="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
               {launchForm.sendBroadcast ? (
-                <span className="text-amber-600 font-bold">
+                <span className="text-slate-600 font-bold">
                   Warning: Toggling ON Notify Members will send an email broadcast explaining this launch update to all {stats.active} active members. Are you sure you want to proceed?
                 </span>
               ) : (
@@ -1432,12 +1432,12 @@ export default function WaitlistView() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsBroadcastConfirmOpen(false)} />
           <div className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 rounded-md bg-rose-100 text-slate-600 flex items-center justify-center mx-auto mb-4">
               <Send size={20} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Send Broadcast Email?</h4>
             <p className="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
-              You are about to send a broadcast email to <span className="text-rose-600 font-black">{broadcastRecipientCount} active subscribers</span> filtered by role: <span className="text-slate-800 font-black font-mono capitalize">{broadcastForm.targetRole}</span>.
+              You are about to send a broadcast email to <span className="text-slate-600 font-black">{broadcastRecipientCount} active subscribers</span> filtered by role: <span className="text-slate-800 font-black font-mono capitalize">{broadcastForm.targetRole}</span>.
               <br />
               This endpoint processes recipients in batches of 50. This action is irreversible.
             </p>

@@ -120,7 +120,7 @@ export default function InviteAdminModal({
                     />
                   </div>
                   {errors.firstName && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                       <AlertCircle size={12} /> {errors.firstName}
                     </p>
                   )}
@@ -147,7 +147,7 @@ export default function InviteAdminModal({
                     />
                   </div>
                   {errors.lastName && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                       <AlertCircle size={12} /> {errors.lastName}
                     </p>
                   )}
@@ -175,7 +175,7 @@ export default function InviteAdminModal({
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                     <AlertCircle size={12} /> {errors.email}
                   </p>
                 )}
@@ -202,7 +202,7 @@ export default function InviteAdminModal({
                   />
                 </div>
                 {errors.phone && (
-                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                     <AlertCircle size={12} /> {errors.phone}
                   </p>
                 )}

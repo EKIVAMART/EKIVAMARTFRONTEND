@@ -126,7 +126,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                 {/* Vendor Name & Email */}
                 <td className="p-4">
                   <div className="flex flex-col">
-                    <span className="font-bold text-slate-800 text-sm group-hover:text-[#00A8B5] transition-colors cursor-pointer flex items-center gap-1">
+                    <span className="font-bold text-slate-800 text-sm group-hover:text-slate-600 transition-colors cursor-pointer flex items-center gap-1">
                       {vendor.name} <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                     </span>
                     <div className="flex items-center gap-1 text-[11px] text-gray-400 font-medium mt-0.5">
@@ -150,7 +150,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                       px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter
                       ${vendor.status === 'Active'
                         ? 'bg-brand-100 text-brand-600 border border-brand-200'
-                        : 'bg-amber-100 text-amber-600 border border-amber-200'
+                        : 'bg-amber-100 text-slate-600 border border-amber-200'
                       }
                     `}
                   >
@@ -163,14 +163,14 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => onEdit(vendor)}
-                      className="p-2 text-blue-500 hover:bg-blue-50 rounded-md transition-all active:scale-90"
+                      className="p-2 text-slate-500 hover:bg-blue-50 rounded-md transition-all active:scale-90"
                       title="Edit Vendor"
                     >
                       <Edit3 size={18} />
                     </button>
                     <button
                       onClick={() => onDelete(vendor.id)}
-                      className="p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-all active:scale-90"
+                      className="p-2 text-slate-400 hover:bg-red-50 hover:text-slate-900 rounded-md transition-all active:scale-90"
                       title="Delete Vendor"
                     >
                       <Trash2 size={18} />
@@ -206,7 +206,7 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                   px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter shrink-0
                   ${vendor.status === 'Active'
                     ? 'bg-brand-100 text-brand-600 border border-brand-200'
-                    : 'bg-amber-100 text-amber-600 border border-amber-200'
+                    : 'bg-amber-100 text-slate-600 border border-amber-200'
                   }
                 `}
               >
@@ -218,8 +218,8 @@ export default function VendorTable({ data, onEdit, onDelete, searchQuery = '' }
                 {vendor.type}
               </span>
               <div className="flex gap-2">
-                <button onClick={() => onEdit(vendor)} className="p-1.5 hover:bg-blue-50 text-blue-500 rounded-lg transition"><Edit3 size={16}/></button>
-                <button onClick={() => onDelete(vendor.id)} className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition"><Trash2 size={16}/></button>
+                <button onClick={() => onEdit(vendor)} className="p-1.5 hover:bg-blue-50 text-slate-500 rounded-lg transition"><Edit3 size={16}/></button>
+                <button onClick={() => onDelete(vendor.id)} className="p-1.5 hover:bg-red-50 text-slate-500 rounded-lg transition"><Trash2 size={16}/></button>
               </div>
             </div>
           </div>

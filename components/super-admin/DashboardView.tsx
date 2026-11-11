@@ -384,7 +384,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               <RefreshCw className="animate-spin" size={16} /> Loading time-series graph…
             </div>
           ) : errorGraph ? (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+            <div className="p-4 bg-rose-50 border border-rose-200 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
               <span>{errorGraph}</span>
               <button onClick={() => fetchEarningsGraph()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
             </div>
@@ -408,7 +408,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                         <span className="font-bold border-b border-slate-700 pb-1">{formatDateString(point.date)}</span>
                         <span>Gross: {fmtNGN(point.grossRevenue)}</span>
                         <span className="text-brand-300">Commission: {fmtNGN(point.platformCommission)}</span>
-                        <span className="text-emerald-300">Vendor Net: {fmtNGN(point.vendorNetEarnings)}</span>
+                        <span className="text-slate-300">Vendor Net: {fmtNGN(point.vendorNetEarnings)}</span>
                       </div>
 
                       <div className="w-full flex items-end justify-center gap-1 h-44">
@@ -471,7 +471,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <RefreshCw className="animate-spin" size={16} /> Loading order status...
               </div>
             ) : errorOrdersBar ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+              <div className="p-3 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
                 <span>{errorOrdersBar}</span>
                 <button onClick={() => fetchOrdersBarChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
               </div>
@@ -493,7 +493,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   {/* Delivered */}
                   <div>
                     <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-emerald-700 flex items-center gap-1">
+                      <span className="text-slate-700 flex items-center gap-1">
                         <CheckCircle2 size={13} /> Delivered
                       </span>
                       <span className="text-slate-600">
@@ -512,7 +512,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   {/* Processing */}
                   <div>
                     <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-blue-700 flex items-center gap-1">
+                      <span className="text-slate-700 flex items-center gap-1">
                         <Clock size={13} /> Processing & In-Transit
                       </span>
                       <span className="text-slate-600">
@@ -531,7 +531,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   {/* Ordered */}
                   <div>
                     <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-amber-700 flex items-center gap-1">
+                      <span className="text-slate-700 flex items-center gap-1">
                         <ShoppingBag size={13} /> Pending Payment / Confirmed
                       </span>
                       <span className="text-slate-600">
@@ -587,7 +587,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <RefreshCw className="animate-spin" size={16} /> Loading top products...
               </div>
             ) : errorPieChart ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+              <div className="p-3 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
                 <span>{errorPieChart}</span>
                 <button onClick={() => fetchPieChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
               </div>
@@ -673,7 +673,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <RefreshCw className="animate-spin" size={16} /> Loading activity feed...
               </div>
             ) : errorActivities ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+              <div className="p-3 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
                 <span>{errorActivities}</span>
                 <button onClick={() => fetchRecentActivities()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
               </div>
@@ -734,9 +734,9 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                           </td>
                           <td className="p-2.5 text-center">
                             <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
-                              po.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                              po.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                              'bg-rose-50 text-rose-700 border-rose-200'
+                              po.status === 'completed' ? 'bg-emerald-50 text-slate-700 border-emerald-200' :
+                              po.status === 'pending' ? 'bg-amber-50 text-slate-700 border-amber-200' :
+                              'bg-rose-50 text-slate-700 border-rose-200'
                             }`}>
                               {po.status}
                             </span>
@@ -773,7 +773,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                           </td>
                           <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(ord.totalAmount)}</td>
                           <td className="p-2.5 text-center">
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-50 text-slate-700 border border-blue-200">
                               {ord.status}
                             </span>
                           </td>
@@ -837,7 +837,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
             <p className="text-xs font-bold text-slate-400">Loading vendor lifetime earnings...</p>
           </div>
         ) : errorVendorEarnings ? (
-          <div className="p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+          <div className="p-4 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
             <span>{errorVendorEarnings}</span>
             <button onClick={() => fetchVendorEarnings()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
           </div>
@@ -867,12 +867,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                     <td className="px-4 py-3.5 text-right font-medium text-slate-600">
                       {row.commissionRate}% / {row.processingFeeRate}%
                     </td>
-                    <td className="px-4 py-3.5 text-right text-amber-600 font-bold">{fmtNGN(row.pendingEscrow)}</td>
-                    <td className="px-4 py-3.5 text-right text-emerald-700 font-bold">{fmtNGN(row.availableBalance)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-600 font-bold">{fmtNGN(row.pendingEscrow)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-700 font-bold">{fmtNGN(row.availableBalance)}</td>
                     <td className="px-4 py-3.5 text-right text-brand-900 font-black text-sm">{fmtNGN(row.lifetimeEarnings)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-700 font-semibold">{fmtNGN(row.totalWithdrawn)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-800 font-extrabold">{fmtNGN(row.totalGmvGenerated)}</td>
-                    <td className="px-4 py-3.5 text-right text-rose-600 font-bold">{fmtNGN(row.platformCommissionGenerated)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-600 font-bold">{fmtNGN(row.platformCommissionGenerated)}</td>
                     <td className="px-4 py-3.5 text-slate-600 font-medium">
                       {row.bankAccount ? (
                         <span>{row.bankAccount.bankName} ••••{(row.bankAccount.accountNumber || '').slice(-4)}</span>

@@ -218,7 +218,7 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
             {/* Footer */}
             <div className="px-8 py-6 border-t bg-gray-50 flex justify-between items-center relative z-10">
 
-              <div className="text-red-500 text-xs font-bold w-1/2">
+              <div className="text-slate-500 text-xs font-bold w-1/2">
                 {imagePreviews.length > 0 && alts.some(alt => !alt.trim()) && (
                   <p>Please provide alt text for all images to continue.</p>
                 )}

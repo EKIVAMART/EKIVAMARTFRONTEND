@@ -109,7 +109,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
     const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === query.toLowerCase() ? (
-        <mark key={i} className="bg-amber-200 text-amber-950 rounded px-0.5 font-extrabold">
+        <mark key={i} className="bg-amber-200 text-slate-950 rounded px-0.5 font-extrabold">
           {part}
         </mark>
       ) : (
@@ -429,7 +429,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
             Loading articles...
           </div>
         ) : error ? (
-          <div className="py-20 text-center text-xs font-semibold text-rose-600">
+          <div className="py-20 text-center text-xs font-semibold text-slate-600">
             {error}
           </div>
         ) : posts.length > 0 ? (
@@ -510,7 +510,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                           <p className="text-slate-800 font-bold">
                             {new Date(post.publishedAt).toLocaleDateString()}
                           </p>
-                          <p className="text-[10px] text-emerald-600">Published</p>
+                          <p className="text-[10px] text-slate-600">Published</p>
                         </div>
                       ) : (
                         <div>
@@ -553,7 +553,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         ) : (
                           <button
                             onClick={() => handleOpenPublish(post)}
-                            className="p-2 rounded-md text-emerald-600 hover:bg-emerald-50 transition cursor-pointer"
+                            className="p-2 rounded-md text-slate-600 hover:bg-emerald-50 transition cursor-pointer"
                             title="Publish article"
                           >
                             <Send size={16} />
@@ -563,7 +563,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                         {/* Delete */}
                         <button
                           onClick={() => setPostToDelete(post)}
-                          className="p-2 rounded-md text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                          className="p-2 rounded-md text-slate-600 hover:bg-rose-50 transition cursor-pointer"
                           title="Delete article"
                         >
                           <Trash2 size={16} />
@@ -646,7 +646,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
       {postToDelete && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
+            <div className="w-14 h-14 rounded-md bg-rose-50 text-slate-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
               <Trash2 size={28} />
             </div>
             <div>

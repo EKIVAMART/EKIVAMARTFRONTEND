@@ -237,7 +237,7 @@ export default function TaxRulesView() {
                         onClick={() => handleToggleActive(rule)}
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition ${
                           rule.isActive
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                            ? 'bg-emerald-50 text-slate-700 border border-emerald-200 hover:bg-emerald-100'
                             : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                         }`}
                       >
@@ -258,7 +258,7 @@ export default function TaxRulesView() {
                       </button>
                       <button
                         onClick={() => handleDelete(rule.id)}
-                        className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                        className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-rose-50 rounded-lg transition"
                         title="Delete rule"
                       >
                         <Trash2 size={15} />

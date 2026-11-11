@@ -223,8 +223,8 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
     secondsLeft > 10
       ? 'text-[#228b22]'
       : secondsLeft > 5
-      ? 'text-amber-600'
-      : 'text-rose-600';
+      ? 'text-slate-600'
+      : 'text-slate-600';
 
   const pulseClass = secondsLeft <= 5 ? '' : '';
 
@@ -251,9 +251,9 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
             <div className="px-8 pt-8 pb-0 flex flex-col items-center text-center gap-3">
               <div className={`w-16 h-16 rounded-md flex items-center justify-center ${
                 secondsLeft <= 5
-                  ? 'bg-rose-50 text-rose-600 border border-rose-100'
+                  ? 'bg-rose-50 text-slate-600 border border-rose-100'
                   : secondsLeft <= 10
-                  ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                  ? 'bg-amber-50 text-slate-600 border border-amber-100'
                   : 'bg-brand-50 text-[#228b22] border border-brand-100'
               } ${pulseClass}`}>
                 <ShieldAlert size={32} strokeWidth={1.75} />
@@ -317,7 +317,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
                 type="button"
                 onClick={performLogout}
                 disabled={isExtending || isLoggingOut}
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 rounded-md font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-slate-700 rounded-md font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoggingOut ? (
                   <>

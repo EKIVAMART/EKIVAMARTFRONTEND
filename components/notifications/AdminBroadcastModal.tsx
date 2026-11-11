@@ -140,7 +140,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
           <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
             {resultMsg ? (
               <div className="py-8 text-center space-y-3">
-                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-md flex items-center justify-center mx-auto border border-emerald-100">
+                <div className="w-14 h-14 bg-emerald-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-emerald-100">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="font-extrabold text-lg text-neutral-900">Broadcast Dispatched</h4>
@@ -180,7 +180,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     </label>
                     <span
                       className={`text-[11px] font-bold ${
-                        title.length > 200 ? 'text-rose-600' : 'text-neutral-400'
+                        title.length > 200 ? 'text-slate-600' : 'text-neutral-400'
                       }`}
                     >
                       {title.length} / 200
@@ -194,7 +194,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     className="w-full bg-neutral-50 border border-neutral-200 rounded-md px-4 py-3 text-xs font-bold text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600"
                   />
                   {title.length > 0 && title.trim().length < 3 && (
-                    <p className="text-[11px] text-rose-500 font-semibold mt-1">
+                    <p className="text-[11px] text-slate-500 font-semibold mt-1">
                       Title must be at least 3 characters.
                     </p>
                   )}
@@ -208,7 +208,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     </label>
                     <span
                       className={`text-[11px] font-bold ${
-                        message.length > 1000 ? 'text-rose-600' : 'text-neutral-400'
+                        message.length > 1000 ? 'text-slate-600' : 'text-neutral-400'
                       }`}
                     >
                       {message.length} / 1000
@@ -222,7 +222,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                     className="w-full bg-neutral-50 border border-neutral-200 rounded-md p-4 text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-600 resize-none"
                   />
                   {message.length > 0 && message.trim().length < 10 && (
-                    <p className="text-[11px] text-rose-500 font-semibold mt-1">
+                    <p className="text-[11px] text-slate-500 font-semibold mt-1">
                       Message must be at least 10 characters.
                     </p>
                   )}
@@ -307,7 +307,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
             ) : (
               /* Step 2: Plain English Confirmation Step */
               <div className="py-2 space-y-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-md flex items-center justify-center mx-auto border border-amber-100">
+                <div className="w-12 h-12 bg-amber-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-amber-100">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
 

@@ -318,7 +318,7 @@ export default function TaxRulesManagement() {
                             </button>
                             <button type="button"
                               onClick={() => handleDeleteRule(rule.id)}
-                              className="p-1.5 text-slate-500 hover:text-rose-700"
+                              className="p-1.5 text-slate-500 hover:text-slate-900"
                               aria-label={`Delete tax rule for ${rule.country}`}
                             >
                               <Trash2 size={14} />

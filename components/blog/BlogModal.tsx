@@ -210,7 +210,7 @@ export default function BlogModal({
             {/* Title */}
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                Article Title <span className="text-rose-500">*</span>
+                Article Title <span className="text-slate-500">*</span>
               </label>
               <input
                 type="text"
@@ -320,7 +320,7 @@ export default function BlogModal({
             {/* Content Medium Editor */}
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                Article Body Content <span className="text-rose-500">*</span>
+                Article Body Content <span className="text-slate-500">*</span>
               </label>
               <MediumEditor
                 value={content}

@@ -9,10 +9,10 @@ interface ViewAdminModalProps {
 }
 
 const statusConfig = {
-  pending: { label: 'Pending Invite', color: 'text-amber-600', bg: 'bg-amber-50', icon: Clock },
-  active: { label: 'Active', color: 'text-emerald-600', bg: 'bg-emerald-50', icon: CheckCircle },
+  pending: { label: 'Pending Invite', color: 'text-slate-600', bg: 'bg-amber-50', icon: Clock },
+  active: { label: 'Active', color: 'text-slate-600', bg: 'bg-emerald-50', icon: CheckCircle },
   deactivated: { label: 'Deactivated', color: 'text-gray-600', bg: 'bg-gray-50', icon: AlertCircle },
-  blocked: { label: 'Blocked', color: 'text-red-600', bg: 'bg-red-50', icon: Ban },
+  blocked: { label: 'Blocked', color: 'text-slate-600', bg: 'bg-red-50', icon: Ban },
   deleted: { label: 'Deleted', color: 'text-gray-400', bg: 'bg-gray-50', icon: AlertCircle },
 };
 
@@ -150,19 +150,19 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
                 Assigned Permissions (Full Access)
               </h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-slate-700">
                   <Package size={14} />
                   <span className="text-xs font-bold">Manage Products</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-slate-700">
                   <ShoppingBag size={14} />
                   <span className="text-xs font-bold">Manage Orders</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-slate-700">
                   <Users size={14} />
                   <span className="text-xs font-bold">Manage Vendors</span>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-emerald-700">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 text-slate-700">
                   <BarChart3 size={14} />
                   <span className="text-xs font-bold">View Analytics</span>
                 </div>

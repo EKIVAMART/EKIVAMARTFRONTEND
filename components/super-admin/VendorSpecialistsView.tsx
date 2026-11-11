@@ -191,8 +191,8 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
               onClick={() => { onToggleActive(specialist); onClose(); }}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-bold transition ${
                 specialist.isActive
-                  ? 'bg-amber-50 hover:bg-amber-100 text-amber-600'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                  ? 'bg-amber-50 hover:bg-amber-100 text-slate-600'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-slate-600'
               }`}
             >
               {specialist.isActive
@@ -207,7 +207,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
             </button>
             <button
               onClick={() => { onDelete(specialist.id); onClose(); }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-500 rounded-md text-sm font-bold transition"
             >
               <Trash2 size={15} /> Delete
             </button>
@@ -357,7 +357,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                 />
                 <p className="text-[10px] text-gray-400 mt-1">E.164 format — no spaces, dashes or leading 0 (e.g. +2348012345678)</p>
                 {form.contactPhone && !PHONE_REGEX.test(form.contactPhone) && (
-                  <p className="text-[10px] text-red-500 mt-1 font-semibold flex items-center gap-1">
+                  <p className="text-[10px] text-slate-500 mt-1 font-semibold flex items-center gap-1">
                     <AlertTriangle size={10} /> Invalid phone format
                   </p>
                 )}
@@ -392,11 +392,11 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                     onClick={() => setIsActiveForm((v) => !v)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold border transition ${
                       isActiveForm
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                        ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
                         : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                     }`}
                   >
-                    {isActiveForm ? <><ToggleRight size={15} className="text-emerald-600" /> Active</> : <><ToggleLeft size={15} /> Inactive</>}
+                    {isActiveForm ? <><ToggleRight size={15} className="text-slate-600" /> Active</> : <><ToggleLeft size={15} /> Inactive</>}
                   </button>
                 </div>
               )}
@@ -444,7 +444,7 @@ function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteCon
         className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
       >
         <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4">
-          <Trash2 size={24} className="text-red-500" />
+          <Trash2 size={24} className="text-slate-500" />
         </div>
         <h3 className="text-lg font-extrabold text-slate-800">Delete Specialist?</h3>
         <p className="text-sm text-gray-500 mt-2 leading-relaxed">
@@ -760,7 +760,7 @@ export default function VendorSpecialistsView() {
                           onClick={() => handleToggleActive(s)}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter transition border ${
                             s.isActive
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                              ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
                               : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                           }`}
                           title={s.isActive ? 'Click to deactivate' : 'Click to activate'}
@@ -794,7 +794,7 @@ export default function VendorSpecialistsView() {
                               type="button"
                               aria-label={`Edit ${s.name}`}
                               onClick={() => handleOpenEdit(s)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all active:scale-90"
+                              className="p-2 text-gray-400 hover:text-slate-900 hover:bg-blue-50 rounded-md transition-all active:scale-90"
                             >
                               <Edit2 size={16} />
                             </button>
@@ -804,7 +804,7 @@ export default function VendorSpecialistsView() {
                               type="button"
                               aria-label={`Delete ${s.name}`}
                               onClick={() => handleDeleteRequest(s.id, s.name)}
-                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all active:scale-90"
+                              className="p-2 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-md transition-all active:scale-90"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -837,7 +837,7 @@ export default function VendorSpecialistsView() {
                       onClick={() => handleToggleActive(s)}
                       className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase border transition ${
                         s.isActive
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-emerald-50 text-slate-700 border-emerald-200'
                           : 'bg-gray-100 text-gray-500 border-gray-200'
                       }`}
                     >
@@ -851,8 +851,8 @@ export default function VendorSpecialistsView() {
                     </span>
                     <div className="flex gap-1">
                       <button onClick={() => handleOpenView(s)} className="p-1.5 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-lg transition"><Eye size={15} /></button>
-                      <button onClick={() => handleOpenEdit(s)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit2 size={15} /></button>
-                      <button onClick={() => handleDeleteRequest(s.id, s.name)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={15} /></button>
+                      <button onClick={() => handleOpenEdit(s)} className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-blue-50 rounded-lg transition"><Edit2 size={15} /></button>
+                      <button onClick={() => handleDeleteRequest(s.id, s.name)} className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-lg transition"><Trash2 size={15} /></button>
                     </div>
                   </div>
                 </div>

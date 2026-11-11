@@ -18,18 +18,18 @@ interface OrderDetailsModalProps {
 }
 
 const statusBadgeStyles: Record<string, string> = {
-  PENDING_PAYMENT: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
-  pending_payment: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
-  PAYMENT_FAILED: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
-  payment_failed: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
-  CONFIRMED: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
-  confirmed: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
+  PENDING_PAYMENT: 'bg-amber-400/20 text-slate-100 border-amber-400/30',
+  pending_payment: 'bg-amber-400/20 text-slate-100 border-amber-400/30',
+  PAYMENT_FAILED: 'bg-rose-400/20 text-slate-100 border-rose-400/30',
+  payment_failed: 'bg-rose-400/20 text-slate-100 border-rose-400/30',
+  CONFIRMED: 'bg-emerald-400/20 text-slate-100 border-emerald-400/30',
+  confirmed: 'bg-emerald-400/20 text-slate-100 border-emerald-400/30',
   PROCESSING: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
   processing: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
-  SHIPPED: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
-  shipped: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
-  DELIVERED: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
-  delivered: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
+  SHIPPED: 'bg-blue-400/20 text-slate-100 border-blue-400/30',
+  shipped: 'bg-blue-400/20 text-slate-100 border-blue-400/30',
+  DELIVERED: 'bg-teal-400/20 text-slate-100 border-teal-400/30',
+  delivered: 'bg-teal-400/20 text-slate-100 border-teal-400/30',
   CANCELLED: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   cancelled: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   REFUNDED: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
@@ -358,7 +358,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           </div>
                         )}
                         {order.discountAmount?.amount > 0 && (
-                          <div className="flex justify-between text-emerald-600 font-bold">
+                          <div className="flex justify-between text-slate-600 font-bold">
                             <span>Discount</span>
                             <span>-{order.discountAmount?.formatted}</span>
                           </div>
