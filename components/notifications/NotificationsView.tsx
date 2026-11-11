@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNotifications } from '@/context/NotificationContext';
 import { useAppSelector } from '@/lib/hooks';
 import { NotificationItem } from './NotificationItem';
@@ -37,14 +37,16 @@ export default function NotificationsView() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
 
+  const loadCurrentView = useCallback(() => fetchNotifications({
+    page: currentPage,
+    limit: 20,
+    isRead: filterUnreadOnly ? false : undefined,
+    type: typeFilter !== 'ALL' && typeFilter !== 'ORDERS' ? typeFilter : undefined,
+  }), [currentPage, filterUnreadOnly, typeFilter, fetchNotifications]);
+
   useEffect(() => {
-    void fetchNotifications({
-      page: currentPage,
-      limit: 20,
-      isRead: filterUnreadOnly ? false : undefined,
-      type: typeFilter !== 'ALL' && typeFilter !== 'ORDERS' ? typeFilter : undefined,
-    });
-  }, [currentPage, filterUnreadOnly, typeFilter, fetchNotifications]);
+    void loadCurrentView();
+  }, [loadCurrentView]);
 
   const isOrderType = (type: string) => {
     const t = String(type || '').toUpperCase();
@@ -173,7 +175,7 @@ export default function NotificationsView() {
 
           {/* Refresh Button */}
           <button
-            onClick={() => void fetchNotifications({ page: currentPage, limit: 20 })}
+            onClick={() => void loadCurrentView()}
             className="p-2.5 rounded-md bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition cursor-pointer shadow-sm"
             title="Refresh list"
           >
