@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Save, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import RecordActions from '@/components/admin/RecordActions';
 import { taxRulesApi } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -27,12 +27,12 @@ export default function TaxRulesManagement() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [country, setCountry] = useState('Nigeria');
   const [region, setRegion] = useState('');
-  const [ratePercentage, setRatePercentage] = useState(7.5);
+  const [ratePercentage, setRatePercentage] = useState('7.5');
   const [submitting, setSubmitting] = useState(false);
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editRate, setEditRate] = useState(7.5);
+  const [editRate, setEditRate] = useState('7.5');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchRules = useCallback(async () => {
@@ -59,10 +59,27 @@ export default function TaxRulesManagement() {
     return () => clearTimeout(timer);
   }, [fetchRules]);
 
+  useEffect(() => {
+    if (!showAddForm && !editingId) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !submitting && !savingEdit) {
+        setShowAddForm(false);
+        setEditingId(null);
+      }
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onEscape);
+    };
+  }, [showAddForm, editingId, submitting, savingEdit]);
+
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!country.trim()) return;
-    if (!isValidRate(ratePercentage)) {
+    if (!ratePercentage.trim() || !isValidRate(Number(ratePercentage))) {
       toast.error('Tax rate must be a number between 0% and 100%.');
       return;
     }
@@ -71,13 +88,13 @@ export default function TaxRulesManagement() {
       const res = await taxRulesApi.create({
         country: country.trim(),
         region: region.trim() || null,
-        ratePercentage: ratePercentage / 100, // Convert e.g. 7.5% -> 0.075
+        ratePercentage: Number(ratePercentage) / 100, // Convert e.g. 7.5% -> 0.075
       });
       if (res?.success) {
         toast.success('Tax rule created successfully');
         setShowAddForm(false);
         setRegion('');
-        setRatePercentage(7.5);
+        setRatePercentage('7.5');
         void fetchRules();
       } else {
         toast.error(res?.message || 'Failed to create tax rule');
@@ -104,22 +121,19 @@ export default function TaxRulesManagement() {
   };
 
   const handleStartEdit = (rule: TaxRule) => {
+    setShowAddForm(false);
     setEditingId(rule.id);
-    setEditRate(rule.ratePercentage * 100);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
+    setEditRate(String(rule.ratePercentage * 100));
   };
 
   const handleSaveEdit = async (id: string) => {
-    if (!isValidRate(editRate)) {
+    if (!editRate.trim() || !isValidRate(Number(editRate))) {
       toast.error('Tax rate must be a number between 0% and 100%.');
       return;
     }
     setSavingEdit(true);
     try {
-      const res = await taxRulesApi.update(id, { ratePercentage: editRate / 100 });
+      const res = await taxRulesApi.update(id, { ratePercentage: Number(editRate) / 100 });
       if (res?.success) {
         toast.success('Tax rate updated successfully');
         setEditingId(null);
@@ -151,6 +165,13 @@ export default function TaxRulesManagement() {
     }
   };
 
+  const editingRule = rules.find((rule) => rule.id === editingId);
+  const closeForm = () => {
+    if (submitting || savingEdit) return;
+    setShowAddForm(false);
+    setEditingId(null);
+  };
+
   return (
     <div className="space-y-5">
 
@@ -160,65 +181,13 @@ export default function TaxRulesManagement() {
           <h1 className="text-2xl font-semibold text-slate-900">Tax rules</h1>
         </div>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="self-start sm:self-center min-h-10 px-4 bg-[#176a35] hover:bg-[#12582b] text-white text-sm font-medium flex items-center gap-1.5"
+          type="button"
+          onClick={() => { setEditingId(null); setShowAddForm(true); }}
+          className="flex min-h-11 items-center gap-2 self-start rounded-lg bg-emerald-800 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-900 sm:self-center"
         >
-          {showAddForm ? <X size={15} /> : <Plus size={15} />}
-          {showAddForm ? 'Close form' : 'Add rule'}
+          <Plus size={16} /> Add rule
         </button>
       </div>
-
-      {/* Add Tax Rule Drawer Form */}
-      {showAddForm && (
-        <form onSubmit={handleCreateRule} className="bg-white p-5 border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-          <div className="space-y-1.5">
-            <label htmlFor="tax-country" className="text-xs font-medium text-slate-700">Country</label>
-            <input
-              id="tax-country"
-              type="text"
-              required
-              value={country}
-              onChange={e => setCountry(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="tax-region" className="text-xs font-medium text-slate-700">Region or state (optional)</label>
-            <input
-              id="tax-region"
-              type="text"
-              placeholder="e.g. Lagos (leave blank for country default)"
-              value={region}
-              onChange={e => setRegion(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="tax-rate" className="text-xs font-medium text-slate-700">Tax rate (%)</label>
-            <div className="relative">
-              <input
-                id="tax-rate"
-                type="number"
-                step="0.01"
-                min="0"
-                max="100"
-                required
-                value={ratePercentage}
-                onChange={e => setRatePercentage(parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border rounded-md text-xs bg-white focus:outline-none"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">%</span>
-            </div>
-          </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full min-h-10 bg-[#176a35] hover:bg-[#12582b] text-white text-sm font-medium"
-          >
-            {submitting ? 'Saving…' : 'Add rule'}
-          </button>
-        </form>
-      )}
 
       {/* Tax Rules List Table */}
       {loading ? (
@@ -248,31 +217,15 @@ export default function TaxRulesManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {rules.map((rule) => {
-                const isEditing = editingId === rule.id;
-                return (
-                  <tr key={rule.id} tabIndex={isEditing ? -1 : 0} aria-label={`Edit tax rule for ${rule.country}${rule.region ? `, ${rule.region}` : ''}`} onClick={() => { if (!isEditing) handleStartEdit(rule); }} onKeyDown={(event) => { if (!isEditing && event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); handleStartEdit(rule); } }} className="cursor-pointer transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
+              {rules.map((rule) => (
+                  <tr key={rule.id} tabIndex={0} aria-label={`Edit tax rule for ${rule.country}${rule.region ? `, ${rule.region}` : ''}`} onClick={() => handleStartEdit(rule)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); handleStartEdit(rule); } }} className="cursor-pointer transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
                     <td className="p-4 font-medium text-slate-800">
                       {rule.country === 'NG' ? 'Nigeria' : rule.country} {rule.region && <span className="font-normal text-slate-500">· {rule.region}</span>}
                     </td>
                     <td className="p-4 font-bold text-slate-700">
-                      {isEditing ? (
-                        <div className="flex items-center gap-1.5 max-w-[100px]">
-                          <input
-                            aria-label="Tax rate percentage"
-                            type="number"
-                            step="0.01"
-                            value={editRate}
-                            onChange={e => setEditRate(parseFloat(e.target.value))}
-                            className="w-full px-2 py-1 border rounded focus:outline-none"
-                          />
-                          <span className="font-bold">%</span>
-                        </div>
-                      ) : (
-                        Number.isFinite(Number(rule.ratePercentage))
-                          ? `${(Number(rule.ratePercentage) * 100).toFixed(2)}%`
-                          : '—'
-                      )}
+                      {Number.isFinite(Number(rule.ratePercentage))
+                        ? `${(Number(rule.ratePercentage) * 100).toFixed(2)}%`
+                        : '—'}
                     </td>
                     <td className="p-4">
                       {rule.region ? (
@@ -283,39 +236,65 @@ export default function TaxRulesManagement() {
                     </td>
                     <td className="p-4 text-center text-slate-700">{rule.isActive ? 'Active' : 'Inactive'}</td>
                     <td className="p-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        {isEditing ? (
-                          <>
-                            <button type="button"
-                              onClick={(event) => { event.stopPropagation(); void handleSaveEdit(rule.id); }}
-                              disabled={savingEdit}
-                              className="p-1.5 text-[#176a35] hover:underline"
-                              aria-label="Save tax rate"
-                            >
-                              <Save size={14} />
-                            </button>
-                            <button type="button"
-                              onClick={(event) => { event.stopPropagation(); handleCancelEdit(); }}
-                              className="p-1.5 text-slate-600 hover:underline"
-                              aria-label="Cancel editing"
-                            >
-                              <X size={14} />
-                            </button>
-                          </>
-                        ) : (
-                          <RecordActions name={`tax rule for ${rule.country}`} actions={[
+                      <RecordActions name={`tax rule for ${rule.country}`} actions={[
                             { label: 'Edit rate', onSelect: () => handleStartEdit(rule) },
                             { label: rule.isActive ? 'Deactivate rule' : 'Activate rule', onSelect: () => void handleToggleStatus(rule.id, rule.isActive) },
                             { label: 'Delete rule', onSelect: () => void handleDeleteRule(rule.id), destructive: true },
                           ]} />
-                        )}
-                      </div>
                     </td>
                   </tr>
-                );
-              })}
+              ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {(showAddForm || editingRule) && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) closeForm(); }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="tax-rule-dialog-title" className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:px-7">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Tax settings</p>
+                <h2 id="tax-rule-dialog-title" className="text-xl font-semibold tracking-tight text-slate-900">{showAddForm ? 'Add tax rule' : 'Edit tax rate'}</h2>
+                <p className="mt-1 text-sm text-slate-600">{showAddForm ? 'Set a rate for a country or a specific region.' : 'Update the rate for this tax rule.'}</p>
+              </div>
+              <button type="button" onClick={closeForm} disabled={submitting || savingEdit} aria-label="Close tax rule form" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"><X size={20} /></button>
+            </div>
+
+            <form onSubmit={showAddForm ? handleCreateRule : (event) => { event.preventDefault(); if (editingRule) void handleSaveEdit(editingRule.id); }} className="flex min-h-0 flex-col">
+              <div className="space-y-5 overflow-y-auto bg-slate-50/60 px-5 py-6 sm:px-7">
+                {showAddForm ? (
+                  <>
+                    <div className="space-y-1.5">
+                      <label htmlFor="tax-country" className="text-sm font-medium text-slate-700">Country</label>
+                      <input id="tax-country" type="text" required autoFocus value={country} onChange={(event) => setCountry(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-emerald-700 focus:outline-none" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="tax-region" className="text-sm font-medium text-slate-700">Region or state <span className="font-normal text-slate-500">(optional)</span></label>
+                      <input id="tax-region" type="text" placeholder="e.g. Lagos" value={region} onChange={(event) => setRegion(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-emerald-700 focus:outline-none" />
+                      <p className="text-xs text-slate-500">Leave blank to apply the rate countrywide.</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Applies to</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-900">{editingRule?.country === 'NG' ? 'Nigeria' : editingRule?.country}{editingRule?.region ? ` · ${editingRule.region}` : ' · Countrywide'}</p>
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <label htmlFor="tax-rate" className="text-sm font-medium text-slate-700">Tax rate (%)</label>
+                  <div className="relative">
+                    <input id="tax-rate" type="number" step="0.01" min="0" max="100" required autoFocus={!showAddForm} value={showAddForm ? ratePercentage : editRate} onChange={(event) => showAddForm ? setRatePercentage(event.target.value) : setEditRate(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 pr-10 text-sm text-slate-900 focus:border-emerald-700 focus:outline-none" />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:px-7">
+                <button type="button" onClick={closeForm} disabled={submitting || savingEdit} className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50">Cancel</button>
+                <button type="submit" disabled={submitting || savingEdit} className="min-h-11 rounded-lg bg-emerald-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-900 disabled:opacity-50">{submitting || savingEdit ? 'Saving…' : showAddForm ? 'Add rule' : 'Save changes'}</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
