@@ -399,7 +399,7 @@ export default function WaitlistView() {
     else if (tagType === 'i') formatted = `<i>${selectedText}</i>`;
     else if (tagType === 'h3') formatted = `<h3 style="font-size: 18px; font-weight: bold; color: #1e293b; margin: 16px 0 8px 0;">${selectedText}</h3>`;
     else if (tagType === 'p') formatted = `<p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 12px;">${selectedText}</p>`;
-    else if (tagType === 'cta') formatted = `<a href="https://faflora.com" style="display: inline-block; background-color: #228b22; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
+    else if (tagType === 'cta') formatted = `<a href="${typeof window !== 'undefined' ? window.location.origin : '/'}" style="display: inline-block; background-color: #228b22; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
     else if (tagType === 'hr') formatted = `<hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />`;
 
     const updated = current.substring(0, start) + formatted + current.substring(end);
@@ -1009,7 +1009,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <Users size={14} /> All Subscribers ({stats.active})
+                      <Users size={14} /> All Subscribers ({stats.active ?? 0})
                     </button>
                     <button
                       type="button"
@@ -1020,7 +1020,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <Briefcase size={14} /> Vendors Only ({stats.vendors})
+                      <Briefcase size={14} /> Vendors Only ({stats.vendors ?? 0})
                     </button>
                     <button
                       type="button"
@@ -1031,7 +1031,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <User size={14} /> Customers Only ({stats.customers})
+                      <User size={14} /> Customers Only ({stats.customers ?? 0})
                     </button>
                   </div>
                 </div>
@@ -1303,8 +1303,7 @@ export default function WaitlistView() {
 
                   {/* Header Branding */}
                   <div className="bg-[#228b22] p-4 text-center">
-                    <h4 className="text-white text-base font-black tracking-widest leading-none">FAFLORA</h4>
-                    <span className="text-[9px] text-brand-100 tracking-wider font-semibold uppercase mt-1 inline-block">Nigeria's Flowers & Marketplace</span>
+                    <h4 className="text-white text-base font-black tracking-widest leading-none">EKIVAMART</h4>
                   </div>
 
                   {/* Optional Hero Banner Image — use localPreview for the live preview panel */}
