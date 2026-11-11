@@ -502,7 +502,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
       </div>
 
       {/* ── 4. TOP PRODUCTS & 3. RECENT ACTIVITIES FEEDS ── */}
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
         {/* Top 5 Products Chart/Cards (1 col) */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm sm:p-6">
           <div>

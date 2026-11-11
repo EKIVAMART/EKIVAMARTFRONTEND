@@ -318,7 +318,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
       </div>
 
       {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
 
         {/* ── Top Products Widget (GET /admin/dashboard/top-products) ──── */}
         <div
