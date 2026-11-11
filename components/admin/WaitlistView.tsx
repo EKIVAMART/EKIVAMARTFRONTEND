@@ -306,8 +306,7 @@ export default function WaitlistView() {
     const authToken = getAuthToken();
     const result = await uploadBroadcastImage(
       file,
-      authToken,
-      process.env.NEXT_PUBLIC_API_URL
+      authToken
     );
 
     setIsUploading(false);

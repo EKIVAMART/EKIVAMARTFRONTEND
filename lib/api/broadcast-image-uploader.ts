@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/lib/axios';
 /**
  * Handles the two-step image upload process for broadcast emails:
  * Step 1: Ask the backend for signed Cloudinary upload credentials.
@@ -49,7 +50,7 @@ const ALLOWED_TYPES = new Set([
 export async function uploadBroadcastImage(
   file: File,
   authToken: string,
-  apiBaseUrl: string = process.env.NEXT_PUBLIC_API_URL ?? ''
+  apiBaseUrl: string = API_BASE_URL
 ): Promise<UploadBroadcastImageOutcome> {
   // ── Step 0: Client-side validation ──────────────────────────────────────
   if (!file) {

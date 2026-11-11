@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/lib/axios';
 /**
  * Firebase Cloud Messaging (FCM) Token Helper & Registration Utility.
  * Prepared for push notification delivery when Firebase FCM credentials are configured.
@@ -32,7 +33,7 @@ export const fcmClient = {
       const authToken = localStorage.getItem('accessToken');
       if (!authToken) return true;
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+      const apiUrl = API_BASE_URL;
       await fetch(`${apiUrl}/notifications/fcm-token`, {
         method: 'POST',
         headers: {

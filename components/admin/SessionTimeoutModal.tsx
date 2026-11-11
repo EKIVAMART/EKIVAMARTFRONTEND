@@ -12,7 +12,7 @@ const TOKEN_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 const WARNING_BEFORE_MS = 15 * 1000;      // Show warning 15 seconds before expiry
 const COUNTDOWN_SECONDS = 15;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from '@/lib/axios';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
