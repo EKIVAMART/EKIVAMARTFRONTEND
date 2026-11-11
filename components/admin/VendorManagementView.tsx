@@ -871,7 +871,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       </div>
 
       {/* Main Display Area */}
-      <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+      <div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
         {/* Sub-header with Title & Search & Action buttons */}
         <div className="p-4 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
@@ -935,7 +935,8 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
         {/* APPLICATIONS TAB STRIP */}
         {activeSection === 'applications' && (
-          <div className="flex overflow-x-auto border-b bg-white scrollbar-none">
+          <div className="border-b border-slate-100 bg-slate-50/60 px-4 py-3" role="group" aria-label="Filter applications by status">
+            <div className="flex gap-2 overflow-x-auto scrollbar-none">
             {(
               [
                 ...(!isSuperAdmin ? [{ id: 'assigned' as const, label: `Assigned to You (${assignedCount})` }] : []),
@@ -951,12 +952,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
               <button
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id); setPage(1); }}
-                className={`px-5 py-4 text-xs font-bold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                aria-pressed={activeTab === tab.id}
+                className={`flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${
                   activeTab === tab.id
-                    ? tab.id === 'banned'
-                      ? 'border-red-500 text-slate-600 bg-red-50/30 font-black'
-                      : 'border-[#228b22] text-[#228b22] bg-brand-50/20 font-black'
-                    : 'border-transparent text-gray-500 hover:text-slate-700 hover:bg-slate-50/50'
+                    ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 {tab.id === 'assigned' && <UserCheck size={13} />}
@@ -966,15 +966,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 {tab.id === 'approved' && <Award size={13} />}
                 {tab.id === 'rejected' && <X size={13} />}
                 {tab.id === 'suspended' && <Ban size={13} />}
-                {tab.id === 'banned' && <ShieldAlert size={13} className="text-slate-500" />}
+                {tab.id === 'banned' && <ShieldAlert size={13} />}
                 {tab.label}
               </button>
             ))}
+            </div>
           </div>
         )}
 
         {/* MAIN DATA TABLES */}
-        <div className="flex-1 overflow-x-auto min-h-[400px]">
+        <div className="flex-1 overflow-x-auto">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <div className="w-10 h-10 border-4 border-[#228b22]/20 border-t-[#228b22] rounded-full animate-spin" />
@@ -1043,13 +1044,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                     const isSelected = selectedVendorIds.includes(vendor.id);
 
                     return (
-                      <tr key={vendor.id} className={`hover:bg-slate-50/30 transition-colors group ${isSelected ? 'bg-brand-50/30' : ''}`}>
+                      <tr key={vendor.id} tabIndex={0} aria-label={`View ${vendor.storeName} details`} onClick={() => handleViewVendor(vendor.id)} onKeyDown={(event) => { if (event.key === 'Enter' && event.target === event.currentTarget) handleViewVendor(vendor.id); }} className={`group cursor-pointer transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700 ${isSelected ? 'bg-slate-50' : ''}`}>
                         {/* Checkbox cell */}
                         {isSuperAdmin && (activeTab === 'pending' || activeTab === 'in_review') && (
                           <td className="p-4 w-10">
                             <input
                               type="checkbox"
                               checked={isSelected}
+                              onClick={(event) => event.stopPropagation()}
                               onChange={(e) => {
                                 setSelectedVendorIds(prev =>
                                   e.target.checked ? [...prev, vendor.id] : prev.filter(id => id !== vendor.id)
@@ -1066,7 +1068,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {/* Store Details */}
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-md bg-brand-50 flex items-center justify-center font-bold text-[#228b22] text-sm overflow-hidden shrink-0 border border-brand-100 shadow-sm">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-sm font-semibold text-emerald-800">
                               {vendor.storeLogoUrl ? (
                                 <img src={vendor.storeLogoUrl} className="w-full h-full object-cover" alt="" />
                               ) : (
@@ -1074,18 +1076,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                               )}
                             </div>
                             <div>
-                              <span
-                                onClick={() => handleViewVendor(vendor.id)}
-                                className="font-bold text-slate-800 text-sm hover:text-[#228b22] cursor-pointer flex items-center gap-1.5 transition-colors"
-                              >
+                              <span className="text-sm font-semibold text-slate-900">
                                 {vendor.storeName}
-                                <Eye size={12} className="opacity-0 group-hover:opacity-100 text-gray-400 transition" />
                               </span>
                               <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-tighter bg-slate-100 px-1.5 py-0.5 rounded">
+                                <span className="text-xs font-medium text-slate-500">
                                   {vendor.applicationReference || 'NO-REF'}
                                 </span>
-                                <span className="text-[10px] text-gray-400 font-medium">
+                                <span className="text-xs text-slate-500">
                                   {vendor.storeEmail}
                                 </span>
                               </div>
@@ -1095,20 +1093,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
                         {/* Vendor Type */}
                         <td className="p-4 text-center">
-                          <span className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200/50 px-2.5 py-1 rounded-lg uppercase tracking-tight">
+                          <span className="text-xs font-medium capitalize text-slate-700">
                             {vendor.vendorType.replace('_', ' ')}
                           </span>
                         </td>
 
                         {/* Trust Level */}
                         <td className="p-4 text-center">
-                          <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-md border ${
-                            vendor.trustLevel === 'official_brand'
-                              ? 'bg-brand-100 text-brand-700 border-brand-200'
-                              : vendor.trustLevel === 'top_seller'
-                                ? 'bg-brand-100 text-brand-700 border-brand-200'
-                                : 'bg-slate-100 text-slate-600 border-slate-200'
-                          }`}>
+                          <span className="text-xs font-medium capitalize text-slate-700">
                             {vendor.trustLevel.replace('_', ' ')}
                           </span>
                         </td>
@@ -1116,26 +1108,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {/* Dynamic Status Badge (search results only) */}
                         {searchQuery && (
                           <td className="p-4 text-center">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border ${
-                              vendor.applicationStatus === 'approved' ? 'bg-emerald-100 text-slate-700 border-emerald-200'
-                              : vendor.applicationStatus === 'rejected' ? 'bg-rose-100 text-slate-700 border-rose-200'
-                              : vendor.applicationStatus === 'suspended' ? 'bg-amber-100 text-slate-700 border-amber-200'
-                              : vendor.applicationStatus === 'banned' ? 'bg-red-100 text-slate-700 border-red-200'
-                              : vendor.applicationStatus === 'in_review' ? 'bg-brand-100 text-brand-700 border-brand-200'
-                              : vendor.applicationStatus === 'requires_resubmission' ? 'bg-orange-100 text-slate-700 border-orange-200'
-                              : 'bg-slate-100 text-slate-600 border-slate-200'
-                            }`}>
+                            <span className="text-xs font-medium capitalize text-slate-700">
                               {(vendor.applicationStatus || 'pending').replace(/_/g, ' ')}
                             </span>
                           </td>
                         )}
                         {activeTab === 'pending' && (
                           <td className="p-4 text-center">
-                            <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase border ${
-                              (vendor as any).isUrgent
-                                ? 'bg-rose-100 text-slate-700 border-rose-200 '
-                                : 'bg-amber-100 text-slate-700 border-amber-200'
-                            }`}>
+                            <span className="text-xs font-medium tabular-nums text-slate-700">
                               {vendor.daysWaiting !== null && vendor.daysWaiting !== undefined ? `${vendor.daysWaiting} days` : '0 days'}
                             </span>
                           </td>

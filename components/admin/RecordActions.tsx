@@ -34,10 +34,10 @@ export default function RecordActions({ name, actions }: {
   return (
     <div className="flex justify-end" onClick={(event) => event.stopPropagation()}>
       <Menu>
-        <MenuButton className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" aria-label={`Actions for ${name}`}>
-          Actions <MoreHorizontal size={17} aria-hidden="true" />
+        <MenuButton className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" aria-label={`Actions for ${name}`}>
+          <MoreHorizontal size={20} aria-hidden="true" />
         </MenuButton>
-        <MenuItems anchor="bottom end" className="z-[150] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl [--anchor-gap:8px] focus:outline-none">
+        <MenuItems portal anchor="bottom end" onClick={(event) => event.stopPropagation()} className="z-[150] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl [--anchor-gap:8px] focus:outline-none">
           {availableActions.map((action) => (
             <MenuItem key={action.label}>
               <button
