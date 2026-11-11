@@ -8,10 +8,7 @@ import {
   Clock,
   User,
   Globe,
-  Tag,
-  Eye,
   ExternalLink,
-  BookOpen,
 } from 'lucide-react';
 import { AdminBlogPost } from '@/types/blog';
 import { decodeHtmlEntities } from '@/lib/api-blog';
@@ -34,19 +31,19 @@ export default function BlogViewModal({
     switch (status) {
       case 'published':
         return (
-          <span className="px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-slate-700 uppercase tracking-wider">
+          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
             Published
           </span>
         );
       case 'draft':
         return (
-          <span className="px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-slate-700 uppercase tracking-wider">
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
             Draft
           </span>
         );
       case 'unpublished':
         return (
-          <span className="px-3 py-1 rounded-md text-xs font-black bg-slate-100 text-slate-700 uppercase tracking-wider">
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
             Unpublished
           </span>
         );
@@ -57,38 +54,37 @@ export default function BlogViewModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="article-preview-title"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]"
+          className="flex max-h-[92dvh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
         >
           {/* Header */}
-          <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
-                <BookOpen size={20} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-extrabold text-slate-800">
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:px-8">
+            <div className="min-w-0">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Blog content</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 id="article-preview-title" className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
                     Article Preview
-                  </h3>
+                  </h2>
                   {getStatusBadge(post.status)}
                 </div>
-                <p className="text-xs text-neutral-400 font-medium">
-                  Slug: /blog/{post.slug}
+                <p className="mt-1 truncate text-xs text-slate-500">
+                  /blog/{post.slug}
                 </p>
-              </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               {post.status === 'published' && (
                 <Link
                   href={`/blog/${post.slug}`}
                   target="_blank"
-                  className="px-3 py-1.5 rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition flex items-center gap-1.5"
+                  className="hidden min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-emerald-800 transition-colors hover:bg-slate-50 sm:inline-flex"
                 >
                   <ExternalLink size={14} />
                   <span>View Public</span>
@@ -96,7 +92,9 @@ export default function BlogViewModal({
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+                type="button"
+                aria-label="Close article preview"
+                className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
               >
                 <X size={20} />
               </button>
@@ -104,10 +102,10 @@ export default function BlogViewModal({
           </div>
 
           {/* Body Content Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+          <div className="flex-1 space-y-6 overflow-y-auto bg-slate-50/60 p-5 sm:p-8">
             {/* Featured Image */}
             {post.featuredImage?.url && (
-              <div className="rounded-md overflow-hidden max-h-72 border border-neutral-200">
+              <div className="max-h-72 overflow-hidden rounded-xl border border-slate-200 bg-white">
                 <img
                   src={post.featuredImage.url}
                   alt={decodeHtmlEntities(post.title)}
@@ -117,25 +115,20 @@ export default function BlogViewModal({
             )}
 
             {/* Title */}
-            <h1
-              className="text-2xl md:text-3xl font-black text-slate-900 leading-tight"
-              style={{ fontFamily: "'Georgia', serif" }}
-            >
+            <h1 className="text-2xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-3xl">
               {decodeHtmlEntities(post.title)}
             </h1>
 
             {/* Metadata Bar */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-500 font-semibold py-3 border-y border-neutral-100">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-slate-200 py-3 text-xs font-medium text-slate-600">
               <div className="flex items-center gap-1.5">
                 <User size={14} className="text-brand-600" />
                 <span>Author: {post.author?.name || 'Unknown Author'}</span>
               </div>
-              <div className="w-1 h-1 rounded-full bg-neutral-300" />
               <div className="flex items-center gap-1.5">
                 <Clock size={14} className="text-brand-600" />
                 <span>{post.readingTime} min read</span>
               </div>
-              <div className="w-1 h-1 rounded-full bg-neutral-300" />
               <div className="flex items-center gap-1.5">
                 <Calendar size={14} className="text-brand-600" />
                 <span>
@@ -144,7 +137,6 @@ export default function BlogViewModal({
               </div>
               {post.publishedAt && (
                 <>
-                  <div className="w-1 h-1 rounded-full bg-neutral-300" />
                   <div className="flex items-center gap-1.5 text-slate-700 font-bold">
                     <span>
                       Published:{' '}
@@ -157,36 +149,35 @@ export default function BlogViewModal({
 
             {/* Hand-written / Auto Excerpt */}
             {post.excerpt && (
-              <div className="p-4 rounded-md bg-neutral-50 border border-neutral-200/80 italic text-slate-700 text-sm font-medium">
-                "{decodeHtmlEntities(post.excerpt)}"
+              <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700">
+                {decodeHtmlEntities(post.excerpt)}
               </div>
             )}
 
             {/* Content Body Render */}
-            <div className="blog-article-content max-w-none text-slate-800 leading-relaxed pt-2">
+            <div className="blog-article-content max-w-none rounded-xl border border-slate-200 bg-white p-5 text-sm leading-relaxed text-slate-800 sm:p-6 sm:text-base">
               <div
                 dangerouslySetInnerHTML={{ __html: post.content }}
-                style={{ fontFamily: "'Palatino Linotype', 'Georgia', serif" }}
               />
             </div>
 
             {/* SEO Info Box */}
             {(post.seoTitle || post.seoDescription) && (
-              <div className="p-4 rounded-md bg-slate-900 text-white space-y-2 mt-8">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+              <div className="mt-8 space-y-2 rounded-xl border border-slate-200 bg-white p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
                   <Globe size={14} />
                   <span>Google Search Result Snippet Preview</span>
                 </div>
                 {post.seoTitle && (
-                  <h4 className="text-sm font-bold text-slate-400 hover:underline cursor-pointer">
+                  <h4 className="text-sm font-semibold text-emerald-800">
                     {decodeHtmlEntities(post.seoTitle)}
                   </h4>
                 )}
-                <p className="text-xs text-slate-300 leading-normal">
-                  https://faflora.com/blog/{post.slug}
+                <p className="text-xs leading-normal text-slate-500">
+                  /blog/{post.slug}
                 </p>
                 {post.seoDescription && (
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs leading-relaxed text-slate-600">
                     {decodeHtmlEntities(post.seoDescription)}
                   </p>
                 )}

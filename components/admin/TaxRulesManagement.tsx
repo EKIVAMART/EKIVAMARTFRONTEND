@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
+import RecordActions from '@/components/admin/RecordActions';
 import { taxRulesApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -250,7 +251,7 @@ export default function TaxRulesManagement() {
               {rules.map((rule) => {
                 const isEditing = editingId === rule.id;
                 return (
-                  <tr key={rule.id} className="hover:bg-gray-50/40 transition">
+                  <tr key={rule.id} tabIndex={isEditing ? -1 : 0} aria-label={`Edit tax rule for ${rule.country}${rule.region ? `, ${rule.region}` : ''}`} onClick={() => { if (!isEditing) handleStartEdit(rule); }} onKeyDown={(event) => { if (!isEditing && event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); handleStartEdit(rule); } }} className="cursor-pointer transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
                     <td className="p-4 font-medium text-slate-800">
                       {rule.country === 'NG' ? 'Nigeria' : rule.country} {rule.region && <span className="font-normal text-slate-500">· {rule.region}</span>}
                     </td>
@@ -286,7 +287,7 @@ export default function TaxRulesManagement() {
                         {isEditing ? (
                           <>
                             <button type="button"
-                              onClick={() => handleSaveEdit(rule.id)}
+                              onClick={(event) => { event.stopPropagation(); void handleSaveEdit(rule.id); }}
                               disabled={savingEdit}
                               className="p-1.5 text-[#176a35] hover:underline"
                               aria-label="Save tax rate"
@@ -294,7 +295,7 @@ export default function TaxRulesManagement() {
                               <Save size={14} />
                             </button>
                             <button type="button"
-                              onClick={handleCancelEdit}
+                              onClick={(event) => { event.stopPropagation(); handleCancelEdit(); }}
                               className="p-1.5 text-slate-600 hover:underline"
                               aria-label="Cancel editing"
                             >
@@ -302,28 +303,11 @@ export default function TaxRulesManagement() {
                             </button>
                           </>
                         ) : (
-                          <>
-                            <button type="button"
-                              onClick={() => handleStartEdit(rule)}
-                              className="p-1.5 text-slate-600 hover:text-[#176a35]"
-                              aria-label={`Edit tax rate for ${rule.country}`}
-                            >
-                              <Edit3 size={14} />
-                            </button>
-                            <button type="button"
-                              onClick={() => handleToggleStatus(rule.id, rule.isActive)}
-                              className="px-2 text-xs font-medium text-slate-600 hover:underline"
-                            >
-                              {rule.isActive ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button type="button"
-                              onClick={() => handleDeleteRule(rule.id)}
-                              className="p-1.5 text-slate-500 hover:text-slate-900"
-                              aria-label={`Delete tax rule for ${rule.country}`}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </>
+                          <RecordActions name={`tax rule for ${rule.country}`} actions={[
+                            { label: 'Edit rate', onSelect: () => handleStartEdit(rule) },
+                            { label: rule.isActive ? 'Deactivate rule' : 'Activate rule', onSelect: () => void handleToggleStatus(rule.id, rule.isActive) },
+                            { label: 'Delete rule', onSelect: () => void handleDeleteRule(rule.id), destructive: true },
+                          ]} />
                         )}
                       </div>
                     </td>

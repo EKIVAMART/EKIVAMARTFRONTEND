@@ -16,8 +16,8 @@ function ActionIcon({ label }: { label: string }) {
   if (value.includes('delete') || value.includes('remove')) return <Trash2 size={16} aria-hidden="true" />;
   if (value.includes('assign') || value.includes('approve')) return <UserRoundCheck size={16} aria-hidden="true" />;
   if (value.includes('trust')) return <Award size={16} aria-hidden="true" />;
-  if (value.includes('reactivate') || value.includes('unban')) return <RotateCcw size={16} aria-hidden="true" />;
-  if (value.includes('suspend') || value.includes('ban') || value.includes('reject') || value.includes('block')) return <CircleSlash size={16} aria-hidden="true" />;
+  if (value.includes('deactivate') || value.includes('suspend') || value.includes('ban') || value.includes('reject') || value.includes('block')) return <CircleSlash size={16} aria-hidden="true" />;
+  if (value.includes('reactivate') || value.includes('activate') || value.includes('unban')) return <RotateCcw size={16} aria-hidden="true" />;
   if (value.includes('payout')) return <CreditCard size={16} aria-hidden="true" />;
   if (value.includes('override') || value.includes('rate')) return <Settings2 size={16} aria-hidden="true" />;
   if (value.includes('unpublish')) return <EyeOff size={16} aria-hidden="true" />;
