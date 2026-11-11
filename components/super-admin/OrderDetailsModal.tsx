@@ -272,7 +272,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-1.5 text-sm text-brand-100 font-semibold">
-                  <Calendar size={14} /> Placed on {order ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
+                  <Calendar size={14} /> Placed on {order?.createdAt && !Number.isNaN(new Date(order.createdAt).getTime()) ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
                 </div>
               </div>
               <div className="flex items-center gap-3">

@@ -15,6 +15,8 @@ interface TaxRule {
   updatedAt: string;
 }
 
+const isValidRate = (value: number) => Number.isFinite(value) && value >= 0 && value <= 100;
+
 export default function TaxRulesManagement() {
   const [rules, setRules] = useState<TaxRule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +61,10 @@ export default function TaxRulesManagement() {
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!country.trim()) return;
+    if (!isValidRate(ratePercentage)) {
+      toast.error('Tax rate must be a number between 0% and 100%.');
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await taxRulesApi.create({
@@ -106,6 +112,10 @@ export default function TaxRulesManagement() {
   };
 
   const handleSaveEdit = async (id: string) => {
+    if (!isValidRate(editRate)) {
+      toast.error('Tax rate must be a number between 0% and 100%.');
+      return;
+    }
     setSavingEdit(true);
     try {
       const res = await taxRulesApi.update(id, { ratePercentage: editRate / 100 });
@@ -124,7 +134,9 @@ export default function TaxRulesManagement() {
   };
 
   const handleDeleteRule = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this tax rule?')) return;
+    const rule = rules.find((r) => r.id === id);
+    const label = rule ? [rule.country === 'NG' ? 'Nigeria' : rule.country, rule.region].filter(Boolean).join(' · ') : 'this tax rule';
+    if (!confirm(`Are you sure you want to delete the tax rule for ${label}? This cannot be undone.`)) return;
     try {
       const res = await taxRulesApi.delete(id);
       if (res?.success) {
@@ -256,7 +268,9 @@ export default function TaxRulesManagement() {
                           <span className="font-bold">%</span>
                         </div>
                       ) : (
-                        `${(rule.ratePercentage * 100).toFixed(2)}%`
+                        Number.isFinite(Number(rule.ratePercentage))
+                          ? `${(Number(rule.ratePercentage) * 100).toFixed(2)}%`
+                          : '—'
                       )}
                     </td>
                     <td className="p-4">

@@ -682,6 +682,7 @@ function AdminPageContent() {
   // Delivery routes hero search (shared with DeliveryRoutesManagement)
 
   const handleTabChange = (t: string) => {
+    if (t !== activeTab) setSearchQuery('');
     setActiveTab(t as any);
     if (t !== 'orders' && typeof window !== 'undefined' && (window.location.search.includes('tab=orders') || window.location.search.includes('orderId='))) {
       router.replace('/super-admin/dashboard');
@@ -749,6 +750,8 @@ function AdminPageContent() {
   const [usersSortBy, setUsersSortBy] = useState('createdAt-desc');
   const [usersStatusFilter, setUsersStatusFilter] = useState('All');
   const [usersAuthFilter, setUsersAuthFilter] = useState('All');
+  const [usersReloadKey, setUsersReloadKey] = useState(0);
+  const [adminsReloadKey, setAdminsReloadKey] = useState(0);
   const [usersDateFrom, setUsersDateFrom] = useState('');
   const [usersDateTo, setUsersDateTo] = useState('');
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -1264,105 +1267,11 @@ function AdminPageContent() {
     return () => { signal.current = false; };
   }, [loadOrders]);
 
-  const fetchUsers = async () => {
-    try {
-      let emailParam: string | undefined;
-      let phoneParam: string | undefined;
-      let firstParam: string | undefined;
-      let lastParam: string | undefined;
+  // Re-run the users effect so reloads use the same filters as the initial load.
+  const fetchUsers = async () => setUsersReloadKey((k) => k + 1);
 
-      if (searchQuery) {
-        const trimmed = searchQuery.trim();
-        if (trimmed.includes('@')) {
-          emailParam = trimmed;
-        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
-          phoneParam = trimmed;
-        } else {
-          const parts = trimmed.split(/\s+/);
-          if (parts.length > 1) {
-            firstParam = parts[0];
-            lastParam = parts.slice(1).join(' ');
-          } else {
-            firstParam = trimmed;
-          }
-        }
-      }
-
-      const [field, dir] = usersSortBy.split('-');
-      const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
-      const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
-
-      const response = await authApi.searchUsers({
-        page: usersPage,
-        limit: usersLimit,
-        role: 'customer',
-        email: emailParam,
-        firstName: firstParam,
-        lastName: lastParam,
-        phoneNumber: phoneParam,
-        sortBy: sortField as any,
-        sortOrder: sortOrder as any,
-      });
-
-      const userList = getUserList(response);
-      const normalized = userList.map(normalizeAppUser);
-      const pagination = getUserPagination(response, normalized.length);
-
-      setUsers(normalized);
-      setUsersTotal(pagination.total);
-      setUsersTotalPages(pagination.totalPages);
-    } catch (error) {
-      console.error('Failed to fetch users', error);
-    }
-  };
-
-  const fetchAdmins = async () => {
-    try {
-      let emailParam: string | undefined;
-      let phoneParam: string | undefined;
-      let firstParam: string | undefined;
-      let lastParam: string | undefined;
-
-      if (searchQuery) {
-        const trimmed = searchQuery.trim();
-        if (trimmed.includes('@')) {
-          emailParam = trimmed;
-        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
-          phoneParam = trimmed;
-        } else {
-          const parts = trimmed.split(/\s+/);
-          if (parts.length > 1) {
-            firstParam = parts[0];
-            lastParam = parts.slice(1).join(' ');
-          } else {
-            firstParam = trimmed;
-          }
-        }
-      }
-
-      const response = await authApi.searchUsers({
-        page: adminsPage,
-        limit: adminsLimit,
-        role: 'admin',
-        email: emailParam,
-        firstName: firstParam,
-        lastName: lastParam,
-        phoneNumber: phoneParam,
-        sortBy: 'createdAt',
-        sortOrder: adminsSortOrder,
-      });
-
-      const userList = getUserList(response);
-      const normalized = userList.map(normalizeAdminUser);
-      const pagination = getUserPagination(response, normalized.length);
-
-      setAdmins(normalized);
-      setAdminsTotal(pagination.total);
-      setAdminsTotalPages(pagination.totalPages);
-    } catch (error) {
-      console.error('Failed to fetch admins', error);
-    }
-  };
+  // Re-run the admins effect so reloads use the same filters as the initial load.
+  const fetchAdmins = async () => setAdminsReloadKey((k) => k + 1);
 
   // Users fetching effect
   useEffect(() => {
@@ -1442,7 +1351,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter]);
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter, usersReloadKey]);
 
   // Reset users page on search/filter changes
   useEffect(() => {
@@ -1520,7 +1429,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder]);
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder, adminsReloadKey]);
 
   // Reset admins page on search/filter changes
   useEffect(() => {
@@ -1679,15 +1588,22 @@ function AdminPageContent() {
   };
 
   const handleDeleteProduct = async (id: string) => {
+    const product = products.find(p => p.id === id);
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${product?.name ? `"${product.name}"` : 'this product'}? This cannot be undone.`);
+    if (!confirmDelete) return;
+
     setProductLoadError('');
+    const toastId = toast.loading('Deleting product...');
 
     try {
       await productApi.deleteProduct(id);
       setProducts(prev => prev.filter(p => p.id !== id));
+      setProductTotal(prev => Math.max(0, prev - 1));
+      toast.success('Product deleted.', { id: toastId });
     } catch (error) {
-      setProductLoadError(
-        getApiErrorMessage(error) || 'Could not delete product. Please try again.'
-      );
+      const message = getApiErrorMessage(error) || 'Could not delete product. Please try again.';
+      setProductLoadError(message);
+      toast.error(message, { id: toastId });
     }
   };
 
@@ -1726,12 +1642,6 @@ function AdminPageContent() {
     }
   };
 
-  const handleDeactivateAdmin = async (id: string) => {
-    const admin = admins.find(item => item.id === id);
-    if (!admin) return;
-    toast.error('Deactivation is unavailable until the admin account API supports it.');
-  };
-
   const handleActivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
@@ -1759,13 +1669,30 @@ function AdminPageContent() {
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
-    toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
+    if (!window.confirm(`Block ${admin.firstName} ${admin.lastName}? They will lose access to the admin portal until unblocked.`)) return;
+
+    setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: 'blocked' as const } : a));
+    try {
+      await authApi.blockUser(id);
+      toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
+    } catch (error) {
+      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: admin.status } : a));
+      toast.error(getApiErrorMessage(error) || 'Could not block admin.');
+    }
   };
 
   const handleUnblockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
-    toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
+
+    setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: 'active' as const } : a));
+    try {
+      await authApi.unblockUser(id);
+      toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
+    } catch (error) {
+      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: admin.status } : a));
+      toast.error(getApiErrorMessage(error) || 'Could not unblock admin.');
+    }
   };
 
   const handleDeleteAdmin = async (id: string) => {
@@ -1820,6 +1747,7 @@ function AdminPageContent() {
 
   const handleBlockUser = async (id: string) => {
     const user = users.find(u => u.id === id);
+    if (!window.confirm(`Block ${user ? `${user.firstName} ${user.lastName}` : 'this user'}? They will not be able to sign in until unblocked.`)) return;
     // Optimistic update
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' as const } : u));
     try {
@@ -2074,7 +2002,6 @@ function AdminPageContent() {
               data={admins}
               searchQuery={searchQuery}
               onViewDetails={handleViewAdmin}
-              onDeactivate={handleDeactivateAdmin}
               onActivate={handleActivateAdmin}
               onBlock={handleBlockAdmin}
               onUnblock={handleUnblockAdmin}
@@ -2094,7 +2021,7 @@ function AdminPageContent() {
           </>
         ) : (
           <>
-            {activeTab !== 'deliveryRoutes' && (
+            {!['deliveryRoutes', 'blog', 'taxes'].includes(activeTab) && (
               <header className="flex flex-wrap justify-between items-center gap-3 mb-5">
                 <div>
                   <h1 className="text-2xl font-semibold text-slate-900 capitalize">{activeTab}</h1>

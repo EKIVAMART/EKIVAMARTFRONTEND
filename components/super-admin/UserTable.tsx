@@ -199,9 +199,10 @@ export default function UserTable({
       result = result.filter((u) => new Date(u.createdAt).getTime() <= to);
     }
 
-    // Sort
-    if (!isServerPaginated) {
-      const [field, dir] = sortBy.split('-');
+    // Sort — the server only sorts by createdAt/updatedAt, so name and
+    // last-login ordering is always applied locally.
+    const [field, dir] = sortBy.split('-');
+    if (!isServerPaginated || field === 'name' || field === 'lastLoginAt') {
       result.sort((a, b) => {
         let cmp = 0;
         if (field === 'name') {
