@@ -10,6 +10,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { adminVendorApi, AdminVendorProfile, AdminVendorDocument, AdminVendorBankAccount, AdminVendorAuditLogEntry, AdminWithdrawal, AdminFlaggedReview, AdminCommissionConfig } from '@/lib/api-vendor';
 import { authApi, categoryApi } from '@/lib/api';
+import RecordActions from '@/components/admin/RecordActions';
 
 interface VendorManagementViewProps {
   isSuperAdmin: boolean;
@@ -1176,116 +1177,17 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                           </td>
                         )}
 
-                        {/* Contextual Actions */}
                         <td className="p-4 text-right">
-                          <div className="flex justify-end gap-1.5">
-                            {/* View full details (Always present) */}
-                            <button
-                              onClick={() => handleViewVendor(vendor.id)}
-                              className="p-1.5 text-brand-600 hover:bg-brand-50 rounded-md transition"
-                              title="View Details"
-                            >
-                              <Eye size={16} />
-                            </button>
-
-                            {/* Assign button — Only pending queue (not assigned tab) */}
-                            {(activeTab === 'pending') && (
-                              <button
-                                onClick={() => { setAssignVendorTarget(vendor); setSelectedAdminId(''); }}
-                                className="px-2.5 py-1.5 bg-brand-50 border border-brand-100 hover:bg-brand-100 text-brand-700 rounded-md text-xs font-bold transition flex items-center gap-1"
-                                title="Assign Application to Admin"
-                              >
-                                <UserCheck size={12} /> Assign
-                              </button>
-                            )}
-
-                            {/* Pending / Assigned tab: ONLY Assign button in row */}
-                            {(activeTab === 'pending') && (
-                              <>
-                              </>
-                            )}
-
-                            {/* In Review tab: view only in row, actions in modal */}
-                            {activeTab === 'in_review' && (
-                              <></>
-                            )}
-
-
-                            {/* Requires Resubmission tab: view only, actions in modal */}
-                            {activeTab === 'requires_resubmission' && (
-                              <></>
-                            )}
-
-
-                            {/* Approved tab */}
-                            {activeTab === 'approved' && (
-                              <>
-                                <button
-                                  onClick={() => { setTrustLevelVendor(vendor); setSelectedTrustLevel(vendor.trustLevel); }}
-                                  className="p-1.5 text-[#228b22] hover:bg-brand-50 rounded-md transition"
-                                  title="Change Trust Level"
-                                >
-                                  <Award size={16} />
-                                </button>
-                                <button
-                                  onClick={() => { setActionVendor(vendor); setActionType('suspend'); setActionReason(''); }}
-                                  className="p-1.5 text-slate-500 hover:bg-amber-50 rounded-md transition"
-                                  title="Suspend Seller"
-                                >
-                                  <Ban size={15} />
-                                </button>
-                              </>
-                            )}
-
-                            {/* Suspended tab */}
-                            {activeTab === 'suspended' && (
-                              <button
-                                onClick={() => handleReactivateVendor(vendor)}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-slate-700 rounded-md text-xs font-bold transition flex items-center gap-1"
-                                title="Reactivate Store"
-                              >
-                                <Check size={12} /> Reactivate
-                              </button>
-                            )}
-
-                            {/* Banned tab — Super Admin only: Unban */}
-                            {activeTab === 'banned' && isSuperAdmin && (
-                              <button
-                                onClick={() => { setActionVendor(vendor); setActionType('unban'); setActionReason(''); }}
-                                className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-slate-700 rounded-md text-xs font-bold transition flex items-center gap-1"
-                                title="Unban Vendor"
-                              >
-                                <Check size={12} /> Unban
-                              </button>
-                            )}
-
-                            {/* Super Admin Override Button — only for approved/rejected/suspended/requires_resubmission */}
-                            {isSuperAdmin && ['approved', 'rejected', 'suspended', 'requires_resubmission'].includes(activeTab) && (
-                              <button
-                                onClick={() => {
-                                  setActionVendor(vendor);
-                                  setActionType('override');
-                                  setActionDecision(vendor.applicationStatus === 'approved' ? 'rejected' : 'approved');
-                                  setActionReason('');
-                                }}
-                                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-md transition"
-                                title="Override Decision"
-                              >
-                                <Settings size={14} />
-                              </button>
-                            )}
-
-                            {/* Super Admin Ban button — shown on all tabs except banned tab itself */}
-                            {isSuperAdmin && activeTab !== 'banned' && (
-                              <button
-                                onClick={() => { setActionVendor(vendor); setActionType('ban'); setActionReason(''); }}
-                                className="p-1.5 text-slate-500 hover:bg-red-50 rounded-md transition"
-                                title="Ban Permanently"
-                              >
-                                <Ban size={14} className="text-slate-500" />
-                              </button>
-                            )}
-                          </div>
+                          <RecordActions name={vendor.storeName || 'vendor'} actions={[
+                            { label: 'View details', onSelect: () => handleViewVendor(vendor.id) },
+                            activeTab === 'pending' && { label: 'Assign admin', onSelect: () => { setAssignVendorTarget(vendor); setSelectedAdminId(''); } },
+                            activeTab === 'approved' && { label: 'Change trust level', onSelect: () => { setTrustLevelVendor(vendor); setSelectedTrustLevel(vendor.trustLevel); } },
+                            activeTab === 'approved' && { label: 'Suspend seller', onSelect: () => { setActionVendor(vendor); setActionType('suspend'); setActionReason(''); } },
+                            activeTab === 'suspended' && { label: 'Reactivate store', onSelect: () => handleReactivateVendor(vendor) },
+                            activeTab === 'banned' && isSuperAdmin && { label: 'Unban vendor', onSelect: () => { setActionVendor(vendor); setActionType('unban'); setActionReason(''); } },
+                            isSuperAdmin && ['approved', 'rejected', 'suspended', 'requires_resubmission'].includes(activeTab) && { label: 'Override decision', onSelect: () => { setActionVendor(vendor); setActionType('override'); setActionDecision(vendor.applicationStatus === 'approved' ? 'rejected' : 'approved'); setActionReason(''); } },
+                            isSuperAdmin && activeTab !== 'banned' && { label: 'Ban vendor', destructive: true, onSelect: () => { setActionVendor(vendor); setActionType('ban'); setActionReason(''); } },
+                          ]} />
                         </td>
                       </tr>
                     );
@@ -1352,38 +1254,10 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {withdrawal.processedAt ? new Date(withdrawal.processedAt).toLocaleDateString() : '—'}
                       </td>
                       <td className="p-4 text-right">
-                        <div className="flex justify-end gap-1.5">
-                          {/* Standard process - pending withdrawal */}
-                          {withdrawal.status === 'pending' && (
-                            <button
-                              onClick={() => {
-                                setActionWithdrawal(withdrawal);
-                                setActionType('process_withdrawal');
-                                setWithdrawalAction('complete');
-                                setActionReason('');
-                              }}
-                              className="px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 border border-brand-100 text-[#228b22] rounded-md text-xs font-bold transition"
-                            >
-                              Process
-                            </button>
-                          )}
-
-                          {/* Force override payout - Super admin only */}
-                          {isSuperAdmin && (
-                            <button
-                              onClick={() => {
-                                setActionWithdrawal(withdrawal);
-                                setActionType('override_withdrawal');
-                                setWithdrawalAction(withdrawal.status === 'completed' ? 'fail' : 'complete');
-                                setActionReason('');
-                              }}
-                              className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-slate-700 rounded-md transition"
-                              title="Override Withdrawal Payout State"
-                            >
-                              <Settings size={14} />
-                            </button>
-                          )}
-                        </div>
+                        <RecordActions name={`withdrawal ${withdrawal.reference}`} actions={[
+                          withdrawal.status === 'pending' && { label: 'Process payout', onSelect: () => { setActionWithdrawal(withdrawal); setActionType('process_withdrawal'); setWithdrawalAction('complete'); setActionReason(''); } },
+                          isSuperAdmin && { label: 'Override payout state', onSelect: () => { setActionWithdrawal(withdrawal); setActionType('override_withdrawal'); setWithdrawalAction(withdrawal.status === 'completed' ? 'fail' : 'complete'); setActionReason(''); } },
+                        ]} />
                       </td>
                     </tr>
                   ))
@@ -1454,33 +1328,14 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                         {new Date(comm.updatedAt).toLocaleDateString()}
                       </td>
                       <td className="p-4 text-right">
-                        <div className="flex justify-end gap-1.5">
-                          <button
-                            onClick={() => setCommissionModal({
-                              isOpen: true,
-                              mode: 'edit',
-                              configId: comm.id,
-                              commissionRate: comm.commissionRate,
-                              gatewayFeeRate: comm.gatewayFeeRate,
-                              categoryId: comm.categoryId || '',
-                              vendorId: comm.vendorId || ''
-                            })}
-                            className="p-1.5 text-slate-500 hover:bg-blue-50 rounded-md transition"
-                            title="Edit Config Rates"
-                          >
-                            <Settings size={16} />
-                          </button>
-                          {/* Sole remaining global config cannot be deleted */}
-                          {(comm.categoryId || comm.vendorId) && (
-                            <button
-                              onClick={() => handleCommissionDelete(comm.id)}
-                              className="p-1.5 text-slate-400 hover:bg-red-50 hover:text-slate-900 rounded-md transition"
-                              title="Delete Config Rate"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                        </div>
+                        <RecordActions name="commission rate" actions={[
+                          { label: 'Edit rates', onSelect: () => setCommissionModal({
+                            isOpen: true, mode: 'edit', configId: comm.id,
+                            commissionRate: comm.commissionRate, gatewayFeeRate: comm.gatewayFeeRate,
+                            categoryId: comm.categoryId || '', vendorId: comm.vendorId || '',
+                          }) },
+                          Boolean(comm.categoryId || comm.vendorId) && { label: 'Delete rate', destructive: true, onSelect: () => handleCommissionDelete(comm.id) },
+                        ]} />
                       </td>
                     </tr>
                   ))

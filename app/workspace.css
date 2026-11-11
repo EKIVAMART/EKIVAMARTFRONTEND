@@ -1,7 +1,9 @@
 .ek-workspace{background:#f8faf7;padding:clamp(16px,2.4vw,40px);color:#1d3023;font-variant-numeric:tabular-nums}
 .ek-workspace-label{font-size:13px;font-weight:600;color:#385940}
 .ek-workspace table{border-collapse:collapse}.ek-workspace th{background:#f6f8f4;color:#516256;letter-spacing:.025em}.ek-workspace tbody tr:hover{background:#f7faf5}
-.ek-workspace h2,.ek-workspace h3{letter-spacing:-.025em}.ek-workspace :is(button,select,input){border-radius:5px}
+.ek-workspace h2,.ek-workspace h3{letter-spacing:-.025em}
+body:has(.ek-workspace) select,body:has(.ek-workspace) option{color-scheme:light;background-color:#fff;color:#1e293b}
+body:has(.ek-workspace) select:focus{box-shadow:none;border-color:#176a35}
 body:has(.ek-workspace) :is(button,a,input,select,textarea,[tabindex]):focus-visible{outline:2px solid #176a35;outline-offset:3px;box-shadow:none}
 :is(.ek-support-launcher,.ek-chat-launcher) {
   position:fixed;

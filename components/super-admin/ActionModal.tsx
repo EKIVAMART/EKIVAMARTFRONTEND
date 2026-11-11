@@ -1352,12 +1352,15 @@ export default function ActionModal({
     <>
       <AnimatePresence>
         {isOpen && (
-        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
+        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="product-editor-title"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white w-full max-w-4xl rounded-md shadow-sm overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
+            className="relative flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
           >
             <AnimatePresence>
               {saveErrors.length > 0 && (
@@ -1376,10 +1379,11 @@ export default function ActionModal({
               )}
             </AnimatePresence>
 
-            <div className="border-b border-slate-200 bg-white px-5 py-4 text-slate-900 flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8">
               <div>
-                <h2 className="text-xl font-semibold">{editingItem ? 'Edit product' : 'Add product'}</h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product management</p>
+                <h2 id="product-editor-title" className="text-xl font-semibold tracking-tight sm:text-2xl">{editingItem ? 'Edit product' : 'Add product'}</h2>
+                <p className="mt-1 text-sm text-slate-500">
                   {quickAddMode ? 'Quick add' : `Step ${currentStep} of ${totalSteps}`}
                 </p>
               </div>
@@ -1410,22 +1414,20 @@ export default function ActionModal({
             ) : (
               <div className="flex flex-col flex-grow min-h-0">
                 {/* Step Indicator */}
-                <div className="px-6 md:px-8 pt-6 pb-2 border-b border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center justify-between">
+                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4 sm:px-8">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     {[
-                      { step: 1, title: 'Basic Information', desc: 'Core product details' },
-                      { step: 2, title: 'Pricing & Inventory', desc: 'Set price, stock levels, and costs' },
-                      { step: 3, title: 'Additional Details', desc: 'Policies, category specifications, and SEO metadata' },
-                      ...(totalSteps === 4 ? [{ step: 4, title: 'Images', desc: 'Manage product gallery' }] : [])
+                      { step: 1, title: 'Product', icon: Layers },
+                      { step: 2, title: 'Pricing', icon: DollarSign },
+                      { step: 3, title: 'Details', icon: Info },
+                      ...(totalSteps === 4 ? [{ step: 4, title: 'Images', icon: ImageIcon }] : [])
                     ].map((s) => (
-                      <div key={s.step} className="flex flex-col items-center flex-1 relative">
-                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#228b22]' : 'bg-gray-200'}`} />}
-                        <div className={`relative z-10 w-8 h-8 rounded-md flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#228b22] text-white shadow-sm ' : currentStep > s.step ? 'bg-[#1c711c] text-white' : 'bg-gray-200 text-gray-500'}`}>
-                          {currentStep > s.step ? <Check size={14} /> : s.step}
+                      <div key={s.step} className="flex min-w-0 flex-1 items-center gap-2">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${currentStep === s.step ? 'bg-emerald-800 text-white' : currentStep > s.step ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500'}`}>
+                          {currentStep > s.step ? <Check size={17} /> : <s.icon size={17} aria-hidden="true" />}
                         </div>
-                        <div className="mt-2 text-center hidden md:block">
-                          <p className={`text-[11px] font-bold ${currentStep >= s.step ? 'text-gray-800' : 'text-gray-400'}`}>{s.title}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5">{s.desc}</p>
+                        <div className="hidden min-w-0 lg:block">
+                          <p className={`truncate text-xs font-semibold ${currentStep >= s.step ? 'text-slate-800' : 'text-slate-400'}`}>{s.title}</p>
                         </div>
                       </div>
                     ))}
@@ -2308,18 +2310,18 @@ export default function ActionModal({
       )}
 
       {showCancelConfirm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
-            <div className="w-12 h-12 bg-orange-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto">
-              <AlertCircle size={24} />
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-[3px]">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="unsaved-title" aria-describedby="unsaved-description" className="animate-in zoom-in-95 flex w-full max-w-md flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+              <AlertCircle size={24} aria-hidden="true" />
             </div>
-            <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Unsaved Changes</h4>
-            <p className="text-center text-sm text-gray-500 mb-6">You have unsaved changes. Do you want to save them before leaving?</p>
-            <div className="flex gap-3">
-              <button type="button" onClick={closeModalAndReset} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition">Discard</button>
-              <button type="button" onClick={() => setShowCancelConfirm(false)} className="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md font-bold transition">Cancel</button>
-              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-60 text-white rounded-md font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
+            <h4 id="unsaved-title" className="text-xl font-semibold tracking-tight text-slate-900">Keep your product changes?</h4>
+            <p id="unsaved-description" className="mt-2 text-sm leading-relaxed text-slate-600">You have edits that have not been saved. Save them now or return to the form.</p>
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+              <button type="button" onClick={() => setShowCancelConfirm(false)} className="min-h-11 flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Keep editing</button>
+              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="min-h-11 flex-1 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900 disabled:opacity-60">{isSaving ? 'Saving…' : 'Save changes'}</button>
             </div>
+            <button type="button" onClick={closeModalAndReset} className="mt-4 self-start text-sm font-medium text-rose-700 hover:underline">Discard changes and close</button>
           </div>
         </div>
       )}

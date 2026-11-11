@@ -1,12 +1,27 @@
 'use client';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { MoreHorizontal } from 'lucide-react';
+import { Award, CircleSlash, CreditCard, Eye, MessageSquare, MoreHorizontal, Pencil, RotateCcw, Send, Settings2, Trash2, UserRoundCheck } from 'lucide-react';
 
 export interface RecordAction {
   label: string;
   onSelect: () => void;
   destructive?: boolean;
+}
+
+function ActionIcon({ label }: { label: string }) {
+  const value = label.toLowerCase();
+  if (value.includes('review') || value.includes('repl')) return <MessageSquare size={16} aria-hidden="true" />;
+  if (value.includes('edit')) return <Pencil size={16} aria-hidden="true" />;
+  if (value.includes('delete') || value.includes('remove')) return <Trash2 size={16} aria-hidden="true" />;
+  if (value.includes('assign') || value.includes('approve')) return <UserRoundCheck size={16} aria-hidden="true" />;
+  if (value.includes('trust')) return <Award size={16} aria-hidden="true" />;
+  if (value.includes('reactivate') || value.includes('unban')) return <RotateCcw size={16} aria-hidden="true" />;
+  if (value.includes('suspend') || value.includes('ban') || value.includes('reject') || value.includes('block')) return <CircleSlash size={16} aria-hidden="true" />;
+  if (value.includes('payout')) return <CreditCard size={16} aria-hidden="true" />;
+  if (value.includes('override') || value.includes('rate')) return <Settings2 size={16} aria-hidden="true" />;
+  if (value.includes('publish')) return <Send size={16} aria-hidden="true" />;
+  return <Eye size={16} aria-hidden="true" />;
 }
 
 export default function RecordActions({ name, actions }: {
@@ -19,17 +34,18 @@ export default function RecordActions({ name, actions }: {
   return (
     <div className="flex justify-end" onClick={(event) => event.stopPropagation()}>
       <Menu>
-        <MenuButton className="inline-flex min-h-9 items-center gap-2 rounded-md border border-slate-200 px-3 text-xs font-medium text-slate-700 hover:bg-slate-50" aria-label={`Actions for ${name}`}>
-          Actions <MoreHorizontal size={16} aria-hidden="true" />
+        <MenuButton className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" aria-label={`Actions for ${name}`}>
+          Actions <MoreHorizontal size={17} aria-hidden="true" />
         </MenuButton>
-        <MenuItems anchor="bottom end" className="z-[150] min-w-44 rounded-md border border-slate-200 bg-white p-1 shadow-sm [--anchor-gap:4px] focus:outline-none">
+        <MenuItems anchor="bottom end" className="z-[150] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl [--anchor-gap:8px] focus:outline-none">
           {availableActions.map((action) => (
             <MenuItem key={action.label}>
               <button
                 type="button"
                 onClick={action.onSelect}
-                className={`block w-full rounded-sm px-3 py-2 text-left text-sm data-focus:bg-slate-100 ${action.destructive ? 'text-slate-700' : 'text-slate-700'}`}
+                className={`flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition data-focus:bg-slate-100 ${action.destructive ? 'text-rose-700 data-focus:bg-rose-50' : 'text-slate-700'}`}
               >
+                <ActionIcon label={action.label} />
                 {action.label}
               </button>
             </MenuItem>

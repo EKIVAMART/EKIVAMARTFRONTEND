@@ -35,10 +35,10 @@ const Skeleton = ({ className = '' }: { className?: string }) => (
 
 // ── Overview KPI stat card ────────────────────────────────────────────────────
 const OverviewCard = ({ title, metric, loading, period }: { title: string; metric?: CardMetric | null; loading?: boolean; period: PeriodType }) => (
-  <div className="min-w-0 border-r last:border-r-0 border-slate-200 px-5 py-4">
-    <p className="text-xs font-medium text-slate-600">{title}</p>
-    {loading ? <Skeleton className="h-8 w-20 mt-2" /> : <p className="mt-1 text-2xl font-semibold text-slate-900">{(metric?.filtered ?? 0).toLocaleString()}</p>}
-    {!loading && period !== 'all_time' && <p className="mt-1 text-xs text-slate-500">{(metric?.totalAllTime ?? 0).toLocaleString()} all time</p>}
+  <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{title}</p>
+    {loading ? <Skeleton className="h-8 w-20 mt-3" /> : <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums text-slate-900">{(metric?.filtered ?? 0).toLocaleString()}</p>}
+    {!loading && period !== 'all_time' && <p className="mt-2 text-xs text-slate-500">{(metric?.totalAllTime ?? 0).toLocaleString()} all time</p>}
   </div>
 );
 
@@ -226,7 +226,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
       </div>
 
       {/* ── 3.1 Overview Cards (GET /admin/dashboard?period=...) ───────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 rounded-lg border border-slate-200 bg-white">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <OverviewCard
           title="Orders"
           metric={stats?.orders}
@@ -296,7 +296,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
               </thead>
               <tbody className="divide-y divide-gray-50 text-sm">
                 {breakdownList.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={idx} className="cursor-pointer transition-colors hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View ${item.status} orders`} onClick={() => onNavigate?.('orders')} onKeyDown={(event) => { if (event.key === 'Enter') onNavigate?.('orders'); }}>
                     <td className="py-3 pl-2 font-medium">
                       <OrderStatusBadge status={item.status} />
                     </td>
@@ -318,11 +318,11 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
       </div>
 
       {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
 
         {/* ── Top Products Widget (GET /admin/dashboard/top-products) ──── */}
         <div
-              className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden flex flex-col"
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -373,8 +373,8 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-sm">
-                  {topProducts.map((p, idx) => (
-                    <tr key={p.productId || idx} className="hover:bg-slate-50/50 transition-colors">
+                  {topProducts.slice(0, 5).map((p, idx) => (
+                    <tr key={p.productId || idx} className="cursor-pointer transition-colors hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View ${p.name} in products`} onClick={() => onNavigate?.('products')} onKeyDown={(event) => { if (event.key === 'Enter') onNavigate?.('products'); }}>
                       <td className="p-3 pl-4 text-xs font-bold text-gray-400">{idx + 1}</td>
                       <td className="p-3">
                         <div className="flex items-center gap-3">
@@ -415,7 +415,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
 
         {/* ── Recent Orders Widget (Replacing Recent Activity) ─────────── */}
         <div
-              className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden flex flex-col"
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <div>
@@ -462,7 +462,11 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                   <div
                     key={ord.id || ord._id || i}
                     onClick={() => handleOpenRecentOrder(ord)}
-                    className="px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition cursor-pointer"
+                    onKeyDown={(event) => { if (event.key === 'Enter') handleOpenRecentOrder(ord); }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`View order ${orderNo}`}
+                    className="px-6 py-3.5 flex items-center justify-between hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-md bg-brand-50 flex items-center justify-center flex-shrink-0 text-brand-600 font-bold text-xs">

@@ -396,7 +396,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     inStock: isRecord(record.stock)
       ? Boolean(record.stock.isInStock)
       : getStockQuantity(record.stock, record.quantity) > 0,
-    image: record.image || imageUrls[0] || '',
+    image: record.image || imageUrls[0] || (typeof record.preview === 'string' && /\.(png|jpe?g|webp|avif)(\?|$)/i.test(record.preview) ? record.preview : ''),
     images: imageObjects,
     status: record.status || 'draft',
     condition: record.condition || 'new',
@@ -1897,8 +1897,13 @@ function AdminPageContent() {
 
       <div className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-end mb-5 pb-3 border-b border-gray-200/60">
-          <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center justify-between gap-6 mb-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Super admin workspace</p>
+            <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-slate-900">Welcome back, {authUser?.firstName || 'Super'}</h1>
+            <p className="mt-1 text-sm text-slate-500">Here is what is happening across EkivaMart.</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
               <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center font-semibold text-slate-700 text-sm border border-slate-200">
@@ -2124,8 +2129,9 @@ function AdminPageContent() {
                 <ProductTable
                   data={resolvedProducts}
                   onEdit={openProductModal}
-                  onView={(item) => openViewModal({
+                  onView={(item, section) => openViewModal({
                     ...item,
+                    initialSection: section || 'overview',
                     image: typeof item.image === 'string' ? item.image : item.image.src,
                   } as AdminProduct)}
                   onDelete={handleDeleteProduct}
