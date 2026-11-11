@@ -282,13 +282,15 @@ export default function TaxRulesView() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border"
             >
-              <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
-                <h3 className="font-bold text-lg">
+              <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+                <h3 className="text-lg font-semibold text-slate-900">
                   {editingRule ? 'Edit Tax Rule' : 'Add Regional Tax Rule'}
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 hover:bg-white/20 rounded-md transition"
+                  type="button"
+                  aria-label="Close tax rule form"
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                   ✕
                 </button>

@@ -78,18 +78,19 @@ export default function InviteAdminModal({
             className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
           >
             {/* Header */}
-            <div className="bg-brand-600 px-6 py-5 text-white">
+            <div className="border-b border-slate-200 bg-white px-6 py-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold">Invite Admin</h2>
-                  <p className="text-sm text-white/80 mt-0.5">
+                  <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900"><UserPlus size={20} className="text-emerald-700" />Invite Admin</h2>
+                  <p className="mt-1 text-sm text-slate-600">
                     Send an invitation to join your admin team
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="p-2 text-white/80 hover:bg-white/10 hover:text-white rounded-md transition"
+                  aria-label="Close invite admin form"
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                   <X size={20} />
                 </button>

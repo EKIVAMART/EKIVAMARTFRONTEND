@@ -138,13 +138,13 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
             className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
           >
             {/* Header */}
-            <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 sm:px-8">
               <div>
-                <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
-                <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
+                <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900 sm:text-2xl"><ImageIcon size={22} className="text-emerald-700" />{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
+                <p className="mt-1 text-sm text-slate-600">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
               </div>
-              <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-md transition-colors">
-                <X size={26} />
+              <button onClick={handleClose} type="button" aria-label="Close image upload" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900">
+                <X size={20} />
               </button>
             </div>
 

@@ -158,14 +158,16 @@ function RunNowModal({ result, onClose }: RunNowModalProps) {
         exit={{ scale: 0.95, opacity: 0 }}
         className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
       >
-        <div className="bg-[#228b22] px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-white">
-            <Zap size={20} />
-            <h3 className="font-bold text-lg">Sweep Results</h3>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+          <div className="flex items-center gap-2 text-slate-900">
+            <Zap size={20} className="text-emerald-700" />
+            <h3 className="text-lg font-semibold">Sweep Results</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white p-1.5 hover:bg-white/20 rounded-md transition"
+            type="button"
+            aria-label="Close sweep results"
+            className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
             ✕
           </button>
