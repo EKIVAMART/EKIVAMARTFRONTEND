@@ -328,12 +328,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: 'Gross sales', value: fmtNGN(kpiData?.platformGmv?.filtered), allTime: fmtNGN(kpiData?.platformGmv?.totalAllTime), icon: ShoppingBag, tint: 'bg-emerald-100 text-emerald-800' },
-              { label: 'Platform commission', value: fmtNGN(kpiData?.platformCommissionEarned?.filtered), allTime: fmtNGN(kpiData?.platformCommissionEarned?.totalAllTime), icon: TrendingUp, tint: 'bg-amber-100 text-amber-800' },
-              { label: 'Vendor earnings', value: fmtNGN(kpiData?.vendorEarningsTotal?.filtered), allTime: fmtNGN(kpiData?.vendorEarningsTotal?.totalAllTime), icon: Store, tint: 'bg-teal-100 text-teal-800' },
-              { label: 'Pending escrow', value: fmtNGN(kpiData?.pendingVendorEscrow?.filtered), allTime: fmtNGN(kpiData?.pendingVendorEscrow?.totalAllTime), icon: Clock, tint: 'bg-sky-100 text-sky-800' },
+              { label: 'Gross sales', value: fmtNGN(kpiData?.platformGmv?.filtered), allTime: fmtNGN(kpiData?.platformGmv?.totalAllTime), icon: ShoppingBag, color: 'text-emerald-800' },
+              { label: 'Platform commission', value: fmtNGN(kpiData?.platformCommissionEarned?.filtered), allTime: fmtNGN(kpiData?.platformCommissionEarned?.totalAllTime), icon: TrendingUp, color: 'text-amber-800' },
+              { label: 'Vendor earnings', value: fmtNGN(kpiData?.vendorEarningsTotal?.filtered), allTime: fmtNGN(kpiData?.vendorEarningsTotal?.totalAllTime), icon: Store, color: 'text-teal-800' },
+              { label: 'Pending escrow', value: fmtNGN(kpiData?.pendingVendorEscrow?.filtered), allTime: fmtNGN(kpiData?.pendingVendorEscrow?.totalAllTime), icon: Clock, color: 'text-sky-800' },
             ].map((metric) => <div key={metric.label} className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-              <div className="flex items-center justify-between gap-2"><p className="text-xs font-medium text-slate-600">{metric.label}</p><span className={`rounded-lg p-2 ${metric.tint}`}><metric.icon size={16} aria-hidden="true" /></span></div>
+              <div className="flex items-center justify-between gap-2"><p className="text-xs font-medium text-slate-600">{metric.label}</p><metric.icon size={20} className={metric.color} aria-hidden="true" /></div>
               <p className="mt-3 text-xl font-semibold tracking-tight text-slate-900 tabular-nums" title={metric.value}>{metric.value}</p>
               {selectedPeriod !== 'all_time' && <p className="mt-1 text-xs text-slate-500" title={metric.allTime}>{metric.allTime} all time</p>}
             </div>)}
