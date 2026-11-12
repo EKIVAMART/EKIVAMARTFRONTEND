@@ -239,14 +239,14 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
       <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="CategoryFormModal-dialog-0-title">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 dashboard-dialog-header">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-black text-slate-800 tracking-tight">
+            <h2 className="text-xl font-black text-slate-800 tracking-tight" id="CategoryFormModal-dialog-0-title">
               {editingCategory ? 'Edit Category' : 'Add New Category'}
             </h2>
             {isPublished && (
@@ -256,12 +256,12 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
               </div>
             )}
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
+          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 dashboard-dialog-body">
           {error && (
             <div className="mb-6 p-4 bg-red-50 text-slate-600 border border-red-200 rounded-md font-medium text-sm flex items-start gap-3">
               <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
@@ -375,7 +375,7 @@ export default function CategoryFormModal({ isOpen, onClose, editingCategory, on
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t bg-gray-50/50 flex gap-3 flex-wrap">
+        <div className="p-6 border-t bg-gray-50/50 flex gap-3 flex-wrap dashboard-dialog-footer">
           <button
             type="button"
             onClick={onClose}

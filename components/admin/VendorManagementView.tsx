@@ -1554,22 +1554,22 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* FULL VENDOR DETAIL MODAL CONTAINER */}
       <AnimatePresence>
         {detailVendorId && detailData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border max-h-full flex flex-col relative"
+              className="bg-white w-full overflow-hidden flex flex-col relative dashboard-dialog dashboard-dialog--large" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-0-title"
             >
               {/* Header */}
-              <div className="bg-[#184b3d] px-6 py-4 text-white flex items-center justify-between shrink-0">
+              <div className="bg-white border-b border-slate-200 px-6 py-4 text-slate-900 flex items-center justify-between shrink-0 dashboard-dialog-header">
                 <div>
-                  <h3 className="text-xl font-black tracking-tight">{detailData.profile.storeName}</h3>
+                  <h3 className="text-xl font-black tracking-tight" id="VendorManagementView-dialog-0-title">{detailData.profile.storeName}</h3>
                   <div className="flex items-center gap-3 mt-1.5">
                     <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-[#228b22] bg-white border px-2 py-0.5 rounded-md shadow-sm">
                       {detailData.profile.applicationStatus}
                     </span>
-                    <span className="text-xs font-medium text-white/90 bg-white/20 px-2.5 py-0.5 rounded-md border border-white/30">
+                    <span className="text-xs font-medium text-slate-500">
                       Ref: {detailData.profile.applicationReference || 'N/A'}
                     </span>
                   </div>
@@ -1577,7 +1577,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 <button
                   type="button"
                   onClick={() => setDetailVendorId(null)}
-                  className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-md transition-colors"
+                  className="p-2 text-slate-500 rounded-md transition-colors dashboard-dialog-close" aria-label="Close dialog"
                 >
                   <X size={20} strokeWidth={3} />
                 </button>
@@ -1628,7 +1628,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
               </div>
 
               {/* Scrollable details contents */}
-              <div className="flex-1 overflow-y-auto p-8 space-y-6">
+              <div className="flex-1 overflow-y-auto p-8 space-y-6 dashboard-dialog-body">
                 {detailTab === 'profile' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-semibold">
                     {/* Basic specs */}
@@ -1943,7 +1943,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
               {/* Footer review buttons */}
               {detailData.profile.applicationStatus !== 'approved' && (
-                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none">
+                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none dashboard-dialog-footer">
                   {/* Approve vendor application */}
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button
@@ -1983,16 +1983,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* ADMIN ASSIGN REVIEWER MODAL */}
       <AnimatePresence>
         {assignVendorTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-1-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">Assign Application Reviewer</h3>
-                <button onClick={() => setAssignVendorTarget(null)} className="p-1 hover:bg-slate-100 rounded-md transition">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-1-title">Assign Application Reviewer</h3>
+                <button onClick={() => setAssignVendorTarget(null)} className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
                   <X size={18} />
                 </button>
               </div>
@@ -2016,7 +2016,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   </select>
                 </div>
               </div>
-              <div className="p-6 border-t flex gap-2 justify-end bg-slate-50/50">
+              <div className="p-6 border-t flex gap-2 justify-end bg-slate-50/50 dashboard-dialog-footer">
                 <button
                   onClick={() => setAssignVendorTarget(null)}
                   className="px-4 py-2 border rounded-md text-xs font-bold hover:bg-slate-50 transition"
@@ -2039,17 +2039,17 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* DOUBLE CONFIRM ASSIGN MODAL */}
       <AnimatePresence>
         {confirmAssignModal && assignVendorTarget && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center border"
+              className="bg-white w-full p-6 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-2-title"
             >
-              <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-md flex items-center justify-center mx-auto mb-4 border border-brand-100">
+              <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-md flex items-center justify-center mx-auto mb-4 border border-brand-100 dashboard-dialog-icon">
                 <UserCheck size={24} />
               </div>
-              <h3 className="font-extrabold text-slate-800 text-lg">Confirm Reviewer Assignment</h3>
+              <h3 className="font-extrabold text-slate-800 text-lg" id="VendorManagementView-dialog-2-title">Confirm Reviewer Assignment</h3>
               <p className="text-xs text-gray-500 font-semibold leading-relaxed mt-3">
                 Confirm you want to assign <strong className="text-slate-700">{assignVendorTarget.storeName}</strong> application to{" "}
                 <strong className="text-slate-700">
@@ -2081,16 +2081,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* TRUST LEVEL UPGRADE DIALOG */}
       <AnimatePresence>
         {trustLevelVendor && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-3-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">Adjust Seller Trust Level</h3>
-                <button onClick={() => setTrustLevelVendor(null)} className="p-1 hover:bg-slate-100 rounded-md transition">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-3-title">Adjust Seller Trust Level</h3>
+                <button onClick={() => setTrustLevelVendor(null)} className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
                   <X size={18} />
                 </button>
               </div>
@@ -2138,18 +2138,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* COMMISSION RATE MANAGE MODAL (Super Admin) */}
       <AnimatePresence>
         {commissionModal.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+              className="bg-white w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-4-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-4-title">
                   {commissionModal.mode === 'create' ? 'Create Commission Configuration' : 'Edit Configuration Rate'}
                 </h3>
-                <button onClick={() => setCommissionModal({ ...commissionModal, isOpen: false })} className="p-1 hover:bg-slate-100 rounded-md transition">
+                <button onClick={() => setCommissionModal({ ...commissionModal, isOpen: false })} className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
                   <X size={18} />
                 </button>
               </div>
@@ -2265,16 +2265,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* GENERIC ACTION NOTE / REASON MODALS (Scale transition animation) */}
       <AnimatePresence>
         {actionType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-5-title"
             >
               {/* Header */}
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-5-title">
                   {actionType === 'reject' && 'Reject Vendor Application'}
                   {actionType === 'suspend' && 'Suspend Vendor Store'}
                   {actionType === 'resubmission' && 'Request Document Corrections'}
@@ -2285,7 +2285,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   {actionType === 'override_withdrawal' && 'Force-Override Payout Status'}
                   {actionType === 'bulk_reject' && `Bulk Reject ${selectedVendorIds.length} Applications`}
                 </h3>
-                <button onClick={() => { setActionType(null); setActionReason(''); setActionVendor(null); setActionWithdrawal(null); }} className="p-1 hover:bg-slate-100 rounded-md transition">
+                <button onClick={() => { setActionType(null); setActionReason(''); setActionVendor(null); setActionWithdrawal(null); }} className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
                   <X size={18} />
                 </button>
               </div>
@@ -2420,18 +2420,18 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* CUSTOM CONFIRM MODAL (Replaces alerts and window.confirm) */}
       <AnimatePresence>
         {confirmModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-6-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">{confirmModal.title}</h3>
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-6-title">{confirmModal.title}</h3>
                 <button
                   onClick={() => setConfirmModal(prev => ({ ...prev, open: false }))}
-                  className="p-1 hover:bg-slate-100 rounded-md transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
                 >
                   <X size={18} />
                 </button>
@@ -2441,7 +2441,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   {confirmModal.message}
                 </p>
               </div>
-              <div className="p-6 border-t flex gap-2 justify-end bg-slate-50/50">
+              <div className="p-6 border-t flex gap-2 justify-end bg-slate-50/50 dashboard-dialog-footer">
                 <button
                   type="button"
                   onClick={() => setConfirmModal(prev => ({ ...prev, open: false }))}
@@ -2465,25 +2465,25 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* BULK ACTION SKIPPED DETAILS WARNING MODAL */}
       <AnimatePresence>
         {skippedModal && skippedModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-7-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2" id="VendorManagementView-dialog-7-title">
                   <AlertTriangle className="text-slate-500" size={18} /> Bulk Action Summary (Skipped Warnings)
                 </h3>
                 <button
                   onClick={() => setSkippedModal(null)}
-                  className="p-1 hover:bg-slate-100 rounded-md transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
                 >
                   <X size={18} />
                 </button>
               </div>
-              <div className="p-6 space-y-4 max-h-[350px] overflow-y-auto">
+              <div className="p-6 space-y-4 max-h-[350px] overflow-y-auto dashboard-dialog-body">
                 <p className="text-xs text-gray-500 font-semibold leading-relaxed">
                   Bulk {skippedModal.action === 'approved' ? 'approval' : 'rejection'} completed.
                   {skippedModal.approved !== undefined && <span className="block mt-1 text-slate-600 font-bold">Successfully Approved: {skippedModal.approved}</span>}
@@ -2503,7 +2503,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   })}
                 </div>
               </div>
-              <div className="p-6 border-t flex justify-end bg-slate-50/50">
+              <div className="p-6 border-t flex justify-end bg-slate-50/50 dashboard-dialog-footer">
                 <button
                   type="button"
                   onClick={() => setSkippedModal(null)}
@@ -2520,39 +2520,40 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* DOCUMENT LIGHTBOX MODAL */}
       <AnimatePresence>
         {docLightbox && docLightbox.open && (
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/85 ">
-            <div className="w-full max-w-4xl flex items-center justify-between text-white mb-4">
-              <span className="text-sm font-extrabold uppercase tracking-wider">{docLightbox.name}</span>
+          <div className="fixed inset-0 z-[70] flex items-center justify-center dashboard-dialog-overlay">
+            <div className="dashboard-dialog dashboard-dialog--wide flex flex-col" role="dialog" aria-modal="true" aria-labelledby="vendor-document-title">
+            <div className="dashboard-dialog-header flex items-center justify-between">
+              <h3 id="vendor-document-title">{docLightbox.name}</h3>
               <div className="flex items-center gap-2">
                 <a
                   href={docLightbox.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-xs font-bold transition border border-white/10"
+                  className="px-3.5 py-2 border border-slate-200 text-slate-700 rounded-md text-xs font-medium hover:bg-slate-50"
                 >
                   Open in New Tab
                 </a>
                 <button
                   onClick={() => setDocLightbox(null)}
-                  className="p-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md transition"
+                  aria-label="Close document" className="dashboard-dialog-close"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="w-full max-w-4xl bg-white rounded-md overflow-hidden shadow-sm p-4 flex items-center justify-center min-h-[300px] max-h-[80vh]">
+            <div className="dashboard-dialog-body flex min-h-0 items-center justify-center overflow-y-auto">
               {docLightbox.type === 'image' ? (
                 <img
                   src={docLightbox.url}
                   alt={docLightbox.name}
-                  className="max-w-full max-h-[75vh] object-contain rounded-md animate-in zoom-in-95 duration-200"
+                  className="max-w-full max-h-[65dvh] object-contain rounded-md animate-in zoom-in-95 duration-200"
                 />
               ) : docLightbox.type === 'pdf' ? (
                 <iframe
                   src={docLightbox.url}
                   title={docLightbox.name}
-                  className="w-full h-[70vh] border-0 rounded-md"
+                  className="w-full h-[65dvh] border-0 rounded-md"
                 />
               ) : (
                 <div className="flex flex-col items-center gap-3 p-10 text-center text-slate-500">
@@ -2570,6 +2571,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 </div>
               )}
             </div>
+            </div>
           </div>
         )}
       </AnimatePresence>
@@ -2577,20 +2579,20 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
       {/* DOCUMENT REVIEW REASON MODAL */}
       <AnimatePresence>
         {docReviewModal && docReviewModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorManagementView-dialog-8-title"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <h3 className="font-extrabold text-slate-800 text-base">
+              <div className="p-6 border-b flex justify-between items-center bg-slate-50/50 dashboard-dialog-header">
+                <h3 className="font-extrabold text-slate-800 text-base" id="VendorManagementView-dialog-8-title">
                   Document Review: {docReviewModal.action === 'rejected' ? 'Reject Document' : 'Request Resubmission'}
                 </h3>
                 <button
                   onClick={() => setDocReviewModal(null)}
-                  className="p-1 hover:bg-slate-100 rounded-md transition"
+                  className="p-1 hover:bg-slate-100 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
                 >
                   <X size={18} />
                 </button>

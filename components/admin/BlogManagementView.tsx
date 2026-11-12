@@ -616,13 +616,13 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Delete Confirmation Modal */}
       {postToDelete && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-md bg-rose-50 text-slate-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200 dashboard-dialog-overlay">
+          <div className="bg-white w-full overflow-hidden p-6 space-y-6 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="BlogManagementView-dialog-0-title">
+            <div className="w-14 h-14 rounded-md bg-rose-50 text-slate-600 flex items-center justify-center font-bold mx-auto border border-rose-100 dashboard-dialog-icon">
               <Trash2 size={28} />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-800" id="BlogManagementView-dialog-0-title">
                 Delete Article?
               </h3>
               <p className="text-xs text-neutral-500 font-medium mt-1 leading-relaxed">
@@ -658,13 +658,13 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Unpublish Confirmation Modal */}
       {postToUnpublish && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200 dashboard-dialog-overlay">
+          <div className="bg-white w-full overflow-hidden p-6 space-y-6 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="BlogManagementView-dialog-1-title">
+            <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200 dashboard-dialog-icon">
               <EyeOff size={28} />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-800" id="BlogManagementView-dialog-1-title">
                 Unpublish Article?
               </h3>
               <p className="text-xs text-neutral-500 font-medium mt-1 leading-relaxed">

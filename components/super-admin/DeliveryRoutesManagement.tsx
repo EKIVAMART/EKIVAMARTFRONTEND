@@ -681,7 +681,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       {/* ── Add / Edit Route Modal ── */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -694,16 +694,16 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 border border-gray-150 z-10"
+              className="relative w-full bg-white p-6 z-10 dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="DeliveryRoutesManagement-dialog-0-title"
             >
-              <div className="flex items-center justify-between border-b pb-3 mb-4">
-                <h3 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
+              <div className="flex items-center justify-between border-b pb-3 mb-4 dashboard-dialog-header">
+                <h3 className="text-base font-extrabold text-slate-800 flex items-center gap-2" id="DeliveryRoutesManagement-dialog-0-title">
                   <Truck size={18} className="text-[#228b22]" />
                   {editingRoute ? 'Edit Delivery Route Fee' : 'Add New Delivery Route'}
                 </h3>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg dashboard-dialog-close" aria-label="Close dialog" type="button"
                 >
                   <X size={18} />
                 </button>
@@ -862,7 +862,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       {/* ── Warning Confirmation Dialog on Disable or Delete ── */}
       <AnimatePresence>
         {confirmAction && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -875,13 +875,13 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 border border-red-100 z-10 text-center"
+              className="relative w-full bg-white p-6 z-10 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="DeliveryRoutesManagement-dialog-1-title"
             >
-              <div className="w-12 h-12 rounded-md bg-red-50 text-slate-500 flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-md bg-red-50 text-slate-500 flex items-center justify-center mx-auto mb-3 dashboard-dialog-icon">
                 <AlertTriangle size={24} />
               </div>
 
-              <h3 className="text-base font-extrabold text-slate-800 mb-1">
+              <h3 className="text-base font-extrabold text-slate-800 mb-1" id="DeliveryRoutesManagement-dialog-1-title">
                 {confirmAction.type === 'delete' ? 'Delete Delivery Route?' : 'Disable Delivery Route?'}
               </h3>
 

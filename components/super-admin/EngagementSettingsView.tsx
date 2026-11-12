@@ -151,17 +151,17 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
 function RunNowModal({ result, onClose }: RunNowModalProps) {
   if (!result) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden"
+        className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="EngagementSettingsView-dialog-0-title"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
           <div className="flex items-center gap-2 text-slate-900">
             <Zap size={20} className="text-emerald-700" />
-            <h3 className="text-lg font-semibold">Sweep Results</h3>
+            <h3 className="text-lg font-semibold" id="EngagementSettingsView-dialog-0-title">Sweep Results</h3>
           </div>
           <button
             onClick={onClose}
@@ -204,17 +204,17 @@ interface ConfirmRunNowModalProps {
 
 function ConfirmRunNowModal({ onConfirm, onCancel, isRunning }: ConfirmRunNowModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl border p-6 text-center"
+        className="bg-white w-full p-6 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="EngagementSettingsView-dialog-1-title"
       >
-        <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+        <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4 dashboard-dialog-icon">
           <AlertTriangle size={26} className="text-slate-500" />
         </div>
-        <h3 className="text-lg font-extrabold text-slate-800">Run Engagement Sweep?</h3>
+        <h3 className="text-lg font-extrabold text-slate-800" id="EngagementSettingsView-dialog-1-title">Run Engagement Sweep?</h3>
         <p className="text-sm text-gray-500 mt-2 leading-relaxed">
           This will immediately send real reminder emails to eligible customers and vendors. This action cannot be undone.
         </p>

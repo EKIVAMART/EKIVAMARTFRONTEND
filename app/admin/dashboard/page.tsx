@@ -1604,14 +1604,10 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
+      <main className="ek-workspace ek-admin-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-between gap-6 mb-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Admin workspace</p>
-            <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-slate-900">Welcome back, {authUser?.firstName || 'Admin'}</h1>
-            <p className="mt-1 text-sm text-slate-500">Here is what is happening across EkivaMart.</p>
-          </div>
+        <div className="hidden md:flex items-center justify-between gap-6 mb-5 border-b border-slate-200 pb-4">
+          <p className="text-sm font-medium text-slate-500">EkivaMart <span className="mx-2 text-slate-300">/</span> Administration</p>
           <div className="flex shrink-0 items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">

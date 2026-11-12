@@ -1,4 +1,5 @@
 'use client';
+import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, X } from 'lucide-react';
@@ -19,6 +20,7 @@ interface TaxRule {
 const isValidRate = (value: number) => Number.isFinite(value) && value >= 0 && value <= 100;
 
 export default function TaxRulesManagement() {
+  const { confirm: requestConfirmation, confirmationDialog } = useDashboardConfirmation();
   const [rules, setRules] = useState<TaxRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -151,7 +153,7 @@ export default function TaxRulesManagement() {
   const handleDeleteRule = async (id: string) => {
     const rule = rules.find((r) => r.id === id);
     const label = rule ? [rule.country === 'NG' ? 'Nigeria' : rule.country, rule.region].filter(Boolean).join(' · ') : 'this tax rule';
-    if (!confirm(`Are you sure you want to delete the tax rule for ${label}? This cannot be undone.`)) return;
+    if (!(await requestConfirmation(`Are you sure you want to delete the tax rule for ${label}? This cannot be undone.`, { title: "Delete tax rule?", confirmLabel: "Delete tax rule", destructive: true }))) return;
     try {
       const res = await taxRulesApi.delete(id);
       if (res?.success) {
@@ -174,6 +176,7 @@ export default function TaxRulesManagement() {
 
   return (
     <div className="space-y-5">
+      {confirmationDialog}
 
       {/* Header Panel */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -250,15 +253,15 @@ export default function TaxRulesManagement() {
       )}
 
       {(showAddForm || editingRule) && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) closeForm(); }}>
-          <div role="dialog" aria-modal="true" aria-labelledby="tax-rule-dialog-title" className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:px-7">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeForm(); }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="tax-rule-dialog-title" className="flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--form">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:px-7 dashboard-dialog-header">
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Tax settings</p>
                 <h2 id="tax-rule-dialog-title" className="text-xl font-semibold tracking-tight text-slate-900">{showAddForm ? 'Add tax rule' : 'Edit tax rate'}</h2>
                 <p className="mt-1 text-sm text-slate-600">{showAddForm ? 'Set a rate for a country or a specific region.' : 'Update the rate for this tax rule.'}</p>
               </div>
-              <button type="button" onClick={closeForm} disabled={submitting || savingEdit} aria-label="Close tax rule form" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"><X size={20} /></button>
+              <button type="button" onClick={closeForm} disabled={submitting || savingEdit} aria-label="Close tax rule form" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50 dashboard-dialog-close"><X size={20} /></button>
             </div>
 
             <form onSubmit={showAddForm ? handleCreateRule : (event) => { event.preventDefault(); if (editingRule) void handleSaveEdit(editingRule.id); }} className="flex min-h-0 flex-col">

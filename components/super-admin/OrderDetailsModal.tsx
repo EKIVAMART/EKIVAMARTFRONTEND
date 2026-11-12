@@ -253,7 +253,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -261,10 +261,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="ek-print-invoice flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-2xl"
+            className="ek-print-invoice flex w-full flex-col overflow-hidden bg-slate-50 dashboard-dialog dashboard-dialog--large"
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Order details</p>
                 <div className="flex items-center gap-3">
@@ -287,7 +287,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                 >
                   <Printer size={15} /> Print Invoice
                 </button>
-                <button type="button" onClick={onClose} aria-label="Close order details" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100">
+                <button type="button" onClick={onClose} aria-label="Close order details" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 dashboard-dialog-close">
                   <X size={24} />
                 </button>
               </div>
@@ -437,7 +437,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     {/* Expected Delivery Promise */}
                     {order.expectedDelivery && (
                       <div className="flex items-start gap-3.5 rounded-xl border border-emerald-100 bg-emerald-50/70 p-5">
-                        <div className="w-10 h-10 rounded-md bg-[#228b22] text-white flex items-center justify-center shrink-0 shadow-sm">
+                        <div className="w-10 h-10 rounded-md bg-[#228b22] text-white flex items-center justify-center shrink-0 shadow-sm dashboard-dialog-icon">
                           <Truck size={20} />
                         </div>
                         <div className="flex-1 text-xs">

@@ -1,4 +1,5 @@
 'use client';
+import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useState, useEffect } from 'react';
 import { Percent, Plus, Trash2, Edit2, ShieldAlert, CheckCircle2, XCircle, RefreshCw, Globe } from 'lucide-react';
@@ -7,6 +8,7 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TaxRulesView() {
+  const { confirm: requestConfirmation, confirmationDialog } = useDashboardConfirmation();
   const [taxRules, setTaxRules] = useState<TaxRuleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function TaxRulesView() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this tax rule?')) return;
+    if (!(await requestConfirmation('Are you sure you want to delete this tax rule?', { title: 'Delete tax rule?', confirmLabel: 'Delete tax rule', destructive: true }))) return;
     const toastId = toast.loading('Deleting tax rule...');
     try {
       const res = await taxRuleApi.deleteTaxRule(id);
@@ -144,6 +146,7 @@ export default function TaxRulesView() {
 
   return (
     <div className="space-y-6">
+      {confirmationDialog}
       {/* Header & Notice */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-md border shadow-xs">
         <div>
@@ -275,15 +278,15 @@ export default function TaxRulesView() {
       {/* Create / Edit Tax Rule Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="TaxRulesView-dialog-0-title"
             >
-              <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
-                <h3 className="text-lg font-semibold text-slate-900">
+              <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
+                <h3 className="text-lg font-semibold text-slate-900" id="TaxRulesView-dialog-0-title">
                   {editingRule ? 'Edit Tax Rule' : 'Add Regional Tax Rule'}
                 </h3>
                 <button

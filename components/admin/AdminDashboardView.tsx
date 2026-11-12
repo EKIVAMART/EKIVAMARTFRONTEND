@@ -1,4 +1,6 @@
 'use client';
+import DashboardRevenueChart from './DashboardRevenueChart';
+import { Metric, OrderBreakdown } from './OverviewPrimitives';
 import RecordStatus from "@/components/admin/RecordStatus";
 import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
 
@@ -34,12 +36,8 @@ const Skeleton = ({ className = '' }: { className?: string }) => (
 );
 
 // ── Overview KPI stat card ────────────────────────────────────────────────────
-const OverviewCard = ({ title, metric, loading, period }: { title: string; metric?: CardMetric | null; loading?: boolean; period: PeriodType }) => (
-  <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{title}</p>
-    {loading ? <Skeleton className="h-8 w-20 mt-3" /> : <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums text-slate-900">{(metric?.filtered ?? 0).toLocaleString()}</p>}
-    {!loading && period !== 'all_time' && <p className="mt-2 text-xs text-slate-500">{(metric?.totalAllTime ?? 0).toLocaleString()} all time</p>}
-  </div>
+const OverviewCard = ({ title, metric, loading, period, error }: { title: string; metric?: CardMetric | null; loading?: boolean; period: PeriodType; error?: string | null }) => (
+  <Metric label={title} value={loading ? '—' : error ? 'Unavailable' : (metric?.filtered ?? 0).toLocaleString()} context={loading ? 'Loading metrics…' : error ? 'Refresh to try again' : period === 'all_time' ? 'Lifetime total' : `${(metric?.totalAllTime ?? 0).toLocaleString()} lifetime · created in selected period`} />
 );
 
 const OrderStatusBadge = ({ status }: { status: string }) => <RecordStatus value={status || 'unknown'} />;
@@ -47,6 +45,7 @@ const OrderStatusBadge = ({ status }: { status: string }) => <RecordStatus value
 export default function AdminDashboardView({ onNavigate }: AdminDashboardViewProps) {
   const router = useRouter();
   const authUser = useAppSelector((state) => state.auth.user);
+  const [chartView, setChartView] = useState<'orders' | 'orderValue'>('orders');
   const [period, setPeriod] = useState<PeriodType>('week');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
 
@@ -56,15 +55,19 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   // Widget states
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [errorStats, setErrorStats] = useState<string | null>(null);
 
   const [orderAnalytics, setOrderAnalytics] = useState<DetailedOrderAnalytics | null>(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+  const [errorAnalytics, setErrorAnalytics] = useState<string | null>(null);
 
   const [topProducts, setTopProducts] = useState<AdminTopProductItem[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [errorProducts, setErrorProducts] = useState<string | null>(null);
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loadingRecentOrders, setLoadingRecentOrders] = useState(true);
+  const [errorRecentOrders, setErrorRecentOrders] = useState<string | null>(null);
 
   // ── Fetch Categories ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -85,15 +88,16 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   // ── Fetch Overview Stats (GET /admin/dashboard?period=...) ─────────────
   const fetchStats = useCallback(async () => {
     setLoadingStats(true);
+    setErrorStats(null);
     try {
       const res = await adminDashboardApi.getDashboard({ period });
       if (res?.success && res.data) {
         setStats(res.data);
       } else if (res && !res.success) {
-        toast.error(res.message || 'Failed to load dashboard metrics');
+        setErrorStats(res.message || 'Failed to load dashboard metrics');
       }
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to load dashboard metrics');
+      setErrorStats(err?.message || 'Failed to load dashboard metrics');
     } finally {
       setLoadingStats(false);
     }
@@ -102,15 +106,16 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   // ── Fetch Order Analytics (GET /admin/dashboard/order-analytics?period=...) ──
   const fetchOrderAnalytics = useCallback(async () => {
     setLoadingAnalytics(true);
+    setErrorAnalytics(null);
     try {
       const res = await adminDashboardApi.getOrderAnalytics({ period });
       if (res?.success && res.data) {
         setOrderAnalytics(res.data);
       } else if (res && !res.success) {
-        toast.error(res.message || 'Failed to load order analytics');
+        setErrorAnalytics(res.message || 'Failed to load order analytics');
       }
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to load order analytics');
+      setErrorAnalytics(err?.message || 'Failed to load order analytics');
     } finally {
       setLoadingAnalytics(false);
     }
@@ -119,6 +124,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   // ── Fetch Top Products (GET /admin/dashboard/top-products?period=...&categoryId=...) ──
   const fetchTopProducts = useCallback(async () => {
     setLoadingProducts(true);
+    setErrorProducts(null);
     try {
       const res = await adminDashboardApi.getTopProducts({
         period,
@@ -128,10 +134,10 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
         const list = res.data?.products ?? [];
         setTopProducts(Array.isArray(list) ? list : []);
       } else if (res && !res.success) {
-        toast.error(res.message || 'Failed to load top products');
+        setErrorProducts(res.message || 'Failed to load top products');
       }
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to load top products');
+      setErrorProducts(err?.message || 'Failed to load top products');
     } finally {
       setLoadingProducts(false);
     }
@@ -140,6 +146,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   // ── Fetch Recent Orders (ordersApi.search sortBy=created_at sortOrder=desc limit=5) ──
   const fetchRecentOrders = useCallback(async () => {
     setLoadingRecentOrders(true);
+    setErrorRecentOrders(null);
     try {
       const res = await ordersApi.search({
         sortBy: 'created_at',
@@ -164,6 +171,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
       setRecentOrders(Array.isArray(list) ? list.slice(0, 5) : []);
     } catch {
       setRecentOrders([]);
+      setErrorRecentOrders("Recent orders could not be loaded.");
     } finally {
       setLoadingRecentOrders(false);
     }
@@ -214,7 +222,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
   const breakdownList = orderAnalytics?.breakdown ?? [];
 
   return (
-    <div className="space-y-8">
+    <div className="overview-page">
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
@@ -226,103 +234,48 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
       </div>
 
       {/* ── 3.1 Overview Cards (GET /admin/dashboard?period=...) ───────── */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="overview-metrics">
         <OverviewCard
           title="Orders"
           metric={stats?.orders}
           period={period}
-          loading={loadingStats}
+          loading={loadingStats} error={errorStats}
         />
         <OverviewCard
           title="Products"
           metric={stats?.products}
           period={period}
-          loading={loadingStats}
+          loading={loadingStats} error={errorStats}
         />
         <OverviewCard
           title="Users"
           metric={stats?.users}
           period={period}
-          loading={loadingStats}
+          loading={loadingStats} error={errorStats}
         />
         <OverviewCard
           title="Vendors"
           metric={stats?.vendors}
           period={period}
-          loading={loadingStats}
+          loading={loadingStats} error={errorStats}
         />
       </div>
 
-      <NewsletterSubscriberCount />
-
-      {/* ── 3.2 Order Analytics (GET /admin/dashboard/order-analytics) ── */}
-      <div
-        className="bg-white p-5 border border-slate-200"
-      >
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-3 border-b border-slate-200 gap-4">
-          <div>
-            <h2 className="font-semibold text-slate-900 text-base">Orders by status</h2>
-            <p className="text-xs text-slate-500 mt-0.5">{periodLabel[period]}</p>
-          </div>
-
-          <div className="flex items-baseline gap-3 text-sm">
-              <span className="text-slate-600">Order value</span>
-              <span className="font-semibold text-slate-900">
-                {loadingAnalytics
-                  ? '—'
-                  : new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(orderAnalytics?.totalOrdersRevenue ?? 0)}
-              </span>
-          </div>
-        </div>
-
-        {loadingAnalytics ? (
-          <div className="py-8 space-y-4">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
-          </div>
-        ) : breakdownList.length === 0 ? (
-          <div className="py-8 text-sm text-slate-600">
-            No orders for this period.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase">
-                  <th className="pb-3 pl-2">Status</th>
-                  <th className="pb-3 text-right">Orders</th>
-                  <th className="pb-3 text-right">Order Value</th>
-                  <th className="pb-3 text-right pr-2">Share</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 text-sm">
-                {breakdownList.map((item, idx) => (
-                  <tr key={idx} className="cursor-pointer transition-colors hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View ${item.status} orders`} onClick={() => onNavigate?.('orders')} onKeyDown={(event) => { if (event.key === 'Enter') onNavigate?.('orders'); }}>
-                    <td className="py-3 pl-2 font-medium">
-                      <OrderStatusBadge status={item.status} />
-                    </td>
-                    <td className="py-3 text-right font-bold text-slate-800">
-                      {item.count.toLocaleString()}
-                    </td>
-                    <td className="py-3 text-right font-bold text-slate-700">
-                      {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(item.totalRevenue ?? 0)}
-                    </td>
-                    <td className="py-3 text-right pr-2 font-semibold text-slate-500">
-                      {item.percentage}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      {errorStats && <button onClick={fetchStats} className="text-sm text-emerald-800">{errorStats} · Retry</button>}
+      <div className="overview-analytics">
+        <section className="overview-panel"><div className="overview-panel-heading"><div><h2>Order activity</h2><p>Orders placed · {periodLabel[period]}</p></div><select aria-label="Chart measure" value={chartView} onChange={e=>setChartView(e.target.value as 'orders' | 'orderValue')}><option value="orders">Order count</option><option value="orderValue">Order value</option></select></div>
+          {loadingAnalytics ? <div className="analytics-empty">Loading order activity…</div> : errorAnalytics ? <div className="analytics-empty flex-col gap-3" role="alert">{errorAnalytics}<button onClick={fetchOrderAnalytics} className="text-emerald-800 underline">Retry</button></div> : orderAnalytics?.dataPoints ? <DashboardRevenueChart points={orderAnalytics.dataPoints} kind={chartView}/> : <div className="analytics-empty">Order history is unavailable. Refresh to try again.</div>}
+        </section>
+        <OrderBreakdown rows={breakdownList} total={orderAnalytics?.totalOrdersCount ?? 0} value={orderAnalytics?.totalOrdersRevenue ?? 0} loading={loadingAnalytics} error={errorAnalytics} onRetry={fetchOrderAnalytics} onOpen={()=>onNavigate?.('orders')}/>
       </div>
+      <NewsletterSubscriberCount />
 
       {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
       <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
 
         {/* ── Top Products Widget (GET /admin/dashboard/top-products) ──── */}
         <div
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+              className="overview-panel overflow-hidden"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -355,7 +308,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
             <div className="p-6 space-y-4">
               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12" />)}
             </div>
-          ) : topProducts.length === 0 ? (
+          ) : errorProducts ? <div className="analytics-empty flex-col gap-3" role="alert">{errorProducts}<button onClick={fetchTopProducts} className="text-emerald-800 underline">Retry</button></div> : topProducts.length === 0 ? (
             <div className="p-10 flex flex-col items-center justify-center text-slate-400 flex-1">
               <Package size={36} className="opacity-20 mb-3" />
               <p className="text-sm font-medium">No top products found</p>
@@ -385,13 +338,13 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                               className="w-9 h-9 rounded-lg object-cover border border-gray-100 flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
+                            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Package size={16} className="text-brand-400" />
                             </div>
                           )}
                           <div className="min-w-0">
-                            <h4 className="text-xs font-bold text-slate-800 truncate max-w-[140px]">
-                              {p.name || 'Unnamed Product'}
+                            <h4 className="text-xs font-bold text-slate-800 truncate max-w-[180px]">
+                              <span title={p.name}>{p.name || 'Unnamed Product'}</span>
                             </h4>
                             <p className="text-[10px] text-gray-400 truncate">
                               {p.categoryName || 'General'} {p.sku ? `• SKU: ${p.sku}` : ''}
@@ -399,7 +352,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                           </div>
                         </div>
                       </td>
-                      <td className="p-3 text-xs font-medium text-slate-600 truncate max-w-[100px]">
+                      <td title={p.vendorName || undefined} className="p-3 text-xs font-medium text-slate-600 truncate max-w-[100px]">
                         {p.vendorName || '—'}
                       </td>
                       <td className="p-3 text-right pr-4 font-black text-slate-800">
@@ -415,7 +368,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
 
         {/* ── Recent Orders Widget (Replacing Recent Activity) ─────────── */}
         <div
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+              className="overview-panel overflow-hidden"
         >
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <div>
@@ -423,7 +376,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                 <ShoppingBag size={18} className="text-brand-500" />
                 Recent Orders
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">Last 5 orders (newest first)</p>
+              <p className="text-xs text-gray-500 mt-0.5">Latest 5 orders · all time</p>
             </div>
             <button
               onClick={() => onNavigate?.('orders')}
@@ -437,7 +390,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
             <div className="p-6 space-y-4">
               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12" />)}
             </div>
-          ) : recentOrders.length === 0 ? (
+          ) : errorRecentOrders ? <div className="analytics-empty flex-col gap-3" role="alert">{errorRecentOrders}<button onClick={fetchRecentOrders} className="text-emerald-800 underline">Retry</button></div> : recentOrders.length === 0 ? (
             <div className="p-10 flex flex-col items-center justify-center text-slate-400 flex-1">
               <ShoppingBag size={36} className="opacity-20 mb-3" />
               <p className="text-sm font-medium">No recent orders</p>
@@ -466,10 +419,10 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
                     tabIndex={0}
                     role="button"
                     aria-label={`View order ${orderNo}`}
-                    className="px-6 py-3.5 flex items-center justify-between hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 transition cursor-pointer"
+                    className="recent-order-row px-6 py-3.5 flex items-center justify-between hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-md bg-brand-50 flex items-center justify-center flex-shrink-0 text-brand-600 font-bold text-xs">
+                      <div className="w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0 text-brand-600 font-bold text-xs">
                         <ShoppingBag size={16} />
                       </div>
                       <div className="min-w-0">

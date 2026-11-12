@@ -1,4 +1,5 @@
 'use client';
+import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
 import Sidebar from '@/components/super-admin/Sidebar';
@@ -669,6 +670,7 @@ const buildProductPayload = (
 };
 
 function AdminPageContent() {
+  const { confirm: requestConfirmation, confirmationDialog } = useDashboardConfirmation();
   const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -1593,7 +1595,7 @@ function AdminPageContent() {
 
   const handleDeleteProduct = async (id: string) => {
     const product = products.find(p => p.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${product?.name ? `"${product.name}"` : 'this product'}? This cannot be undone.`);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete ${product?.name ? `"${product.name}"` : 'this product'}? This cannot be undone.`, { title: "Delete product?", confirmLabel: "Delete product", destructive: true });
     if (!confirmDelete) return;
 
     setProductLoadError('');
@@ -1673,7 +1675,7 @@ function AdminPageContent() {
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
-    if (!window.confirm(`Block ${admin.firstName} ${admin.lastName}? They will lose access to the admin portal until unblocked.`)) return;
+    if (!(await requestConfirmation(`Block ${admin.firstName} ${admin.lastName}? They will lose access to the admin portal until unblocked.`, { title: "Block admin?", confirmLabel: "Block admin", destructive: true }))) return;
 
     setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: 'blocked' as const } : a));
     try {
@@ -1701,7 +1703,7 @@ function AdminPageContent() {
 
   const handleDeleteAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`, { title: "Delete admin?", confirmLabel: "Delete admin", destructive: true });
     if (!confirmDelete) return;
 
     const toastId = toast.loading('Deleting admin...');
@@ -1751,7 +1753,7 @@ function AdminPageContent() {
 
   const handleBlockUser = async (id: string) => {
     const user = users.find(u => u.id === id);
-    if (!window.confirm(`Block ${user ? `${user.firstName} ${user.lastName}` : 'this user'}? They will not be able to sign in until unblocked.`)) return;
+    if (!(await requestConfirmation(`Block ${user ? `${user.firstName} ${user.lastName}` : 'this user'}? They will not be able to sign in until unblocked.`, { title: "Block user?", confirmLabel: "Block user", destructive: true }))) return;
     // Optimistic update
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' as const } : u));
     try {
@@ -1780,7 +1782,7 @@ function AdminPageContent() {
 
   const handleDeleteUser = async (id: string) => {
     const user = users.find(u => u.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`, { title: "Delete user?", confirmLabel: "Delete user", destructive: true });
     if (!confirmDelete) return;
 
     const toastId = toast.loading('Deleting user...');
@@ -1869,6 +1871,7 @@ function AdminPageContent() {
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
+      {confirmationDialog}
 
       {/* Session Timeout Warning */}
       <SessionTimeoutModal loginPath="/super-admin/login" />
@@ -1895,14 +1898,10 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
+      <div className="ek-workspace ek-admin-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-between gap-6 mb-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Super admin workspace</p>
-            <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-slate-900">Welcome back, {authUser?.firstName || 'Super'}</h1>
-            <p className="mt-1 text-sm text-slate-500">Here is what is happening across EkivaMart.</p>
-          </div>
+        <div className="hidden md:flex items-center justify-between gap-6 mb-5 border-b border-slate-200 pb-4">
+          <p className="text-sm font-medium text-slate-500">EkivaMart <span className="mx-2 text-slate-300">/</span> Marketplace operations</p>
           <div className="flex shrink-0 items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">

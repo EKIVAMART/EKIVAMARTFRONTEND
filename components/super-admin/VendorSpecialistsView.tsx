@@ -82,7 +82,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
   if (!specialist) return null;
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 dashboard-dialog-overlay">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -95,23 +95,23 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white w-full flex flex-col overflow-hidden dashboard-dialog dashboard-dialog--form"
+          onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-0-title"
         >
-          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
             <div className="flex min-w-0 items-start gap-3">
               <Truck size={22} className="mt-0.5 shrink-0 text-emerald-700" aria-hidden="true" />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Vendor specialist</p>
-                <h2 className="truncate text-xl font-semibold text-slate-900">{specialist.name}</h2>
+                <h2 className="truncate text-xl font-semibold text-slate-900" id="VendorSpecialistsView-dialog-0-title">{specialist.name}</h2>
                 <p className="mt-1 text-sm text-slate-600">{specialist.contactPhone}</p>
               </div>
             </div>
-            <button type="button" onClick={onClose} aria-label="Close specialist details" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"><X size={20} /></button>
+            <button type="button" onClick={onClose} aria-label="Close specialist details" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"><X size={20} /></button>
           </div>
 
           {/* Scrollable content */}
-          <div className="flex-1 space-y-6 overflow-y-auto p-6">
+          <div className="flex-1 space-y-6 overflow-y-auto p-6 dashboard-dialog-body">
             <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
               {specialist.isActive ? <CheckCircle2 size={19} className="shrink-0 text-emerald-700" /> : <XCircle size={19} className="shrink-0 text-slate-500" />}
               <div>
@@ -144,7 +144,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           </div>
 
           {/* Footer Actions */}
-          <div className="border-t border-gray-100 p-4 flex flex-wrap gap-3 shrink-0">
+          <div className="border-t border-gray-100 p-4 flex flex-wrap gap-3 shrink-0 dashboard-dialog-footer">
             <button
               onClick={() => { onToggleActive(specialist); onClose(); }}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-bold transition ${
@@ -266,26 +266,26 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="flex max-h-[92dvh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-1-title"
           >
-            <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
               <div className="flex items-center gap-2">
                 <Truck size={20} className="text-emerald-700" />
-                <h3 className="text-lg font-semibold text-slate-900">
+                <h3 className="text-lg font-semibold text-slate-900" id="VendorSpecialistsView-dialog-1-title">
                   {isEditing ? 'Edit Specialist' : 'Add Vendor Specialist'}
                 </h3>
               </div>
-              <button type="button" onClick={onClose} aria-label="Close specialist form" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
+              <button type="button" onClick={onClose} aria-label="Close specialist form" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto p-6 dashboard-dialog-body">
               {/* Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
@@ -394,17 +394,17 @@ interface DeleteConfirmProps {
 
 function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteConfirmProps) {
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl border p-6 text-center"
+        className="bg-white w-full p-6 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-2-title"
       >
-        <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4">
+        <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4 dashboard-dialog-icon">
           <Trash2 size={24} className="text-slate-500" />
         </div>
-        <h3 className="text-lg font-extrabold text-slate-800">Delete Specialist?</h3>
+        <h3 className="text-lg font-extrabold text-slate-800" id="VendorSpecialistsView-dialog-2-title">Delete Specialist?</h3>
         <p className="text-sm text-gray-500 mt-2 leading-relaxed">
           Are you sure you want to delete <span className="font-bold text-slate-700">{name}</span>? This action cannot be undone.
         </p>

@@ -231,13 +231,13 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
   return (
     <AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px] ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
+            className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="SessionTimeoutModal-dialog-0-title"
           >
             {/* ── Progress bar ── */}
             <div className="h-1.5 bg-slate-100 w-full">
@@ -260,7 +260,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
               </div>
 
               <div>
-                <h2 className="text-xl font-black text-slate-800 tracking-tight">
+                <h2 className="text-xl font-black text-slate-800 tracking-tight" id="SessionTimeoutModal-dialog-0-title">
                   ⚠️ Session Expiring!
                 </h2>
                 <p className="text-sm text-gray-500 font-medium mt-1 leading-relaxed">

@@ -70,18 +70,18 @@ export default function InviteAdminModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
+            className="relative bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="InviteAdminModal-dialog-0-title"
           >
             {/* Header */}
-            <div className="border-b border-slate-200 bg-white px-6 py-5">
+            <div className="border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900"><UserPlus size={20} className="text-emerald-700" />Invite Admin</h2>
+                  <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900" id="InviteAdminModal-dialog-0-title"><UserPlus size={20} className="text-emerald-700" />Invite Admin</h2>
                   <p className="mt-1 text-sm text-slate-600">
                     Send an invitation to join your admin team
                   </p>
@@ -90,7 +90,7 @@ export default function InviteAdminModal({
                   type="button"
                   onClick={handleClose}
                   aria-label="Close invite admin form"
-                  className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"
                 >
                   <X size={20} />
                 </button>

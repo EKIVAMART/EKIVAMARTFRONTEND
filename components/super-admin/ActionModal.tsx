@@ -1352,7 +1352,7 @@ export default function ActionModal({
     <>
       <AnimatePresence>
         {isOpen && (
-        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
+        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -1360,7 +1360,7 @@ export default function ActionModal({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="relative flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="relative flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--wide"
           >
             <AnimatePresence>
               {saveErrors.length > 0 && (
@@ -1379,7 +1379,7 @@ export default function ActionModal({
               )}
             </AnimatePresence>
 
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product management</p>
                 <h2 id="product-editor-title" className="text-xl font-semibold tracking-tight sm:text-2xl">{editingItem ? 'Edit product' : 'Add product'}</h2>
@@ -1401,7 +1401,7 @@ export default function ActionModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="p-2 text-slate-500 hover:bg-slate-100 rounded-md transition"
+                  className="p-2 text-slate-500 hover:bg-slate-100 rounded-md transition dashboard-dialog-close"
                   aria-label="Close modal"
                 >
                   <X size={22} />
@@ -1438,7 +1438,7 @@ export default function ActionModal({
                   {currentStep === 1 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Layers size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><Layers size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
                           <p className="text-xs text-gray-500">Core product details</p>
@@ -1730,7 +1730,7 @@ export default function ActionModal({
                   {currentStep === 2 && (
                     <div className="space-y-8">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><DollarSign size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><DollarSign size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
                           <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
@@ -1778,7 +1778,7 @@ export default function ActionModal({
                   {currentStep === 3 && (
                     <div className="space-y-8 animate-in fade-in duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Info size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><Info size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
                           <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
@@ -1990,7 +1990,7 @@ export default function ActionModal({
                     <div className="space-y-6 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-[#228b22] rounded-lg text-white">
+                          <div className="dashboard-dialog-icon flex items-center justify-center">
                             <ImageIcon size={22} />
                           </div>
                           <div>
@@ -2191,9 +2191,9 @@ export default function ActionModal({
 
                       {/* Delete Confirmation */}
                       {imageToDelete && (
-                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
-                          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-sm animate-in zoom-in-95">
-                            <div className="w-12 h-12 bg-red-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto">
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 dashboard-dialog-overlay">
+                          <div className="bg-white p-6 w-full animate-in zoom-in-95 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true">
+                            <div className="w-12 h-12 bg-red-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto dashboard-dialog-icon dashboard-dialog-icon">
                               <Trash2 size={24} />
                             </div>
                             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Delete Image?</h4>
@@ -2214,7 +2214,7 @@ export default function ActionModal({
 
             {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
             {!quickAddMode && (
-              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
+              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative dashboard-dialog-footer">
                 <button
                   type="button"
                   onClick={prevStep}
@@ -2280,8 +2280,8 @@ export default function ActionModal({
       />
 
       {imageToReplace && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 dashboard-dialog-overlay">
+          <div className="bg-white p-6 w-full animate-in zoom-in-95 flex flex-col dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true">
             <h4 className="font-bold text-lg text-gray-800 mb-4 text-center">Replace Image</h4>
 
             <div className="w-full aspect-square bg-gray-100 rounded-md overflow-hidden mb-4 border border-gray-200">
@@ -2310,9 +2310,9 @@ export default function ActionModal({
       )}
 
       {showCancelConfirm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-[3px]">
-          <div role="alertdialog" aria-modal="true" aria-labelledby="unsaved-title" aria-describedby="unsaved-description" className="animate-in zoom-in-95 flex w-full max-w-md flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8">
-            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-[3px] dashboard-dialog-overlay">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="unsaved-title" aria-describedby="unsaved-description" className="animate-in zoom-in-95 flex w-full flex-col bg-white p-6 sm:p-8 dashboard-dialog dashboard-dialog--form dashboard-dialog--padded">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700 dashboard-dialog-icon">
               <AlertCircle size={24} aria-hidden="true" />
             </div>
             <h4 id="unsaved-title" className="text-xl font-semibold tracking-tight text-slate-900">Keep your product changes?</h4>

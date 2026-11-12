@@ -122,7 +122,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
         <motion.div
           role="dialog"
           aria-modal="true"
@@ -130,10 +130,10 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+          className="relative flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--large"
         >
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8">
+          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product details</p>
               <h2 id="product-details-title" className="text-xl font-semibold tracking-tight sm:text-2xl">{product.name}</h2>
@@ -150,7 +150,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"
               aria-label="Close product details"
             >
               <X size={20} strokeWidth={3} />
@@ -163,7 +163,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto bg-slate-50/60 p-5 sm:p-8">
+          <div className="flex-1 overflow-y-auto bg-slate-50/60 p-5 sm:p-8 dashboard-dialog-body">
             {activeSection === 'reviews' ? <ProductReviewsPanel productId={String(product.id)} /> : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 

@@ -332,14 +332,14 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
   const totalFiltered = published.length + drafts.length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 dashboard-dialog-overlay">
       <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={onClose} />
-      <div className="relative w-full max-w-6xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--large" role="dialog" aria-modal="true" aria-labelledby="CategoriesModal-dialog-0-title">
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 flex-shrink-0 dashboard-dialog-header">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">All Categories</h2>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight" id="CategoriesModal-dialog-0-title">All Categories</h2>
             <p className="text-sm text-gray-500 font-medium mt-0.5">
               {published.length} published · {drafts.length} draft{drafts.length !== 1 ? 's' : ''}
             </p>
@@ -351,7 +351,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
             >
               <Plus size={17} /> New Category
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
+            <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
               <X size={22} />
             </button>
           </div>
@@ -387,7 +387,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
         </div>
 
         {/* ── Body ── */}
-        <div className="flex-1 overflow-y-auto p-6 bg-[#F8F9FA] space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 bg-[#F8F9FA] space-y-8 dashboard-dialog-body">
 
           {error && (
             <div className="p-4 bg-red-50 text-slate-600 border border-red-200 rounded-md font-medium text-sm flex items-center gap-2">
@@ -501,13 +501,13 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
 
       {/* ── Delete Confirmation ── */}
       {deletingId && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setDeletingId(null)} />
-          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4 ">
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="CategoriesModal-dialog-1-title">
+            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4  dashboard-dialog-icon">
               <Trash2 size={22} className="text-slate-600" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Category?</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center" id="CategoriesModal-dialog-1-title">Delete Category?</h3>
             <p className="text-gray-500 text-sm mb-6 text-center">
               This will permanently delete the category and all its data. This action cannot be undone.
             </p>

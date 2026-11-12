@@ -43,18 +43,18 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] ">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col"
+          className="relative bg-white w-full overflow-hidden flex flex-col dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="ViewAdminModal-dialog-0-title"
         >
           {/* Header */}
-          <div className="border-b border-slate-200 bg-white px-6 py-5">
+          <div className="border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900"><Shield size={20} className="text-emerald-700" />Admin Details</h2>
+                <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900" id="ViewAdminModal-dialog-0-title"><Shield size={20} className="text-emerald-700" />Admin Details</h2>
                 <p className="mt-1 text-sm text-slate-600">
                   View and manage admin information
                 </p>
@@ -63,7 +63,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
                 type="button"
                 onClick={onClose}
                 aria-label="Close admin details"
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"
               >
                 <X size={20} />
               </button>
@@ -71,7 +71,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 dashboard-dialog-body">
             {/* Profile Section */}
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-md bg-brand-100 flex items-center justify-center text-2xl font-bold text-brand-700 shadow-sm">
@@ -172,7 +172,7 @@ export default function ViewAdminModal({ isOpen, onClose, admin }: ViewAdminModa
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t bg-gray-50 flex justify-end">
+          <div className="px-6 py-4 border-t bg-gray-50 flex justify-end dashboard-dialog-footer">
             <button
               onClick={onClose}
               className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-md font-bold transition shadow-sm "

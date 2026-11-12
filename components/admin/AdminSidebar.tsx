@@ -55,7 +55,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
       )}
 
       <aside className={`
-        fixed md:sticky top-0 left-0 h-screen w-52 bg-white border-r border-slate-200 flex flex-col z-50
+        fixed md:sticky top-0 left-0 h-dvh w-52 bg-white border-r border-slate-200 flex flex-col z-50
         transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
@@ -71,7 +71,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             </button>
           )}
         </div>
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+        <nav aria-label="Dashboard navigation" className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
           <SidebarLink
             icon={<LayoutDashboard size={20} />}
             label="Overview"
@@ -108,6 +108,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             active={activeTab === 'waitlist'}
             onClick={() => { setActiveTab('waitlist'); onClose?.(); }}
           />
+          <hr className="!my-3 border-slate-100" />
           <SidebarLink
             icon={<BookOpen size={20} />}
             label="Blog"
@@ -120,6 +121,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
             active={activeTab === 'notifications'}
             onClick={() => { setActiveTab('notifications'); onClose?.(); }}
           />
+          <hr className="!my-3 border-slate-100" />
           <SidebarLink
             icon={<Truck size={20} />}
             label="Vendor Specialists"
@@ -146,14 +148,14 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
 
       <AnimatePresence>
         {showLogoutConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-lg shadow-sm p-6 border border-slate-200"
+              className="bg-white w-full p-6 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="AdminSidebar-dialog-0-title"
             >
-              <h3 className="font-semibold text-slate-900 text-lg">Sign out?</h3>
+              <h3 className="font-semibold text-slate-900 text-lg" id="AdminSidebar-dialog-0-title">Sign out?</h3>
               <p className="text-sm text-slate-600 leading-relaxed mt-2">
                 Unsaved changes may be lost.
               </p>

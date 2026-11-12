@@ -1,6 +1,7 @@
 import './globals.css';
 import './marketplace.css';
 import './workspace.css';
+import './dashboard-dialogs.css';
 import { DM_Sans } from 'next/font/google';
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
 import StoreProvider from './StoreProvider';

@@ -54,7 +54,7 @@ export default function BlogViewModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
         <motion.div
           role="dialog"
           aria-modal="true"
@@ -62,10 +62,10 @@ export default function BlogViewModal({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="flex max-h-[92dvh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+          className="flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--wide"
         >
           {/* Header */}
-          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:px-8">
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:px-8 dashboard-dialog-header">
             <div className="min-w-0">
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Blog content</p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -94,7 +94,7 @@ export default function BlogViewModal({
                 onClick={onClose}
                 type="button"
                 aria-label="Close article preview"
-                className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"
               >
                 <X size={20} />
               </button>
@@ -102,7 +102,7 @@ export default function BlogViewModal({
           </div>
 
           {/* Body Content Scroll Area */}
-          <div className="flex-1 space-y-6 overflow-y-auto bg-slate-50/60 p-5 sm:p-8">
+          <div className="flex-1 space-y-6 overflow-y-auto bg-slate-50/60 p-5 sm:p-8 dashboard-dialog-body">
             {/* Featured Image */}
             {post.featuredImage?.url && (
               <div className="max-h-72 overflow-hidden rounded-xl border border-slate-200 bg-white">

@@ -1867,6 +1867,7 @@ export interface DetailedOrderAnalytics {
   totalOrdersCount: number;
   totalOrdersRevenue: number;
   breakdown: OrderStatusBreakdownItem[];
+  dataPoints?: { date: string; orders: number; orderValue: number }[];
 }
 
 export interface AdminTopProductItem {
@@ -1955,10 +1956,12 @@ export const superAdminDashboardApi = {
   },
 
   // 3. Recent Activities
-  async getRecentActivities(params?: { limit?: number }) {
+  async getRecentActivities(params?: { limit?: number; period?: 'day' | 'week' | 'month' | 'all_time'; vendorId?: string }) {
     try {
       const q = new URLSearchParams();
       if (params?.limit) q.set('limit', String(params.limit));
+      if (params?.period) q.set('period', params.period);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
       const qs = q.toString();
       const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/recent-activities${qs ? `?${qs}` : ''}`);
       return res.data;
@@ -1966,10 +1969,11 @@ export const superAdminDashboardApi = {
   },
 
   // 4. Top Products Pie Chart
-  async getPieChart(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; categoryId?: string }) {
+  async getPieChart(params?: { period?: 'day' | 'week' | 'month' | 'all_time'; categoryId?: string; vendorId?: string }) {
     try {
       const q = new URLSearchParams();
       if (params?.period) q.set('period', params.period);
+      if (params?.vendorId) q.set('vendorId', params.vendorId);
       if (params?.categoryId) q.set('categoryId', params.categoryId);
       const qs = q.toString();
       const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/pie-chart${qs ? `?${qs}` : ''}`);
@@ -1978,10 +1982,11 @@ export const superAdminDashboardApi = {
   },
 
   // 5. Earnings Line Graph
-  async getEarningsGraph(params?: { interval?: 'daily' | 'weekly' | 'monthly'; vendorId?: string }) {
+  async getEarningsGraph(params?: { interval?: 'daily' | 'weekly' | 'monthly'; vendorId?: string; period?: 'day' | 'week' | 'month' | 'all_time' }) {
     try {
       const q = new URLSearchParams();
       if (params?.interval) q.set('interval', params.interval);
+      if (params?.period) q.set('period', params.period);
       if (params?.vendorId) q.set('vendorId', params.vendorId);
       const qs = q.toString();
       const res = await axiosInstance.get<ApiResponse<any>>(`/super-admin/dashboard/earnings-graph${qs ? `?${qs}` : ''}`);

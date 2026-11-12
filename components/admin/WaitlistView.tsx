@@ -814,26 +814,26 @@ export default function WaitlistView() {
 
       {/* ── Modal: Launch Settings Config ── */}
       {isLaunchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
           <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={() => setIsLaunchModalOpen(false)} />
-          <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="WaitlistView-dialog-0-title">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50 dashboard-dialog-header">
               <div>
-                <h3 className="text-xl font-black text-slate-800">Launch Configuration</h3>
+                <h3 className="text-xl font-black text-slate-800" id="WaitlistView-dialog-0-title">Launch Configuration</h3>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Pre-populate countdown & update marketing message</p>
               </div>
               <button
                 onClick={() => setIsLaunchModalOpen(false)}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Form Scroll Body */}
-            <form onSubmit={handleLaunchSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+            <form onSubmit={handleLaunchSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 dashboard-dialog-body">
 
               {/* Date Input */}
               <div className="space-y-2">
@@ -946,7 +946,7 @@ export default function WaitlistView() {
             </form>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 flex-shrink-0 dashboard-dialog-footer">
               <button
                 type="button"
                 onClick={() => setIsLaunchModalOpen(false)}
@@ -969,21 +969,21 @@ export default function WaitlistView() {
 
       {/* ── Modal: Send email Composer ── */}
       {isBroadcastModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
           <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={closeBroadcastModal} />
-          <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+          <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--large" role="dialog" aria-modal="true" aria-labelledby="WaitlistView-dialog-1-title">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50 dashboard-dialog-header">
               <div>
-                <h3 className="text-xl font-black text-slate-800">Compose Broadcast</h3>
+                <h3 className="text-xl font-black text-slate-800" id="WaitlistView-dialog-1-title">Compose Broadcast</h3>
                 <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   Draft and send an email update to subscribers across your waitlist.
                 </p>
               </div>
               <button
                 onClick={closeBroadcastModal}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
               >
                 <X size={20} />
               </button>
@@ -1360,7 +1360,7 @@ export default function WaitlistView() {
             </div>
 
             {/* Modal Action Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between flex-shrink-0 dashboard-dialog-footer">
               <div className="text-xs text-slate-500 font-medium">
                 Recipients: <span className="font-bold text-slate-800">{broadcastRecipientCount} subscribers</span>
               </div>
@@ -1388,10 +1388,10 @@ export default function WaitlistView() {
 
       {/* ── Modal: Confirm Launch config save ── */}
       {isLaunchConfirmOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsLaunchConfirmOpen(false)} />
-          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22]">
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true">
+            <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22] dashboard-dialog-icon">
               <Settings size={22} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Save Launch Configuration?</h4>
@@ -1430,10 +1430,10 @@ export default function WaitlistView() {
 
       {/* ── Modal: Confirm Broadcast Send ── */}
       {isBroadcastConfirmOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsBroadcastConfirmOpen(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-md bg-rose-100 text-slate-600 flex items-center justify-center mx-auto mb-4">
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true">
+            <div className="w-12 h-12 rounded-md bg-rose-100 text-slate-600 flex items-center justify-center mx-auto mb-4 dashboard-dialog-icon">
               <Send size={20} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Send Broadcast Email?</h4>

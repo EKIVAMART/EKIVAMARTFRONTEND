@@ -106,22 +106,22 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60  dashboard-dialog-overlay">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 flex flex-col"
+          className="bg-white w-full overflow-hidden flex flex-col dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="AdminBroadcastModal-dialog-0-title"
         >
           {/* Header */}
-          <div className="p-6 bg-brand-900 text-white flex items-center justify-between">
+          <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex items-center justify-between dashboard-dialog-header">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-white/15 flex items-center justify-center text-white">
+              <div className="w-10 h-10 flex items-center justify-center text-emerald-800 dashboard-dialog-icon">
                 <Megaphone className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-extrabold text-base leading-tight">Compose Platform Broadcast</h3>
-                <p className="text-xs text-brand-100/90 font-medium">
+                <h3 className="font-extrabold text-base leading-tight" id="AdminBroadcastModal-dialog-0-title">Compose Platform Broadcast</h3>
+                <p className="text-xs text-slate-500 font-medium">
                   Send real-time in-app announcements to users
                 </p>
               </div>
@@ -129,18 +129,18 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
             <button
               onClick={handleClose}
-              className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition"
-              disabled={isSending}
+              className="p-2 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition dashboard-dialog-close"
+              disabled={isSending} aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Body */}
-          <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
+          <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh] dashboard-dialog-body">
             {resultMsg ? (
               <div className="py-8 text-center space-y-3">
-                <div className="w-14 h-14 bg-emerald-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-emerald-100">
+                <div className="w-14 h-14 bg-emerald-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-emerald-100 dashboard-dialog-icon">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="font-extrabold text-lg text-neutral-900">Broadcast Dispatched</h4>
@@ -307,7 +307,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
             ) : (
               /* Step 2: Plain English Confirmation Step */
               <div className="py-2 space-y-4">
-                <div className="w-12 h-12 bg-amber-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-amber-100">
+                <div className="w-12 h-12 bg-amber-50 text-slate-600 rounded-md flex items-center justify-center mx-auto border border-amber-100 dashboard-dialog-icon">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
 
