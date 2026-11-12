@@ -1943,7 +1943,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
               {/* Footer review buttons */}
               {detailData.profile.applicationStatus !== 'approved' && (
-                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none dashboard-dialog-footer">
+                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none dashboard-dialog-footer dashboard-dialog-actions">
                   {/* Approve vendor application */}
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button

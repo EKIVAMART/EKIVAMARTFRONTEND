@@ -1000,7 +1000,7 @@ export default function WaitlistView() {
                   <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
                     Target Audience Group <span className="text-slate-500">*</span>
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <button
                       type="button"
                       onClick={() => setBroadcastForm(prev => ({ ...prev, targetRole: 'ALL' }))}

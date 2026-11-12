@@ -249,19 +249,13 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
 
             {/* ── Header ── */}
             <div className="px-8 pt-8 pb-0 flex flex-col items-center text-center gap-3">
-              <div className={`w-16 h-16 rounded-md flex items-center justify-center ${
-                secondsLeft <= 5
-                  ? 'bg-rose-50 text-slate-600 border border-rose-100'
-                  : secondsLeft <= 10
-                  ? 'bg-amber-50 text-slate-600 border border-amber-100'
-                  : 'bg-brand-50 text-[#228b22] border border-brand-100'
-              } ${pulseClass}`}>
+              <div className="flex items-center justify-center text-[#176a35] dashboard-dialog-icon">
                 <ShieldAlert size={32} strokeWidth={1.75} />
               </div>
 
               <div>
                 <h2 className="text-xl font-black text-slate-800 tracking-tight" id="SessionTimeoutModal-dialog-0-title">
-                  ⚠️ Session Expiring!
+                  Session expiring
                 </h2>
                 <p className="text-sm text-gray-500 font-medium mt-1 leading-relaxed">
                   Your session will expire in{' '}
@@ -274,7 +268,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
 
             {/* ── Countdown ring ── */}
             <div className="flex items-center justify-center py-6">
-              <div className={`relative w-24 h-24 rounded-md border-4 flex items-center justify-center shadow-inner ${
+              <div className={`relative w-24 h-24 rounded-lg border flex items-center justify-center ${
                 secondsLeft <= 5
                   ? 'border-rose-200 bg-rose-50'
                   : secondsLeft <= 10

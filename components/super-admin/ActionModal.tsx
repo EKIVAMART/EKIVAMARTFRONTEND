@@ -1362,23 +1362,6 @@ export default function ActionModal({
             exit={{ scale: 0.95, opacity: 0 }}
             className="relative flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--wide"
           >
-            <AnimatePresence>
-              {saveErrors.length > 0 && (
-                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-slate-600"><AlertCircle size={20} /></div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-slate-800">Please fix these details before saving.</p>
-                      <ul className="mt-2 list-disc space-y-1 pl-4">
-                        {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
-                      </ul>
-                    </div>
-                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-slate-500 transition hover:bg-red-50"><X size={18} /></button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product management</p>
@@ -1408,6 +1391,23 @@ export default function ActionModal({
                 </button>
               </div>
             </div>
+
+            <AnimatePresence>
+              {saveErrors.length > 0 && (
+                <motion.div key="save-errors-banner" role="alert" className="mx-5 mt-4 max-h-[25dvh] shrink-0 overflow-y-auto rounded-lg border border-red-200 bg-white p-4 text-sm text-slate-700">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 shrink-0 text-rose-700"><AlertCircle size={20} /></div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-slate-800">Please fix these details before saving.</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-4">
+                        {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
+                      </ul>
+                    </div>
+                    <button type="button" aria-label="Dismiss validation errors" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-slate-500 transition hover:bg-red-50"><X size={18} /></button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {quickAddMode ? (
               renderQuickAddForm()
@@ -1630,12 +1630,12 @@ export default function ActionModal({
 
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">SKU (Stock Keeping Unit)</label>
-                        <div className="flex gap-3">
-                          <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="flex-1 p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                          <input type="text" value={formData.sku} onChange={e => updateField('sku', e.target.value)} className="min-w-0 w-full flex-1 p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-semibold tracking-wider text-gray-700" placeholder="e.g. GADG-IPHONE-256GB" />
                           <button
                             type="button"
                             onClick={generateSKU}
-                            className="px-5 bg-[#228b22] hover:bg-[#1c711c] text-white text-xs font-bold rounded-md shadow-sm transition"
+                            className="min-h-11 shrink-0 px-5 bg-[#228b22] hover:bg-[#1c711c] text-white text-xs font-bold rounded-md shadow-sm transition"
                           >
                             Auto-Generate SKU
                           </button>
@@ -2214,7 +2214,7 @@ export default function ActionModal({
 
             {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
             {!quickAddMode && (
-              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative dashboard-dialog-footer">
+              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative dashboard-dialog-footer dashboard-product-footer">
                 <button
                   type="button"
                   onClick={prevStep}

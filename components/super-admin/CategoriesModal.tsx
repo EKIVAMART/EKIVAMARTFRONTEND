@@ -337,7 +337,7 @@ export default function CategoriesModal({ isOpen, onClose }: CategoriesModalProp
       <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--large" role="dialog" aria-modal="true" aria-labelledby="CategoriesModal-dialog-0-title">
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 flex-shrink-0 dashboard-dialog-header">
+        <div className="flex flex-col items-start justify-between px-6 py-4 border-b bg-gray-50/50 flex-shrink-0 sm:flex-row sm:items-center dashboard-dialog-header">
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight" id="CategoriesModal-dialog-0-title">All Categories</h2>
             <p className="text-sm text-gray-500 font-medium mt-0.5">
