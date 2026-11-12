@@ -75,14 +75,6 @@ const transitionRules: Record<string, string[]> = {
   refunded: [],
 };
 
-function NairaIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline mr-0.5">
-      <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
-    </svg>
-  );
-}
-
 export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, onOrderUpdated }: OrderDetailsModalProps) {
   const { user } = useAppSelector(state => state.auth);
   const userRole = user?.role || 'VENDOR';
@@ -267,7 +259,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
             <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Order details</p>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <h2 id="order-details-title" className="text-xl font-semibold tracking-tight sm:text-2xl">Order {order?.orderNumber || basicOrder?.orderNumber || basicOrder?.id}</h2>
                   {order && (
                     <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
@@ -324,8 +316,8 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                             </div>
                             <div className="min-w-0 flex-1">
                               <h4 className="font-bold text-slate-800 text-sm truncate">{item.productName}</h4>
-                              <p className="text-xs text-gray-500 font-medium mt-0.5">SKU: {item.productSku || 'N/A'}</p>
-                              <div className="flex justify-between items-center mt-2">
+                              <p className="break-words text-xs text-gray-500 font-medium mt-0.5">SKU: {item.productSku || 'N/A'}</p>
+                              <div className="flex flex-wrap justify-between items-center gap-2 mt-2">
                                 <span className="text-[11px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded">Qty: {item.quantity}</span>
                                 <span className="text-sm font-bold text-slate-700">{item.unitPrice?.formatted}</span>
                               </div>
@@ -367,11 +359,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                             <span>-{order.discountAmount?.formatted}</span>
                           </div>
                         )}
-                        <div className="pt-3 mt-3 border-t flex justify-between items-center">
-                          <span className="text-base font-bold text-slate-800">Order total</span>
+                        <div className="pt-3 mt-3 border-t flex flex-wrap justify-between items-center gap-2">
+                          <span className="whitespace-nowrap text-base font-bold text-slate-800">Order total</span>
                           <span className="text-xl font-black text-[#228b22] flex items-center gap-0.5">
-                            <NairaIcon size={16} />
-                            {order.totalAmount?.formatted?.replace('₦', '') || order.totalAmount?.amount?.toLocaleString()}
+                            {order.totalAmount?.formatted || `₦${Number(order.totalAmount?.amount ?? order.totalAmount ?? 0).toLocaleString('en-NG')}`}
                           </span>
                         </div>
                       </div>

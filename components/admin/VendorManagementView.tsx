@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast';
 import { adminVendorApi, AdminVendorProfile, AdminVendorDocument, AdminVendorBankAccount, AdminVendorAuditLogEntry, AdminWithdrawal, AdminFlaggedReview, AdminCommissionConfig } from '@/lib/api-vendor';
 import { authApi, categoryApi } from '@/lib/api';
 import RecordActions from '@/components/admin/RecordActions';
+import VendorEarningsPanel from '@/components/super-admin/VendorEarningsPanel';
 
 interface VendorManagementViewProps {
   isSuperAdmin: boolean;
@@ -61,8 +62,6 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
     documents: AdminVendorDocument[];
     bankAccounts: AdminVendorBankAccount[];
     recentAuditLog: AdminVendorAuditLogEntry[];
-    earnings?: any;
-    earningsHistory?: any[];
   } | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [detailTab, setDetailTab] = useState<'profile' | 'docs' | 'bank' | 'earnings' | 'audit'>('profile');
@@ -387,15 +386,11 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
     try {
       const response = await adminVendorApi.getVendorDetail(vendorId);
       if (response?.success) {
-        const earningsRes = await adminVendorApi.getVendorEarnings(vendorId).catch(() => null);
-        const historyRes = await adminVendorApi.getVendorEarningsHistory(vendorId).catch(() => null);
         setDetailData({
           profile: response.data.profile,
           documents: response.data.documents,
           bankAccounts: response.data.bankAccounts,
-          recentAuditLog: response.data.recentAuditLog,
-          earnings: earningsRes?.data || null,
-          earningsHistory: historyRes?.data?.earnings || []
+          recentAuditLog: response.data.recentAuditLog
         });
       } else {
         toast.error('Failed to load vendor details.');
@@ -1609,14 +1604,16 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                 >
                   Bank Payout Details
                 </button>
-                <button
-                  onClick={() => setDetailTab('earnings')}
-                  className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
-                    detailTab === 'earnings' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
-                  }`}
-                >
-                  Earnings Balance
-                </button>
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setDetailTab('earnings')}
+                    className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
+                      detailTab === 'earnings' ? 'border-[#228b22] text-[#228b22]' : 'border-transparent text-gray-500 hover:text-slate-700'
+                    }`}
+                  >
+                    Earnings Balance
+                  </button>
+                )}
                 <button
                   onClick={() => setDetailTab('audit')}
                   className={`px-6 py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition-all ${
@@ -1825,78 +1822,8 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
                   </div>
                 )}
 
-                {/* Earnings & ledger list */}
-                {detailTab === 'earnings' && (
-                  <div className="space-y-6">
-                    {/* Account Balance Summaries */}
-                    {detailData.earnings ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
-                          <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.availableBalance).toLocaleString()} NGN</p>
-                        </div>
-                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pending Balance</span>
-                          <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.pendingBalance).toLocaleString()} NGN</p>
-                        </div>
-                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Withdrawn</span>
-                          <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.totalWithdrawn).toLocaleString()} NGN</p>
-                        </div>
-                        <div className="border rounded-md p-4 text-center bg-slate-50/30">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Lifetime Earnings</span>
-                          <p className="text-base font-black text-slate-800 mt-1">{Number(detailData.earnings.lifetimeEarnings).toLocaleString()} NGN</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-gray-400 font-bold uppercase text-center ">Failed to load live earnings balances.</p>
-                    )}
-
-                    {/* Earnings History Ledger */}
-                    <div className="bg-white rounded-md border border-slate-200 overflow-hidden shadow-sm">
-                      <div className="bg-slate-50 px-6 py-4 border-b">
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Earnings Ledger History</h4>
-                      </div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs font-semibold">
-                          <thead className="bg-slate-50/50 border-b">
-                            <tr>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase">Order Ref</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase text-center">Gross Amount</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase text-center">Platform Comm</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase text-center">Gateway Fee</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase text-center">Net Payout</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase text-center">Status</th>
-                              <th className="p-3 text-[10px] text-gray-400 uppercase">Date</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                            {detailData.earningsHistory && detailData.earningsHistory.length > 0 ? (
-                              detailData.earningsHistory.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-slate-50/20">
-                                  <td className="p-3 text-slate-700 font-extrabold">{item.orderNumber}</td>
-                                  <td className="p-3 text-center text-slate-800">{Number(item.grossAmount).toLocaleString()} NGN</td>
-                                  <td className="p-3 text-center text-slate-500">{Number(item.commissionAmount).toLocaleString()} NGN ({item.commissionRate}%)</td>
-                                  <td className="p-3 text-center text-slate-500">{Number(item.gatewayFeeAmount).toLocaleString()} NGN</td>
-                                  <td className="p-3 text-center text-slate-800 font-black">{Number(item.netAmount).toLocaleString()} NGN</td>
-                                  <td className="p-3 text-center">
-                                    <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[9px] uppercase font-extrabold border">
-                                      {item.status}
-                                    </span>
-                                  </td>
-                                  <td className="p-3 text-gray-400 font-medium">{new Date(item.date).toLocaleDateString()}</td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan={7} className="p-10 text-center text-gray-400 font-semibold">No ledger entries.</td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
+                {isSuperAdmin && detailTab === 'earnings' && detailVendorId && (
+                  <VendorEarningsPanel key={detailVendorId} vendorId={detailVendorId} />
                 )}
 
                 {/* Audit log for vendor */}
@@ -1943,7 +1870,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
 
               {/* Footer review buttons */}
               {detailData.profile.applicationStatus !== 'approved' && (
-                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none dashboard-dialog-footer">
+                <div className="p-6 border-t bg-slate-50/50 flex flex-wrap gap-2 justify-end shrink-0 select-none dashboard-dialog-footer dashboard-dialog-actions">
                   {/* Approve vendor application */}
                   {(detailData.profile.applicationStatus === 'submitted' || detailData.profile.applicationStatus === 'in_review') && (
                     <button
