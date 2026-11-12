@@ -45,3 +45,13 @@ export function departmentSlug(value: string) {
   const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   return aliases[slug] ?? slug;
 }
+
+export const homepageDepartments = [
+  ['Fashion', 'Find your next everyday favourite.'],
+  ['Footwear', 'Step into something new.'],
+  ['Bags & Luggage', 'For everyday plans and journeys ahead.'],
+  ['Jewelry & Fashion Accessories', 'The details that complete your look.'],
+  ['Beauty & Cosmetics', 'Refresh your beauty routine.'],
+  ['Groceries & Food', 'Stock up on everyday essentials.'],
+  ['Home Appliances', 'Make more of life at home.'],
+] as const;
