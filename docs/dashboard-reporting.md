@@ -47,6 +47,4 @@ Read-only API checks across Today, Last 7 days, Last 30 days, and All time confi
 - An unmatched ledger search returns no rows and zero aggregate totals.
 - The local order-payment reconciliation difference is zero.
 
-The local preview dataset has five orders; four are eligible financial orders. Eligible goods total ₦141,500, accrued net is ₦141,500, pending escrow is ₦73,000, and accrued commission is ₦0. Customer-paid eligible order totals are ₦158,113, including ₦10,613 tax and ₦6,000 shipping. These reconcile. The ledger's zero posted earnings do not mean accrued goods sales are zero. Preview order-line commission snapshots are zero; current configured commission rates cannot establish a historical charge.
-
 Screenshots cover desktop (1440×900), tablet (768×1024), and mobile (390×844), with additional narrow-width checks. These checks use local data and do not certify production payment-provider balances.
