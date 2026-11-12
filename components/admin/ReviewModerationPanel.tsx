@@ -43,7 +43,7 @@ function StarRating({ rating }: { rating: number }) {
           key={i}
           size={14}
           className={`${
-            i < rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-155 text-gray-200'
+            i < rating ? 'fill-amber-400 text-slate-400' : 'fill-gray-155 text-gray-200'
           }`}
         />
       ))}
@@ -202,7 +202,7 @@ export default function ReviewModerationPanel() {
                     </span>
                     <StarRating rating={review.rating} />
                     {review.isVerifiedPurchase && (
-                      <span className="text-[9px] uppercase font-black bg-teal-50 border border-teal-200 text-teal-700 px-1.5 py-0.2 rounded-md">
+                      <span className="text-[9px] uppercase font-black bg-teal-50 border border-teal-200 text-slate-700 px-1.5 py-0.2 rounded-md">
                         Verified Purchase
                       </span>
                     )}
@@ -218,7 +218,7 @@ export default function ReviewModerationPanel() {
                     {review.isHidden ? (
                       <button
                         onClick={() => handleModerate(review.id, 'restore')}
-                        className="px-2.5 py-1 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex items-center gap-1 transition"
+                        className="px-2.5 py-1 text-[10px] font-bold bg-emerald-50 text-slate-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex items-center gap-1 transition"
                         title="Restore public view"
                       >
                         <Eye size={12} /> Restore
@@ -235,7 +235,7 @@ export default function ReviewModerationPanel() {
                     {review.isFlagged ? (
                       <button
                         onClick={() => handleModerate(review.id, 'unflag')}
-                        className="px-2.5 py-1 text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 flex items-center gap-1 transition"
+                        className="px-2.5 py-1 text-[10px] font-bold bg-amber-50 text-slate-700 border border-amber-200 rounded-lg hover:bg-amber-100 flex items-center gap-1 transition"
                         title="Clear warning flag"
                       >
                         <ShieldOff size={12} /> Unflag
@@ -243,7 +243,7 @@ export default function ReviewModerationPanel() {
                     ) : (
                       <button
                         onClick={() => setFlaggingReviewId(review.id)}
-                        className="px-2.5 py-1 text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 flex items-center gap-1 transition"
+                        className="px-2.5 py-1 text-[10px] font-bold bg-rose-50 text-slate-700 border border-rose-200 rounded-lg hover:bg-rose-100 flex items-center gap-1 transition"
                         title="Flag review"
                       >
                         <Flag size={12} /> Flag
@@ -258,7 +258,7 @@ export default function ReviewModerationPanel() {
                 {review.title && <h4 className="font-bold text-slate-800 text-sm">{review.title}</h4>}
                 {review.comment && <p className="text-xs text-gray-650 leading-relaxed font-semibold">{review.comment}</p>}
                 {review.isFlagged && review.flaggedReason && (
-                  <div className="mt-2 text-[10px] text-rose-700 bg-rose-50 border border-rose-100 rounded-lg p-2 flex items-center gap-1.5">
+                  <div className="mt-2 text-[10px] text-slate-700 bg-rose-50 border border-rose-100 rounded-lg p-2 flex items-center gap-1.5">
                     <ShieldAlert size={12} />
                     <span>Flagged Reason: <span className="font-bold">{review.flaggedReason}</span></span>
                   </div>
@@ -329,9 +329,9 @@ export default function ReviewModerationPanel() {
 
       {/* Flag review dialog box */}
       {flaggingReviewId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white w-full max-w-sm rounded-md shadow-sm p-6">
-            <h3 className="font-bold text-base text-slate-800 mb-2">Flag Review</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px] animate-[fadeIn_0.2s_ease-out] dashboard-dialog-overlay">
+          <div className="bg-white w-full p-6 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="ReviewModerationPanel-dialog-0-title">
+            <h3 className="font-bold text-base text-slate-800 mb-2" id="ReviewModerationPanel-dialog-0-title">Flag Review</h3>
             <p className="text-xs text-gray-500 mb-4 font-semibold">Flagged reviews are listed for admin investigations. Provide flag reason:</p>
 
             <form onSubmit={handleFlagReview} className="space-y-4">

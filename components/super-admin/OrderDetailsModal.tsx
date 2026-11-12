@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store,
-  MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText, Truck
+  MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText, Truck, ChevronDown
 } from 'lucide-react';
 import { ordersApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
@@ -18,18 +18,18 @@ interface OrderDetailsModalProps {
 }
 
 const statusBadgeStyles: Record<string, string> = {
-  PENDING_PAYMENT: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
-  pending_payment: 'bg-amber-400/20 text-amber-100 border-amber-400/30',
-  PAYMENT_FAILED: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
-  payment_failed: 'bg-rose-400/20 text-rose-100 border-rose-400/30',
-  CONFIRMED: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
-  confirmed: 'bg-emerald-400/20 text-emerald-100 border-emerald-400/30',
+  PENDING_PAYMENT: 'bg-amber-400/20 text-slate-100 border-amber-400/30',
+  pending_payment: 'bg-amber-400/20 text-slate-100 border-amber-400/30',
+  PAYMENT_FAILED: 'bg-rose-400/20 text-slate-100 border-rose-400/30',
+  payment_failed: 'bg-rose-400/20 text-slate-100 border-rose-400/30',
+  CONFIRMED: 'bg-emerald-400/20 text-slate-100 border-emerald-400/30',
+  confirmed: 'bg-emerald-400/20 text-slate-100 border-emerald-400/30',
   PROCESSING: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
   processing: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
-  SHIPPED: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
-  shipped: 'bg-blue-400/20 text-blue-100 border-blue-400/30',
-  DELIVERED: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
-  delivered: 'bg-teal-400/20 text-teal-100 border-teal-400/30',
+  SHIPPED: 'bg-blue-400/20 text-slate-100 border-blue-400/30',
+  shipped: 'bg-blue-400/20 text-slate-100 border-blue-400/30',
+  DELIVERED: 'bg-teal-400/20 text-slate-100 border-teal-400/30',
+  delivered: 'bg-teal-400/20 text-slate-100 border-teal-400/30',
   CANCELLED: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   cancelled: 'bg-gray-400/20 text-gray-100 border-gray-400/30',
   REFUNDED: 'bg-brand-400/20 text-brand-100 border-brand-400/30',
@@ -253,36 +253,41 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="order-details-title"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-[#F8F9FA] w-full max-w-5xl rounded-md shadow-sm overflow-hidden border border-gray-150 md:max-h-[90vh] max-h-full flex flex-col"
+            className="ek-print-invoice flex w-full flex-col overflow-hidden bg-slate-50 dashboard-dialog dashboard-dialog--large"
           >
             {/* Header */}
-            <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between sticky top-0 z-10">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Order details</p>
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold tracking-tight">Order {order?.orderNumber || basicOrder?.orderNumber || basicOrder?.id}</h2>
+                  <h2 id="order-details-title" className="text-xl font-semibold tracking-tight sm:text-2xl">Order {order?.orderNumber || basicOrder?.orderNumber || basicOrder?.id}</h2>
                   {order && (
-                    <span className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border shadow-sm ${statusBadgeStyles[order.status] || 'bg-white/20 text-white border-white/30'}`}>
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
                       {statusLabels[order.status] || order.status}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-1.5 text-sm text-brand-100 font-semibold">
-                  <Calendar size={14} /> Placed on {order ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
+                <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
+                  <Calendar size={14} /> Placed on {order?.createdAt && !Number.isNaN(new Date(order.createdAt).getTime()) ? new Date(order.createdAt).toLocaleDateString() : basicOrder.date}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="ek-print-hide flex items-center gap-3">
                 <button
+                  type="button"
                   onClick={() => window.print()}
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-md font-bold transition text-xs"
+                  className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 md:flex"
                 >
                   <Printer size={15} /> Print Invoice
                 </button>
-                <button onClick={onClose} className="p-3 hover:bg-white/20 rounded-md transition-colors">
+                <button type="button" onClick={onClose} aria-label="Close order details" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 dashboard-dialog-close">
                   <X size={24} />
                 </button>
               </div>
@@ -291,24 +296,24 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
             {/* Content Body */}
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center p-20 gap-3">
-                <div className="w-10 h-10 border-4 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700" />
                 <p className="text-gray-500 font-bold text-sm">Fetching detailed order information...</p>
               </div>
             ) : order ? (
-              <div className="flex-1 overflow-y-auto p-8 space-y-8">
+              <div className="flex-1 space-y-6 overflow-y-auto p-5 sm:p-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                   {/* Left Side: Items & Payments */}
                   <div className="lg:col-span-2 space-y-8">
 
                     {/* Items List */}
-                    <div className="bg-white rounded-md border p-6 shadow-sm">
+                    <div className="rounded-xl border border-slate-200 bg-white p-5">
                       <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <Package size={18} className="text-[#228b22]" /> Order Items
                       </h3>
                       <div className="space-y-4">
                         {order.items?.map((item: any, idx: number) => (
-                          <div key={idx} className="flex gap-4 items-center p-3 border rounded-md hover:bg-gray-50 transition">
+                          <div key={idx} className="flex items-center gap-4 rounded-lg bg-slate-50 p-3 transition hover:bg-emerald-50/50">
                             <div className="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden border shrink-0 flex items-center justify-center">
                               {item.productImage ? (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -331,7 +336,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     </div>
 
                     {/* Cost Breakdowns */}
-                    <div className="bg-white rounded-md border p-6 shadow-sm">
+                    <div className="rounded-xl border border-slate-200 bg-white p-5">
                       <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <CreditCard size={18} className="text-[#228b22]" /> Financial summary
                       </h3>
@@ -357,13 +362,13 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           </div>
                         )}
                         {order.discountAmount?.amount > 0 && (
-                          <div className="flex justify-between text-emerald-600 font-bold">
+                          <div className="flex justify-between text-slate-600 font-bold">
                             <span>Discount</span>
                             <span>-{order.discountAmount?.formatted}</span>
                           </div>
                         )}
                         <div className="pt-3 mt-3 border-t flex justify-between items-center">
-                          <span className="text-base font-bold text-slate-800">Total Paid</span>
+                          <span className="text-base font-bold text-slate-800">Order total</span>
                           <span className="text-xl font-black text-[#228b22] flex items-center gap-0.5">
                             <NairaIcon size={16} />
                             {order.totalAmount?.formatted?.replace('₦', '') || order.totalAmount?.amount?.toLocaleString()}
@@ -374,7 +379,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
                     {/* Refund Review Action Section (ADMIN/SUPER_ADMIN only) */}
                     {order.refundStatus === 'requested' && isAdmin && (
-                      <div className="bg-brand-50 border border-brand-200 rounded-md p-6 shadow-sm">
+                      <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-5">
                         <h3 className="text-sm font-bold text-brand-950 uppercase tracking-wider mb-3 flex items-center gap-2">
                           <RotateCcw size={18} className="text-brand-700" /> Review Refund Request
                         </h3>
@@ -431,8 +436,8 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                   <div className="space-y-6">
                     {/* Expected Delivery Promise */}
                     {order.expectedDelivery && (
-                      <div className="bg-brand-50 border border-brand-200 rounded-md p-5 shadow-xs flex items-start gap-3.5">
-                        <div className="w-10 h-10 rounded-md bg-[#228b22] text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="flex items-start gap-3.5 rounded-xl border border-emerald-100 bg-emerald-50/70 p-5">
+                        <div className="w-10 h-10 rounded-md bg-[#228b22] text-white flex items-center justify-center shrink-0 shadow-sm dashboard-dialog-icon">
                           <Truck size={20} />
                         </div>
                         <div className="flex-1 text-xs">
@@ -455,7 +460,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     )}
 
                     {/* Customer & Address */}
-                    <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
+                    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
                       <div>
                         <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
                           <User size={14} /> Customer Details
@@ -477,7 +482,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                     </div>
 
                     {/* Staff Notes (VENDOR/ADMIN/SUPER_ADMIN only) */}
-                    <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
+                    <div className="ek-print-hide space-y-4 rounded-xl border border-slate-200 bg-white p-5">
                       <h3 className="text-xs font-bold text-slate-850 uppercase tracking-wider flex items-center gap-2">
                         <FileText size={16} className="text-[#228b22]" /> Staff Internal Notes
                       </h3>
@@ -526,25 +531,30 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
 
             {/* Footer Action (Status Transition) */}
             {order && (
-              <div className="bg-white px-8 py-5 border-t flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 z-10 rounded-b-3xl">
+              <div className="ek-print-hide sticky bottom-0 z-10 flex flex-col items-stretch justify-end gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:flex-row sm:items-center sm:px-8">
                 {allowedNextStatuses.length > 0 ? (
                   <>
-                    <select
-                      value={selectedStatus}
-                      onChange={e => setSelectedStatus(e.target.value)}
-                      className="w-full sm:w-auto px-4 py-2.5 bg-gray-55 border rounded-md font-bold text-slate-700 outline-none text-xs cursor-pointer"
-                    >
-                      <option value="">Update Order Status...</option>
-                      {allowedNextStatuses.map(status => (
-                        <option key={status} value={status}>{statusLabels[status] || status}</option>
-                      ))}
-                    </select>
+                    <label className="relative block w-full sm:w-60">
+                      <span className="sr-only">Next order status</span>
+                      <select
+                        value={selectedStatus}
+                        onChange={e => setSelectedStatus(e.target.value)}
+                        className="w-full appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-4 pr-11 text-sm font-medium text-slate-800 focus:border-emerald-700 focus:outline-none"
+                        style={{ colorScheme: 'light' }}
+                      >
+                        <option value="">Choose next status</option>
+                        {allowedNextStatuses.map(status => (
+                          <option key={status} value={status}>{statusLabels[status] || status}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={17} aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                    </label>
                     <button
                       onClick={handleStatusUpdate}
                       disabled={!selectedStatus || submittingStatus}
-                      className="w-full sm:w-auto px-5 py-2.5 bg-[#228b22] hover:opacity-95 text-white rounded-md font-black transition text-xs disabled:opacity-60"
+                      className="w-full rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                     >
-                      {submittingStatus ? 'Updating...' : 'Save Transition'}
+                      {submittingStatus ? 'Updating…' : 'Update status'}
                     </button>
                   </>
                 ) : (

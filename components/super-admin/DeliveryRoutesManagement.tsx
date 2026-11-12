@@ -558,7 +558,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                             </button>
                             <button
                               onClick={() => triggerDelete(route)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                              className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-red-50 rounded-lg transition"
                               title="Delete route"
                             >
                               <Trash2 size={14} />
@@ -651,7 +651,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                             <span className="font-bold text-slate-600 block">
                               ₦{reverse.fee.toLocaleString()}
                             </span>
-                            <span className="text-[9px] text-amber-600 font-bold block mt-0.5">
+                            <span className="text-[9px] text-slate-600 font-bold block mt-0.5">
                               uses reverse
                             </span>
                           </td>
@@ -681,7 +681,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       {/* ── Add / Edit Route Modal ── */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -694,16 +694,16 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 border border-gray-150 z-10"
+              className="relative w-full bg-white p-6 z-10 dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="DeliveryRoutesManagement-dialog-0-title"
             >
-              <div className="flex items-center justify-between border-b pb-3 mb-4">
-                <h3 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
+              <div className="flex items-center justify-between border-b pb-3 mb-4 dashboard-dialog-header">
+                <h3 className="text-base font-extrabold text-slate-800 flex items-center gap-2" id="DeliveryRoutesManagement-dialog-0-title">
                   <Truck size={18} className="text-[#228b22]" />
                   {editingRoute ? 'Edit Delivery Route Fee' : 'Add New Delivery Route'}
                 </h3>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg dashboard-dialog-close" aria-label="Close dialog" type="button"
                 >
                   <X size={18} />
                 </button>
@@ -862,12 +862,12 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       {/* ── Warning Confirmation Dialog on Disable or Delete ── */}
       <AnimatePresence>
         {confirmAction && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+              className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] backdrop-blur-xs"
               onClick={() => setConfirmAction(null)}
             />
 
@@ -875,19 +875,19 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 border border-red-100 z-10 text-center"
+              className="relative w-full bg-white p-6 z-10 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="DeliveryRoutesManagement-dialog-1-title"
             >
-              <div className="w-12 h-12 rounded-md bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-md bg-red-50 text-slate-500 flex items-center justify-center mx-auto mb-3 dashboard-dialog-icon">
                 <AlertTriangle size={24} />
               </div>
 
-              <h3 className="text-base font-extrabold text-slate-800 mb-1">
+              <h3 className="text-base font-extrabold text-slate-800 mb-1" id="DeliveryRoutesManagement-dialog-1-title">
                 {confirmAction.type === 'delete' ? 'Delete Delivery Route?' : 'Disable Delivery Route?'}
               </h3>
 
               <div className="bg-amber-50 border border-amber-200 rounded-md p-3 my-3 text-left">
-                <p className="text-xs text-amber-800 font-bold mb-1">Impact Warning:</p>
-                <p className="text-[11px] text-amber-700 leading-snug">
+                <p className="text-xs text-slate-800 font-bold mb-1">Impact Warning:</p>
+                <p className="text-[11px] text-slate-700 leading-snug">
                   Customers ordering items shipping between{' '}
                   <span className="font-extrabold">{confirmAction.route.originState}</span> and{' '}
                   <span className="font-extrabold">{confirmAction.route.destinationState}</span> will be unable to check out until this route is active!

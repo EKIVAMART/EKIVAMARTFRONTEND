@@ -258,7 +258,7 @@ export default function MediumEditor({
             <button
               type="button"
               onClick={handleInsertHighlight}
-              className="p-2 rounded-md text-amber-700 bg-amber-50 hover:bg-amber-100 transition"
+              className="p-2 rounded-md text-slate-700 bg-amber-50 hover:bg-amber-100 transition"
               title="Highlight Mark"
             >
               <Highlighter size={16} />
@@ -424,7 +424,7 @@ export default function MediumEditor({
               onClick={copyHtmlCode}
               className="px-3 py-1.5 rounded-md bg-neutral-800 text-neutral-200 hover:bg-neutral-700 text-xs font-semibold flex items-center gap-1.5 transition"
             >
-              {copiedHtml ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+              {copiedHtml ? <Check size={14} className="text-slate-400" /> : <Copy size={14} />}
               <span>{copiedHtml ? 'Copied!' : 'Copy Code'}</span>
             </button>
             <span className="text-xs text-neutral-400 font-mono">
@@ -526,7 +526,7 @@ export default function MediumEditor({
             <textarea
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              className="flex-1 bg-transparent text-emerald-300 p-4 outline-none resize-none leading-6 font-mono text-xs selection:bg-purple-900 selection:text-white min-h-[340px]"
+              className="flex-1 bg-transparent text-slate-300 p-4 outline-none resize-none leading-6 font-mono text-xs selection:bg-purple-900 selection:text-white min-h-[340px]"
               placeholder="<p>Write raw HTML content here...</p>"
               spellCheck={false}
             />

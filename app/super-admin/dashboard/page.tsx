@@ -1,4 +1,5 @@
 'use client';
+import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
 import Sidebar from '@/components/super-admin/Sidebar';
@@ -396,7 +397,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     inStock: isRecord(record.stock)
       ? Boolean(record.stock.isInStock)
       : getStockQuantity(record.stock, record.quantity) > 0,
-    image: record.image || imageUrls[0] || '',
+    image: record.image || imageUrls[0] || (typeof record.preview === 'string' && /\.(png|jpe?g|webp|avif)(\?|$)/i.test(record.preview) ? record.preview : ''),
     images: imageObjects,
     status: record.status || 'draft',
     condition: record.condition || 'new',
@@ -669,6 +670,7 @@ const buildProductPayload = (
 };
 
 function AdminPageContent() {
+  const { confirm: requestConfirmation, confirmationDialog } = useDashboardConfirmation();
   const authUser = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -682,6 +684,7 @@ function AdminPageContent() {
   // Delivery routes hero search (shared with DeliveryRoutesManagement)
 
   const handleTabChange = (t: string) => {
+    if (t !== activeTab) setSearchQuery('');
     setActiveTab(t as any);
     if (t !== 'orders' && typeof window !== 'undefined' && (window.location.search.includes('tab=orders') || window.location.search.includes('orderId='))) {
       router.replace('/super-admin/dashboard');
@@ -702,6 +705,7 @@ function AdminPageContent() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productLoadError, setProductLoadError] = useState('');
   const [productPage, setProductPage] = useState(1);
+  const [productSortBy, setProductSortBy] = useState('createdAt-desc');
   const [productLimit, setProductLimit] = useState(PRODUCT_PAGE_LIMIT);
   const [productTotal, setProductTotal] = useState(0);
   const [productTotalPages, setProductTotalPages] = useState(1);
@@ -749,6 +753,8 @@ function AdminPageContent() {
   const [usersSortBy, setUsersSortBy] = useState('createdAt-desc');
   const [usersStatusFilter, setUsersStatusFilter] = useState('All');
   const [usersAuthFilter, setUsersAuthFilter] = useState('All');
+  const [usersReloadKey, setUsersReloadKey] = useState(0);
+  const [adminsReloadKey, setAdminsReloadKey] = useState(0);
   const [usersDateFrom, setUsersDateFrom] = useState('');
   const [usersDateTo, setUsersDateTo] = useState('');
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -1078,14 +1084,17 @@ function AdminPageContent() {
 
       try {
         const vendorId = filterVendorId !== 'all' ? filterVendorId : undefined;
+        const [rawSortField, rawSortOrder] = productSortBy.split('-');
+        const productSortField = (['createdAt', 'updatedAt', 'price', 'name'].includes(rawSortField) ? rawSortField : 'createdAt') as 'createdAt' | 'updatedAt' | 'price' | 'name';
+        const productSortOrder = rawSortOrder === 'asc' ? 'asc' : 'desc';
         const response = await productApi.getAllProducts({
           page: productPage,
           limit: PRODUCT_PAGE_LIMIT,
           searchQuery: searchQuery || undefined,
           categoryId: filterSubcategoryId !== 'all' ? filterSubcategoryId : (filterCategoryId !== 'all' ? filterCategoryId : undefined),
           ...(vendorId ? { vendorId } : {}),
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
+          sortBy: productSortField,
+          sortOrder: productSortOrder,
         });
         const fetchedProducts = getProductList(response)
           .map(normalizeProduct)
@@ -1118,7 +1127,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId, filterVendorId]);
+  }, [isCheckingAuth, hasSuperAdminRole, productPage, searchQuery, filterCategoryId, filterSubcategoryId, filterVendorId, productSortBy]);
 
   const resolveAmount = (value: any): number => {
     if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -1264,105 +1273,11 @@ function AdminPageContent() {
     return () => { signal.current = false; };
   }, [loadOrders]);
 
-  const fetchUsers = async () => {
-    try {
-      let emailParam: string | undefined;
-      let phoneParam: string | undefined;
-      let firstParam: string | undefined;
-      let lastParam: string | undefined;
+  // Re-run the users effect so reloads use the same filters as the initial load.
+  const fetchUsers = async () => setUsersReloadKey((k) => k + 1);
 
-      if (searchQuery) {
-        const trimmed = searchQuery.trim();
-        if (trimmed.includes('@')) {
-          emailParam = trimmed;
-        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
-          phoneParam = trimmed;
-        } else {
-          const parts = trimmed.split(/\s+/);
-          if (parts.length > 1) {
-            firstParam = parts[0];
-            lastParam = parts.slice(1).join(' ');
-          } else {
-            firstParam = trimmed;
-          }
-        }
-      }
-
-      const [field, dir] = usersSortBy.split('-');
-      const sortField = field === 'createdAt' || field === 'updatedAt' ? field : 'createdAt';
-      const sortOrder = dir === 'asc' || dir === 'desc' ? dir : 'desc';
-
-      const response = await authApi.searchUsers({
-        page: usersPage,
-        limit: usersLimit,
-        role: 'customer',
-        email: emailParam,
-        firstName: firstParam,
-        lastName: lastParam,
-        phoneNumber: phoneParam,
-        sortBy: sortField as any,
-        sortOrder: sortOrder as any,
-      });
-
-      const userList = getUserList(response);
-      const normalized = userList.map(normalizeAppUser);
-      const pagination = getUserPagination(response, normalized.length);
-
-      setUsers(normalized);
-      setUsersTotal(pagination.total);
-      setUsersTotalPages(pagination.totalPages);
-    } catch (error) {
-      console.error('Failed to fetch users', error);
-    }
-  };
-
-  const fetchAdmins = async () => {
-    try {
-      let emailParam: string | undefined;
-      let phoneParam: string | undefined;
-      let firstParam: string | undefined;
-      let lastParam: string | undefined;
-
-      if (searchQuery) {
-        const trimmed = searchQuery.trim();
-        if (trimmed.includes('@')) {
-          emailParam = trimmed;
-        } else if (/^\+?[0-9\s\-()]+$/.test(trimmed)) {
-          phoneParam = trimmed;
-        } else {
-          const parts = trimmed.split(/\s+/);
-          if (parts.length > 1) {
-            firstParam = parts[0];
-            lastParam = parts.slice(1).join(' ');
-          } else {
-            firstParam = trimmed;
-          }
-        }
-      }
-
-      const response = await authApi.searchUsers({
-        page: adminsPage,
-        limit: adminsLimit,
-        role: 'admin',
-        email: emailParam,
-        firstName: firstParam,
-        lastName: lastParam,
-        phoneNumber: phoneParam,
-        sortBy: 'createdAt',
-        sortOrder: adminsSortOrder,
-      });
-
-      const userList = getUserList(response);
-      const normalized = userList.map(normalizeAdminUser);
-      const pagination = getUserPagination(response, normalized.length);
-
-      setAdmins(normalized);
-      setAdminsTotal(pagination.total);
-      setAdminsTotalPages(pagination.totalPages);
-    } catch (error) {
-      console.error('Failed to fetch admins', error);
-    }
-  };
+  // Re-run the admins effect so reloads use the same filters as the initial load.
+  const fetchAdmins = async () => setAdminsReloadKey((k) => k + 1);
 
   // Users fetching effect
   useEffect(() => {
@@ -1442,7 +1357,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter]);
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, usersPage, searchQuery, usersSortBy, usersStatusFilter, usersReloadKey]);
 
   // Reset users page on search/filter changes
   useEffect(() => {
@@ -1520,7 +1435,7 @@ function AdminPageContent() {
     return () => {
       isMounted = false;
     };
-  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder]);
+  }, [isCheckingAuth, hasSuperAdminRole, activeTab, adminsPage, searchQuery, adminsSortOrder, adminsReloadKey]);
 
   // Reset admins page on search/filter changes
   useEffect(() => {
@@ -1679,15 +1594,22 @@ function AdminPageContent() {
   };
 
   const handleDeleteProduct = async (id: string) => {
+    const product = products.find(p => p.id === id);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete ${product?.name ? `"${product.name}"` : 'this product'}? This cannot be undone.`, { title: "Delete product?", confirmLabel: "Delete product", destructive: true });
+    if (!confirmDelete) return;
+
     setProductLoadError('');
+    const toastId = toast.loading('Deleting product...');
 
     try {
       await productApi.deleteProduct(id);
       setProducts(prev => prev.filter(p => p.id !== id));
+      setProductTotal(prev => Math.max(0, prev - 1));
+      toast.success('Product deleted.', { id: toastId });
     } catch (error) {
-      setProductLoadError(
-        getApiErrorMessage(error) || 'Could not delete product. Please try again.'
-      );
+      const message = getApiErrorMessage(error) || 'Could not delete product. Please try again.';
+      setProductLoadError(message);
+      toast.error(message, { id: toastId });
     }
   };
 
@@ -1726,12 +1648,6 @@ function AdminPageContent() {
     }
   };
 
-  const handleDeactivateAdmin = async (id: string) => {
-    const admin = admins.find(item => item.id === id);
-    if (!admin) return;
-    toast.error('Deactivation is unavailable until the admin account API supports it.');
-  };
-
   const handleActivateAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
@@ -1759,18 +1675,35 @@ function AdminPageContent() {
   const handleBlockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
-    toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
+    if (!(await requestConfirmation(`Block ${admin.firstName} ${admin.lastName}? They will lose access to the admin portal until unblocked.`, { title: "Block admin?", confirmLabel: "Block admin", destructive: true }))) return;
+
+    setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: 'blocked' as const } : a));
+    try {
+      await authApi.blockUser(id);
+      toast.success(`${admin.firstName} ${admin.lastName} has been blocked.`);
+    } catch (error) {
+      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: admin.status } : a));
+      toast.error(getApiErrorMessage(error) || 'Could not block admin.');
+    }
   };
 
   const handleUnblockAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
     if (!admin) return;
-    toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
+
+    setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: 'active' as const } : a));
+    try {
+      await authApi.unblockUser(id);
+      toast.success(`${admin.firstName} ${admin.lastName} has been unblocked.`);
+    } catch (error) {
+      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: admin.status } : a));
+      toast.error(getApiErrorMessage(error) || 'Could not unblock admin.');
+    }
   };
 
   const handleDeleteAdmin = async (id: string) => {
     const admin = admins.find(s => s.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete admin ${admin?.firstName} ${admin?.lastName}? This action cannot be undone.`, { title: "Delete admin?", confirmLabel: "Delete admin", destructive: true });
     if (!confirmDelete) return;
 
     const toastId = toast.loading('Deleting admin...');
@@ -1820,6 +1753,7 @@ function AdminPageContent() {
 
   const handleBlockUser = async (id: string) => {
     const user = users.find(u => u.id === id);
+    if (!(await requestConfirmation(`Block ${user ? `${user.firstName} ${user.lastName}` : 'this user'}? They will not be able to sign in until unblocked.`, { title: "Block user?", confirmLabel: "Block user", destructive: true }))) return;
     // Optimistic update
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' as const } : u));
     try {
@@ -1848,7 +1782,7 @@ function AdminPageContent() {
 
   const handleDeleteUser = async (id: string) => {
     const user = users.find(u => u.id === id);
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`);
+    const confirmDelete = await requestConfirmation(`Are you sure you want to delete ${user?.firstName} ${user?.lastName}? This cannot be undone.`, { title: "Delete user?", confirmLabel: "Delete user", destructive: true });
     if (!confirmDelete) return;
 
     const toastId = toast.loading('Deleting user...');
@@ -1888,7 +1822,7 @@ function AdminPageContent() {
         <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-md border border-red-100">
-              <svg className="w-12 h-12 text-red-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-12 h-12 text-slate-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
@@ -1937,6 +1871,7 @@ function AdminPageContent() {
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA] flex-col md:flex-row relative">
+      {confirmationDialog}
 
       {/* Session Timeout Warning */}
       <SessionTimeoutModal loginPath="/super-admin/login" />
@@ -1963,10 +1898,11 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
+      <div className="ek-workspace ek-admin-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-end mb-5 pb-3 border-b border-gray-200/60">
-          <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center justify-between gap-6 mb-5 border-b border-slate-200 pb-4">
+          <p className="text-sm font-medium text-slate-500">EkivaMart <span className="mx-2 text-slate-300">/</span> Marketplace operations</p>
+          <div className="flex shrink-0 items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
               <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center font-semibold text-slate-700 text-sm border border-slate-200">
@@ -2015,7 +1951,7 @@ function AdminPageContent() {
             </div>
 
             {usersLoadError && (
-              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 mb-4">
+              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-slate-700 mb-4">
                 {usersLoadError}
               </div>
             )}
@@ -2074,7 +2010,6 @@ function AdminPageContent() {
               data={admins}
               searchQuery={searchQuery}
               onViewDetails={handleViewAdmin}
-              onDeactivate={handleDeactivateAdmin}
               onActivate={handleActivateAdmin}
               onBlock={handleBlockAdmin}
               onUnblock={handleUnblockAdmin}
@@ -2094,7 +2029,7 @@ function AdminPageContent() {
           </>
         ) : (
           <>
-            {activeTab !== 'deliveryRoutes' && (
+            {!['deliveryRoutes', 'blog', 'taxes'].includes(activeTab) && (
               <header className="flex flex-wrap justify-between items-center gap-3 mb-5">
                 <div>
                   <h1 className="text-2xl font-semibold text-slate-900 capitalize">{activeTab}</h1>
@@ -2184,7 +2119,7 @@ function AdminPageContent() {
               <div className="space-y-3">
                 {(isLoadingProducts || isSavingProduct || productLoadError) && (
                   <div className={`rounded-md border px-4 py-3 text-sm font-medium ${productLoadError
-                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    ? 'border-amber-200 bg-amber-50 text-slate-700'
                     : 'border-gray-200 bg-white text-gray-500'
                     }`}>
                     {productLoadError || (isSavingProduct ? 'Saving product...' : 'Loading products...')}
@@ -2193,8 +2128,9 @@ function AdminPageContent() {
                 <ProductTable
                   data={resolvedProducts}
                   onEdit={openProductModal}
-                  onView={(item) => openViewModal({
+                  onView={(item, section) => openViewModal({
                     ...item,
+                    initialSection: section || 'overview',
                     image: typeof item.image === 'string' ? item.image : item.image.src,
                   } as AdminProduct)}
                   onDelete={handleDeleteProduct}
@@ -2207,6 +2143,8 @@ function AdminPageContent() {
                   onPageChange={setProductPage}
                   isLoading={isLoadingProducts}
                   showReviewRepliesButton
+                  sortBy={productSortBy}
+                  onSortByChange={(value) => { setProductSortBy(value); setProductPage(1); }}
                 />
               </div>
             )}
@@ -2216,7 +2154,7 @@ function AdminPageContent() {
             {activeTab === 'orders' && (
               <div className="space-y-4">
                 {ordersLoadError && (
-                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-slate-700">
                     {ordersLoadError}
                   </div>
                 )}
@@ -2309,7 +2247,7 @@ function AdminPageContent() {
           onUnblock={handleUnblockUser}
           onDelete={handleDeleteUser}
         />
-      </main>
+      </div>
     </div>
   );
 }

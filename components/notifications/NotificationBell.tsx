@@ -188,7 +188,7 @@ export function NotificationBell() {
                 className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
                 title={soundEnabled ? 'Mute chime' : 'Enable chime'}
               >
-                {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-rose-500" />}
+                {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
               </button>
 
               {/* Mark All Read Button */}

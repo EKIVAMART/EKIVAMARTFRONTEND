@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/lib/axios';
 /**
  * Sends the actual broadcast email after all images (if any) have
  * already been uploaded via uploadBroadcastImage().
@@ -23,7 +24,7 @@ export interface SendBroadcastResult {
 export async function sendBroadcast(
   payload: SendBroadcastPayload,
   authToken: string,
-  apiBaseUrl: string = process.env.NEXT_PUBLIC_API_URL ?? ''
+  apiBaseUrl: string = API_BASE_URL
 ): Promise<SendBroadcastResult> {
   try {
     const response = await fetch(`${apiBaseUrl}/waitlist/broadcast`, {

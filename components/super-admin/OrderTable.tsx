@@ -1,4 +1,5 @@
 import RecordStatus from "@/components/admin/RecordStatus";
+import RecordActions from '@/components/admin/RecordActions';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Search, RefreshCw, Store, MapPin, DollarSign, Tag } from 'lucide-react';
 import { ordersApi } from '@/lib/api';
@@ -151,28 +152,42 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
   }, []);
 
   // Execute Search API call
-  const executeSearch = useCallback(async (overrides?: { status?: string }) => {
+  const executeSearch = useCallback(async (overrides?: {
+    status?: string;
+    orderId?: string;
+    vendorId?: string;
+    minAmount?: string;
+    maxAmount?: string;
+    deliveryState?: string;
+    sortCombo?: string;
+  }) => {
     setIsSearching(true);
     setCurrentPage(1);
 
     const rawTarget = overrides?.status !== undefined ? overrides.status : activeStatusTab;
     const targetStatus = rawTarget === 'ALL' ? 'ALL' : rawTarget.toLowerCase();
-    const [sortBy, sortOrder] = sortCombo.split(':');
+    // Explicit overrides win over state so callers (e.g. reset) don't search with stale values.
+    const effOrderId = overrides?.orderId ?? orderId;
+    const effVendorId = overrides?.vendorId ?? vendorId;
+    const effMinAmount = overrides?.minAmount ?? minAmount;
+    const effMaxAmount = overrides?.maxAmount ?? maxAmount;
+    const effDeliveryState = overrides?.deliveryState ?? deliveryState;
+    const [sortBy, sortOrder] = (overrides?.sortCombo ?? sortCombo).split(':');
 
     const searchParams: Record<string, any> = {
       page: 1,
       limit: 50,
-      orderId: orderId.trim() || undefined,
-      vendorId: vendorId || undefined,
-      minAmount: minAmount !== '' ? Number(minAmount) : undefined,
-      maxAmount: maxAmount !== '' ? Number(maxAmount) : undefined,
-      deliveryState: deliveryState || undefined,
+      orderId: effOrderId.trim() || undefined,
+      vendorId: effVendorId || undefined,
+      minAmount: effMinAmount !== '' ? Number(effMinAmount) : undefined,
+      maxAmount: effMaxAmount !== '' ? Number(effMaxAmount) : undefined,
+      deliveryState: effDeliveryState || undefined,
       status: targetStatus !== 'ALL' ? targetStatus : undefined,
       sortBy: sortBy || 'created_at',
       sortOrder: sortOrder || 'desc',
     };
 
-    if (globalQuery && !orderId) {
+    if (globalQuery && !effOrderId) {
       searchParams.searchQuery = globalQuery;
     }
 
@@ -253,7 +268,15 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
     setDeliveryState('');
     setActiveStatusTab('ALL');
     setSortCombo('created_at:desc');
-    void executeSearch({ status: 'ALL' });
+    void executeSearch({
+      status: 'ALL',
+      orderId: '',
+      vendorId: '',
+      minAmount: '',
+      maxAmount: '',
+      deliveryState: '',
+      sortCombo: 'created_at:desc',
+    });
   };
 
   // Local Client Filtering Fallback when offline or using static data
@@ -463,7 +486,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
             <tbody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((order, idx) => (
-                  <tr key={order.id} className="border-b last:border-0 hover:bg-gray-50/50 transition">
+                  <tr key={order.id} className="cursor-pointer border-b transition hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 last:border-0" onClick={() => onViewDetails?.(order)} onKeyDown={(event) => { if (event.key === 'Enter') onViewDetails?.(order); }} tabIndex={0} aria-label={`View order ${order.id}`}>
                     <td className="p-4 text-xs font-bold text-slate-400 text-center">
                       {(currentPage - 1) * itemsPerPage + idx + 1}
                     </td>
@@ -498,12 +521,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                       <RecordStatus value={order.paymentStatus} />
                     </td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => onViewDetails?.(order)}
-                        className="text-[#228b22] hover:bg-brand-50 px-3 py-1.5 rounded-lg text-xs font-bold transition"
-                      >
-                        Details
-                      </button>
+                      <RecordActions name={`order ${order.id}`} actions={[{ label: 'View details', onSelect: () => onViewDetails?.(order) }]} />
                     </td>
                   </tr>
                 ))
@@ -522,7 +540,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
         <div className="md:hidden flex flex-col p-4 space-y-4 bg-gray-50/50">
           {paginatedData.length > 0 ? (
             paginatedData.map(order => (
-              <div key={order.id} className="bg-white p-5 rounded-md shadow-sm border border-gray-100 space-y-4">
+              <div key={order.id} className="cursor-pointer space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" onClick={() => onViewDetails?.(order)} onKeyDown={(event) => { if (event.key === 'Enter') onViewDetails?.(order); }} tabIndex={0} role="button" aria-label={`View order ${order.id}`}>
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="font-bold text-slate-800 text-base">{order.id}</span>
                   <div className="flex items-center gap-2">
@@ -555,13 +573,8 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
                     <span className="text-gray-400 text-sm font-medium">Date</span>
                     <span className="font-medium text-slate-700 text-sm">{order.date}</span>
                   </div>
-                  <div className="pt-2 border-t border-gray-50 mt-2">
-                    <button
-                      onClick={() => onViewDetails?.(order)}
-                      className="w-full text-center bg-[#228b22] text-white py-2.5 rounded-md text-sm font-bold shadow-sm hover:opacity-90 transition"
-                    >
-                      View Details
-                    </button>
+                  <div className="flex justify-end border-t border-slate-100 pt-3" onClick={(event) => event.stopPropagation()}>
+                    <RecordActions name={`order ${order.id}`} actions={[{ label: 'View details', onSelect: () => onViewDetails?.(order) }]} />
                   </div>
                 </div>
               </div>

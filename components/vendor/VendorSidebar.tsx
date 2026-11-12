@@ -9,6 +9,7 @@ import type { RootState } from '@/lib/store';
 import { useState } from 'react';
 import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL } from '@/lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export type VendorTab = 'dashboard' | 'products' | 'store-settings' | 'orders' | 'earnings' | 'notifications';
@@ -31,7 +32,7 @@ export default function VendorSidebar({ activeTab, setActiveTab, isOpen, onClose
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

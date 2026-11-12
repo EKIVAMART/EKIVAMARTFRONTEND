@@ -12,7 +12,7 @@ const TOKEN_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 const WARNING_BEFORE_MS = 15 * 1000;      // Show warning 15 seconds before expiry
 const COUNTDOWN_SECONDS = 15;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from '@/lib/axios';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -223,21 +223,21 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
     secondsLeft > 10
       ? 'text-[#228b22]'
       : secondsLeft > 5
-      ? 'text-amber-600'
-      : 'text-rose-600';
+      ? 'text-slate-600'
+      : 'text-slate-600';
 
   const pulseClass = secondsLeft <= 5 ? '' : '';
 
   return (
     <AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="bg-white w-full max-w-md rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden"
+            className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="SessionTimeoutModal-dialog-0-title"
           >
             {/* ── Progress bar ── */}
             <div className="h-1.5 bg-slate-100 w-full">
@@ -251,16 +251,16 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
             <div className="px-8 pt-8 pb-0 flex flex-col items-center text-center gap-3">
               <div className={`w-16 h-16 rounded-md flex items-center justify-center ${
                 secondsLeft <= 5
-                  ? 'bg-rose-50 text-rose-600 border border-rose-100'
+                  ? 'bg-rose-50 text-slate-600 border border-rose-100'
                   : secondsLeft <= 10
-                  ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                  ? 'bg-amber-50 text-slate-600 border border-amber-100'
                   : 'bg-brand-50 text-[#228b22] border border-brand-100'
               } ${pulseClass}`}>
                 <ShieldAlert size={32} strokeWidth={1.75} />
               </div>
 
               <div>
-                <h2 className="text-xl font-black text-slate-800 tracking-tight">
+                <h2 className="text-xl font-black text-slate-800 tracking-tight" id="SessionTimeoutModal-dialog-0-title">
                   ⚠️ Session Expiring!
                 </h2>
                 <p className="text-sm text-gray-500 font-medium mt-1 leading-relaxed">
@@ -317,7 +317,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
                 type="button"
                 onClick={performLogout}
                 disabled={isExtending || isLoggingOut}
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 rounded-md font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-rose-50 border border-rose-200 text-slate-700 rounded-md font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoggingOut ? (
                   <>

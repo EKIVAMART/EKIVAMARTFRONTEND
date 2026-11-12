@@ -116,7 +116,7 @@ export const AddressesTab: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.addressLine1 || !formData.city || !formData.state || !formData.postalCode || !formData.phoneNumber) {
+    if (!formData.fullName || !formData.addressLine1 || !formData.city || !formData.state || !formData.phoneNumber) {
       toast.error('Please fill in all required address fields.');
       return;
     }
@@ -268,10 +268,9 @@ export const AddressesTab: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-bold text-gray-600 block mb-1">Postal Code *</label>
+              <label className="text-[11px] font-bold text-gray-600 block mb-1">Postal Code (optional)</label>
               <input
                 type="text"
-                required
                 value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                 placeholder="105102"

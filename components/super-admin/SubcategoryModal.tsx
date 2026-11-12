@@ -163,25 +163,25 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white rounded-md shadow-sm flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
+      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={onClose} />
+      <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="SubcategoryModal-dialog-0-title">
 
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/50 dashboard-dialog-header">
           <div>
-            <h2 className="text-xl font-black text-slate-800 tracking-tight">Subcategories</h2>
+            <h2 className="text-xl font-black text-slate-800 tracking-tight" id="SubcategoryModal-dialog-0-title">Subcategories</h2>
             <p className="text-sm text-[#1c711c] font-bold mt-1 bg-brand-50 px-2 py-0.5 rounded inline-block">
               {category.name}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition">
+          <button onClick={onClose} className="p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button">
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-[#F8F9FA]">
+        <div className="flex-1 overflow-y-auto p-6 bg-[#F8F9FA] dashboard-dialog-body">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-600 border border-red-200 rounded-lg font-medium text-sm">
+            <div className="mb-4 p-3 bg-red-50 text-slate-600 border border-red-200 rounded-lg font-medium text-sm">
               {error}
             </div>
           )}
@@ -255,7 +255,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-slate-700 text-sm">{sub.name}</span>
                         {!sub.isActive && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-slate-600 border border-amber-200">
                             Draft
                           </span>
                         )}
@@ -264,7 +264,7 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                         {!sub.isActive ? (
                           <button
                             onClick={() => handlePublish(sub.id)}
-                            className="text-xs font-bold px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200/80 rounded-md transition-all flex items-center gap-1.5"
+                            className="text-xs font-bold px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-slate-600 border border-emerald-200/80 rounded-md transition-all flex items-center gap-1.5"
                           >
                             <Check size={14} /> Publish
                           </button>
@@ -272,14 +272,14 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
                           <>
                             <button
                               onClick={() => startEditing(sub)}
-                              className="p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition border border-blue-100/50 flex items-center justify-center"
+                              className="p-2 text-slate-600 hover:text-slate-900 bg-blue-50 hover:bg-blue-100 rounded-md transition border border-blue-100/50 flex items-center justify-center"
                               title="Edit"
                             >
                               <Edit size={14} />
                             </button>
                             <button
                               onClick={() => setDeletingId(sub.id)}
-                              className="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition border border-red-100/50 flex items-center justify-center"
+                              className="p-2 text-slate-600 hover:text-slate-900 bg-red-50 hover:bg-red-100 rounded-md transition border border-red-100/50 flex items-center justify-center"
                               title="Delete"
                             >
                               <Trash2 size={14} />
@@ -298,13 +298,13 @@ export default function SubcategoryModal({ isOpen, onClose, category, onSubcateg
 
       {/* ── Subcategory Delete Confirmation ── */}
       {deletingId && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setDeletingId(null)} />
-          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4 ">
-              <Trash2 size={22} className="text-red-600" />
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200 dashboard-dialog-overlay">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setDeletingId(null)} />
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="SubcategoryModal-dialog-1-title">
+            <div className="w-12 h-12 rounded-md bg-red-100 flex items-center justify-center mx-auto mb-4  dashboard-dialog-icon">
+              <Trash2 size={22} className="text-slate-600" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Delete Subcategory?</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center" id="SubcategoryModal-dialog-1-title">Delete Subcategory?</h3>
             <p className="text-gray-500 text-sm mb-6 text-center">
               This will permanently delete the subcategory. This action cannot be undone.
             </p>

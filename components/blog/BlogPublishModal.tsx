@@ -93,21 +93,21 @@ export default function BlogPublishModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 dashboard-dialog-overlay">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6"
+          className="bg-white w-full overflow-hidden p-6 space-y-6 dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="BlogPublishModal-dialog-0-title"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
+          <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dashboard-dialog-header">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-md bg-emerald-50 text-slate-600 flex items-center justify-center font-bold dashboard-dialog-icon">
                 <Send size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-extrabold text-slate-800">
+                <h3 className="text-lg font-extrabold text-slate-800" id="BlogPublishModal-dialog-0-title">
                   Publish Article
                 </h3>
                 <p className="text-xs text-neutral-500 font-medium truncate max-w-[260px]">
@@ -117,18 +117,18 @@ export default function BlogPublishModal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+              className="p-2 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition dashboard-dialog-close" aria-label="Close dialog" type="button"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Banner */}
-          <div className="bg-emerald-50/60 border border-emerald-100 rounded-md p-4 flex items-start gap-3 text-emerald-950">
-            <Sparkles size={18} className="text-emerald-600 shrink-0 mt-0.5" />
+          <div className="bg-emerald-50/60 border border-emerald-100 rounded-md p-4 flex items-start gap-3 text-slate-950">
+            <Sparkles size={18} className="text-slate-600 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed">
               <p className="font-extrabold">Ready to go live?</p>
-              <p className="text-emerald-700 font-medium">
+              <p className="text-slate-700 font-medium">
                 Publishing makes this story immediately visible to all visitors on the public EkivaMart website.
               </p>
             </div>

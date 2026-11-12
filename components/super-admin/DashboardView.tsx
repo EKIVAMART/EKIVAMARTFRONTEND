@@ -1,11 +1,14 @@
 'use client';
 import RecordStatus from "@/components/admin/RecordStatus";
+import { Metric, OrderBreakdown } from '@/components/admin/OverviewPrimitives';
 import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
+import DashboardRevenueChart from '@/components/admin/DashboardRevenueChart';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  TrendingUp, ShoppingBag, Package, Users, ArrowUpRight, ChevronRight,
+  TrendingUp, ShoppingBag, Package, Users, Store, ArrowUpRight, ChevronRight,
   Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity, RefreshCw,
   Search, Filter, DollarSign, Award, Shield, Layers, CreditCard, ChevronLeft
 } from 'lucide-react';
@@ -61,6 +64,12 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ onNavigate }: DashboardViewProps) {
+  const router = useRouter();
+  const openOrder = (order: any) => {
+    const orderId = order?.orderNumber || order?.orderId;
+    onNavigate?.('orders');
+    if (orderId) router.push(`/super-admin/dashboard?tab=orders&orderId=${encodeURIComponent(String(orderId))}`);
+  };
   // Shared Filter Controls
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('all_time');
   const [selectedVendorId, setSelectedVendorId] = useState<string>('');
@@ -186,7 +195,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     setLoadingActivities(true);
     setErrorActivities(null);
     try {
-      const res = await superAdminDashboardApi.getRecentActivities({ limit: 10 });
+      const res = await superAdminDashboardApi.getRecentActivities({ limit: 5, period: selectedPeriod, vendorId: selectedVendorId || undefined });
       if (res?.success) {
         setActivitiesData(res.data);
       } else {
@@ -197,7 +206,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     } finally {
       setLoadingActivities(false);
     }
-  }, []);
+  }, [selectedPeriod, selectedVendorId]);
 
   // Fetch 4: Top Products Pie Chart
   const fetchPieChart = useCallback(async () => {
@@ -205,6 +214,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     setErrorPieChart(null);
     try {
       const res = await superAdminDashboardApi.getPieChart({
+        vendorId: selectedVendorId || undefined,
         period: selectedPeriod,
         categoryId: selectedCategoryId || undefined,
       });
@@ -218,7 +228,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     } finally {
       setLoadingPieChart(false);
     }
-  }, [selectedPeriod, selectedCategoryId]);
+  }, [selectedPeriod, selectedCategoryId, selectedVendorId]);
 
   // Fetch 5: Earnings Line Graph
   const fetchEarningsGraph = useCallback(async () => {
@@ -226,6 +236,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     setErrorGraph(null);
     try {
       const res = await superAdminDashboardApi.getEarningsGraph({
+        period: selectedPeriod,
         interval: selectedInterval,
         vendorId: selectedVendorId || undefined,
       });
@@ -239,7 +250,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     } finally {
       setLoadingGraph(false);
     }
-  }, [selectedInterval, selectedVendorId]);
+  }, [selectedInterval, selectedVendorId, selectedPeriod]);
 
   // Fetch 6: Orders Bar Chart
   const fetchOrdersBarChart = useCallback(async () => {
@@ -278,17 +289,11 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
     return [...rawPoints].sort((a, b) => a.date.localeCompare(b.date));
   }, [graphData]);
 
-  // Max value in graph for scaling
-  const maxGraphValue = useMemo(() => {
-    if (processedGraphPoints.length === 0) return 1;
-    return Math.max(...processedGraphPoints.map((p) => Math.max(p.grossRevenue || 0, p.platformCommission || 0, p.vendorNetEarnings || 0)));
-  }, [processedGraphPoints]);
-
   return (
-    <div className="space-y-8 pb-16">
+    <div className="overview-page">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="overview-filters">
           <label className="text-xs text-slate-600" htmlFor="overview-store">Store</label>
           <select id="overview-store" value={selectedVendorId} onChange={(event) => setSelectedVendorId(event.target.value)}
             className="min-h-9 border border-slate-300 bg-white px-3 text-sm text-slate-800">
@@ -306,52 +311,24 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         </div>
       </div>
 
-      <section aria-label="Marketplace activity">
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-sm font-semibold text-slate-800">Marketplace activity</h2>
-          <span className="text-xs text-slate-500">{selectedPeriod === 'all_time' ? 'All time' : selectedPeriod === 'day' ? 'Today' : selectedPeriod === 'week' ? 'Last 7 days' : 'Last 30 days'}</span>
-        </div>
-        {loadingKpi ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 border border-slate-200 bg-white">
-            {[...Array(4)].map((_, index) => <div key={index} className="h-24 border-r last:border-r-0 border-slate-200 p-4 " />)}
-          </div>
-        ) : errorKpi ? (
-          <div role="status" className="flex items-center justify-between gap-4 border border-slate-200 bg-white p-4 text-sm text-slate-700">
-            <span>{errorKpi}</span>
-            <button type="button" onClick={() => void fetchKpiOverview()} className="border border-slate-300 px-3 py-2 font-medium">Retry</button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 border border-slate-200 bg-white">
-            {[
-              { label: 'Gross sales', value: fmtNGN(kpiData?.platformGmv?.filtered), allTime: fmtNGN(kpiData?.platformGmv?.totalAllTime) },
-              { label: 'Platform commission', value: fmtNGN(kpiData?.platformCommissionEarned?.filtered), allTime: fmtNGN(kpiData?.platformCommissionEarned?.totalAllTime) },
-              { label: 'Vendor earnings', value: fmtNGN(kpiData?.vendorEarningsTotal?.filtered), allTime: fmtNGN(kpiData?.vendorEarningsTotal?.totalAllTime) },
-              { label: 'Pending escrow', value: fmtNGN(kpiData?.pendingVendorEscrow?.filtered), allTime: fmtNGN(kpiData?.pendingVendorEscrow?.totalAllTime) },
-            ].map((metric) => <div key={metric.label} className="min-w-0 border-r last:border-r-0 border-slate-200 px-4 py-4">
-              <p className="text-xs text-slate-600">{metric.label}</p>
-              <p className="mt-1 truncate text-xl font-semibold text-slate-900" title={metric.value}>{metric.value}</p>
-              {selectedPeriod !== 'all_time' && <p className="mt-1 truncate text-xs text-slate-500" title={metric.allTime}>{metric.allTime} all time</p>}
-            </div>)}
-          </div>
-        )}
-        {kpiData && !errorKpi && <div className="mt-3 flex flex-wrap gap-x-8 gap-y-2 text-xs text-slate-600">
-          <span><strong className="font-semibold text-slate-900">{kpiData.activeVendorsCount ?? 0}</strong> active vendors</span>
-          <span><strong className="font-semibold text-slate-900">{kpiData.totalOrdersCount ?? 0}</strong> orders</span>
-          <span><strong className="font-semibold text-slate-900">{fmtNGN(kpiData.withdrawnTotal?.totalAllTime)}</strong> withdrawn all time</span>
-        </div>}
-      </section>
-
-      <NewsletterSubscriberCount />
-
+      <div className="overview-metrics" aria-label="Marketplace activity">
+        {[
+          ['Gross sales', kpiData?.platformGmv, 'Paid goods, excluding refunded items'],
+          ['Platform commission', kpiData?.platformCommissionEarned, 'Customer-paid commission accrued'],
+          ['Vendor earnings', kpiData?.vendorEarningsTotal, 'Accrued from eligible sales'],
+          ['Pending escrow', kpiData?.pendingVendorEscrow, 'Accrued earnings awaiting release'],
+        ].map(([label, metric, context]: any) => <Metric key={label} label={label} value={loadingKpi ? '—' : errorKpi ? 'Unavailable' : fmtNGN(metric?.filtered)} context={`${context}${selectedPeriod !== 'all_time' && !loadingKpi && !errorKpi ? ` · ${fmtNGN(metric?.totalAllTime)} lifetime` : ''}`} />)}
+      </div>
+      {errorKpi && <button onClick={()=>void fetchKpiOverview()} className="text-sm text-emerald-800">{errorKpi} · Retry</button>}
             {/* ── 5. EARNINGS TIME-SERIES LINE GRAPH & 6. ORDERS BAR CHART ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="overview-analytics">
         {/* Earnings Line Graph (2 cols) */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-md border border-slate-100 shadow-xs flex flex-col justify-between">
+        <div className="overview-panel p-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <h3 className="font-semibold text-slate-900 text-base">Sales and earnings</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Gross sales, commission, and vendor earnings over time.
+                Eligible paid goods · excludes refunds and cancelled items.
               </p>
             </div>
 
@@ -359,14 +336,15 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
             <div className="flex items-center bg-slate-100 p-1 rounded-md text-xs font-bold text-slate-600 self-start sm:self-auto">
               {(
                 [
-                  { label: 'Daily (7d)', value: 'daily' },
-                  { label: 'Weekly (60d)', value: 'weekly' },
-                  { label: 'Monthly (365d)', value: 'monthly' },
+                  { label: 'Daily', value: 'daily' },
+                  { label: 'Weekly', value: 'weekly' },
+                  { label: 'Monthly', value: 'monthly' },
                 ] as const
               ).map((int) => (
                 <button
                   key={int.value}
                   onClick={() => setSelectedInterval(int.value)}
+                  aria-pressed={selectedInterval === int.value}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
                     selectedInterval === int.value
                       ? 'bg-white text-[#228b22] shadow-xs font-black'
@@ -384,194 +362,45 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               <RefreshCw className="animate-spin" size={16} /> Loading time-series graph…
             </div>
           ) : errorGraph ? (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+            <div className="p-4 bg-rose-50 border border-rose-200 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
               <span>{errorGraph}</span>
               <button onClick={() => fetchEarningsGraph()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
             </div>
           ) : processedGraphPoints.length === 0 ? (
-            <div className="py-8 text-sm text-slate-600">
-              No sales data for this interval.
+            <div className="analytics-empty">
+              No eligible sales in this period.
             </div>
           ) : (
             <div>
-              {/* Visual Bar Chart Comparison per bucket */}
-              <div className="h-56 flex items-end gap-3 pt-6 pb-2 px-2 overflow-x-auto border-b border-slate-100">
-                {processedGraphPoints.map((point: any, idx: number) => {
-                  const grossHeight = Math.max(8, (point.grossRevenue / maxGraphValue) * 100);
-                  const commHeight = Math.max(8, (point.platformCommission / maxGraphValue) * 100);
-                  const netHeight = Math.max(8, (point.vendorNetEarnings / maxGraphValue) * 100);
-
-                  return (
-                    <div key={point.date || idx} className="flex-1 min-w-[48px] flex flex-col items-center gap-1 group relative">
-                      {/* Tooltip on hover */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2.5 rounded-md shadow-sm z-20 whitespace-nowrap gap-1 pointer-events-none">
-                        <span className="font-bold border-b border-slate-700 pb-1">{formatDateString(point.date)}</span>
-                        <span>Gross: {fmtNGN(point.grossRevenue)}</span>
-                        <span className="text-brand-300">Commission: {fmtNGN(point.platformCommission)}</span>
-                        <span className="text-emerald-300">Vendor Net: {fmtNGN(point.vendorNetEarnings)}</span>
-                      </div>
-
-                      <div className="w-full flex items-end justify-center gap-1 h-44">
-                        {/* Gross Bar */}
-                        <div
-                          style={{ height: `${grossHeight}%` }}
-                          className="w-2.5 bg-brand-700 rounded-t-md transition-all group-hover:bg-brand-800"
-                        />
-                        {/* Commission Bar */}
-                        <div
-                          style={{ height: `${commHeight}%` }}
-                          className="w-2.5 bg-amber-400 rounded-t-md transition-all group-hover:bg-amber-500"
-                        />
-                        {/* Net Bar */}
-                        <div
-                          style={{ height: `${netHeight}%` }}
-                          className="w-2.5 bg-emerald-500 rounded-t-md transition-all group-hover:bg-emerald-600"
-                        />
-                      </div>
-
-                      <span className="text-[10px] font-bold text-slate-400 truncate w-full text-center">
-                        {formatDateString(point.date).split(' ').slice(0, 2).join(' ')}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Legend */}
-              <div className="mt-4 flex items-center justify-center gap-6 text-xs font-bold text-slate-600">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-brand-700 rounded-xs" />
-                  <span>Gross Revenue</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-amber-400 rounded-xs" />
-                  <span>Platform Commission</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-xs" />
-                  <span>Vendor Net Earnings</span>
-                </div>
-              </div>
+              <DashboardRevenueChart points={processedGraphPoints} interval={selectedInterval} />
             </div>
           )}
         </div>
 
-        {/* Orders Bar Chart (1 col) */}
-        <div className="bg-white p-6 rounded-md border border-slate-100 shadow-xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900 text-base">Orders by status</h3>
-              <span className="text-[10px] font-extrabold bg-brand-50 text-brand-700 px-2 py-0.5 rounded-md uppercase">
-                {ordersBarData?.period || selectedPeriod}
-              </span>
-            </div>
-
-            {loadingOrdersBar ? (
-              <div className="h-56 flex items-center justify-center text-xs text-slate-400 font-bold gap-2">
-                <RefreshCw className="animate-spin" size={16} /> Loading order status...
-              </div>
-            ) : errorOrdersBar ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
-                <span>{errorOrdersBar}</span>
-                <button onClick={() => fetchOrdersBarChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="p-3 bg-slate-50 rounded-md border border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Orders</span>
-                    <p className="text-xl font-black text-slate-800">{ordersBarData?.totalOrdersCount ?? 0}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Value</span>
-                    <p className="text-base font-black text-brand-700">{fmtNGN(ordersBarData?.totalOrdersRevenue)}</p>
-                  </div>
-                </div>
-
-                {/* Status Segments */}
-                <div className="space-y-3 pt-1">
-                  {/* Delivered */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-emerald-700 flex items-center gap-1">
-                        <CheckCircle2 size={13} /> Delivered
-                      </span>
-                      <span className="text-slate-600">
-                        {ordersBarData?.delivered?.count ?? 0} ({ordersBarData?.delivered?.percentage ?? 0}%)
-                      </span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-sm overflow-hidden">
-                      <div
-                        style={{ width: `${Math.min(100, ordersBarData?.delivered?.percentage ?? 0)}%` }}
-                        className="h-full bg-emerald-500 rounded-md"
-                      />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.delivered?.revenue)}</p>
-                  </div>
-
-                  {/* Processing */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-blue-700 flex items-center gap-1">
-                        <Clock size={13} /> Processing & In-Transit
-                      </span>
-                      <span className="text-slate-600">
-                        {ordersBarData?.processing?.count ?? 0} ({ordersBarData?.processing?.percentage ?? 0}%)
-                      </span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-sm overflow-hidden">
-                      <div
-                        style={{ width: `${Math.min(100, ordersBarData?.processing?.percentage ?? 0)}%` }}
-                        className="h-full bg-blue-500 rounded-md"
-                      />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.processing?.revenue)}</p>
-                  </div>
-
-                  {/* Ordered */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-bold mb-1">
-                      <span className="text-amber-700 flex items-center gap-1">
-                        <ShoppingBag size={13} /> Pending Payment / Confirmed
-                      </span>
-                      <span className="text-slate-600">
-                        {ordersBarData?.ordered?.count ?? 0} ({ordersBarData?.ordered?.percentage ?? 0}%)
-                      </span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-sm overflow-hidden">
-                      <div
-                        style={{ width: `${Math.min(100, ordersBarData?.ordered?.percentage ?? 0)}%` }}
-                        className="h-full bg-amber-500 rounded-md"
-                      />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 text-right">{fmtNGN(ordersBarData?.ordered?.revenue)}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <OrderBreakdown total={ordersBarData?.totalOrdersCount ?? 0} value={ordersBarData?.totalOrdersRevenue ?? 0} loading={loadingOrdersBar} error={errorOrdersBar} onRetry={fetchOrdersBarChart} onOpen={()=>onNavigate?.('orders')} rows={ordersBarData?.breakdown ?? (ordersBarData ? ['ordered','processing','delivered'].map(key=>({status:key === 'ordered' ? 'pending / confirmed' : key === 'processing' ? 'processing / shipped' : key,count:ordersBarData[key]?.count ?? 0,totalRevenue:ordersBarData[key]?.revenue ?? 0,percentage:ordersBarData[key]?.percentage ?? 0})) : [])}/>
       </div>
+      <NewsletterSubscriberCount />
+      {!errorKpi && !loadingKpi && <div className="overview-context"><span>{kpiData?.activeVendorsCount ?? '—'} active vendors</span><span>{kpiData?.totalOrdersCount ?? '—'} eligible orders</span><span>{fmtNGN(kpiData?.withdrawnTotal?.totalAllTime)} withdrawn · lifetime</span></div>}
 
       {/* ── 4. TOP PRODUCTS & 3. RECENT ACTIVITIES FEEDS ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
         {/* Top 5 Products Chart/Cards (1 col) */}
-        <div className="bg-white p-6 rounded-md border border-slate-100 shadow-xs flex flex-col justify-between">
+        <div className="overview-panel p-5">
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div className="flex flex-col gap-3 mb-4">
               <div>
                 <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
                   <Award size={18} className="text-[#228b22]" />
                   Top Products
                 </h3>
-                <span className="text-[10px] font-bold text-slate-400">Ranked by units sold (Share of Top 5)</span>
+                <span className="text-[10px] font-bold text-slate-400">Top 5 by units sold</span>
               </div>
 
               {/* Category Filter Dropdown */}
               <select
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md font-bold text-slate-700 outline-none text-xs"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="">All Categories</option>
                 {categoryOptions.map((c) => (
@@ -587,7 +416,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <RefreshCw className="animate-spin" size={16} /> Loading top products...
               </div>
             ) : errorPieChart ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+              <div className="p-3 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
                 <span>{errorPieChart}</span>
                 <button onClick={() => fetchPieChart()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
               </div>
@@ -597,10 +426,10 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               </div>
             ) : (
               <div className="space-y-3">
-                {pieChartData.products.map((item: any, idx: number) => (
-                  <div key={item.productId || idx} className="p-3 rounded-md border border-slate-100 hover:border-brand-200 transition-colors bg-slate-50/40 flex items-center justify-between gap-3">
+                {pieChartData.products.slice(0, 5).map((item: any, idx: number) => (
+                  <div key={item.productId || idx} className="flex min-h-16 cursor-pointer items-center justify-between gap-3 border-b border-slate-100 py-3 transition-colors hover:border-emerald-300 hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" onClick={() => onNavigate?.('products')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onNavigate?.('products'); } }} role="button" tabIndex={0} aria-label={`View ${item.name} in products`}>
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-md bg-brand-100 overflow-hidden shrink-0 flex items-center justify-center font-bold text-brand-700 text-xs">
+                      <div className="w-10 h-10 rounded-md bg-slate-50 overflow-hidden shrink-0 flex items-center justify-center font-bold text-brand-700 text-xs">
                         {item.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -609,7 +438,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-extrabold text-xs text-slate-800 truncate">{item.name}</p>
+                        <p className="font-extrabold text-xs text-slate-800 truncate"><span title={item.name}>{item.name}</span></p>
                         <p className="text-[10px] text-slate-400 font-medium truncate">
                           {item.vendorName ? `${item.vendorName} • ` : ''}{item.categoryName || 'General'}
                         </p>
@@ -617,7 +446,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="font-black text-slate-800 text-xs">{item.unitsSold} sold</p>
-                      <p className="text-[10px] text-brand-600 font-bold">{item.percentageShare}% share</p>
+                      <p className="text-[10px] text-brand-600 font-bold"><span title="Revenue share among the top five products">{item.percentageShare}% of top 5</span></p>
                       <p className="text-[10px] text-slate-400 font-medium">{fmtNGN(item.revenue)}</p>
                     </div>
                   </div>
@@ -628,19 +457,19 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         </div>
 
         {/* Recent Activity Feeds (2 cols) */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-md border border-slate-100 shadow-xs flex flex-col justify-between">
+        <div className="overview-panel p-5 lg:col-span-2">
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
+            <div className="flex flex-col gap-4 mb-4 border-b border-slate-100 pb-4">
               <div>
                 <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
                   <Activity size={18} className="text-[#228b22]" />
-                  Real-time Activity Feeds
+                  Recent activity
                 </h3>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">Live customer payments, vendor payout requests, and order placements.</p>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">Latest payments, payouts, and orders · selected period · up to 5</p>
               </div>
 
               {/* Feed Tabs */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs font-bold text-slate-600">
+              <div className="flex flex-wrap items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs font-semibold text-slate-600">
                 <button
                   onClick={() => setActivityTab('payments')}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
@@ -673,7 +502,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <RefreshCw className="animate-spin" size={16} /> Loading activity feed...
               </div>
             ) : errorActivities ? (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+              <div className="p-3 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
                 <span>{errorActivities}</span>
                 <button onClick={() => fetchRecentActivities()} className="px-2 py-0.5 bg-rose-600 text-white rounded-md text-[11px]">Retry</button>
               </div>
@@ -692,8 +521,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {(activitiesData?.recentCustomerTransactions || []).length > 0 ? (
-                      activitiesData.recentCustomerTransactions.map((trx: any, idx: number) => (
-                        <tr key={trx.orderId || idx} className="hover:bg-slate-50/50">
+                      activitiesData.recentCustomerTransactions.slice(0, 5).map((trx: any, idx: number) => (
+                        <tr key={trx.orderId || idx} className="cursor-pointer hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View order ${trx.orderNumber}`} onClick={() => openOrder(trx)} onKeyDown={(event) => { if (event.key === 'Enter') openOrder(trx); }}>
                           <td className="p-2.5 font-bold font-mono text-slate-800">{trx.orderNumber}</td>
                           <td className="p-2.5 font-medium text-slate-600">{trx.customerName || 'Guest Customer'}</td>
                           <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(trx.amount)}</td>
@@ -724,8 +553,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {(activitiesData?.recentVendorPayouts || []).length > 0 ? (
-                      activitiesData.recentVendorPayouts.map((po: any, idx: number) => (
-                        <tr key={po.withdrawalId || idx} className="hover:bg-slate-50/50">
+                      activitiesData.recentVendorPayouts.slice(0, 5).map((po: any, idx: number) => (
+                        <tr key={po.withdrawalId || idx} className="cursor-pointer hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View payout ${po.reference || ''}`} onClick={() => onNavigate?.('vendors')} onKeyDown={(event) => { if (event.key === 'Enter') onNavigate?.('vendors'); }}>
                           <td className="p-2.5 font-bold font-mono text-slate-800">{po.reference || 'WDR'}</td>
                           <td className="p-2.5 font-medium text-slate-600">{po.storeName}</td>
                           <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(po.amount)}</td>
@@ -734,9 +563,9 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                           </td>
                           <td className="p-2.5 text-center">
                             <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
-                              po.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                              po.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                              'bg-rose-50 text-rose-700 border-rose-200'
+                              po.status === 'completed' ? 'bg-emerald-50 text-slate-700 border-emerald-200' :
+                              po.status === 'pending' ? 'bg-amber-50 text-slate-700 border-amber-200' :
+                              'bg-rose-50 text-slate-700 border-rose-200'
                             }`}>
                               {po.status}
                             </span>
@@ -764,8 +593,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {(activitiesData?.recentOrders || []).length > 0 ? (
-                      activitiesData.recentOrders.map((ord: any, idx: number) => (
-                        <tr key={ord.orderId || idx} className="hover:bg-slate-50/50">
+                      activitiesData.recentOrders.slice(0, 5).map((ord: any, idx: number) => (
+                        <tr key={ord.orderId || idx} className="cursor-pointer hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600" tabIndex={0} aria-label={`View order ${ord.orderNumber}`} onClick={() => openOrder(ord)} onKeyDown={(event) => { if (event.key === 'Enter') openOrder(ord); }}>
                           <td className="p-2.5 font-bold font-mono text-slate-800">{ord.orderNumber}</td>
                           <td className="p-2.5 font-medium text-slate-600">{ord.customerName || 'Guest Customer'}</td>
                           <td className="p-2.5 text-brand-700 font-medium">
@@ -773,7 +602,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                           </td>
                           <td className="p-2.5 text-right font-black text-slate-800">{fmtNGN(ord.totalAmount)}</td>
                           <td className="p-2.5 text-center">
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-50 text-slate-700 border border-blue-200">
                               {ord.status}
                             </span>
                           </td>
@@ -791,20 +620,20 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
       </div>
 
       {/* ── 2. VENDOR LIFETIME EARNINGS TABLE WIDGET ── */}
-      <div className="bg-white p-6 rounded-md border border-slate-100 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      <div className="overview-panel space-y-4 p-5">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
-            <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+            <h3 className="font-semibold text-slate-900 text-lg flex items-center gap-2">
               <Shield size={18} className="text-[#228b22]" />
-              Lifetime Vendor Earnings & Commission Ledger
+              Vendor earnings ledger
             </h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Comprehensive list of approved store profiles, lifetime earnings, platform commission generated, and payout banks.
+            <p className="text-sm text-slate-500 mt-1">
+              Lifetime posted earnings and wallet balances for approved stores. These exclude eligible sales not yet posted to the earnings ledger.
             </p>
           </div>
 
           {/* Search Box */}
-          <div className="relative min-w-[240px]">
+          <div className="relative w-full xl:w-64 shrink-0">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
@@ -817,15 +646,15 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         </div>
 
         {/* Global Lifetime Sums Header Banner */}
-        {vendorEarningsData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-brand-50/60 rounded-md border border-brand-100 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-brand-900">Total Platform Vendor Earnings Sum:</span>
-              <span className="font-black text-brand-900 text-sm">{fmtNGN(vendorEarningsData.totalVendorEarningsSum)}</span>
+        {vendorEarningsData && !loadingVendorEarnings && !errorVendorEarnings && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="border-b border-slate-200 py-3">
+              <span className="text-xs font-medium text-emerald-900">Posted vendor earnings · lifetime</span>
+              <p className="mt-2 text-xl font-semibold tabular-nums text-emerald-950">{fmtNGN(vendorEarningsData.totalVendorEarningsSum)}</p>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-brand-900">Total Platform Commission Sum:</span>
-              <span className="font-black text-brand-900 text-sm">{fmtNGN(vendorEarningsData.totalPlatformCommissionSum)}</span>
+            <div className="border-b border-slate-200 py-3">
+              <span className="text-xs font-medium text-slate-600">Posted commission · lifetime</span>
+              <p className="mt-2 text-xl font-semibold tabular-nums text-slate-900">{fmtNGN(vendorEarningsData.totalPlatformCommissionSum)}</p>
             </div>
           </div>
         )}
@@ -837,13 +666,13 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
             <p className="text-xs font-bold text-slate-400">Loading vendor lifetime earnings...</p>
           </div>
         ) : errorVendorEarnings ? (
-          <div className="p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md flex items-center justify-between">
+          <div className="p-4 bg-rose-50 text-slate-700 text-xs font-semibold rounded-md flex items-center justify-between">
             <span>{errorVendorEarnings}</span>
             <button onClick={() => fetchVendorEarnings()} className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold">Retry</button>
           </div>
         ) : (vendorEarningsData?.items || []).length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="vendor-ledger-table w-full min-w-[1060px] text-left text-xs">
               <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                 <tr>
                   <th className="px-4 py-3">Store & Contact</th>
@@ -859,7 +688,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {vendorEarningsData.items.map((row: any, idx: number) => (
-                  <tr key={row.vendorId || idx} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={row.vendorId || idx} className="cursor-pointer hover:bg-emerald-50/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 transition-colors" tabIndex={0} aria-label={`View ${row.storeName} in vendors`} onClick={() => onNavigate?.('vendors')} onKeyDown={(event) => { if (event.key === 'Enter') onNavigate?.('vendors'); }}>
                     <td className="px-4 py-3.5">
                       <p className="font-extrabold text-slate-800 text-xs">{row.storeName}</p>
                       <p className="text-[10px] text-slate-400 font-medium">{row.ownerEmail}</p>
@@ -867,12 +696,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                     <td className="px-4 py-3.5 text-right font-medium text-slate-600">
                       {row.commissionRate}% / {row.processingFeeRate}%
                     </td>
-                    <td className="px-4 py-3.5 text-right text-amber-600 font-bold">{fmtNGN(row.pendingEscrow)}</td>
-                    <td className="px-4 py-3.5 text-right text-emerald-700 font-bold">{fmtNGN(row.availableBalance)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-600 font-bold">{fmtNGN(row.pendingEscrow)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-700 font-bold">{fmtNGN(row.availableBalance)}</td>
                     <td className="px-4 py-3.5 text-right text-brand-900 font-black text-sm">{fmtNGN(row.lifetimeEarnings)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-700 font-semibold">{fmtNGN(row.totalWithdrawn)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-800 font-extrabold">{fmtNGN(row.totalGmvGenerated)}</td>
-                    <td className="px-4 py-3.5 text-right text-rose-600 font-bold">{fmtNGN(row.platformCommissionGenerated)}</td>
+                    <td className="px-4 py-3.5 text-right text-slate-600 font-bold">{fmtNGN(row.platformCommissionGenerated)}</td>
                     <td className="px-4 py-3.5 text-slate-600 font-medium">
                       {row.bankAccount ? (
                         <span>{row.bankAccount.bankName} ••••{(row.bankAccount.accountNumber || '').slice(-4)}</span>

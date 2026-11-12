@@ -71,7 +71,7 @@ const TYPE_META: Record<
     description:
       'Nudges vendors who started registration but never completed submitting their application to finalize onboarding.',
     icon: <Store size={20} />,
-    accent: 'text-amber-600',
+    accent: 'text-slate-600',
     bg: 'bg-amber-50 border-amber-200',
     variables: [
       { tag: '{{firstName}}', label: 'Vendor Name', sample: 'Alex' },
@@ -125,7 +125,7 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
             <XCircle size={12} /> Skipped (Disabled)
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 text-slate-700 text-xs font-bold">
             <CheckCircle2 size={12} /> Ran
           </span>
         )}
@@ -134,8 +134,8 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Eligible', value: data.eligible, color: 'text-slate-700' },
-            { label: 'Sent', value: data.sent, color: 'text-emerald-600' },
-            { label: 'Failed', value: data.failed, color: data.failed > 0 ? 'text-rose-600' : 'text-gray-400' },
+            { label: 'Sent', value: data.sent, color: 'text-slate-600' },
+            { label: 'Failed', value: data.failed, color: data.failed > 0 ? 'text-slate-600' : 'text-gray-400' },
           ].map(({ label: l, value, color }) => (
             <div key={l} className="bg-slate-50 rounded-md p-3 text-center border">
               <p className={`text-xl font-black ${color}`}>{value}</p>
@@ -151,21 +151,23 @@ function SweepRow({ label, data }: { label: string; data: SweepResult | undefine
 function RunNowModal({ result, onClose }: RunNowModalProps) {
   if (!result) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-md rounded-md shadow-sm border overflow-hidden"
+        className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="EngagementSettingsView-dialog-0-title"
       >
-        <div className="bg-[#228b22] px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-white">
-            <Zap size={20} />
-            <h3 className="font-bold text-lg">Sweep Results</h3>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
+          <div className="flex items-center gap-2 text-slate-900">
+            <Zap size={20} className="text-emerald-700" />
+            <h3 className="text-lg font-semibold" id="EngagementSettingsView-dialog-0-title">Sweep Results</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white p-1.5 hover:bg-white/20 rounded-md transition"
+            type="button"
+            aria-label="Close sweep results"
+            className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
             ✕
           </button>
@@ -202,17 +204,17 @@ interface ConfirmRunNowModalProps {
 
 function ConfirmRunNowModal({ onConfirm, onCancel, isRunning }: ConfirmRunNowModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
+        className="bg-white w-full p-6 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="EngagementSettingsView-dialog-1-title"
       >
-        <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
-          <AlertTriangle size={26} className="text-amber-500" />
+        <div className="w-14 h-14 mx-auto rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center mb-4 dashboard-dialog-icon">
+          <AlertTriangle size={26} className="text-slate-500" />
         </div>
-        <h3 className="text-lg font-extrabold text-slate-800">Run Engagement Sweep?</h3>
+        <h3 className="text-lg font-extrabold text-slate-800" id="EngagementSettingsView-dialog-1-title">Run Engagement Sweep?</h3>
         <p className="text-sm text-gray-500 mt-2 leading-relaxed">
           This will immediately send real reminder emails to eligible customers and vendors. This action cannot be undone.
         </p>
@@ -374,13 +376,13 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
           title={effective.enabled ? 'Disable' : 'Enable'}
           className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-md font-bold text-xs border transition ${
             effective.enabled
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+              ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
               : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
           }`}
         >
           {effective.enabled ? (
             <>
-              <ToggleRight size={18} className="text-emerald-600" /> Enabled
+              <ToggleRight size={18} className="text-slate-600" /> Enabled
             </>
           ) : (
             <>
@@ -590,12 +592,12 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                 ) : (
                   /* Live Email Preview Tab */
                   <div className="p-5 bg-slate-100 min-h-[350px]">
-                    <div className="max-w-xl mx-auto bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                       {/* Fake Email Header */}
                       <div className="bg-slate-50 border-b border-slate-200 p-4 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-slate-500">
                           <span className="font-extrabold text-slate-700">From: EkivaMart Notifications &lt;no-reply@faflora.com&gt;</span>
-                          <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Simulated Email</span>
+                          <span className="text-[10px] bg-emerald-50 text-slate-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Simulated Email</span>
                         </div>
                         <div className="text-xs text-slate-600">
                           <span className="font-bold text-slate-400">Subject:</span>{' '}
@@ -657,7 +659,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
               >
                 Discard
               </button>
-              <span className="text-[10px] text-amber-600 font-semibold flex items-center gap-1">
+              <span className="text-[10px] text-slate-600 font-semibold flex items-center gap-1">
                 <AlertTriangle size={12} /> Unsaved changes
               </span>
             </motion.div>

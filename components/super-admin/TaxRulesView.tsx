@@ -1,4 +1,5 @@
 'use client';
+import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useState, useEffect } from 'react';
 import { Percent, Plus, Trash2, Edit2, ShieldAlert, CheckCircle2, XCircle, RefreshCw, Globe } from 'lucide-react';
@@ -7,6 +8,7 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TaxRulesView() {
+  const { confirm: requestConfirmation, confirmationDialog } = useDashboardConfirmation();
   const [taxRules, setTaxRules] = useState<TaxRuleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function TaxRulesView() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this tax rule?')) return;
+    if (!(await requestConfirmation('Are you sure you want to delete this tax rule?', { title: 'Delete tax rule?', confirmLabel: 'Delete tax rule', destructive: true }))) return;
     const toastId = toast.loading('Deleting tax rule...');
     try {
       const res = await taxRuleApi.deleteTaxRule(id);
@@ -144,6 +146,7 @@ export default function TaxRulesView() {
 
   return (
     <div className="space-y-6">
+      {confirmationDialog}
       {/* Header & Notice */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-md border shadow-xs">
         <div>
@@ -237,7 +240,7 @@ export default function TaxRulesView() {
                         onClick={() => handleToggleActive(rule)}
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition ${
                           rule.isActive
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                            ? 'bg-emerald-50 text-slate-700 border border-emerald-200 hover:bg-emerald-100'
                             : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                         }`}
                       >
@@ -258,7 +261,7 @@ export default function TaxRulesView() {
                       </button>
                       <button
                         onClick={() => handleDelete(rule.id)}
-                        className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                        className="p-1.5 text-gray-400 hover:text-slate-900 hover:bg-rose-50 rounded-lg transition"
                         title="Delete rule"
                       >
                         <Trash2 size={15} />
@@ -275,20 +278,22 @@ export default function TaxRulesView() {
       {/* Create / Edit Tax Rule Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
+              className="bg-white w-full overflow-hidden dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="TaxRulesView-dialog-0-title"
             >
-              <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
-                <h3 className="font-bold text-lg">
+              <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
+                <h3 className="text-lg font-semibold text-slate-900" id="TaxRulesView-dialog-0-title">
                   {editingRule ? 'Edit Tax Rule' : 'Add Regional Tax Rule'}
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 hover:bg-white/20 rounded-md transition"
+                  type="button"
+                  aria-label="Close tax rule form"
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                   ✕
                 </button>

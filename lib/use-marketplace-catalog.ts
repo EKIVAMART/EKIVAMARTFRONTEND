@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { productApi } from '@/lib/api';
+import { categoryApi, productApi } from '@/lib/api';
 import { mapProduct } from '@/lib/data/landing-product';
 
 export type CatalogItem = ReturnType<typeof mapProduct> & {
@@ -20,13 +20,21 @@ export function useMarketplaceCatalog() {
     let active = true;
     async function load() {
       try {
-        const response = await productApi.getAllProducts({ status:'active', limit:60, sortBy:'createdAt', sortOrder:'desc', skipAuth:true });
+        const [response, categoryResponse] = await Promise.all([
+          productApi.getAllProducts({ status:'active', limit:100, sortBy:'createdAt', sortOrder:'desc', skipAuth:true }),
+          categoryApi.getCategories({ limit:100 }),
+        ]);
+        // API product and category payloads are not typed by the shared client yet.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const categoryRows: any[] = Array.isArray(categoryResponse?.data) ? categoryResponse.data : categoryResponse?.data?.data ?? categoryResponse?.data?.categories ?? [];
+        const namesById = new Map(categoryRows.map(category => [String(category.id), String(category.name)]));
         const data = response?.data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const rows: any[] = Array.isArray(data) ? data : data?.data ?? data?.products ?? data?.docs ?? [];
         const catalog: CatalogItem[] = rows.map(raw => ({
           ...mapProduct(raw),
           categoryKey: String(raw.categoryId ?? raw.category?.id ?? raw.category?.name ?? raw.category ?? ''),
-          categoryName: raw.category?.name || raw.categoryName || (typeof raw.category === 'string' ? raw.category : ''),
+          categoryName: raw.category?.name || raw.categoryName || namesById.get(String(raw.categoryId)) || (typeof raw.category === 'string' ? raw.category : ''),
           sold: Number(raw.unitsSold ?? raw.salesCount ?? 0),
           added: Date.parse(raw.createdAt) || 0,
           featured: Boolean(raw.isFeatured ?? raw.featured),

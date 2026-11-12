@@ -20,8 +20,7 @@ export type {
   PaginatedPosts,
 };
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+import { API_BASE_URL } from './axios';
 
 /**
  * Decodes HTML-encoded entities returned by the backend (Section 5.5 of API docs).

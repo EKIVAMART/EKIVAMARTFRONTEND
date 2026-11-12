@@ -1,263 +1,95 @@
 'use client';
 
-import MarketplaceNav from './MarketplaceNav';
-
 import ShoppingNavLink from './ShoppingNavLink';
-import { UserRound } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { useAppSelector, useCartCount } from '@/lib/hooks';
+import { Menu, Search, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import { useAppSelector, useCartCount } from '@/lib/hooks';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 interface MobileHeaderProps {
-  categories: any[];
-  onOpenCategories: () => void;
   onOpenLogin: () => void;
   onOpenProfile: () => void;
 }
 
-function CollapseMenuIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
-      <rect x="2" y="5" width="11" height="1.6" rx="0.8" fill="currentColor" />
-      <rect x="2" y="10.2" width="11" height="1.6" rx="0.8" fill="currentColor" />
-      <rect x="2" y="15.4" width="11" height="1.6" rx="0.8" fill="currentColor" />
-      <path d="M16 8l4 3-4 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function SearchIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden>
-      <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M12 12.5L17 17.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-export default function MobileHeader({
-  categories,
-  onOpenCategories,
-  onOpenLogin,
-  onOpenProfile,
-}: MobileHeaderProps) {
+export default function MobileHeader({ onOpenLogin, onOpenProfile }: MobileHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-
-  // Category scroller properties
-  const catScrollRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0); // 0 to 1 representing scroll position
-
+  const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const cartCount = useCartCount();
   const wishlistCount = useAppSelector((state) => state.wishlist.count);
-  const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
-  const onWishlist = pathname === '/wishlist';
-  const onCart = pathname === '/cart';
-
-  // Check scroll position and calculate progress from 0 to 1
-  const checkScroll = () => {
-    const el = catScrollRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScroll = scrollWidth - clientWidth;
-    if (maxScroll <= 0) {
-      setScrollProgress(0);
-    } else {
-      setScrollProgress(scrollLeft / maxScroll);
-    }
-  };
-
   useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [categories]);
-
-  // Close search on click outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        setSearchOpen(false);
-      }
-    }
-    if (searchOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => { document.removeEventListener('mousedown', handleClickOutside); };
+    if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    router.push(`/categories/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen]);
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+    router.push(`/categories/shop?search=${encodeURIComponent(query)}`);
     setSearchOpen(false);
     setSearchQuery('');
   };
 
-  // Get active category slug from pathname
-  const activeCatSlug = (() => {
-    const match = pathname.match(/^\/categories\/([^/?]+)/);
-    return match ? match[1] : null;
-  })();
-
   return (
-    <div className="md:hidden w-full bg-white relative z-40">
-      {/* ── Row 2: Categories | logo | action icons with equal spacing in between them, logo moved closer to left ── */}
-      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-brand-200 scrollbar-track-brand-50/60 [scrollbar-width:thin] [scrollbar-color:rgba(157,74,227,0.35)_rgba(157,74,227,0.08)]">
-        <div className="flex w-max min-w-full items-center bg-white px-3.5 py-2.5 relative border-b border-neutral-100 gap-2 min-w-0">
-
-          {/* Categories button */}
-          <button
-            type="button"
-            onClick={onOpenCategories}
-            aria-label="Open categories"
-            className="flex items-center gap-1 text-brand-600 font-bold text-xs shrink-0"
-          >
-            <CollapseMenuIcon />
-            <span>Categories</span>
+    <div className="ek-mobile-header relative w-full bg-white md:hidden">
+      <div className="ek-mobile-header-row flex min-h-14 items-center justify-between gap-1 border-b border-neutral-100 px-2.5">
+        <Link href="/" onClick={() => { setMenuOpen(false); setSearchOpen(false); }} aria-label="EkivaMart home" className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
+          <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={122} height={39} priority className="ek-mobile-logo h-auto w-full max-w-[122px] object-contain" />
+        </Link>
+        <div className="ek-mobile-actions flex shrink-0 items-center">
+          <button type="button" aria-label={searchOpen ? 'Close search' : 'Search products'} aria-expanded={searchOpen} aria-controls="mobile-product-search" onClick={() => { setSearchOpen((open) => !open); setMenuOpen(false); }} className="ek-mobile-icon-button flex h-11 w-11 items-center justify-center rounded-md text-stone-700 hover:text-green-800 focus-visible:outline-2 focus-visible:outline-green-700">
+            <Search size={23} strokeWidth={1.8} aria-hidden="true" />
           </button>
-
-          {/* Logo (moved left, close to categories but with equal layout spacing) */}
-          <Link href="/" className="flex items-center shrink-0 ml-[5%] mr-auto">
-            <Image
-              src="/brand/ekivamart-logo.svg"
-              alt="EkivaMart"
-              width={82}
-              height={26}
-              className="h-6.5 w-auto object-contain"
-              priority
-            />
-          </Link>
-
-          {/* 4 icons group (placed close to the searchbar/other icons on the right) */}
-          <div className="flex items-center gap-2 shrink-0">
-          {/* Search trigger */}
-          <button
-            type="button"
-            onClick={() => setSearchOpen((prev) => !prev)}
-            aria-label="Search"
-            className={`p-0.5 transition-colors cursor-pointer ${
-              searchOpen ? 'text-brand-600' : 'text-neutral-700 hover:text-brand-600'
-            }`}
-          >
-            <SearchIcon />
-          </button>
-
-          <ShoppingNavLink href="/wishlist" active={onWishlist} count={wishlistCount} />
-
-          <ShoppingNavLink href="/cart" active={onCart} count={cartCount} />
-
-          {/* In-App Notifications Bell (Renders strictly for authenticated users) */}
-          <NotificationBell />
-
-          {/* Account Icon */}
-
-          {isAuthenticated && user ? (
-            <button
-              type="button"
-              onClick={onOpenProfile}
-              aria-label="Account"
-              className="relative shrink-0 flex items-center justify-center"
-            >
-              <div className="w-5.5 h-5.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-800 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm">
-                {user.firstName?.[0]}{user.lastName?.[0]}
-              </div>
+          <ShoppingNavLink href="/wishlist" active={pathname === '/wishlist'} count={wishlistCount} />
+          <ShoppingNavLink href="/cart" active={pathname === '/cart'} count={cartCount} />
+          <div ref={menuRef} className="relative">
+            <button type="button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="mobile-main-menu" onClick={() => { setMenuOpen((open) => !open); setSearchOpen(false); }} className="ek-mobile-icon-button flex h-11 w-11 items-center justify-center rounded-md text-stone-700 hover:text-green-800 focus-visible:outline-2 focus-visible:outline-green-700">
+              {menuOpen ? <X size={24} strokeWidth={1.8} aria-hidden="true" /> : <Menu size={24} strokeWidth={1.8} aria-hidden="true" />}
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onOpenLogin}
-              aria-label="Account"
-              className="relative shrink-0 flex items-center justify-center p-0.5"
-            >
-              <UserRound aria-hidden="true" size={22} strokeWidth={1.75} className="text-stone-700" />
-            </button>
-          )}
+            {menuOpen && (
+              <nav id="mobile-main-menu" aria-label="More navigation" className="ek-mobile-menu absolute right-0 top-full z-50 w-[min(290px,calc(100vw-20px))] rounded-b-xl border border-neutral-100 bg-white p-2 shadow-xl">
+                <button type="button" onClick={() => { setMenuOpen(false); if (isAuthenticated) onOpenProfile(); else onOpenLogin(); }} className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-stone-800 hover:bg-green-50">
+                  <UserRound size={20} strokeWidth={1.8} aria-hidden="true" /> {isAuthenticated ? 'My account' : 'Sign in / Account'}
+                </button>
+                <Link href="/categories/shop" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Shop all products</Link>
+                <Link href="/stores" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Featured stores</Link>
+                <Link href="/why-ekivamart" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Why shop with EkivaMart?</Link>
+                {isAuthenticated && <div className="flex min-h-11 items-center gap-3 border-t border-neutral-100 px-3 text-sm text-stone-800"><span>Notifications</span><NotificationBell /></div>}
+              </nav>
+            )}
           </div>
         </div>
       </div>
-
-      <MarketplaceNav />
-
-      {/* ── Horizontal category names strip ── */}
-      <div className="w-full bg-white flex flex-col border-t border-neutral-100">
-        <div
-          ref={catScrollRef}
-          onScroll={checkScroll}
-          className="flex gap-6 overflow-x-auto scrollbar-hide px-4 py-3 min-w-0"
-        >
-          {categories.map((cat) => {
-            const isActive = activeCatSlug === cat.slug;
-            return (
-              <Link
-                key={cat.id}
-                href={`/categories/${cat.slug}`}
-                className={`shrink-0 whitespace-nowrap text-xs font-semibold transition-all ${
-                  isActive ? 'text-brand-600' : 'text-neutral-600 hover:text-brand-600'
-                }`}
-              >
-                {cat.name}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Fixed horizontal line progress bar that moves along the entire bottom navbar width */}
-        <div className="w-full h-1 bg-neutral-100 relative overflow-hidden">
-          <div
-            className="h-full bg-brand-600 rounded-full absolute top-0 transition-all duration-75"
-            style={{
-              width: '60px',
-              left: `calc(${scrollProgress * 100}% - ${scrollProgress * 60}px)`,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* ── Row 3.5: Search bar dropdown positioned directly underneath the entire navbar ── */}
       {searchOpen && (
-        <div
-          ref={searchContainerRef}
-          className="absolute left-0 right-0 top-full z-50 bg-white border-b border-brand-100 shadow-xl px-4 py-3 flex items-center gap-2"
-        >
-          <div className="flex-1 flex items-center bg-neutral-50 rounded-full px-3 py-1.5 border border-neutral-200">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-              autoFocus
-              className="w-full bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:!border-none !border-none !outline-none active:!border-none focus:!ring-0"
-            />
-            <button
-              type="button"
-              onClick={handleSearch}
-              disabled={!searchQuery.trim()}
-              className={`p-1.5 rounded-full transition-all shrink-0 ${
-                searchQuery.trim()
-                  ? 'bg-brand-600 text-white cursor-pointer active:scale-95'
-                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-              }`}
-            >
-              <SearchIcon size={14} />
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSearchOpen(false)}
-            className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 shrink-0 px-1 py-1"
-          >
-            Cancel
-          </button>
-        </div>
+        <form id="mobile-product-search" role="search" onSubmit={handleSearch} className="flex items-center gap-2 border-b border-neutral-100 px-3 py-2">
+          <input ref={searchRef} type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search products and stores" aria-label="Search products and stores" className="min-h-11 min-w-0 flex-1 rounded-lg border border-neutral-200 bg-neutral-50 px-3 text-base text-stone-800 outline-none focus:border-green-700" />
+          <button type="submit" disabled={!searchQuery.trim()} className="min-h-11 rounded-lg bg-green-800 px-4 text-sm font-semibold text-white disabled:opacity-50">Search</button>
+        </form>
       )}
     </div>
   );

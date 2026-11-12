@@ -130,27 +130,27 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 ">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-3xl rounded-md shadow-sm overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]"
+            className="bg-white w-full overflow-hidden flex flex-col dashboard-dialog dashboard-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="ImageUploadModal-dialog-0-title"
           >
             {/* Header */}
-            <div className="bg-[#228b22] px-8 py-6 text-white flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 sm:px-8 dashboard-dialog-header">
               <div>
-                <h2 className="text-2xl font-bold">{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
-                <p className="text-sm opacity-90 mt-1">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
+                <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900 sm:text-2xl" id="ImageUploadModal-dialog-0-title"><ImageIcon size={22} className="text-emerald-700" />{isPublishMode ? 'Upload Product Images' : 'Add Images'}</h2>
+                <p className="mt-1 text-sm text-slate-600">{isPublishMode ? 'Add visuals to publish your product' : 'Upload images for this product'}</p>
               </div>
-              <button onClick={handleClose} type="button" className="p-3 hover:bg-white/20 rounded-md transition-colors">
-                <X size={26} />
+              <button onClick={handleClose} type="button" aria-label="Close image upload" className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close">
+                <X size={20} />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6">
+            <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6 dashboard-dialog-body">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#228b22] rounded-lg text-white"><ImageIcon size={22} /></div>
+                <div className="dashboard-dialog-icon flex items-center justify-center"><ImageIcon size={22} /></div>
                 <div>
                   <h3 className="font-bold text-lg text-gray-800">Product Images</h3>
                   <p className="text-xs text-gray-500">
@@ -216,9 +216,9 @@ export default function ImageUploadModal({ isOpen, onClose, onComplete, onSkip, 
             </div>
 
             {/* Footer */}
-            <div className="px-8 py-6 border-t bg-gray-50 flex justify-between items-center relative z-10">
+            <div className="px-8 py-6 border-t bg-gray-50 flex justify-between items-center relative z-10 dashboard-dialog-footer">
 
-              <div className="text-red-500 text-xs font-bold w-1/2">
+              <div className="text-slate-500 text-xs font-bold w-1/2">
                 {imagePreviews.length > 0 && alts.some(alt => !alt.trim()) && (
                   <p>Please provide alt text for all images to continue.</p>
                 )}

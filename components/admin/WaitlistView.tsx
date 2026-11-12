@@ -237,7 +237,7 @@ export default function WaitlistView() {
       sub.lastName || '',
       sub.fullName || '',
       sub.phoneNumber || '',
-      sub.role,
+      sub.role || 'ANOMALY: missing role',
       sub.status,
       sub.referralSource || '',
       new Date(sub.createdAt).toLocaleString()
@@ -306,8 +306,7 @@ export default function WaitlistView() {
     const authToken = getAuthToken();
     const result = await uploadBroadcastImage(
       file,
-      authToken,
-      process.env.NEXT_PUBLIC_API_URL
+      authToken
     );
 
     setIsUploading(false);
@@ -400,7 +399,7 @@ export default function WaitlistView() {
     else if (tagType === 'i') formatted = `<i>${selectedText}</i>`;
     else if (tagType === 'h3') formatted = `<h3 style="font-size: 18px; font-weight: bold; color: #1e293b; margin: 16px 0 8px 0;">${selectedText}</h3>`;
     else if (tagType === 'p') formatted = `<p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 12px;">${selectedText}</p>`;
-    else if (tagType === 'cta') formatted = `<a href="https://faflora.com" style="display: inline-block; background-color: #228b22; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
+    else if (tagType === 'cta') formatted = `<a href="${typeof window !== 'undefined' ? window.location.origin : '/'}" style="display: inline-block; background-color: #228b22; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none; margin: 16px 0;">${selectedText}</a>`;
     else if (tagType === 'hr') formatted = `<hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />`;
 
     const updated = current.substring(0, start) + formatted + current.substring(end);
@@ -732,6 +731,7 @@ export default function WaitlistView() {
                     <td className="p-4 text-sm text-slate-500">{sub.phoneNumber || '—'}</td>
                     <td className="p-4 text-center">
                       <RecordStatus value={sub.role} />
+                      {!sub.role && <span className="block text-xs font-semibold text-amber-700">Anomaly: missing role — review required</span>}
                     </td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1">
@@ -814,30 +814,30 @@ export default function WaitlistView() {
 
       {/* ── Modal: Launch Settings Config ── */}
       {isLaunchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 " onClick={() => setIsLaunchModalOpen(false)} />
-          <div className="relative w-full max-w-xl bg-white rounded-md shadow-sm flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={() => setIsLaunchModalOpen(false)} />
+          <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="WaitlistView-dialog-0-title">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50 dashboard-dialog-header">
               <div>
-                <h3 className="text-xl font-black text-slate-800">Launch Configuration</h3>
+                <h3 className="text-xl font-black text-slate-800" id="WaitlistView-dialog-0-title">Launch Configuration</h3>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Pre-populate countdown & update marketing message</p>
               </div>
               <button
                 onClick={() => setIsLaunchModalOpen(false)}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Form Scroll Body */}
-            <form onSubmit={handleLaunchSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+            <form onSubmit={handleLaunchSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 dashboard-dialog-body">
 
               {/* Date Input */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 block">Launch Date (Future Only) <span className="text-red-500">*</span></label>
+                <label className="text-sm font-bold text-slate-700 block">Launch Date (Future Only) <span className="text-slate-500">*</span></label>
                 <input
                   type="datetime-local"
                   required
@@ -852,7 +852,7 @@ export default function WaitlistView() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-bold text-slate-700">Display Title</label>
-                  <span className={`text-xs font-semibold ${launchForm.title.length > 255 ? 'text-red-500' : 'text-slate-400'}`}>
+                  <span className={`text-xs font-semibold ${launchForm.title.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                     {launchForm.title.length}/255
                   </span>
                 </div>
@@ -870,7 +870,7 @@ export default function WaitlistView() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-bold text-slate-700">Display Subtitle</label>
-                  <span className={`text-xs font-semibold ${launchForm.subtitle.length > 500 ? 'text-red-500' : 'text-slate-400'}`}>
+                  <span className={`text-xs font-semibold ${launchForm.subtitle.length > 500 ? 'text-slate-500' : 'text-slate-400'}`}>
                     {launchForm.subtitle.length}/500
                   </span>
                 </div>
@@ -908,9 +908,9 @@ export default function WaitlistView() {
                 <div className="space-y-1.5 animate-in slide-in-from-top-3 duration-250">
                   <div className="flex justify-between items-center">
                     <label className="text-sm font-bold text-slate-700 block">
-                      Broadcast Reason <span className="text-red-500">*</span>
+                      Broadcast Reason <span className="text-slate-500">*</span>
                     </label>
-                    <span className={`text-xs font-semibold ${launchForm.broadcastReason.length > 1000 ? 'text-red-500' : 'text-slate-400'}`}>
+                    <span className={`text-xs font-semibold ${launchForm.broadcastReason.length > 1000 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {launchForm.broadcastReason.length}/1000
                     </span>
                   </div>
@@ -946,7 +946,7 @@ export default function WaitlistView() {
             </form>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 flex-shrink-0 dashboard-dialog-footer">
               <button
                 type="button"
                 onClick={() => setIsLaunchModalOpen(false)}
@@ -969,21 +969,21 @@ export default function WaitlistView() {
 
       {/* ── Modal: Send email Composer ── */}
       {isBroadcastModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 " onClick={closeBroadcastModal} />
-          <div className="relative w-full max-w-5xl bg-white rounded-md shadow-sm flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dashboard-dialog-overlay">
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[3px] " onClick={closeBroadcastModal} />
+          <div className="relative w-full bg-white flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 dashboard-dialog dashboard-dialog--large" role="dialog" aria-modal="true" aria-labelledby="WaitlistView-dialog-1-title">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-slate-50/50 dashboard-dialog-header">
               <div>
-                <h3 className="text-xl font-black text-slate-800">Compose Broadcast</h3>
+                <h3 className="text-xl font-black text-slate-800" id="WaitlistView-dialog-1-title">Compose Broadcast</h3>
                 <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   Draft and send an email update to subscribers across your waitlist.
                 </p>
               </div>
               <button
                 onClick={closeBroadcastModal}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-md transition dashboard-dialog-close" aria-label="Close dialog" type="button"
               >
                 <X size={20} />
               </button>
@@ -998,7 +998,7 @@ export default function WaitlistView() {
                 {/* Recipient Audience Selector */}
                 <div className="space-y-2">
                   <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
-                    Target Audience Group <span className="text-rose-500">*</span>
+                    Target Audience Group <span className="text-slate-500">*</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     <button
@@ -1010,7 +1010,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <Users size={14} /> All Subscribers ({stats.active})
+                      <Users size={14} /> All Subscribers ({stats.active ?? 0})
                     </button>
                     <button
                       type="button"
@@ -1021,7 +1021,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <Briefcase size={14} /> Vendors Only ({stats.vendors})
+                      <Briefcase size={14} /> Vendors Only ({stats.vendors ?? 0})
                     </button>
                     <button
                       type="button"
@@ -1032,7 +1032,7 @@ export default function WaitlistView() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <User size={14} /> Customers Only ({stats.customers})
+                      <User size={14} /> Customers Only ({stats.customers ?? 0})
                     </button>
                   </div>
                 </div>
@@ -1041,9 +1041,9 @@ export default function WaitlistView() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                      Subject Line <span className="text-rose-500">*</span>
+                      Subject Line <span className="text-slate-500">*</span>
                     </label>
-                    <span className={`text-[11px] font-semibold ${broadcastForm.subject.length > 255 ? 'text-rose-500' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] font-semibold ${broadcastForm.subject.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {broadcastForm.subject.length}/255
                     </span>
                   </div>
@@ -1063,7 +1063,7 @@ export default function WaitlistView() {
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                       Preview Text (Inbox Snippet)
                     </label>
-                    <span className={`text-[11px] font-semibold ${broadcastForm.previewText.length > 255 ? 'text-rose-500' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] font-semibold ${broadcastForm.previewText.length > 255 ? 'text-slate-500' : 'text-slate-400'}`}>
                       {broadcastForm.previewText.length}/255
                     </span>
                   </div>
@@ -1119,7 +1119,7 @@ export default function WaitlistView() {
                   </div>
 
                   {uploadError && (
-                    <p className="text-xs text-rose-500 font-bold flex items-center gap-1 mt-1">
+                    <p className="text-xs text-slate-500 font-bold flex items-center gap-1 mt-1">
                       <AlertCircle size={14} /> {uploadError}
                     </p>
                   )}
@@ -1152,12 +1152,12 @@ export default function WaitlistView() {
                                     onClick={() => handleSetAsHeroBanner(img.imageUrl)}
                                     className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition flex items-center gap-1 ${
                                       isHero
-                                        ? 'bg-amber-100 text-amber-700 border-amber-300'
+                                        ? 'bg-amber-100 text-slate-700 border-amber-300'
                                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
                                     }`}
                                     title="Set as hero banner image at top of email"
                                   >
-                                    <Star size={10} className={isHero ? 'fill-amber-500 text-amber-500' : ''} />
+                                    <Star size={10} className={isHero ? 'fill-amber-500 text-slate-500' : ''} />
                                     {isHero ? 'Hero Banner' : 'Set Hero'}
                                   </button>
                                   <button
@@ -1173,7 +1173,7 @@ export default function WaitlistView() {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveImage(img.imageUrl)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-rose-50 rounded-lg transition"
                                 title="Remove image"
                               >
                                 <Trash2 size={14} />
@@ -1190,7 +1190,7 @@ export default function WaitlistView() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
-                      Email Body (HTML) <span className="text-rose-500">*</span>
+                      Email Body (HTML) <span className="text-slate-500">*</span>
                     </label>
                     <button
                       type="button"
@@ -1304,8 +1304,7 @@ export default function WaitlistView() {
 
                   {/* Header Branding */}
                   <div className="bg-[#228b22] p-4 text-center">
-                    <h4 className="text-white text-base font-black tracking-widest leading-none">FAFLORA</h4>
-                    <span className="text-[9px] text-brand-100 tracking-wider font-semibold uppercase mt-1 inline-block">Nigeria's Flowers & Marketplace</span>
+                    <h4 className="text-white text-base font-black tracking-widest leading-none">EKIVAMART</h4>
                   </div>
 
                   {/* Optional Hero Banner Image — use localPreview for the live preview panel */}
@@ -1361,7 +1360,7 @@ export default function WaitlistView() {
             </div>
 
             {/* Modal Action Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between flex-shrink-0 dashboard-dialog-footer">
               <div className="text-xs text-slate-500 font-medium">
                 Recipients: <span className="font-bold text-slate-800">{broadcastRecipientCount} subscribers</span>
               </div>
@@ -1389,16 +1388,16 @@ export default function WaitlistView() {
 
       {/* ── Modal: Confirm Launch config save ── */}
       {isLaunchConfirmOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsLaunchConfirmOpen(false)} />
-          <div className="relative w-full max-w-sm bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22]">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsLaunchConfirmOpen(false)} />
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true">
+            <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4 text-[#228b22] dashboard-dialog-icon">
               <Settings size={22} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Save Launch Configuration?</h4>
             <p className="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
               {launchForm.sendBroadcast ? (
-                <span className="text-amber-600 font-bold">
+                <span className="text-slate-600 font-bold">
                   Warning: Toggling ON Notify Members will send an email broadcast explaining this launch update to all {stats.active} active members. Are you sure you want to proceed?
                 </span>
               ) : (
@@ -1431,15 +1430,15 @@ export default function WaitlistView() {
 
       {/* ── Modal: Confirm Broadcast Send ── */}
       {isBroadcastConfirmOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 " onClick={() => setIsBroadcastConfirmOpen(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-md shadow-sm p-6 animate-in zoom-in-95 duration-200 border border-slate-100 text-center">
-            <div className="w-12 h-12 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 dashboard-dialog-overlay">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px] " onClick={() => setIsBroadcastConfirmOpen(false)} />
+          <div className="relative w-full bg-white p-6 animate-in zoom-in-95 duration-200 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true">
+            <div className="w-12 h-12 rounded-md bg-rose-100 text-slate-600 flex items-center justify-center mx-auto mb-4 dashboard-dialog-icon">
               <Send size={20} />
             </div>
             <h4 className="text-lg font-black text-slate-800 mb-2">Send Broadcast Email?</h4>
             <p className="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
-              You are about to send a broadcast email to <span className="text-rose-600 font-black">{broadcastRecipientCount} active subscribers</span> filtered by role: <span className="text-slate-800 font-black font-mono capitalize">{broadcastForm.targetRole}</span>.
+              You are about to send a broadcast email to <span className="text-slate-600 font-black">{broadcastRecipientCount} active subscribers</span> filtered by role: <span className="text-slate-800 font-black font-mono capitalize">{broadcastForm.targetRole}</span>.
               <br />
               This endpoint processes recipients in batches of 50. This action is irreversible.
             </p>

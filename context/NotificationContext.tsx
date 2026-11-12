@@ -11,6 +11,7 @@ import { playNotificationSound } from '@/lib/utils/audio';
 import { getNotificationRoute } from '@/lib/utils/notification-routes';
 import type { AppNotification, Pagination } from '@/types/notification';
 import axios from 'axios';
+import { API_BASE_URL } from '@/lib/axios';
 
 interface NotificationContextValue {
   notifications: AppNotification[];
@@ -64,11 +65,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const handleRefreshToken = useCallback(async (): Promise<string | null> => {
     if (!refreshToken) return null;
     try {
-      const baseUrl = (
-        process.env.NEXT_PUBLIC_API_BASE_URL ||
-        process.env.NEXT_PUBLIC_API_URL ||
-        'http://localhost:3000/api/v1'
-      ).replace(/\/$/, '');
+      const baseUrl = API_BASE_URL;
 
       const res = await axios.post<{ data?: { accessToken?: string; refreshToken?: string } }>(
         `${baseUrl}/auth/refresh`,

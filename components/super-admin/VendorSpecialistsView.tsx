@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Eye, Trash2, Edit2, RefreshCw, Plus, Search, Filter,
+  Trash2, Edit2, RefreshCw, Plus, Search, Filter,
   ChevronLeft, ChevronRight, Phone, MapPin, X, User,
   CheckCircle2, XCircle, Calendar, Clock, ToggleLeft, ToggleRight,
   AlertTriangle, Info, Truck,
@@ -17,6 +17,7 @@ import {
   STATE_ENUM_VALUES,
 } from '@/lib/api';
 import toast from 'react-hot-toast';
+import RecordActions from '@/components/admin/RecordActions';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -51,17 +52,6 @@ function formatDateTime(iso?: string | null): string {
   }
 }
 
-const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="relative group/tip">
-    {children}
-    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden md:group-hover/tip:flex whitespace-nowrap bg-white border border-gray-200/80 text-slate-700 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-sm z-50">
-      {label}
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
-      <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] -mt-[1px] border-transparent border-t-gray-200/80 -z-10" />
-    </div>
-  </div>
-);
-
 const DetailRow = ({
   icon: Icon, label, value, valueClass = '',
 }: {
@@ -92,7 +82,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
   if (!specialist) return null;
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 dashboard-dialog-overlay">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -105,62 +95,30 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-white rounded-md shadow-sm w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white w-full flex flex-col overflow-hidden dashboard-dialog dashboard-dialog--form"
+          onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-0-title"
         >
-          {/* Header */}
-          <div className="relative bg-brand-600 px-6 pt-8 pb-16 text-white overflow-hidden shrink-0">
-            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-md hover:bg-white/10 transition">
-              <X size={18} />
-            </button>
-            <div className="relative z-10">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-3">Vendor Specialist</p>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-md bg-white/20 border-2 border-white/20 flex items-center justify-center text-2xl font-black">
-                  <Truck size={28} className="text-white/90" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-xl font-black tracking-tight truncate">{specialist.name}</h2>
-                  <p className="text-white/70 text-xs font-medium">{specialist.contactPhone}</p>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
-                      specialist.isActive
-                        ? 'bg-emerald-400/30 text-white border-white/30'
-                        : 'bg-gray-400/30 text-white/70 border-white/20'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${specialist.isActive ? 'bg-emerald-300' : 'bg-gray-400'}`} />
-                      {specialist.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                    <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider border border-white/20">
-                      {formatStateLabel(specialist.state)}
-                    </span>
-                  </div>
-                </div>
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
+            <div className="flex min-w-0 items-start gap-3">
+              <Truck size={22} className="mt-0.5 shrink-0 text-emerald-700" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Vendor specialist</p>
+                <h2 className="truncate text-xl font-semibold text-slate-900" id="VendorSpecialistsView-dialog-0-title">{specialist.name}</h2>
+                <p className="mt-1 text-sm text-slate-600">{specialist.contactPhone}</p>
               </div>
             </div>
-          </div>
-
-          {/* Active status banner */}
-          <div className={`-mt-8 mx-6 rounded-md p-4 shadow-sm z-10 shrink-0 ${specialist.isActive ? 'bg-emerald-500' : 'bg-slate-500'}`}>
-            <div className="flex items-center gap-3">
-              {specialist.isActive
-                ? <CheckCircle2 size={20} className="text-white shrink-0" />
-                : <XCircle size={20} className="text-white shrink-0" />}
-              <div>
-                <p className="text-white text-sm font-black">
-                  {specialist.isActive ? 'Available for Assignment' : 'Not in Rotation'}
-                </p>
-                <p className="text-white/80 text-[11px] font-medium">
-                  {specialist.isActive
-                    ? 'This specialist is active and can be assigned to orders in their state.'
-                    : 'This specialist is inactive and will not be assigned to any orders.'}
-                </p>
-              </div>
-            </div>
+            <button type="button" onClick={onClose} aria-label="Close specialist details" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"><X size={20} /></button>
           </div>
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 mt-2">
+          <div className="flex-1 space-y-6 overflow-y-auto p-6 dashboard-dialog-body">
+            <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              {specialist.isActive ? <CheckCircle2 size={19} className="shrink-0 text-emerald-700" /> : <XCircle size={19} className="shrink-0 text-slate-500" />}
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{specialist.isActive ? 'Available for assignment' : 'Not in rotation'}</p>
+                <p className="mt-1 text-xs text-slate-600">{specialist.isActive ? 'This specialist can be assigned to orders in their state.' : 'This specialist will not be assigned to orders.'}</p>
+              </div>
+            </div>
             <div>
               <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Specialist Details</h3>
               <div className="bg-gray-50/50 rounded-md p-2">
@@ -186,13 +144,13 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
           </div>
 
           {/* Footer Actions */}
-          <div className="border-t border-gray-100 p-4 flex flex-wrap gap-3 shrink-0">
+          <div className="border-t border-gray-100 p-4 flex flex-wrap gap-3 shrink-0 dashboard-dialog-footer">
             <button
               onClick={() => { onToggleActive(specialist); onClose(); }}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-bold transition ${
                 specialist.isActive
-                  ? 'bg-amber-50 hover:bg-amber-100 text-amber-600'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                  ? 'bg-amber-50 hover:bg-amber-100 text-slate-600'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-slate-600'
               }`}
             >
               {specialist.isActive
@@ -207,7 +165,7 @@ function ViewModal({ specialist, onClose, onEdit, onDelete, onToggleActive }: Vi
             </button>
             <button
               onClick={() => { onDelete(specialist.id); onClose(); }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-500 rounded-md text-sm font-bold transition"
             >
               <Trash2 size={15} /> Delete
             </button>
@@ -235,7 +193,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
 
   useEffect(() => {
     if (editingSpecialist) {
-      setForm({ name: editingSpecialist.name, contactPhone: editingSpecialist.contactPhone, state: editingSpecialist.state });
+      setForm({ name: editingSpecialist.name, contactPhone: editingSpecialist.contactPhone, state: (String(editingSpecialist.state || '').toLowerCase() as StateEnumValue) });
       setIsActiveForm(editingSpecialist.isActive);
     } else {
       setForm({ name: '', contactPhone: '', state: '' });
@@ -308,26 +266,26 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-md rounded-md shadow-sm overflow-hidden border"
+            className="flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--form" role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-1-title"
           >
-            <div className="bg-[#228b22] px-6 py-4 text-white flex justify-between items-center">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 dashboard-dialog-header">
               <div className="flex items-center gap-2">
-                <Truck size={20} />
-                <h3 className="font-bold text-lg">
+                <Truck size={20} className="text-emerald-700" />
+                <h3 className="text-lg font-semibold text-slate-900" id="VendorSpecialistsView-dialog-1-title">
                   {isEditing ? 'Edit Specialist' : 'Add Vendor Specialist'}
                 </h3>
               </div>
-              <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-md transition">
+              <button type="button" onClick={onClose} aria-label="Close specialist form" className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto p-6 dashboard-dialog-body">
               {/* Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
@@ -339,7 +297,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Chinedu Okafor"
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">2–150 characters</p>
               </div>
@@ -353,11 +311,11 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   value={form.contactPhone}
                   onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))}
                   placeholder="+2348012345678"
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition font-mono"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 font-mono text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">E.164 format — no spaces, dashes or leading 0 (e.g. +2348012345678)</p>
                 {form.contactPhone && !PHONE_REGEX.test(form.contactPhone) && (
-                  <p className="text-[10px] text-red-500 mt-1 font-semibold flex items-center gap-1">
+                  <p className="text-[10px] text-slate-500 mt-1 font-semibold flex items-center gap-1">
                     <AlertTriangle size={10} /> Invalid phone format
                   </p>
                 )}
@@ -370,7 +328,7 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                   required
                   value={form.state}
                   onChange={(e) => setForm((f) => ({ ...f, state: e.target.value as StateEnumValue }))}
-                  className="w-full px-3.5 py-2.5 text-sm border rounded-md bg-slate-50 focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none"
                 >
                   <option value="">Select a state…</option>
                   {STATE_ENUM_VALUES.map((s) => (
@@ -392,11 +350,11 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                     onClick={() => setIsActiveForm((v) => !v)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold border transition ${
                       isActiveForm
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                        ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
                         : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                     }`}
                   >
-                    {isActiveForm ? <><ToggleRight size={15} className="text-emerald-600" /> Active</> : <><ToggleLeft size={15} /> Inactive</>}
+                    {isActiveForm ? <><ToggleRight size={15} className="text-slate-600" /> Active</> : <><ToggleLeft size={15} /> Inactive</>}
                   </button>
                 </div>
               )}
@@ -405,14 +363,14 @@ function FormModal({ isOpen, onClose, editingSpecialist, onSaved }: FormModalPro
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-md transition"
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 text-sm font-bold text-white bg-[#228b22] hover:bg-[#1c711c] rounded-md shadow-sm transition disabled:opacity-50"
+                  className="rounded-lg bg-[#228b22] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1c711c] disabled:opacity-50"
                 >
                   {isSaving ? 'Saving…' : isEditing ? 'Update Specialist' : 'Create Specialist'}
                 </button>
@@ -436,17 +394,17 @@ interface DeleteConfirmProps {
 
 function DeleteConfirmModal({ name, onConfirm, onCancel, isDeleting }: DeleteConfirmProps) {
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 ">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-[3px]  dashboard-dialog-overlay">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-sm rounded-md shadow-sm border p-6 text-center"
+        className="bg-white w-full p-6 text-center dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="VendorSpecialistsView-dialog-2-title"
       >
-        <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4">
-          <Trash2 size={24} className="text-red-500" />
+        <div className="w-14 h-14 mx-auto rounded-md bg-red-50 border border-red-100 flex items-center justify-center mb-4 dashboard-dialog-icon">
+          <Trash2 size={24} className="text-slate-500" />
         </div>
-        <h3 className="text-lg font-extrabold text-slate-800">Delete Specialist?</h3>
+        <h3 className="text-lg font-extrabold text-slate-800" id="VendorSpecialistsView-dialog-2-title">Delete Specialist?</h3>
         <p className="text-sm text-gray-500 mt-2 leading-relaxed">
           Are you sure you want to delete <span className="font-bold text-slate-700">{name}</span>? This action cannot be undone.
         </p>
@@ -722,7 +680,16 @@ export default function VendorSpecialistsView() {
                   {filtered.map((s) => (
                     <tr
                       key={s.id}
-                      className="border-b last:border-0 hover:bg-gray-50/50 transition-colors group"
+                      tabIndex={0}
+                      aria-label={`View ${s.name} details`}
+                      onClick={() => handleOpenView(s)}
+                      onKeyDown={(event) => {
+                        if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault();
+                          handleOpenView(s);
+                        }
+                      }}
+                      className="group cursor-pointer border-b transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700 last:border-0"
                     >
                       {/* Name + Phone */}
                       <td className="p-4">
@@ -731,13 +698,7 @@ export default function VendorSpecialistsView() {
                             <Truck size={16} className="text-[#228b22]" />
                           </div>
                           <div>
-                            <p
-                              className="font-bold text-slate-800 text-sm group-hover:text-[#228b22] transition-colors cursor-pointer flex items-center gap-1"
-                              onClick={() => handleOpenView(s)}
-                            >
-                              {s.name}
-                              <Eye size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </p>
+                            <p className="text-sm font-bold text-slate-800 transition-colors group-hover:text-emerald-800">{s.name}</p>
                             <div className="flex items-center gap-1 text-[11px] text-gray-400 font-medium mt-0.5">
                               <Phone size={10} />
                               {s.contactPhone}
@@ -757,10 +718,10 @@ export default function VendorSpecialistsView() {
                       {/* Status toggle */}
                       <td className="p-4 text-center">
                         <button
-                          onClick={() => handleToggleActive(s)}
+                          onClick={(event) => { event.stopPropagation(); handleToggleActive(s); }}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tighter transition border ${
                             s.isActive
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                              ? 'bg-emerald-50 text-slate-700 border-emerald-200 hover:bg-emerald-100'
                               : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                           }`}
                           title={s.isActive ? 'Click to deactivate' : 'Click to activate'}
@@ -778,32 +739,11 @@ export default function VendorSpecialistsView() {
 
                       {/* Actions */}
                       <td className="p-4 text-right">
-                        <div className="flex justify-end gap-1">
-                          <Tooltip label="View details">
-                            <button
-                              onClick={() => handleOpenView(s)}
-                              className="p-2 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Eye size={16} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Edit specialist">
-                            <button
-                              onClick={() => handleOpenEdit(s)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Delete specialist">
-                            <button
-                              onClick={() => handleDeleteRequest(s.id, s.name)}
-                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all active:scale-90"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </Tooltip>
-                        </div>
+                        <RecordActions name={s.name} actions={[
+                          { label: 'View details', onSelect: () => handleOpenView(s) },
+                          { label: 'Edit specialist', onSelect: () => handleOpenEdit(s) },
+                          { label: 'Delete specialist', onSelect: () => handleDeleteRequest(s.id, s.name), destructive: true },
+                        ]} />
                       </td>
                     </tr>
                   ))}
@@ -814,7 +754,7 @@ export default function VendorSpecialistsView() {
             {/* Mobile card view */}
             <div className="md:hidden flex flex-col p-4 space-y-3 bg-gray-50/50">
               {filtered.map((s) => (
-                <div key={s.id} className="bg-white p-4 rounded-md shadow-sm border border-gray-100">
+                <div key={s.id} role="button" tabIndex={0} aria-label={`View ${s.name} details`} onClick={() => handleOpenView(s)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); handleOpenView(s); } }} className="cursor-pointer rounded-md border border-gray-100 bg-white p-4 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-md bg-brand-100 flex items-center justify-center shrink-0">
@@ -828,10 +768,10 @@ export default function VendorSpecialistsView() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleToggleActive(s)}
+                      onClick={(event) => { event.stopPropagation(); handleToggleActive(s); }}
                       className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase border transition ${
                         s.isActive
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-emerald-50 text-slate-700 border-emerald-200'
                           : 'bg-gray-100 text-gray-500 border-gray-200'
                       }`}
                     >
@@ -843,11 +783,11 @@ export default function VendorSpecialistsView() {
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200">
                       <MapPin size={10} /> {formatStateLabel(s.state)}
                     </span>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleOpenView(s)} className="p-1.5 text-gray-400 hover:text-[#228b22] hover:bg-brand-50 rounded-lg transition"><Eye size={15} /></button>
-                      <button onClick={() => handleOpenEdit(s)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit2 size={15} /></button>
-                      <button onClick={() => handleDeleteRequest(s.id, s.name)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={15} /></button>
-                    </div>
+                    <RecordActions name={s.name} actions={[
+                      { label: 'View details', onSelect: () => handleOpenView(s) },
+                      { label: 'Edit specialist', onSelect: () => handleOpenEdit(s) },
+                      { label: 'Delete specialist', onSelect: () => handleDeleteRequest(s.id, s.name), destructive: true },
+                    ]} />
                   </div>
                 </div>
               ))}

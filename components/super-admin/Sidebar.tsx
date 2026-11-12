@@ -6,6 +6,7 @@ import { useAppDispatch } from '@/lib/hooks';
 import { useState } from 'react';
 import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL } from '@/lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists' | 'deliveryRoutes';
@@ -27,7 +28,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
       )}
 
       <aside className={`
-        fixed md:sticky top-0 left-0 h-screen w-52 bg-white border-r border-slate-200 flex flex-col z-50
+        fixed md:sticky top-0 left-0 h-dvh w-52 bg-white border-r border-slate-200 flex flex-col z-50
         transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
@@ -70,7 +71,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             </button>
           )}
         </div>
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+        <nav aria-label="Dashboard navigation" className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
           <SidebarLink
             icon={<LayoutDashboard size={20} />}
             label="Overview"
@@ -113,6 +114,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             active={activeTab === 'waitlist'}
             onClick={() => { setActiveTab('waitlist'); onClose?.(); }}
           />
+          <hr className="!my-3 border-slate-100" />
           <SidebarLink
             icon={<BookOpen size={20} />}
             label="Blog"
@@ -131,6 +133,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
             active={activeTab === 'engagement'}
             onClick={() => { setActiveTab('engagement'); onClose?.(); }}
           />
+          <hr className="!my-3 border-slate-100" />
           <SidebarLink
             icon={<Truck size={20} />}
             label="Vendor Specialists"
@@ -163,14 +166,14 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
 
       <AnimatePresence>
         {showLogoutConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 dashboard-dialog-overlay">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-lg shadow-sm p-6 border border-slate-200"
+              className="bg-white w-full p-6 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="Sidebar-dialog-0-title"
             >
-              <h3 className="font-semibold text-slate-900 text-lg">Sign out?</h3>
+              <h3 className="font-semibold text-slate-900 text-lg" id="Sidebar-dialog-0-title">Sign out?</h3>
               <p className="text-sm text-slate-600 leading-relaxed mt-2">
                 Unsaved changes may be lost.
               </p>

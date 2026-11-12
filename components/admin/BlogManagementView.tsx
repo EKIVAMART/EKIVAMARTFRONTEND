@@ -1,5 +1,6 @@
 'use client';
 import RecordStatus from "@/components/admin/RecordStatus";
+import RecordActions from "@/components/admin/RecordActions";
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -9,9 +10,6 @@ import {
   Plus,
   Search,
   RefreshCw,
-  Eye,
-  Edit,
-  Send,
   EyeOff,
   Trash2,
   Calendar,
@@ -109,7 +107,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
     const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === query.toLowerCase() ? (
-        <mark key={i} className="bg-amber-200 text-amber-950 rounded px-0.5 font-extrabold">
+        <mark key={i} className="bg-amber-200 text-slate-950 rounded px-0.5 font-extrabold">
           {part}
         </mark>
       ) : (
@@ -353,17 +351,18 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
         {/* Status Filter Tabs & Refresh */}
         <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide">
-          <div className="flex items-center gap-1.5 bg-white border border-neutral-200 rounded-md p-1 shadow-xs">
-            <Filter className="w-3.5 h-3.5 text-neutral-400 ml-2" />
+          <div className="flex items-center gap-2" role="group" aria-label="Filter articles by status">
+            <Filter className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
             <button
               onClick={() => {
                 setActiveStatusTab('all');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+              aria-pressed={activeStatusTab === 'all'}
+              className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 activeStatusTab === 'all'
-                  ? 'bg-brand-600 text-white shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
               All
@@ -373,10 +372,11 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('published');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+              aria-pressed={activeStatusTab === 'published'}
+              className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 activeStatusTab === 'published'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
               Published
@@ -386,10 +386,11 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('draft');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+              aria-pressed={activeStatusTab === 'draft'}
+              className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 activeStatusTab === 'draft'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
               Drafts
@@ -399,10 +400,11 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 setActiveStatusTab('unpublished');
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+              aria-pressed={activeStatusTab === 'unpublished'}
+              className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 activeStatusTab === 'unpublished'
-                  ? 'bg-slate-700 text-white shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
               Unpublished
@@ -429,7 +431,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
             Loading articles...
           </div>
         ) : error ? (
-          <div className="py-20 text-center text-xs font-semibold text-rose-600">
+          <div className="py-20 text-center text-xs font-semibold text-slate-600">
             {error}
           </div>
         ) : posts.length > 0 ? (
@@ -450,7 +452,16 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                 {posts.map((post, idx) => (
                   <tr
                     key={post.id}
-                    className="hover:bg-neutral-50/70 transition"
+                    tabIndex={0}
+                    aria-label={`Preview ${decodeHtmlEntities(post.title)}`}
+                    onClick={() => void handleOpenView(post)}
+                    onKeyDown={(event) => {
+                      if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                        event.preventDefault();
+                        void handleOpenView(post);
+                      }
+                    }}
+                    className="cursor-pointer transition-colors hover:bg-emerald-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"
                   >
                     {/* Index numbering */}
                     <td className="py-4 px-4 text-center font-extrabold text-neutral-400">
@@ -510,7 +521,7 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
                           <p className="text-slate-800 font-bold">
                             {new Date(post.publishedAt).toLocaleDateString()}
                           </p>
-                          <p className="text-[10px] text-emerald-600">Published</p>
+                          <p className="text-[10px] text-slate-600">Published</p>
                         </div>
                       ) : (
                         <div>
@@ -522,53 +533,14 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
                     {/* Actions */}
                     <td className="py-4 px-6 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {/* View Preview */}
-                        <button
-                          onClick={() => handleOpenView(post)}
-                          className="p-2 rounded-md text-neutral-600 hover:bg-neutral-100 hover:text-slate-900 transition"
-                          title="Preview article"
-                        >
-                          <Eye size={16} />
-                        </button>
-
-                        {/* Edit */}
-                        <button
-                          onClick={() => handleOpenEdit(post)}
-                          className="p-2 rounded-md text-brand-600 hover:bg-brand-50 transition"
-                          title="Edit article"
-                        >
-                          <Edit size={16} />
-                        </button>
-
-                        {/* Publish / Unpublish */}
-                        {post.status === 'published' ? (
-                          <button
-                            onClick={() => setPostToUnpublish(post)}
-                            className="p-2 rounded-md text-slate-600 hover:bg-slate-100 transition cursor-pointer"
-                            title="Unpublish article"
-                          >
-                            <EyeOff size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleOpenPublish(post)}
-                            className="p-2 rounded-md text-emerald-600 hover:bg-emerald-50 transition cursor-pointer"
-                            title="Publish article"
-                          >
-                            <Send size={16} />
-                          </button>
-                        )}
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => setPostToDelete(post)}
-                          className="p-2 rounded-md text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                          title="Delete article"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      <RecordActions name={decodeHtmlEntities(post.title)} actions={[
+                        { label: 'Preview article', onSelect: () => void handleOpenView(post) },
+                        { label: 'Edit article', onSelect: () => handleOpenEdit(post) },
+                        post.status === 'published'
+                          ? { label: 'Unpublish article', onSelect: () => setPostToUnpublish(post) }
+                          : { label: 'Publish article', onSelect: () => void handleOpenPublish(post) },
+                        { label: 'Delete article', onSelect: () => setPostToDelete(post), destructive: true },
+                      ]} />
                     </td>
                   </tr>
                 ))}
@@ -644,13 +616,13 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Delete Confirmation Modal */}
       {postToDelete && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center font-bold mx-auto border border-rose-100">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200 dashboard-dialog-overlay">
+          <div className="bg-white w-full overflow-hidden p-6 space-y-6 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="BlogManagementView-dialog-0-title">
+            <div className="w-14 h-14 rounded-md bg-rose-50 text-slate-600 flex items-center justify-center font-bold mx-auto border border-rose-100 dashboard-dialog-icon">
               <Trash2 size={28} />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-800" id="BlogManagementView-dialog-0-title">
                 Delete Article?
               </h3>
               <p className="text-xs text-neutral-500 font-medium mt-1 leading-relaxed">
@@ -686,13 +658,13 @@ export default function BlogManagementView({ globalSearchQuery }: BlogManagement
 
       {/* Custom Unpublish Confirmation Modal */}
       {postToUnpublish && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-sm overflow-hidden border border-neutral-100 p-6 space-y-6 text-center">
-            <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-[3px] flex items-center justify-center p-4 animate-in fade-in duration-200 dashboard-dialog-overlay">
+          <div className="bg-white w-full overflow-hidden p-6 space-y-6 text-center dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true" aria-labelledby="BlogManagementView-dialog-1-title">
+            <div className="w-14 h-14 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center font-bold mx-auto border border-slate-200 dashboard-dialog-icon">
               <EyeOff size={28} />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-800" id="BlogManagementView-dialog-1-title">
                 Unpublish Article?
               </h3>
               <p className="text-xs text-neutral-500 font-medium mt-1 leading-relaxed">

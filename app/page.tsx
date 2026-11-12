@@ -1,3 +1,4 @@
+import HeroRotation from '@/components/home/HeroRotation';
 import Image from 'next/image';
 import Link from 'next/link';
 import AppScreenPreview from '@/components/home/AppScreenPreview';
@@ -8,6 +9,7 @@ import Newsletter from '@/components/home/Newsletter';
 import { departments, departmentSlug } from '@/lib/data/departments';
 
 export default function Home(){return <div className="ek-home">
+  <HeroRotation>
   <section className="ek-hero" aria-labelledby="hero-title">
     <div className="ek-hero-copy">
       <span className="ek-kicker">The marketplace edit</span>
@@ -19,6 +21,7 @@ export default function Home(){return <div className="ek-home">
       <Image src="/images/collections/lagos.webp" alt="A woman in a patterned terracotta jacket wearing ivory headphones and carrying a woven bag" fill priority sizes="(max-width:767px) 100vw, (max-width:1360px) 82vw, 1063px"/>
     </div>
   </section>
+  </HeroRotation>
   <CategoryRail loopCards={renderCategoryCards(true)}>
     {renderCategoryCards()}
   </CategoryRail>

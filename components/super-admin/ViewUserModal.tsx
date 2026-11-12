@@ -88,7 +88,7 @@ export default function ViewUserModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 dashboard-dialog-overlay">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -104,26 +104,26 @@ export default function ViewUserModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="relative bg-white rounded-md shadow-sm w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white w-full flex flex-col overflow-hidden dashboard-dialog dashboard-dialog--form"
+            onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="ViewUserModal-dialog-0-title"
           >
-            <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+            <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 dashboard-dialog-header">
               <div className="min-w-0">
                 <p className="text-xs text-slate-500 mb-1">User details</p>
-                <h2 className="text-xl font-semibold text-slate-900 break-words">{user.firstName} {user.lastName}</h2>
+                <h2 className="text-xl font-semibold text-slate-900 break-words" id="ViewUserModal-dialog-0-title">{user.firstName} {user.lastName}</h2>
                 <p className="text-sm text-slate-600 break-all mt-1">{user.email}</p>
                 <div className="mt-2 flex items-center gap-3">
                   <RecordStatus value={userStatus} />
                   <span className="text-xs text-slate-500 capitalize">{user.role}</span>
                 </div>
               </div>
-              <button onClick={onClose} aria-label="Close user details" className="p-2 rounded-md text-slate-500 hover:bg-slate-100">
+              <button onClick={onClose} aria-label="Close user details" className="p-2 rounded-md text-slate-500 hover:bg-slate-100 dashboard-dialog-close" type="button">
                 <X size={18} />
               </button>
             </header>
 
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 mt-2">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 mt-2 dashboard-dialog-body">
 
               {/* Account Details */}
               <div>
@@ -154,18 +154,18 @@ export default function ViewUserModal({
                 <div className="bg-gray-50/50 rounded-md p-2">
                   <DetailRow icon={ShieldCheck} label="Email Verification" value={
                     user.isEmailVerified ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <CheckCircle2 size={13} /> Verified
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-amber-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <XCircle size={13} /> Not Verified
                       </span>
                     )
                   } />
                   <DetailRow icon={Lock} label="Two-Factor Auth" value={
                     user.isTwoFactorEnabled ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-bold text-xs">
                         <CheckCircle2 size={13} /> Enabled
                       </span>
                     ) : (
@@ -195,7 +195,7 @@ export default function ViewUserModal({
                 {userStatus === 'active' && onBlock && (
                   <button
                     onClick={() => { onBlock(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-600 rounded-md text-sm font-bold transition"
                   >
                     <Ban size={15} /> Block User
                   </button>
@@ -203,7 +203,7 @@ export default function ViewUserModal({
                 {userStatus === 'blocked' && onUnblock && (
                   <button
                     onClick={() => { onUnblock(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-slate-600 rounded-md text-sm font-bold transition"
                   >
                     <CheckCircle2 size={15} /> Unblock User
                   </button>
@@ -211,7 +211,7 @@ export default function ViewUserModal({
                 {onDelete && (
                   <button
                     onClick={() => { onDelete(user.id); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 text-slate-500 rounded-md text-sm font-bold transition"
                   >
                     <XCircle size={15} /> Delete Account
                   </button>

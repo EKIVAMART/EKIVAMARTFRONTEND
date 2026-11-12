@@ -393,7 +393,7 @@ const normalizeProduct = (product: unknown): AdminProduct | null => {
     inStock: isRecord(record.stock)
       ? Boolean(record.stock.isInStock)
       : getStockQuantity(record.stock, record.quantity) > 0,
-    image: record.image || imageUrls[0] || '',
+    image: record.image || imageUrls[0] || (typeof record.preview === 'string' && /\.(png|jpe?g|webp|avif)(\?|$)/i.test(record.preview) ? record.preview : ''),
     images: imageObjects,
     status: record.status || 'draft',
     condition: record.condition || 'new',
@@ -703,26 +703,7 @@ function AdminPageContent() {
 
   // Initialize products as empty array (will be populated from API)
   const [products, setProducts] = useState<AdminProduct[]>([]);
-  const [vendors, setVendors] = useState<AdminVendor[]>([
-    { id: 1, name: 'TechHub Solutions', type: 'Electronics', email: 'contact@techhub.com', status: 'Active' },
-  ]);
-  const [orders, setOrders] = useState<AdminOrder[]>([
-    { id: '#CM9815', user: { name: 'Natali Craig', avatar: 'https://i.pravatar.cc/150?u=natalicraig' }, items: '3 items', total: 125000, address: 'Meadow Lane Oakland', date: 'Apr 25, 2026 • 10:15 AM', status: 'Ongoing', paymentStatus: 'Paid' },
-    { id: '#CM9814', user: { name: 'Kate Morrison', avatar: 'https://i.pravatar.cc/150?u=katemorrison' }, items: '1 item', total: 450000, address: 'Larry San Francisco', date: 'Apr 25, 2026 • 09:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9813', user: { name: 'Drew Cano', avatar: 'https://i.pravatar.cc/150?u=drewcano' }, items: '2 items', total: 85000, address: 'Bagwell Avenue Ocala', date: 'Apr 24, 2026 • 04:20 PM', status: 'Ongoing', paymentStatus: 'Pending' },
-    { id: '#CM9812', user: { name: 'Orlando Diggs', avatar: 'https://i.pravatar.cc/150?u=orlandodiggs' }, items: '1 item', total: 1200000, address: 'Washburn Baton Rouge', date: 'Apr 24, 2026 • 02:00 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9811', user: { name: 'Andi Lane', avatar: 'https://i.pravatar.cc/150?u=andilane' }, items: '4 items', total: 65000, address: 'Nest Lane Olivette', date: 'Apr 24, 2026 • 11:45 AM', status: 'Cancelled', paymentStatus: 'Failed' },
-    { id: '#CM9810', user: { name: 'Lori Daniels', avatar: 'https://i.pravatar.cc/150?u=loridaniels' }, items: '1 item', total: 32000, address: 'Pin Oak Drive, NY', date: 'Apr 23, 2026 • 05:30 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9809', user: { name: 'Rene Wells', avatar: 'https://i.pravatar.cc/150?u=renewells' }, items: '2 items', total: 210000, address: 'Broad St, Atlanta', date: 'Apr 23, 2026 • 01:15 PM', status: 'Ongoing', paymentStatus: 'Refunded' },
-    { id: '#CM9808', user: { name: 'Tom Hardy', avatar: 'https://i.pravatar.cc/150?u=tomhardy' }, items: '5 items', total: 450000, address: 'Main St, Boston', date: 'Apr 22, 2026 • 10:05 AM', status: 'Returned', paymentStatus: 'Paid' },
-    { id: '#CM9807', user: { name: 'Sarah Connor', avatar: 'https://i.pravatar.cc/150?u=sarahconnor' }, items: '1 item', total: 180000, address: 'Tech Park, Seattle', date: 'Apr 21, 2026 • 03:45 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9806', user: { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?u=johnsmith' }, items: '2 items', total: 55000, address: 'Library Ave, Austin', date: 'Apr 20, 2026 • 09:20 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9805', user: { name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?u=emilyclark' }, items: '1 item', total: 290000, address: 'Home Blvd, Chicago', date: 'Apr 19, 2026 • 02:10 PM', status: 'Cancelled', paymentStatus: 'Failed' },
-    { id: '#CM9804', user: { name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?u=michaellee' }, items: '3 items', total: 155000, address: 'Fitness Way, Miami', date: 'Apr 18, 2026 • 11:30 AM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9803', user: { name: 'Sophia Chen', avatar: 'https://i.pravatar.cc/150?u=sophiachen' }, items: '1 item', total: 145000, address: 'Gamer St, Vegas', date: 'Apr 15, 2026 • 08:45 AM', status: 'Returned', paymentStatus: 'Paid' },
-    { id: '#CM9802', user: { name: 'David Kim', avatar: 'https://i.pravatar.cc/150?u=davidkim' }, items: '4 items', total: 195000, address: 'Adventure Rd, Denver', date: 'Apr 10, 2026 • 04:15 PM', status: 'Delivered', paymentStatus: 'Paid' },
-    { id: '#CM9801', user: { name: 'Olivia Brown', avatar: 'https://i.pravatar.cc/150?u=oliviabrown' }, items: '2 items', total: 42000, address: 'Camp St, Portland', date: 'Feb 2, 2026 • 10:00 AM', status: 'Delivered', paymentStatus: 'Paid' },
-  ]);
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
 
   useEffect(() => {
     if (paramTab) {
@@ -1623,10 +1604,11 @@ function AdminPageContent() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="ek-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
+      <main className="ek-workspace ek-admin-workspace flex-1 w-full min-w-0 overflow-x-hidden" data-section={activeTab}>
         {/* Desktop Top Header Bar */}
-        <div className="hidden md:flex items-center justify-end mb-5 pb-3 border-b border-gray-200/60">
-          <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center justify-between gap-6 mb-5 border-b border-slate-200 pb-4">
+          <p className="text-sm font-medium text-slate-500">EkivaMart <span className="mx-2 text-slate-300">/</span> Administration</p>
+          <div className="flex shrink-0 items-center gap-4">
             <NotificationBell />
             <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
               <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center font-semibold text-slate-700 text-sm border border-slate-200">
@@ -1801,8 +1783,9 @@ function AdminPageContent() {
                 <ProductTable
                   data={resolvedProducts}
                   onEdit={openProductModal}
-                  onView={(item) => openViewModal({
+                  onView={(item, section) => openViewModal({
                     ...item,
+                    initialSection: section || 'overview',
                     image: typeof item.image === 'string' ? item.image : item.image.src,
                   } as AdminProduct)}
                   onDelete={handleDeleteProduct}
@@ -1830,7 +1813,7 @@ function AdminPageContent() {
                 )}
                 {isLoadingOrders ? (
                   <div className="flex items-center justify-center py-20">
-                    <div className="w-10 h-10 border-4 border-brand-200 border-t-purple-600 rounded-full animate-spin" />
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-100 border-t-green-700" />
                   </div>
                 ) : (
                   <OrderTable data={orders} searchQuery={searchQuery} onViewDetails={openModal} />

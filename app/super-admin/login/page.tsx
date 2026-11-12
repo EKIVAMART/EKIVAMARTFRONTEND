@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, ShieldCheck, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@/lib/api';
 import Link from 'next/link';
@@ -95,22 +96,23 @@ export default function SuperAdminLoginPage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,#e5f3e8_0%,#f6f9f6_45%,#f9fbf9_100%)] px-4 py-10">
 
-      <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 relative z-10">
-        <div className="flex justify-center mb-8">
-          <div className="bg-slate-50 p-4 rounded-md border border-slate-100">
-            <ShieldCheck size={36} className="text-[#228b22]" />
-          </div>
+      <div className="relative z-10 w-full max-w-[460px] rounded-2xl border border-[#dce9de] bg-white p-6 shadow-[0_20px_60px_rgba(20,61,31,0.10)] sm:p-9">
+        <div className="mb-6 flex justify-center">
+          <Link href="/" aria-label="EkivaMart home" className="inline-flex min-h-11 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#228b22]">
+            <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={122} height={70} priority className="h-[70px] w-auto object-contain" />
+          </Link>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Super Admin Portal Access</h1>
-          <p className="text-slate-500 text-sm mt-2 font-medium">Verify your credentials to continue</p>
+        <div className="mb-8 text-center">
+          <span className="inline-flex rounded-full bg-[#edf7ee] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#236337]">Staff access</span>
+          <h1 className="mt-4 text-[27px] font-bold tracking-tight text-[#183b27]">Super-admin sign in</h1>
+          <p className="mt-2 text-sm text-slate-500">Welcome back. Sign in to manage EkivaMart.</p>
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-medium">
+          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-slate-600 text-sm font-medium">
             <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
             {error}
           </div>
@@ -130,8 +132,8 @@ export default function SuperAdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10 rounded-md outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
-                placeholder="admin@example.com"
+                className="min-h-12 w-full rounded-lg border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10"
+                placeholder="you@ekivamart.com"
                 disabled={isLoading}
               />
             </div>
@@ -140,7 +142,7 @@ export default function SuperAdminLoginPage() {
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
               <label htmlFor="admin-password" className="text-sm font-medium text-slate-700 block">Password</label>
-              <a href="#" className="text-xs font-semibold text-[#228b22] hover:text-[#1c711c] transition-colors">Forgot?</a>
+              <Link href="/contact-us" className="text-xs font-semibold text-[#228b22] hover:text-[#1c711c] transition-colors">Need help?</Link>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -153,14 +155,14 @@ export default function SuperAdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10 rounded-md outline-none transition-all text-sm font-medium text-slate-800 placeholder-slate-400"
+                className="min-h-12 w-full rounded-lg border border-slate-200 bg-white py-3 pl-10 pr-12 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-slate-400 transition-colors hover:text-slate-600"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -171,7 +173,7 @@ export default function SuperAdminLoginPage() {
           <button
             type="submit"
             disabled={isLoading || !email || !password}
-            className="w-full bg-[#228b22] hover:bg-[#1c711c] text-white py-3.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed group mt-2"
+            className="group mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#183d27] py-3.5 font-bold text-white shadow-sm transition-colors hover:bg-[#285a39] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isLoading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -192,11 +194,11 @@ export default function SuperAdminLoginPage() {
         </form>
       </div>
 
-      <div className="mt-8 text-center text-sm font-medium text-slate-400">
-        <p>&copy; {new Date().getFullYear()} EkivaMart Group. All rights reserved.</p>
-        <p className="mt-1 flex items-center justify-center gap-1">
+      <div className="mt-6 text-center text-xs font-medium text-[#617569]">
+        <p>&copy; {new Date().getFullYear()} EkivaMart</p>
+        <p className="mt-2 flex items-center justify-center gap-1">
           <Lock size={12} />
-          Secured by enterprise-grade encryption
+            Protected staff access
         </p>
       </div>
     </div>

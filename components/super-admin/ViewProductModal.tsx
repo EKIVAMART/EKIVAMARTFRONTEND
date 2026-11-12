@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box, MapPin } from 'lucide-react';
-import { ProductImage } from './ActionModal';
+import ProductReviewsPanel from '@/components/admin/ProductReviewsPanel';
 
 const parseMarkdownToHtml = (markdown: string): string => {
   if (!markdown) return '';
@@ -52,12 +52,21 @@ interface ViewProductModalProps {
 
 export default function ViewProductModal({ product, isOpen, onClose }: ViewProductModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [activeSection, setActiveSection] = useState<'overview' | 'reviews'>('overview');
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedImageIndex(0);
+      setActiveSection(product?.initialSection === 'reviews' ? 'reviews' : 'overview');
+    }
+  }, [isOpen, product?.id, product?.initialSection]);
 
   if (!isOpen || !product) return null;
 
+  const previewImage = typeof product.preview === 'string' && /\.(png|jpe?g|webp|avif)(\?|$)/i.test(product.preview) ? product.preview : '';
   const images = product.images && product.images.length > 0
     ? product.images
-    : product.image ? [{ url: product.image, alt: product.name, isPrimary: true, order: 0 }] : [];
+    : product.image || previewImage ? [{ url: product.image || previewImage, alt: product.name, isPrimary: true, order: 0 }] : [];
 
   const mainImage = images[selectedImageIndex];
   const mainImageUrl = mainImage ? (typeof mainImage === 'string' ? mainImage : mainImage.url) : '';
@@ -70,13 +79,12 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
     : (product.location || '');
 
   const compulsoryInfo = [
-    { label: 'Final Price', value: `NGN ${Number(product.price).toLocaleString()}` },
-    { label: 'Initial Price', value: product.compareAtPrice ? `NGN ${Number(product.compareAtPrice).toLocaleString()}` : '-' },
-    { label: 'Discount', value: product.discount ? `${product.discount}%` : '-' },
-    { label: 'Stock', value: `${product.stock} items` },
-    { label: 'SKU', value: product.sku || '-' },
-    { label: 'Brand', value: product.brand || '-' },
-    { label: 'Preview', value: product.preview || '-', isFullWidth: true },
+    { label: 'Final price', value: `₦${Number(product.price || 0).toLocaleString('en-NG')}`, icon: Tag },
+    { label: 'Original price', value: product.compareAtPrice ? `₦${Number(product.compareAtPrice).toLocaleString('en-NG')}` : 'Not set', icon: RefreshCcw },
+    { label: 'Discount', value: product.discount ? `${product.discount}%` : 'None', icon: Tag },
+    { label: 'Stock', value: `${product.stock ?? 0} items`, icon: Package },
+    { label: 'SKU', value: product.sku || 'Not set', icon: Box },
+    { label: 'Brand', value: product.brand || 'Not set', icon: ShieldCheck },
   ];
 
   const metadataEntries = Object.entries(product.metadata || {}).filter(([key, value]) => {
@@ -99,14 +107,14 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
     const isPublished = status === 'active' || status === 'published';
     if (isPublished) {
       return (
-        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
+        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-slate-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           Published
         </span>
       );
     }
     return (
-      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase border border-amber-200/80">
+      <span className="text-[10px] font-bold text-slate-600 bg-amber-50 px-2 py-0.5 rounded uppercase border border-amber-200/80">
         {status.replaceAll('_', ' ')}
       </span>
     );
@@ -114,21 +122,25 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 ">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="product-details-title"
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative bg-white w-full max-w-6xl rounded-[2rem] shadow-sm overflow-hidden border border-gray-100 max-h-full flex flex-col"
+          className="relative flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--large"
         >
           {/* Header */}
-          <div className="bg-[#228b22] px-6 sm:px-8 py-5 text-white flex items-center justify-between shrink-0">
+          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight">{product.name}</h2>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product details</p>
+              <h2 id="product-details-title" className="text-xl font-semibold tracking-tight sm:text-2xl">{product.name}</h2>
               <div className="flex items-center gap-3 mt-1.5">
                 {getStatusBadge(product.status)}
                 {(product.category || product.subCategory) && (
-                  <span className="text-xs font-medium text-white/90 bg-white/20 px-2.5 py-0.5 rounded-md border border-white/30 flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">
                     <Tag size={12} />
                     {product.category} {product.subCategory ? `› ${product.subCategory}` : ''}
                   </span>
@@ -138,22 +150,29 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
             <button
               type="button"
               onClick={onClose}
-              className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-md transition-colors "
+              className="rounded-lg p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dashboard-dialog-close"
+              aria-label="Close product details"
             >
               <X size={20} strokeWidth={3} />
             </button>
           </div>
 
+          <div className="flex gap-2 border-b border-slate-200 bg-white px-5 py-3 sm:px-8" role="tablist" aria-label="Product information">
+            <button type="button" role="tab" aria-selected={activeSection === 'overview'} onClick={() => setActiveSection('overview')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeSection === 'overview' ? 'bg-emerald-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}>Overview</button>
+            <button type="button" role="tab" aria-selected={activeSection === 'reviews'} onClick={() => setActiveSection('reviews')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeSection === 'reviews' ? 'bg-emerald-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}>Reviews</button>
+          </div>
+
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+          <div className="flex-1 overflow-y-auto bg-slate-50/60 p-5 sm:p-8 dashboard-dialog-body">
+            {activeSection === 'reviews' ? <ProductReviewsPanel productId={String(product.id)} /> : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 
               {/* Left Column: Images */}
               <div className="lg:col-span-5 space-y-4">
-                <div className="bg-slate-50 p-4 sm:p-6 rounded-md border border-slate-100 flex flex-col items-center">
-                  <div className="relative w-full aspect-square bg-white rounded-md shadow-sm border border-slate-100 overflow-hidden flex items-center justify-center group mb-4">
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="group relative mx-auto mb-4 flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50">
                     {mainImageUrl ? (
-                      <img src={mainImageUrl} alt={product.name} className="w-full h-full object-contain p-4" />
+                      <img src={mainImageUrl} alt={product.name} className="h-full w-full object-contain p-3" />
                     ) : (
                       <div className="text-gray-400 flex flex-col items-center gap-2">
                         <Box size={48} strokeWidth={1} />
@@ -205,10 +224,10 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                   <h4 className="text-sm font-bold text-brand-900 mb-2 flex items-center gap-2">
                     <Info size={16} className="text-brand-500" /> Description
                   </h4>
-                  {product.description || product.preview ? (
+                  {product.description || (product.preview && !previewImage) ? (
                     <div
                       className="text-sm text-brand-900/70 leading-relaxed prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(product.description || product.preview) }}
+                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(product.description || (previewImage ? '' : product.preview)) }}
                     />
                   ) : (
                     <p className="text-sm text-brand-900/70">No description provided.</p>
@@ -222,9 +241,9 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
                 {/* Compulsory Info Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {compulsoryInfo.map((item, idx) => (
-                    <div key={idx} className={`bg-white p-4 rounded-md border border-slate-100 shadow-sm hover:border-brand-200 hover:transition-all ${item.isFullWidth ? 'col-span-2 sm:col-span-3' : ''}`}>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
-                      <p className={`text-sm text-slate-800 ${item.isFullWidth ? 'font-medium leading-relaxed' : 'font-black'}`}>{item.value}</p>
+                    <div key={idx} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <div className="mb-3 flex items-center gap-2 text-emerald-700"><item.icon size={16} aria-hidden="true" /><p className="text-xs font-medium text-slate-500">{item.label}</p></div>
+                      <p className="break-words text-sm font-semibold tabular-nums text-slate-900">{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -332,6 +351,7 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
 
               </div>
             </div>
+            )}
           </div>
         </motion.div>
       </div>

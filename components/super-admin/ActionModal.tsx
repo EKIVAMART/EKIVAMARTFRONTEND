@@ -259,7 +259,7 @@ const ChipSelector = ({
         {selectedValues.map((val, idx) => (
           <span key={`${val}-${idx}`} className="bg-[#e3ebdf] text-[#1c711c] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
-            <button type="button" onClick={() => handleRemove(val)} className="text-[#1c711c] hover:text-red-500 transition">
+            <button type="button" onClick={() => handleRemove(val)} className="text-[#1c711c] hover:text-slate-900 transition">
               <X size={13} strokeWidth={3} />
             </button>
           </span>
@@ -1352,34 +1352,38 @@ export default function ActionModal({
     <>
       <AnimatePresence>
         {isOpen && (
-        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
+        <div key="action-modal-overlay" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-[3px] sm:p-6 dashboard-dialog-overlay">
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="product-editor-title"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white w-full max-w-4xl rounded-md shadow-sm overflow-hidden border border-gray-100 md:max-h-[90vh] max-h-full flex flex-col"
+            className="relative flex w-full flex-col overflow-hidden bg-white dashboard-dialog dashboard-dialog--wide"
           >
             <AnimatePresence>
               {saveErrors.length > 0 && (
-                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-red-700 shadow-sm">
+                <motion.div key="save-errors-banner" className="absolute left-4 right-4 top-4 z-30 mx-auto max-w-2xl rounded-md border border-red-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-red-600"><AlertCircle size={20} /></div>
+                    <div className="mt-0.5 rounded-md bg-red-100 p-2 text-slate-600"><AlertCircle size={20} /></div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-800">Please fix these details before saving.</p>
+                      <p className="font-bold text-slate-800">Please fix these details before saving.</p>
                       <ul className="mt-2 list-disc space-y-1 pl-4">
                         {saveErrors.map((error, index) => <li key={`${error}-${index}`}>{error}</li>)}
                       </ul>
                     </div>
-                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-red-500 transition hover:bg-red-50"><X size={18} /></button>
+                    <button type="button" onClick={() => setSaveErrors([])} className="rounded-md p-2 text-slate-500 transition hover:bg-red-50"><X size={18} /></button>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <div className="border-b border-slate-200 bg-white px-5 py-4 text-slate-900 flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-5 text-slate-900 sm:px-8 dashboard-dialog-header">
               <div>
-                <h2 className="text-xl font-semibold">{editingItem ? 'Edit product' : 'Add product'}</h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Product management</p>
+                <h2 id="product-editor-title" className="text-xl font-semibold tracking-tight sm:text-2xl">{editingItem ? 'Edit product' : 'Add product'}</h2>
+                <p className="mt-1 text-sm text-slate-500">
                   {quickAddMode ? 'Quick add' : `Step ${currentStep} of ${totalSteps}`}
                 </p>
               </div>
@@ -1397,7 +1401,7 @@ export default function ActionModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="p-2 text-slate-500 hover:bg-slate-100 rounded-md transition"
+                  className="p-2 text-slate-500 hover:bg-slate-100 rounded-md transition dashboard-dialog-close"
                   aria-label="Close modal"
                 >
                   <X size={22} />
@@ -1410,22 +1414,20 @@ export default function ActionModal({
             ) : (
               <div className="flex flex-col flex-grow min-h-0">
                 {/* Step Indicator */}
-                <div className="px-6 md:px-8 pt-6 pb-2 border-b border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center justify-between">
+                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4 sm:px-8">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     {[
-                      { step: 1, title: 'Basic Information', desc: 'Core product details' },
-                      { step: 2, title: 'Pricing & Inventory', desc: 'Set price, stock levels, and costs' },
-                      { step: 3, title: 'Additional Details', desc: 'Policies, category specifications, and SEO metadata' },
-                      ...(totalSteps === 4 ? [{ step: 4, title: 'Images', desc: 'Manage product gallery' }] : [])
+                      { step: 1, title: 'Product', icon: Layers },
+                      { step: 2, title: 'Pricing', icon: DollarSign },
+                      { step: 3, title: 'Details', icon: Info },
+                      ...(totalSteps === 4 ? [{ step: 4, title: 'Images', icon: ImageIcon }] : [])
                     ].map((s) => (
-                      <div key={s.step} className="flex flex-col items-center flex-1 relative">
-                        {s.step !== 1 && <div className={`absolute top-4 left-[-50%] w-full h-[2px] ${currentStep >= s.step ? 'bg-[#228b22]' : 'bg-gray-200'}`} />}
-                        <div className={`relative z-10 w-8 h-8 rounded-md flex items-center justify-center font-bold text-xs transition-colors duration-300 ${currentStep === s.step ? 'bg-[#228b22] text-white shadow-sm ' : currentStep > s.step ? 'bg-[#1c711c] text-white' : 'bg-gray-200 text-gray-500'}`}>
-                          {currentStep > s.step ? <Check size={14} /> : s.step}
+                      <div key={s.step} className="flex min-w-0 flex-1 items-center gap-2">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${currentStep === s.step ? 'bg-emerald-800 text-white' : currentStep > s.step ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500'}`}>
+                          {currentStep > s.step ? <Check size={17} /> : <s.icon size={17} aria-hidden="true" />}
                         </div>
-                        <div className="mt-2 text-center hidden md:block">
-                          <p className={`text-[11px] font-bold ${currentStep >= s.step ? 'text-gray-800' : 'text-gray-400'}`}>{s.title}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5">{s.desc}</p>
+                        <div className="hidden min-w-0 lg:block">
+                          <p className={`truncate text-xs font-semibold ${currentStep >= s.step ? 'text-slate-800' : 'text-slate-400'}`}>{s.title}</p>
                         </div>
                       </div>
                     ))}
@@ -1436,7 +1438,7 @@ export default function ActionModal({
                   {currentStep === 1 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Layers size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><Layers size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Basic Information</h3>
                           <p className="text-xs text-gray-500">Core product details</p>
@@ -1618,7 +1620,7 @@ export default function ActionModal({
                           <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white focus-within:ring-2 focus-within:border-[#228b22] focus-within:ring-[#228b22]/20 ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
                               <span key={`tag-${t}-${idx}`} className="bg-[#e3ebdf] text-[#228b22] text-xs font-bold px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
-                                {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-red-500 transition" onClick={() => removeTag(t)} />
+                                {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-slate-900 transition" onClick={() => removeTag(t)} />
                               </span>
                             ))}
                             <input type="text" value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag} className="bg-transparent outline-none flex-1 min-w-[80px] text-sm focus:!ring-0 focus:!border-transparent" placeholder="Add tag..." />
@@ -1728,7 +1730,7 @@ export default function ActionModal({
                   {currentStep === 2 && (
                     <div className="space-y-8">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><DollarSign size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><DollarSign size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Pricing & Inventory</h3>
                           <p className="text-xs text-gray-500">Set price, stock levels, and costs</p>
@@ -1776,7 +1778,7 @@ export default function ActionModal({
                   {currentStep === 3 && (
                     <div className="space-y-8 animate-in fade-in duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#228b22] rounded-lg text-white"><Info size={22} /></div>
+                        <div className="dashboard-dialog-icon flex items-center justify-center"><Info size={22} /></div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800">Additional Details</h3>
                           <p className="text-xs text-gray-500">Policies, category specifications, and SEO metadata</p>
@@ -1944,7 +1946,7 @@ export default function ActionModal({
                               <input type="text" placeholder="Value (e.g. Intel i7)" value={field.value} onChange={e => {
                                 const newF = [...customFields]; newF[index].value = e.target.value; setCustomFields(newF);
                               }} className="flex-1 p-3 rounded-md border bg-white text-sm outline-none font-medium" />
-                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-red-500 hover:bg-red-50 rounded-md transition">
+                              <button type="button" onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))} className="p-3 text-slate-500 hover:bg-red-50 rounded-md transition">
                                 <Trash2 size={18} />
                               </button>
                             </div>
@@ -1964,7 +1966,7 @@ export default function ActionModal({
                         {seoExpanded && (
                           <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
                             <div className="flex justify-end">
-                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-[#1c7bb3] px-3.5 py-2 rounded-md hover:bg-[#e1eff8] transition">
+                              <button type="button" onClick={generateSEO} className="text-xs font-extrabold bg-[#f1f8fc] text-slate-600 px-3.5 py-2 rounded-md hover:bg-[#e1eff8] transition">
                                 Auto-Generate from Product Data
                               </button>
                             </div>
@@ -1988,7 +1990,7 @@ export default function ActionModal({
                     <div className="space-y-6 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-[#228b22] rounded-lg text-white">
+                          <div className="dashboard-dialog-icon flex items-center justify-center">
                             <ImageIcon size={22} />
                           </div>
                           <div>
@@ -2162,7 +2164,7 @@ export default function ActionModal({
                                 <button type="button" onClick={() => { setEditingAltIndex(selectedImageIndex); setAltTextInput(altText); }} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#228b22] rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Edit2 size={16} /> {hasAlt ? 'Edit Alt Text' : 'Add Alt Text'}
                                 </button>
-                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-md text-sm font-bold flex items-center gap-2 transition">
+                                <button type="button" onClick={() => setImageToDelete(currentImg as any)} className="px-5 py-2.5 bg-white border border-red-200 text-slate-600 hover:bg-red-50 rounded-md text-sm font-bold flex items-center gap-2 transition">
                                   <Trash2 size={16} /> Delete
                                 </button>
                               </div>
@@ -2189,9 +2191,9 @@ export default function ActionModal({
 
                       {/* Delete Confirmation */}
                       {imageToDelete && (
-                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
-                          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-sm animate-in zoom-in-95">
-                            <div className="w-12 h-12 bg-red-100 text-red-500 rounded-md flex items-center justify-center mb-4 mx-auto">
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 dashboard-dialog-overlay">
+                          <div className="bg-white p-6 w-full animate-in zoom-in-95 dashboard-dialog dashboard-dialog--compact dashboard-dialog--padded" role="dialog" aria-modal="true">
+                            <div className="w-12 h-12 bg-red-100 text-slate-500 rounded-md flex items-center justify-center mb-4 mx-auto dashboard-dialog-icon dashboard-dialog-icon">
                               <Trash2 size={24} />
                             </div>
                             <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Delete Image?</h4>
@@ -2212,7 +2214,7 @@ export default function ActionModal({
 
             {/* Footer — only shown for the multi-step detailed form, NOT in Quick Add mode */}
             {!quickAddMode && (
-              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative">
+              <div className="px-5 md:px-8 py-5 md:py-6 border-t bg-gray-50 flex justify-between items-center z-10 relative dashboard-dialog-footer">
                 <button
                   type="button"
                   onClick={prevStep}
@@ -2278,8 +2280,8 @@ export default function ActionModal({
       />
 
       {imageToReplace && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 dashboard-dialog-overlay">
+          <div className="bg-white p-6 w-full animate-in zoom-in-95 flex flex-col dashboard-dialog dashboard-dialog--form dashboard-dialog--padded" role="dialog" aria-modal="true">
             <h4 className="font-bold text-lg text-gray-800 mb-4 text-center">Replace Image</h4>
 
             <div className="w-full aspect-square bg-gray-100 rounded-md overflow-hidden mb-4 border border-gray-200">
@@ -2287,7 +2289,7 @@ export default function ActionModal({
             </div>
 
             <div className="mb-6">
-              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text <span className="text-red-500">*</span></label>
+              <label className="text-xs font-bold text-gray-600 mb-1.5 block">Image Alt Text <span className="text-slate-500">*</span></label>
               <input
                 type="text"
                 value={imageToReplace.alt}
@@ -2308,18 +2310,18 @@ export default function ActionModal({
       )}
 
       {showCancelConfirm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-md p-6 max-w-md w-full shadow-sm animate-in zoom-in-95 flex flex-col">
-            <div className="w-12 h-12 bg-orange-100 text-orange-500 rounded-md flex items-center justify-center mb-4 mx-auto">
-              <AlertCircle size={24} />
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-[3px] dashboard-dialog-overlay">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="unsaved-title" aria-describedby="unsaved-description" className="animate-in zoom-in-95 flex w-full flex-col bg-white p-6 sm:p-8 dashboard-dialog dashboard-dialog--form dashboard-dialog--padded">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700 dashboard-dialog-icon">
+              <AlertCircle size={24} aria-hidden="true" />
             </div>
-            <h4 className="text-center font-bold text-lg text-gray-800 mb-2">Unsaved Changes</h4>
-            <p className="text-center text-sm text-gray-500 mb-6">You have unsaved changes. Do you want to save them before leaving?</p>
-            <div className="flex gap-3">
-              <button type="button" onClick={closeModalAndReset} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md font-bold transition">Discard</button>
-              <button type="button" onClick={() => setShowCancelConfirm(false)} className="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md font-bold transition">Cancel</button>
-              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="flex-1 py-3 bg-[#228b22] hover:bg-[#1c711c] disabled:opacity-60 text-white rounded-md font-bold transition">{isSaving ? 'Saving...' : 'Save'}</button>
+            <h4 id="unsaved-title" className="text-xl font-semibold tracking-tight text-slate-900">Keep your product changes?</h4>
+            <p id="unsaved-description" className="mt-2 text-sm leading-relaxed text-slate-600">You have edits that have not been saved. Save them now or return to the form.</p>
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+              <button type="button" onClick={() => setShowCancelConfirm(false)} className="min-h-11 flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Keep editing</button>
+              <button type="button" onClick={() => { setShowCancelConfirm(false); void saveData(); }} disabled={isSaving} className="min-h-11 flex-1 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900 disabled:opacity-60">{isSaving ? 'Saving…' : 'Save changes'}</button>
             </div>
+            <button type="button" onClick={closeModalAndReset} className="mt-4 self-start text-sm font-medium text-rose-700 hover:underline">Discard changes and close</button>
           </div>
         </div>
       )}

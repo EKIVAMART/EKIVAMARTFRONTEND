@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from './axios';
 
 export interface AuthUser {
   id: string;

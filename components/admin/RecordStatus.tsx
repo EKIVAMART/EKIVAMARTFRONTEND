@@ -8,9 +8,9 @@ export default function RecordStatus({ value, children }: { value: string | null
   // Older waitlist subscribers may not have declared a role.
   const normalized = (value ?? '').trim().toLowerCase().replace(/[ -]/g, '_');
   const color = problemStatuses.has(normalized)
-    ? 'text-red-700'
+    ? 'text-slate-700'
     : attentionStatuses.has(normalized)
-      ? 'text-amber-800'
+      ? 'text-slate-800'
       : 'text-slate-700';
 
   return (
