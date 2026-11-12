@@ -69,7 +69,9 @@ export default function DashboardRevenueChart({
           return out;
         })();
   const id = useId().replaceAll(':', '');
-  const [active, setActive] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [focused, setFocused] = useState<number | null>(null);
+  const active = hovered ?? focused;
   const [hidden, setHidden] = useState<string[]>([]);
   const series =
     kind === 'finance'
@@ -165,10 +167,10 @@ export default function DashboardRevenueChart({
           No activity recorded for this period.
         </div>
       ) : (
-        <div className="analytics-plot" onMouseLeave={() => setActive(null)}>
+        <div className="analytics-plot" onMouseLeave={() => setHovered(null)}>
           <svg
             viewBox={`0 0 ${W} ${H}`}
-            role="img"
+            role="group"
             aria-label={
               kind === 'finance'
                 ? 'Sales and earnings over time'
@@ -242,14 +244,33 @@ export default function DashboardRevenueChart({
               );
             })}
             {active !== null && active < points.length && (
-              <line
-                x1={x(active)}
-                x2={x(active)}
-                y1={T}
-                y2={H - B}
-                stroke="#a4b2aa"
-                strokeDasharray="3 3"
-              />
+              <g aria-hidden="true" pointerEvents="none">
+                <line
+                  x1={x(active)}
+                  x2={x(active)}
+                  y1={T}
+                  y2={H - B}
+                  stroke="#a4b2aa"
+                  strokeDasharray="3 3"
+                />
+                {visible.map((s) => {
+                  const value = points[active][s.key as keyof AnalyticsPoint];
+                  if (typeof value !== 'number' || !Number.isFinite(value))
+                    return null;
+                  return (
+                    <circle
+                      key={s.key}
+                      className="analytics-point-marker"
+                      cx={x(active)}
+                      cy={y(value)}
+                      r={s.key === 'grossRevenue' ? 5 : 3}
+                      fill={s.color}
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                  );
+                })}
+              </g>
             )}
             {points.map((p, i) => (
               <g key={p.date}>
@@ -277,6 +298,8 @@ export default function DashboardRevenueChart({
                   </text>
                 )}
                 <rect
+                  className="analytics-hit-target"
+                  role="img"
                   x={Math.max(
                     L,
                     x(i) - pw / Math.max(1, points.length - 1) / 2
@@ -294,10 +317,13 @@ export default function DashboardRevenueChart({
                   height={ph}
                   fill="transparent"
                   tabIndex={0}
-                  onBlur={() => setActive(null)}
-                  onFocus={() => setActive(i)}
-                  onMouseEnter={() => setActive(i)}
-                  onTouchStart={() => setActive(i)}
+                  onBlur={() => setFocused(null)}
+                  onFocus={() => {
+                    setHovered(null);
+                    setFocused(i);
+                  }}
+                  onMouseEnter={() => setHovered(i)}
+                  onTouchStart={() => setHovered(i)}
                   aria-label={`${p.date}: ${visible.map((s) => `${s.label} ${fmt(Number(p[s.key as keyof AnalyticsPoint]) || 0)}`).join(', ')}`}
                 />
               </g>
