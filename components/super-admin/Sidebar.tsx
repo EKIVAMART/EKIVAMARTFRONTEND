@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent, Bell, BookOpen, Mail, Truck, CircleHelp } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingCart, X, UserCog, UserCircle, Clock, LogOut, Percent, Bell, BookOpen, Mail, Truck, CircleHelp } from '@/components/ui/platform-icons';
 import { SidebarLink } from './SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';

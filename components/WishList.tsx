@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Trash2, Star, ChevronRight, ShoppingCart } from 'lucide-react';
+import { Trash2, Star, ChevronRight, ShoppingCart } from '@/components/ui/platform-icons';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist, removeWishlistItem, clearWishlistApi } from '@/lib/features/wishlist/wishlistSlice';
 import { openNoteModal } from '@/lib/features/cart/cartSlice';

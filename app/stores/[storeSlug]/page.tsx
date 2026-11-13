@@ -1,4 +1,5 @@
 'use client';
+import { CurrencyNgn as PlatformCurrencyNgn } from '@/components/ui/platform-icons';
 
 import React, { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import {
   ChevronRight, Package, MessageSquare, Truck, Search, SlidersHorizontal,
   ArrowLeft, ExternalLink, AlertTriangle, Store, ShoppingBag, BadgeCheck,
   Calendar, ChevronDown, RefreshCw,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { storePublicApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -144,9 +145,7 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
 /* ─── Helper: Naira formatter ─────────────────────────────────────────────── */
 function NairaIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
-    </svg>
+    <PlatformCurrencyNgn size={size} aria-hidden="true" />
   );
 }
 const formatNaira = (amount: number) =>

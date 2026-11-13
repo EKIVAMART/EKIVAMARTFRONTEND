@@ -2,7 +2,7 @@
 import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X } from '@/components/ui/platform-icons';
 import RecordActions from '@/components/admin/RecordActions';
 import { taxRulesApi } from '@/lib/api';
 import toast from 'react-hot-toast';

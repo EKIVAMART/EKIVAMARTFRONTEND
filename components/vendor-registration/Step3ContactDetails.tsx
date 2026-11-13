@@ -1,6 +1,6 @@
 import FormWrapper from './FormWrapper';
 import { InputGroup } from './FormInputs';
-import { UserCircle2 } from 'lucide-react';
+import { UserCircle2 } from '@/components/ui/platform-icons';
 
 interface Props {
   onNext: () => void;

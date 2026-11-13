@@ -1,3 +1,4 @@
+import { ChevronRight as PlatformChevronRight, Mail as PlatformMail, Phone as PlatformPhone } from '@/components/ui/platform-icons';
 import Image from "next/image";
 import type { ReactNode } from "react";
 
@@ -10,9 +11,7 @@ type ContactItem = {
 };
 
 const PhoneIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current" aria-hidden="true">
-    <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z" />
-  </svg>
+  <PlatformPhone className="h-7 w-7" aria-hidden="true" />
 );
 
 const WhatsappIcon = () => (
@@ -29,17 +28,7 @@ const WhatsappIcon = () => (
 );
 
 const MailIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
-    <rect x="3" y="5" width="18" height="14" rx="3" className="fill-current" />
-    <path
-      d="m7.5 10 4.5 3.5 4.5-3.5"
-      fill="none"
-      stroke="white"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+  <PlatformMail className="h-7 w-7" aria-hidden="true" />
 );
 
 const contacts: ContactItem[] = [
@@ -131,18 +120,7 @@ export default function HelpSection() {
                 Get in touch with a 24/7 support agent to address your issue
               </span>
             </span>
-            <svg
-              viewBox="0 0 24 24"
-              className="h-5 w-5 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m9 6 6 6-6 6" />
-            </svg>
+            <PlatformChevronRight className="h-5 w-5 shrink-0" aria-hidden="true" />
           </a>
         </div>
       </div>

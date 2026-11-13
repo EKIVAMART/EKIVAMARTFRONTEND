@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/ui/platform-icons';
 import { AuthCallbackClient } from './AuthCallbackClient';
 
 function AuthCallbackFallback() {

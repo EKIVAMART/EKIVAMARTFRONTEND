@@ -9,7 +9,7 @@ import {
   Sparkles,
   ShoppingCart,
   ShieldCheck,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import ProductTable from '@/components/super-admin/ProductTable';
 
 export interface VendorProduct {

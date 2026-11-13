@@ -5,7 +5,7 @@ import {
   X, Plus, Edit, Trash2, Layers, Search,
   CheckCircle2, Clock, Upload, ChevronRight,
   AlertCircle,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import { categoryApi, ApiError } from '@/lib/api';

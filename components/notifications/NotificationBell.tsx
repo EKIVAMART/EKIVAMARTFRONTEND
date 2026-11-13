@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useNotifications } from '@/context/NotificationContext';
 import { NotificationItem } from './NotificationItem';
 import { useAppSelector } from '@/lib/hooks';
-import { Bell, CheckCheck, Volume2, VolumeX, ArrowRight } from 'lucide-react';
+import { Bell, CheckCheck, Volume2, VolumeX, ArrowRight } from '@/components/ui/platform-icons';
+
+import { NotificationBell as BellControl } from '@/components/ui/notification-bell';
 
 interface DropdownPos {
   top: number;
@@ -123,29 +125,21 @@ export function NotificationBell() {
     return null;
   }
 
-  const displayBadge = unreadCount > 99 ? '99+' : unreadCount;
   const recentNotifications = notifications.slice(0, 8);
 
   return (
     <div className="relative inline-block">
       {/* Bell Trigger Button */}
-      <button
+      <BellControl
         ref={buttonRef}
-        type="button"
+        count={unreadCount}
+        size={40}
+        color="green"
         onClick={handleToggle}
-        className="relative flex items-center justify-center p-2 rounded-md text-neutral-600 hover:text-brand-600 hover:bg-neutral-100/80 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/30"
-        aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
         aria-expanded={isOpen}
-      >
-        <Bell className="w-5 h-5" />
-
-        {/* Unread Badge Counter (Capped at 99+) */}
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-md bg-brand-600 text-[11px] font-extrabold text-white shadow-sm ">
-            {displayBadge}
-          </span>
-        )}
-      </button>
+        aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
+        className="cursor-pointer hover:text-[#22643e]"
+      />
 
       {/* Popover Dropdown Panel — rendered via fixed positioning calculated from the button rect */}
       {isOpen && dropdownPos && (
@@ -225,7 +219,7 @@ export function NotificationBell() {
               ))
             ) : (
               <div className="py-10 text-center">
-                <div className="w-12 h-12 rounded-md bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-2">
+                <div className="h-10 text-neutral-400 flex items-center justify-center mx-auto mb-2">
                   <Bell className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-bold text-neutral-700">No notifications yet</p>

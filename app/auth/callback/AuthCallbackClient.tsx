@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { authApi } from '@/lib/api';
 import { setCredentials } from '@/lib/features/auth/authSlice';

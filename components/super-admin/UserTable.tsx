@@ -9,7 +9,7 @@ import {
   Eye, Ban, CheckCircle, Trash2, Filter, ArrowUpDown,
   ChevronLeft, ChevronRight, Mail, Clock, ShieldCheck,
   ShieldOff, Calendar, LogIn, User
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 
 export interface AppUser {
   id: string;

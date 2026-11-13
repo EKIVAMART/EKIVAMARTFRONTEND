@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Clock, Truck, CreditCard, LifeBuoy } from 'lucide-react';
+import { Clock, Truck, CreditCard, LifeBuoy } from '@/components/ui/platform-icons';
 import FadeInSection from '@/components/FadeInSection';
 import TypingText from '@/components/TypingText';
 import HeroGeometry from './HeroGeometry';

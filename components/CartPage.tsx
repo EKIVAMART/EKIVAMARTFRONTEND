@@ -1,4 +1,5 @@
 'use client';
+import { Check as PlatformCheck } from '@/components/ui/platform-icons';
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -25,7 +26,7 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -1713,22 +1714,7 @@ export default function CartPage() {
                 transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 18 }}
                 className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200"
               >
-                <svg
-                  className="w-10 h-10 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <motion.path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
-                  />
-                </svg>
+                <PlatformCheck className="w-10 h-10 text-white" aria-hidden="true" />
               </motion.div>
 
               <motion.div

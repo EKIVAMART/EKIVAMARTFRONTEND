@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AlertCircle, Home } from 'lucide-react';
+import { AlertCircle, Home } from '@/components/ui/platform-icons';
 import { BackButton } from '@/components/BackButton';
 
 export default function NotFound() {

@@ -13,7 +13,7 @@ import {
   Loader2,
   Trash2,
   CheckCircle,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { AdminBlogPost, CreateBlogPostDto, UpdateBlogPostDto } from '@/types/blog';
 import { blogApi, decodeHtmlEntities } from '@/lib/api-blog';
 import MediumEditor from './MediumEditor';

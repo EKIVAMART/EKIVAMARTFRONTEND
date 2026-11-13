@@ -17,7 +17,7 @@ import {
   Bell,
   Clock,
   BookOpen,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import type { AppNotification } from '@/types/notification';
 import { getNotificationRoute } from '@/lib/utils/notification-routes';
 import { useAppSelector } from '@/lib/hooks';

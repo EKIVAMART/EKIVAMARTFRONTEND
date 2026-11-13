@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, ShieldAlert, Flag, Check, X, ShieldOff, EyeOff, Eye, Send, Reply, User, Star } from 'lucide-react';
+import { MessageSquare, ShieldAlert, Flag, Check, X, ShieldOff, EyeOff, Eye, Send, Reply, User, Star } from '@/components/ui/platform-icons';
 import { reviewsApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
 import toast from 'react-hot-toast';

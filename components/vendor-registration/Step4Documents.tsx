@@ -1,6 +1,6 @@
 import FormWrapper from './FormWrapper';
 import { UploadBox } from './FormInputs';
-import { FileText } from 'lucide-react';
+import { FileText } from '@/components/ui/platform-icons';
 
 interface Props {
   onNext: () => void;

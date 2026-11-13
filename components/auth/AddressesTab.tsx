@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Trash2, Edit3, Check, Loader2, Home } from 'lucide-react';
+import { MapPin, Plus, Trash2, Edit3, Check, Loader2, Home } from '@/components/ui/platform-icons';
 import { userAddressApi, deliveryRoutesApi, SavedAddressItem, SavedAddressPayload, AvailableState } from '@/lib/api';
 import toast from 'react-hot-toast';
 

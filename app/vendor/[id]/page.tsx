@@ -1,9 +1,10 @@
 'use client';
+import { Star as PlatformStar } from '@/components/ui/platform-icons';
 
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, Search, Share, UserPlus, Calendar, Heart, MapPin, CheckCircle, ChevronDown, Plus, Monitor, Watch, Headphones, Speaker, MousePointerClick, Home, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Search, Share, UserPlus, Calendar, Heart, MapPin, CheckCircle, ChevronDown, Plus, Monitor, Watch, Headphones, Speaker, MousePointerClick, Home, AlertCircle } from '@/components/ui/platform-icons';
 import './vendor-details.css';
 import { useAppDispatch, useAppSelector, useWishlist } from '@/lib/hooks';
 import { addItemToCartApi } from '@/lib/features/cart/cartSlice';
@@ -132,13 +133,7 @@ export default function VendorPage({ params }: VendorPageProps) {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <svg
-        key={i}
-        className={`w-3.5 h-3.5 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'}`}
-        viewBox="0 0 24 24"
-      >
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
+      <PlatformStar key={i} className={`w-3.5 h-3.5 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`} weight="fill" aria-hidden="true" />
     ));
   };
 

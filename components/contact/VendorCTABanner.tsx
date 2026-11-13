@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Store, ArrowRight } from 'lucide-react';
+import { Store, ArrowRight } from '@/components/ui/platform-icons';
 import FadeInSection from '@/components/FadeInSection';
 
 export default function VendorCTABanner() {

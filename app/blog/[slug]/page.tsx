@@ -2,7 +2,7 @@
 
 import React, { use, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clock, Tag, Calendar, BookOpen, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, Calendar, BookOpen, ArrowRight } from '@/components/ui/platform-icons';
 import FadeInSection from '@/components/FadeInSection';
 import { blogApi, decodeHtmlEntities } from '@/lib/api-blog';
 

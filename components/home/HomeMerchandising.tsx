@@ -16,6 +16,7 @@ import {
   homepageDepartments,
 } from '@/lib/data/departments';
 import ProductCard from './ProductCard';
+import ProductRowSkeleton from './ProductRowSkeleton';
 import DepartmentShelves from './DepartmentShelves';
 import { useHomeShelves } from '@/lib/use-home-shelves';
 
@@ -26,6 +27,7 @@ function Shelf({
   id,
   children,
   href,
+  loading = false,
 }: {
   title: string;
   items: CatalogItem[];
@@ -33,11 +35,13 @@ function Shelf({
   id?: string;
   children?: ReactNode;
   href?: string;
+  loading?: boolean;
 }) {
   return (
     <MarketplaceRail
       title={title}
       products
+      loading={loading && !items.length}
       id={id}
       caption={children}
       href={href}
@@ -47,6 +51,8 @@ function Shelf({
         items
           .slice(0, 10)
           .map((item) => <ProductCard key={item.id} product={item} />)
+      ) : loading ? (
+        <ProductRowSkeleton />
       ) : (
         <p>{empty}</p>
       )}
@@ -127,19 +133,13 @@ export default function HomeMerchandising({
       id="special-offers"
       title="Flash sales & special offers"
       items={offers}
+      loading={offerCatalog.state === 'loading'}
       empty={offerMessage}
     >
       {Number.isFinite(end) && <SaleClock end={end} />}
     </Shelf>
   );
-  if (state !== 'ready')
-    return (
-      <>
-        {offerShelf}
-        {children}
-        <DepartmentShelves shelves={departmentShelves} />
-      </>
-    );
+  const catalogError = state === 'error' ? 'Products are temporarily unavailable.' : null;
   const newest = [...items].sort((a, b) => b.added - a.added);
   const popular = [...items].sort(
     (a, b) => b.sold - a.sold || b.reviewCount - a.reviewCount
@@ -194,14 +194,16 @@ export default function HomeMerchandising({
       {offerShelf}
       <Shelf
         title="Trending now"
+        loading={state === 'loading'}
         items={popular}
-        empty="Popular products will appear here."
+        empty={catalogError ?? 'Popular products will appear here.'}
       />
       {children}
       <Shelf
         title="Featured products"
+        loading={state === 'loading'}
         items={featured}
-        empty="Our next selection is on its way."
+        empty={catalogError ?? 'Our next selection is on its way.'}
       />
       {spotlight.map((name) => {
         const slug = departmentSlug(name);
@@ -218,17 +220,19 @@ export default function HomeMerchandising({
       <DepartmentShelves shelves={departmentShelves} />
       <Shelf
         title="New arrivals"
+        loading={state === 'loading'}
         items={newest}
-        empty="New products will appear here."
+        empty={catalogError ?? 'New products will appear here.'}
       />
       <Shelf
         title="Recommended for you"
+        loading={state === 'loading'}
         items={
           related.length
             ? related
             : featured.slice(4).concat(featured.slice(0, 4))
         }
-        empty="Explore the marketplace to discover more products."
+        empty={catalogError ?? 'Explore the marketplace to discover more products.'}
       >
         <p className="ek-shelf-caption">
           {related.length

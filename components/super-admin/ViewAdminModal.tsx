@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle, Shield, Package, ShoppingBag, Users, BarChart3, Ban } from 'lucide-react';
+import { X, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle, Shield, Package, ShoppingBag, Users, BarChart3, Ban } from '@/components/ui/platform-icons';
 import { AdminUser } from './AdminTable';
 
 interface ViewAdminModalProps {

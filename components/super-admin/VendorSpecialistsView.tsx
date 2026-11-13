@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, Phone, MapPin, X, User,
   CheckCircle2, XCircle, Calendar, Clock, ToggleLeft, ToggleRight,
   AlertTriangle, Info, Truck,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import {
   vendorSpecialistApi,
   VendorSpecialist,

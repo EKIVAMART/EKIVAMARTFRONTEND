@@ -1,0 +1,10 @@
+.slot:focus-visible {
+  outline: 2px solid #22643e;
+  outline-offset: 0;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.slot[aria-invalid='true']:focus-visible {
+  outline-color: #b42318;
+}

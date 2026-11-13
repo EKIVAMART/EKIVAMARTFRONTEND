@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { authApi, type ApiError } from '@/lib/api';
 import { useAppDispatch } from '@/lib/hooks';
@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { setCredentials } from '@/lib/features/auth/authSlice';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@/components/ui/Button';
 
 const loginSchema = z.object({
@@ -61,7 +62,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [rateLimitInfo, setRateLimitInfo] = useState<{
     blocked: boolean;
     retryAfter?: number;
@@ -189,29 +189,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         />
 
         {/* Password Input */}
-        <Input
-          {...register('password')}
-          type={showPassword ? 'text' : 'password'}
-          label="Password"
-          placeholder="Enter your password"
-          icon={Lock}
-          error={errors.password?.message}
-          disabled={isSubmitting || rateLimitInfo.blocked}
-          autoComplete="current-password"
-          rightIcon={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="p-0.5 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              {showPassword ? (
-                <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-              ) : (
-                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-              )}
-            </button>
-          }
-        />
+        <PasswordInput
+            {...register('password')}
+            label="Password"
+            placeholder="Enter your password"
+            icon={Lock}
+            error={errors.password?.message}
+            disabled={isSubmitting || rateLimitInfo.blocked}
+            autoComplete="current-password"
+          />
 
         {/* Forgot Password */}
         <div className="flex justify-end -mt-1">

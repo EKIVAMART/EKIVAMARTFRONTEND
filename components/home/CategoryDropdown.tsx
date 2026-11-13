@@ -1,7 +1,8 @@
 'use client';
+import { ArrowRight as CategoryArrow } from '@/components/ui/platform-icons';
 
 import Image from 'next/image';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid } from '@/components/ui/platform-icons';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
@@ -119,9 +120,7 @@ export default function CategoryDropdown({ categories, onClose, anchorRef }: Cat
               className="mb-4 flex items-center gap-2 text-brand-700 hover:text-brand-800 group transition-all"
             >
               <span className="text-sm font-bold group-hover:underline">All {activeCategory?.name}</span>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-                <path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <CategoryArrow size={14} aria-hidden="true" />
             </Link>
 
             {activeCategory?.subcategories && activeCategory.subcategories.length > 0 ? (

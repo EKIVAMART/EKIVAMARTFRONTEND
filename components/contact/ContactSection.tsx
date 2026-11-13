@@ -1,249 +1,124 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { Mail, Send, CheckCircle2, AlertCircle, ArrowRight, Phone, Clock, MapPin, ExternalLink } from 'lucide-react';
-import FadeInSection from '@/components/FadeInSection';
-import FloatInput from './shared/FloatInput';
-import FloatTextarea from './shared/FloatTextarea';
-import CategorySelector from './shared/CategorySelector';
-import CopyButton from './shared/CopyButton';
-import { FormState, Category, SOCIALS } from './shared/types';
+import { ArrowRight, CheckCircle2, Loader2 } from '@/components/ui/platform-icons';
+import { API_BASE_URL } from '@/lib/axios';
+import styles from '@/app/contact-us/contact.module.css';
 
-/* ─── CONTACT INFO CARD ─── */
-const ContactInfoCard = ({
-  icon: Icon,
-  label,
-  value,
-  href,
-  copyable,
-  delay,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  href?: string;
-  copyable?: boolean;
-  delay: number;
-}) => (
-  <FadeInSection type="fadeUp" delay={delay}>
-    <div className="group flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-[#bfd4bc] hover:border-[#1c711c]/60 hover:shadow-lg transition-all duration-300">
-      <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-md shadow-[#48824d30]">
-        <Icon size={18} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-[3px] text-[#1c711c] mb-1">{label}</p>
-        <div className="flex items-center flex-wrap gap-1">
-          {href ? (
-            <a
-              href={href}
-              className="text-[14px] sm:text-[15px] font-semibold text-[#203c29] hover:text-[#228b22] transition-colors break-all"
-            >
-              {value}
-            </a>
-          ) : (
-            <span className="text-[14px] sm:text-[15px] font-semibold text-[#203c29]">{value}</span>
-          )}
-          {copyable && <CopyButton value={value} />}
-        </div>
-      </div>
-    </div>
-  </FadeInSection>
-);
-
-/* ─── OFFICE CARD ─── */
-/* ─── MAIN CONTACT FORM ─── */
-const ContactForm = () => {
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', orderId: '', subject: '', message: '',
-  });
-  const [category, setCategory] = useState<Category>('');
-  const [errors, setErrors] = useState<Partial<typeof form & { category: string }>>({});
-  const [status, setStatus] = useState<FormState>('idle');
-
-  const set = (k: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm((p) => ({ ...p, [k]: e.target.value }));
-
-  const validate = () => {
-    const e: typeof errors = {};
-    if (!form.name.trim()) e.name = 'Please enter your name';
-    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      e.email = 'Enter a valid email address';
-    if (!category) e.category = 'Please select a reason';
-    if (!form.message.trim() || form.message.length < 20)
-      e.message = 'Please describe your issue (min 20 characters)';
-    return e;
-  };
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    setErrors({});
-    setStatus('submitting');
-    await new Promise((r) => setTimeout(r, 1800));
-    setStatus('success');
-  };
-
-  if (status === 'success') {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center gap-6">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center shadow-2xl shadow-[#48824d30]">
-          <CheckCircle2 size={38} className="text-white" />
-        </div>
-        <div>
-          <h3
-            className="text-3xl font-extrabold text-[#203c29] mb-2"
-            style={{ fontFamily: "'Georgia', serif" }}
-          >
-            Message received!
-          </h3>
-          <p className="text-gray-500 max-w-xs leading-relaxed">
-            We'll get back to you at{' '}
-            <span className="text-[#228b22] font-semibold">{form.email}</span> within 24 hours.
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            setStatus('idle');
-            setForm({ name: '', email: '', phone: '', orderId: '', subject: '', message: '' });
-            setCategory('');
-          }}
-          className="inline-flex items-center gap-2 text-sm font-bold text-[#228b22] hover:text-[#1c711c] transition-colors"
-        >
-          <ArrowRight size={14} className="rotate-180" /> Send another message
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={submit} noValidate className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FloatInput label="Full Name *" value={form.name} onChange={set('name')} error={errors.name} autoComplete="name" />
-        <FloatInput label="Email Address *" type="email" value={form.email} onChange={set('email')} error={errors.email} autoComplete="email" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FloatInput label="Phone Number (optional)" type="tel" value={form.phone} onChange={set('phone')} autoComplete="tel" />
-        <FloatInput label="Order ID (if applicable)" value={form.orderId} onChange={set('orderId')} />
-      </div>
-      <CategorySelector value={category} onChange={setCategory} />
-      {errors.category && (
-        <p className="flex items-center gap-1 text-xs text-red-500 -mt-3">
-          <AlertCircle size={11} /> {errors.category}
-        </p>
-      )}
-      <FloatInput label="Subject" value={form.subject} onChange={set('subject')} />
-      <FloatTextarea label="Your Message *" value={form.message} onChange={set('message')} error={errors.message} />
-      <div className="flex items-start gap-3 text-xs text-gray-500 border border-dashed border-[#bfd4bc] rounded-xl px-4 py-3 bg-[#f7f9f5]">
-        <Mail size={13} className="text-[#1c711c] mt-0.5 flex-shrink-0" />
-        <span>
-          Need to share a screenshot or invoice? Email us directly at{' '}
-          <a href="mailto:support@faflora.com" className="text-[#228b22] font-semibold hover:underline">
-            support@faflora.com
-          </a>{' '}
-          with your attachments.
-        </span>
-      </div>
-      <button
-        type="submit"
-        disabled={status === 'submitting'}
-        className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-extrabold text-base px-8 py-4 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-[#48824d30] disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {status === 'submitting' ? (
-          <>
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            Sending…
-          </>
-        ) : (
-          <>Send Message <Send size={18} /></>
-        )}
-      </button>
-      <p className="text-center text-[11px] text-gray-400 leading-relaxed">
-        By submitting this form you agree to our{' '}
-        <Link href="/privacy-policy" className="text-[#228b22] hover:underline">Privacy Policy</Link>.
-        {' '}We never share your data with third parties.
-      </p>
-    </form>
-  );
-};
+const emptyForm = { fullName: '', email: '', phoneNumber: '', message: '' };
+type ContactForm = typeof emptyForm;
+type FieldErrors = Partial<Record<keyof ContactForm, string>>;
 
 export default function ContactSection() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 lg:gap-14 items-start h-full">
-      {/* LEFT: Form */}
-      <div className="flex flex-col h-full">
-        <FadeInSection type="slideLeft" delay={0.1}>
-          <div className="mb-8">
-            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-1">
-              Send a message
-            </span>
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#203c29] leading-tight"
-              style={{ fontFamily: "'Georgia', serif" }}
-            >
-              Tell us what's on<br />your mind.
-            </h2>
-            <p className="mt-3 text-gray-500 text-[15px] leading-relaxed max-w-md">
-              Fill in the form below and we'll route your message to the right team. Typical reply time is under 24 hours.
-            </p>
-          </div>
-        </FadeInSection>
+  const [form, setForm] = useState<ContactForm>(emptyForm);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+  const [submitError, setSubmitError] = useState('');
+  const sending = useRef(false);
+  const successHeading = useRef<HTMLHeadingElement>(null);
 
-        <FadeInSection type="fadeUp" delay={0.18} className="flex-1 flex flex-col">
-          <div className="bg-white border border-[#bfd4bc] rounded-3xl p-6 sm:p-8 md:p-9 shadow-sm hover:shadow-lg transition-shadow duration-500 flex-1">
-            <ContactForm />
-          </div>
-        </FadeInSection>
-      </div>
+  useEffect(() => {
+    if (status === 'success') successHeading.current?.focus();
+  }, [status]);
 
-      {/* RIGHT: Contact Info + Office + Social */}
-      <div className="flex flex-col h-full space-y-6 sm:space-y-8">
-        <FadeInSection type="slideRight" delay={0.12}>
-          <div>
-            <span className="block text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-4">
-              Direct Channels
-            </span>
-            <div className="space-y-3">
-              <ContactInfoCard icon={Phone} label="Phone / WhatsApp" value="+234 906 991 0407" href="https://wa.me/2349069910407" copyable delay={0.22} />
-            </div>
-          </div>
-        </FadeInSection>
+  function update(field: keyof ContactForm, value: string) {
+    setForm(current => ({ ...current, [field]: value }));
+    setErrors(current => ({ ...current, [field]: undefined }));
+    setSubmitError('');
+  }
 
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (sending.current) return;
+    const payload = {
+      fullName: form.fullName.trim(),
+      email: form.email.trim(),
+      phoneNumber: form.phoneNumber.trim(),
+      message: form.message.trim(),
+    };
+    const nextErrors: FieldErrors = {};
+    if (payload.fullName.length < 2 || payload.fullName.length > 150) nextErrors.fullName = 'Enter your name (2–150 characters).';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email) || payload.email.length > 255) nextErrors.email = 'Enter a valid email address.';
+    if (payload.phoneNumber.length < 7 || payload.phoneNumber.length > 25) nextErrors.phoneNumber = 'Enter a phone number (7–25 characters).';
+    if (payload.message.length < 10 || payload.message.length > 3000) nextErrors.message = 'Enter a message between 10 and 3,000 characters.';
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      const field = event.currentTarget.elements.namedItem(Object.keys(nextErrors)[0]);
+      if (field instanceof HTMLElement) field.focus();
+      return;
+    }
+    sending.current = true;
+    setStatus('sending');
+    setSubmitError('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(30000),
+      });
+      const result = await response.json();
+      if (!response.ok || result?.success !== true) {
+        throw new Error(response.status === 429
+          ? 'Too many messages. Please wait 15 minutes before trying again.'
+          : 'We couldn’t send your message. Please try again or contact us on WhatsApp.');
+      }
+      setStatus('success');
+    } catch (error) {
+      setStatus('idle');
+      setSubmitError(error instanceof Error && error.name === 'TimeoutError'
+        ? 'We couldn’t confirm whether your message arrived. Please contact us on WhatsApp.'
+        : error instanceof Error && error.message.startsWith('Too many messages.')
+          ? error.message
+          : 'We couldn’t confirm your message was sent. Please try again or contact us on WhatsApp.');
+    } finally {
+      sending.current = false;
+    }
+  }
 
-
-        <FadeInSection type="fadeUp" delay={0.38}>
-          <div className="rounded-2xl border border-[#bfd4bc] bg-white p-5 sm:p-6 flex-1">
-            <p className="text-[10px] font-black uppercase tracking-[4px] text-[#1c711c] mb-4">
-              Find Us Online
-            </p>
-            <div className="flex flex-col gap-2">
-              {SOCIALS.map(({ label, icon: Icon, href, handle }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#bfd4bc] hover:border-[#1c711c]/60 hover:bg-[#f7f9f5] transition-all group"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white flex-shrink-0">
-                    <Icon size={14} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#203c29] group-hover:text-[#228b22] transition-colors text-[13px] leading-tight">{label}</p>
-                    <p className="text-gray-400 text-[11px]">{handle}</p>
-                  </div>
-                  <ExternalLink size={13} className="text-[#1c711c]/40 group-hover:text-[#1c711c] transition-colors flex-shrink-0" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </FadeInSection>
-      </div>
+  if (status === 'success') return (
+    <div className={styles.success} role="status">
+      <CheckCircle2 size={30} strokeWidth={1.6} aria-hidden="true" />
+      <h3 ref={successHeading} tabIndex={-1}>Message received</h3>
+      <p>Thank you for getting in touch. Our team will reply to <strong>{form.email.trim()}</strong>.</p>
+      <button type="button" onClick={() => { setForm(emptyForm); setStatus('idle'); }}>Send another message <ArrowRight size={16} aria-hidden="true" /></button>
     </div>
+  );
+
+  return (
+    <form onSubmit={submit} noValidate className={styles.form} aria-label="Contact support" aria-busy={status === 'sending'}>
+      <fieldset disabled={status === 'sending'}>
+        <legend className="sr-only">Your contact details and message</legend>
+        <div className={styles.fieldGrid}>
+          {([
+            ['fullName', 'Full name', 'text', 'name', 150],
+            ['email', 'Email address', 'email', 'email', 255],
+          ] as const).map(([name, label, type, autoComplete, maxLength]) => (
+            <div className={styles.field} key={name}>
+              <label htmlFor={`contact-${name}`}>{label}</label>
+              <input id={`contact-${name}`} name={name} type={type} autoComplete={autoComplete} required maxLength={maxLength} value={form[name]} onChange={event => update(name, event.target.value)} aria-invalid={Boolean(errors[name])} aria-describedby={errors[name] ? `contact-${name}-error` : undefined} />
+              {errors[name] && <p id={`contact-${name}-error`} className={styles.fieldError}>{errors[name]}</p>}
+            </div>
+          ))}
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="contact-phoneNumber">Phone number</label>
+          <input id="contact-phoneNumber" name="phoneNumber" type="tel" autoComplete="tel" required maxLength={25} value={form.phoneNumber} onChange={event => update('phoneNumber', event.target.value)} aria-invalid={Boolean(errors.phoneNumber)} aria-describedby={errors.phoneNumber ? 'contact-phone-error' : undefined} />
+          {errors.phoneNumber && <p id="contact-phone-error" className={styles.fieldError}>{errors.phoneNumber}</p>}
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="contact-message">Your message</label>
+          <textarea id="contact-message" name="message" rows={5} required maxLength={3000} value={form.message} onChange={event => update('message', event.target.value)} aria-invalid={Boolean(errors.message)} aria-describedby={`contact-message-hint${errors.message ? ' contact-message-error' : ''}`} />
+          <div className={styles.messageHint}><span id="contact-message-hint">Include your order reference, if relevant.</span><span>{form.message.length.toLocaleString()} / 3,000</span></div>
+          {errors.message && <p id="contact-message-error" className={styles.fieldError}>{errors.message}</p>}
+        </div>
+        {submitError && <p role="alert" className={styles.submitError}>{submitError}</p>}
+        <div className={styles.formActions}>
+          <p>Read our <Link href="/privacy-policy">privacy policy</Link> to learn how we handle your information.</p>
+          <button type="submit" disabled={status === 'sending'}>{status === 'sending' ? <>Sending… <Loader2 size={16} className={styles.spinner} aria-hidden="true" /></> : <>Send message <ArrowRight size={16} aria-hidden="true" /></>}</button>
+        </div>
+      </fieldset>
+    </form>
   );
 }

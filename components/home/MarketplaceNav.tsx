@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Store } from 'lucide-react';
+import { Store } from '@/components/ui/platform-icons';
 import ExploreMenu from './ExploreMenu';
 
 export default function MarketplaceNav() {

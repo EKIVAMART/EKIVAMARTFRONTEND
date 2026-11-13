@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box, MapPin } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Tag, Package, ShieldCheck, RefreshCcw, Info, Box, MapPin } from '@/components/ui/platform-icons';
 import ProductReviewsPanel from '@/components/admin/ProductReviewsPanel';
 
 const parseMarkdownToHtml = (markdown: string): string => {

@@ -4,7 +4,7 @@ import { useEffect, type MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
-const widget = '6a8ccce732c63a3448b62764/1k0r00qf1';
+const widget = '6af433d11c3ead3c3ea9687a/default';
 
 function ChatMascot() {
   return (

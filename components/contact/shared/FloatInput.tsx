@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '@/components/ui/platform-icons';
 
 interface FloatInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;

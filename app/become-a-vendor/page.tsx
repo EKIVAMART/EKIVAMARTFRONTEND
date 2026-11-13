@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, ClipboardList, Package, Store, Truck } from 'lucide-react';
+import { ArrowRight, ClipboardList, Package, Store, Truck } from '@/components/ui/platform-icons';
 
 export const metadata = {
   title: 'Sell on EkivaMart | EkivaMart',

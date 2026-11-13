@@ -1,4 +1,4 @@
-import { HelpCircle, Upload } from 'lucide-react';
+import { HelpCircle, Upload } from '@/components/ui/platform-icons';
 
 type InputGroupProps = {
   label: string;

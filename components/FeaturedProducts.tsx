@@ -3,7 +3,7 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@/components/ui/platform-icons';
 import { assets } from '@/assets/assets';
 import ProductCard from './ProductCard';
 import { productApi } from '@/lib/api';

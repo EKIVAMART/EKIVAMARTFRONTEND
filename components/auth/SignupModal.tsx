@@ -1,16 +1,18 @@
 'use client';
+import { AlertCircle as PlatformAlertCircle } from '@/components/ui/platform-icons';
 
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, Phone, User } from 'lucide-react';
+import { Mail, Lock, Phone, User } from '@/components/ui/platform-icons';
 import PhoneInput from 'react-phone-number-input';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import toast from 'react-hot-toast';
 import { authApi } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@/components/ui/Button';
 import { PasswordStrength } from './PasswordStrength';
 import { EmailVerificationModal } from './EmailVerificationModal';
@@ -75,8 +77,6 @@ export const SignupModal: React.FC<SignupModalProps> = ({
   onClose,
   onSwitchToLogin,
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [socialSubmitting, setSocialSubmitting] =
@@ -211,56 +211,28 @@ export const SignupModal: React.FC<SignupModalProps> = ({
           />
 
           {/* Password */}
-          <Input
+          <PasswordInput
             {...register('password')}
-            type={showPassword ? 'text' : 'password'}
             label="Password"
             placeholder="Create a strong password"
             icon={Lock}
             error={errors.password?.message}
             disabled={isSubmitting}
             autoComplete="new-password"
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400" />
-                ) : (
-                  <Eye className="w-5 h-5 text-gray-400" />
-                )}
-              </button>
-            }
           />
 
           {/* Password Strength */}
           {password && <PasswordStrength password={password} />}
 
           {/* Confirm Password */}
-          <Input
+          <PasswordInput
             {...register('confirmPassword')}
-            type={showConfirmPassword ? 'text' : 'password'}
             label="Confirm password"
             placeholder="Confirm your password"
             icon={Lock}
             error={errors.confirmPassword?.message}
             disabled={isSubmitting}
             autoComplete="new-password"
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400" />
-                ) : (
-                  <Eye className="w-5 h-5 text-gray-400" />
-                )}
-              </button>
-            }
           />
 
           {/* Phone Number */}
@@ -288,17 +260,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({
                 />
                 {fieldState.error && (
                   <p className="text-xs text-red-600 flex items-center gap-1 sm:gap-1.5 animate-in slide-in-from-top-1 duration-200">
-                    <svg
-                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <PlatformAlertCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" aria-hidden="true" />
                     {fieldState.error.message}
                   </p>
                 )}

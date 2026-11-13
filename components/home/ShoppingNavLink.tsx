@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart } from '@/components/ui/platform-icons';
 import Link from 'next/link';
 
 type ShoppingNavLinkProps = {

@@ -1,6 +1,6 @@
 import FormWrapper from './FormWrapper';
 import { InputGroup } from './FormInputs';
-import { FileCheck, Info, RotateCcw, Lock } from 'lucide-react';
+import { FileCheck, Info, RotateCcw, Lock } from '@/components/ui/platform-icons';
 
 interface Props {
   onPrev: () => void;

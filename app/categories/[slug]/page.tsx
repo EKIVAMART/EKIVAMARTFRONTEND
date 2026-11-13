@@ -7,10 +7,11 @@ import ProductCard from '@/components/home/ProductCard';
 import { departmentSlug } from '@/lib/data/departments';
 import CategoriesGrid from '@/components/CategoriesGrid';
 import ProductFilters from '@/components/ProductFilters';
+import { Modal } from '@/components/ui/Modal';
 import { categoryApi, productApi } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
-import { ChevronLeft, ChevronRight, Package, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package, SlidersHorizontal } from '@/components/ui/platform-icons';
 
 interface Rating {
   id: string;
@@ -43,6 +44,7 @@ interface Product {
 }
 
 export default function CategoryPage() {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -524,6 +526,35 @@ export default function CategoryPage() {
     return activeCategory?.name || (slug === 'shop' || slug === 'all' ? 'All Products' : slug.charAt(0).toUpperCase() + slug.slice(1));
   })();
 
+  const filterControls = (<ProductFilters
+                rating={selectedRating}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                globalMin={globalMin}
+                globalMax={globalMax}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                inStockOnly={inStockOnly}
+                onPriceChange={(min, max) => {
+                  setMinPrice(min);
+                  setMaxPrice(max);
+                  setPage(1);
+                }}
+                onRatingChange={(rating) => {
+                  setSelectedRating(rating);
+                  setPage(1);
+                }}
+                onSortChange={(sBy, sOrder) => {
+                  setSortBy(sBy);
+                  setSortOrder(sOrder);
+                  setPage(1);
+                }}
+                onInStockOnlyChange={(val) => {
+                  setInStockOnly(val);
+                  setPage(1);
+                }}
+              />);
+
   // Normalization for matching slugs
   const getSlug = (name: string) =>
     name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
@@ -607,6 +638,11 @@ export default function CategoryPage() {
           </div>
         )}
 
+        <button type="button" onClick={() => setFiltersOpen(true)} className="mb-5 flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-4 text-sm text-stone-800 lg:hidden"><SlidersHorizontal size={18} aria-hidden="true" />Filter and sort</button>
+        <Modal isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filter and sort" size="md" footer={<button type="button" onClick={() => setFiltersOpen(false)} className="min-h-11 w-full rounded-md bg-[#183d27] px-4 text-sm font-semibold text-white">Show results</button>}>
+          {filterControls}
+        </Modal>
+
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
@@ -619,33 +655,7 @@ export default function CategoryPage() {
 
             {/* Price, Rating, Sort & In-Stock filters */}
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-              <ProductFilters
-                minPrice={minPrice}
-                maxPrice={maxPrice}
-                globalMin={globalMin}
-                globalMax={globalMax}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
-                inStockOnly={inStockOnly}
-                onPriceChange={(min, max) => {
-                  setMinPrice(min);
-                  setMaxPrice(max);
-                  setPage(1);
-                }}
-                onRatingChange={(rating) => {
-                  setSelectedRating(rating);
-                  setPage(1);
-                }}
-                onSortChange={(sBy, sOrder) => {
-                  setSortBy(sBy);
-                  setSortOrder(sOrder);
-                  setPage(1);
-                }}
-                onInStockOnlyChange={(val) => {
-                  setInStockOnly(val);
-                  setPage(1);
-                }}
-              />
+              {filterControls}
             </div>
           </aside>
 
@@ -798,17 +808,14 @@ export default function CategoryPage() {
               </>
             ) : (
               <div className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center max-w-lg mx-auto mt-8">
-                <div className="inline-flex p-4 rounded-full bg-stone-50 text-[#228b22] mb-4">
+                <div className="inline-flex text-[#657065] mb-4">
                   <Package size={48} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">No Products Found</h3>
                 <p className="text-gray-500 text-sm mb-6">
                   We couldn&apos;t find any published products matching this selection in our category catalog.
                 </p>
-                <div className="flex justify-center gap-2">
-                  <Sparkles size={16} className="text-stone-400 animate-pulse" />
-                  <span className="text-xs font-semibold text-stone-600 uppercase tracking-widest">New Arrivals Soon!</span>
-                </div>
+
               </div>
             )}
           </section>

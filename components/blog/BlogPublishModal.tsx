@@ -12,7 +12,7 @@ import {
   Loader2,
   CheckCircle2,
   Sparkles,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import {
   AdminBlogPost,
   BlogNotificationAudience,

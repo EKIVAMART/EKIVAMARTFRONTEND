@@ -1,7 +1,7 @@
 import RecordStatus from "@/components/admin/RecordStatus";
 import RecordActions from '@/components/admin/RecordActions';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Search, RefreshCw, Store, MapPin, DollarSign, Tag } from 'lucide-react';
+import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Search, RefreshCw, Store, MapPin, DollarSign, Tag } from '@/components/ui/platform-icons';
 import { ordersApi } from '@/lib/api';
 import { adminVendorApi } from '@/lib/api-vendor';
 import { toast } from 'react-hot-toast';

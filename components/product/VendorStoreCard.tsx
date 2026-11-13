@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Star, ChevronRight, Calendar } from 'lucide-react';
+import { Star, ChevronRight, Calendar } from '@/components/ui/platform-icons';
 import { storePublicApi, productApi } from '@/lib/api';
 
 interface VendorStoreCardProps {

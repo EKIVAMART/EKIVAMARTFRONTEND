@@ -1,4 +1,5 @@
 'use client';
+import { CurrencyNgn as PlatformCurrencyNgn } from '@/components/ui/platform-icons';
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import {
   ShoppingBag, Calendar, MapPin, CreditCard, ChevronRight, Package, ArrowLeft,
   XCircle, RotateCcw, AlertTriangle, Truck, DollarSign, Clock, HelpCircle,
   AlertCircle, ShieldCheck, FileText, ChevronDown, CheckCircle2, MessageCircle
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { ordersApi, ExpectedDelivery } from '@/lib/api';
 import { deliveryCopy, daysUntil } from '@/lib/utils/delivery';
 import toast from 'react-hot-toast';
@@ -26,9 +27,7 @@ const statusSteps = [
 
 function NairaIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
-    </svg>
+    <PlatformCurrencyNgn size={size} aria-hidden="true" />
   );
 }
 

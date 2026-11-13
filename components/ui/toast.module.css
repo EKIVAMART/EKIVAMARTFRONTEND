@@ -1,0 +1,10 @@
+.card { width: min(400px, calc(100vw - 24px)); }
+.icon { display: flex; align-items: center; flex-shrink: 0; color: #526152; }
+.icon:empty { display: none; }
+.message { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+.message > div { justify-content: flex-start; margin-inline: 10px; }
+.close { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; color: #657065; border-radius: 6px; }
+.close:hover { color: #22643e; }
+.loading { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .card, .loading { animation: none !important; transition: none !important; } }

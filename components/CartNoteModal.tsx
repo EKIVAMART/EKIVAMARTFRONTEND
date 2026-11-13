@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { closeNoteModal, addItemToCartApi } from '@/lib/features/cart/cartSlice';
-import { MessageSquare, Check, X } from 'lucide-react';
+import { MessageSquare, Check, X } from '@/components/ui/platform-icons';
 
 export default function CartNoteModal() {
   const dispatch = useAppDispatch();

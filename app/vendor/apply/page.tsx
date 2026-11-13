@@ -38,7 +38,7 @@ import {
   Download,
   Ban,
   Tag,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { FaInstagram, FaFacebookF } from 'react-icons/fa';
 import { FaXTwitter, FaTiktok } from 'react-icons/fa6';
 import { useAppSelector } from '@/lib/hooks';

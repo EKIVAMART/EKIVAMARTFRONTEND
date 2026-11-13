@@ -1,14 +1,5 @@
-import CartPage from '@/components/CartPage'
-import HeroSubscribe from '@/components/HeroSubscribe'
-import React from 'react'
+import PageContent from '@/components/CartPage';
 
-const page = () => {
-  return (
-    <div>
-        <CartPage/>
-        <HeroSubscribe/>
-    </div>
-  )
+export default function Page() {
+  return <PageContent />;
 }
-
-export default page

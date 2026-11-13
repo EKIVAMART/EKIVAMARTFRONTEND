@@ -1,7 +1,8 @@
 'use client';
+import { Star as PlatformStar, StarHalf as PlatformStarHalf } from '@/components/ui/platform-icons';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
-import { Heart, ShoppingCart, MapPin, Plus } from 'lucide-react';
+import { Heart, ShoppingCart, MapPin, Plus } from '@/components/ui/platform-icons';
 import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
 import { addWishlistItem, removeWishlistItem } from '@/lib/features/wishlist/wishlistSlice';
 import { openNoteModal } from '@/lib/features/cart/cartSlice';
@@ -97,36 +98,13 @@ export default function ProductCard({
           <div className="pc-stars-container">
             <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
               {Array.from({ length: fullStars }).map((_, i) => (
-                <svg
-                  key={'f' + i}
-                  viewBox="0 0 24 24"
-                  className="star star-filled"
-                >
-                  <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-                </svg>
+                <PlatformStar key={'f' + i} className="star star-filled" weight="fill" aria-hidden="true" />
               ))}
               {halfStar && (
-                <svg viewBox="0 0 24 24" className="star star-half">
-                  <defs>
-                    <linearGradient id="halfGrad">
-                      <stop offset="50%" stopColor="#fb923c" />
-                      <stop offset="50%" stopColor="#e6e6e6" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    fill="url(#halfGrad)"
-                    d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z"
-                  />
-                </svg>
+                <PlatformStarHalf className="star star-half" weight="fill" aria-hidden="true" />
               )}
               {Array.from({ length: emptyStars }).map((_, i) => (
-                <svg
-                  key={'e' + i}
-                  viewBox="0 0 24 24"
-                  className="star star-empty"
-                >
-                  <path d="M12 .587l3.668 7.431L23 9.75l-5.5 5.357L18.834 24 12 19.897 5.166 24l1.334-8.893L1 9.75l7.332-1.732z" />
-                </svg>
+                <PlatformStar key={'e' + i} className="star star-empty" weight="regular" aria-hidden="true" />
               ))}
             </div>
             <span className="pc-rating-num">({rating})</span>

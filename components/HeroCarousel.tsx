@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Sparkles, Shield, ChevronRight as ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Shield, ChevronRight as ArrowRight } from '@/components/ui/platform-icons';
 import TypingText from '@/components/TypingText';
 import FadeInSection from '@/components/FadeInSection';
 import BuyerHero from '@/assets/Buyer-hero.png';

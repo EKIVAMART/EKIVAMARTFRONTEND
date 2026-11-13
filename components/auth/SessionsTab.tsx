@@ -10,7 +10,7 @@ import {
   Clock,
   AlertCircle,
   Loader2,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { authApi } from '@/lib/api';
 
 interface Session {

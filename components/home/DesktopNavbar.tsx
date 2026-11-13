@@ -1,7 +1,7 @@
 'use client';
 
 import ShoppingNavLink from './ShoppingNavLink';
-import { UserRound } from 'lucide-react';
+import { UserRound, Menu, Search } from '@/components/ui/platform-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -19,12 +19,7 @@ interface DesktopNavbarProps {
 
 function CollapseMenuIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-      <rect x="2" y="4" width="10" height="1.5" rx="0.75" fill="currentColor" />
-      <rect x="2" y="9.25" width="10" height="1.5" rx="0.75" fill="currentColor" />
-      <rect x="2" y="14.5" width="10" height="1.5" rx="0.75" fill="currentColor" />
-      <path d="M15 7l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <Menu size={20} aria-hidden="true" />
   );
 }
 
@@ -88,10 +83,7 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 hover:bg-brand-700 text-white mr-3 cursor-pointer active:scale-95 transition-all"
               aria-label="Search"
             >
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
-                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.6" />
-                <path d="M10 10.5L14 14.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
+              <Search size={15} aria-hidden="true" />
             </button>
           </div>
 

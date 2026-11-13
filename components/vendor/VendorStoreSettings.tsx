@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   Store, Camera, Image as ImageIcon, FileText, Palmtree, RefreshCw,
   AlertCircle, CheckCircle2, Save, UploadCloud, Loader2, Calendar, ShieldCheck, Tag, Star
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { toast } from 'react-hot-toast';
 
 interface StoreProfile {

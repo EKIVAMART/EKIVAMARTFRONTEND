@@ -1,4 +1,5 @@
 'use client';
+import { ChevronLeft as PlatformChevronLeft, ChevronRight as PlatformChevronRight, Pause as PlatformPause, Play as PlatformPlay } from '@/components/ui/platform-icons';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
@@ -120,16 +121,11 @@ const RowSkeleton = () => (
 );
 
 const PauseIcon = () => (
-  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-    <rect x="6" y="5" width="4" height="14" rx="1" />
-    <rect x="14" y="5" width="4" height="14" rx="1" />
-  </svg>
+  <PlatformPause className="w-4 h-4" weight="fill" aria-hidden="true" />
 );
 
 const PlayIcon = () => (
-  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-    <path d="M8 5v14l11-7z" />
-  </svg>
+  <PlatformPlay className="w-4 h-4" weight="fill" aria-hidden="true" />
 );
 
 export default function CategoryScroller() {
@@ -406,9 +402,7 @@ export default function CategoryScroller() {
           className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg items-center justify-center transition-all duration-200 hover:scale-110 border-2 border-purple-200/50 ml-2 md:ml-4"
           aria-label="Scroll categories left"
         >
-          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-          </svg>
+          <PlatformChevronLeft className="w-5 h-5 text-purple-600" aria-hidden="true" />
         </button>
 
         <button
@@ -416,9 +410,7 @@ export default function CategoryScroller() {
           className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg items-center justify-center transition-all duration-200 hover:scale-110 border-2 border-purple-200/50 mr-2 md:mr-4"
           aria-label="Scroll categories right"
         >
-          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-          </svg>
+          <PlatformChevronRight className="w-5 h-5 text-purple-600" aria-hidden="true" />
         </button>
 
         {/* Carousel Tracks */}

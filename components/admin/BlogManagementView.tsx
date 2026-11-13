@@ -24,7 +24,7 @@ import {
   Loader2,
   X,
   ArrowRight,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import {
   AdminBlogPost,
   AdminBlogPostSummary,

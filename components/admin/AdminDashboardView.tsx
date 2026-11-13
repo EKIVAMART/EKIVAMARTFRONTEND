@@ -11,7 +11,7 @@ import {
   ShoppingBag, Package, Users, Store, ChevronRight,
   RefreshCw, BarChart3, Clock, CheckCircle2, AlertCircle,
   TrendingDown, ShoppingCart, Filter, ArrowUpRight, FileText, Zap
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { useAppSelector } from '@/lib/hooks';
 import {
   adminDashboardApi,

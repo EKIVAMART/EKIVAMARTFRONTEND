@@ -1,7 +1,9 @@
 'use client';
 
+import { PasswordInput } from '@/components/ui/password-input';
+
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from '@/components/ui/platform-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,7 +16,6 @@ const ALLOWED_ROLES = ['ADMIN', 'admin', 'SUPER-ADMIN', 'super-admin'];
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -142,30 +143,13 @@ export default function AdminLoginPage() {
               <label htmlFor="admin-password" className="text-sm font-medium text-slate-700 block">Password</label>
               <Link href="/contact-us" className="text-xs font-semibold text-[#228b22] hover:text-[#1c711c] transition-colors">Need help?</Link>
             </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock size={18} className="text-slate-400" />
-              </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="admin-password"
+            <PasswordInput label="" id="admin-password"
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                className="min-h-12 w-full rounded-lg border border-slate-200 bg-white py-3 pl-10 pr-12 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-[#228b22] focus:ring-4 focus:ring-[#228b22]/10"
                 placeholder="••••••••"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-slate-400 transition-colors hover:text-slate-600"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+                disabled={isLoading} />
           </div>
 
           <button
