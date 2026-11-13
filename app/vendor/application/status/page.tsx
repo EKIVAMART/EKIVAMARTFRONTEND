@@ -27,7 +27,7 @@ import {
   CreditCard,
   ChevronDown,
   Ban
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import {
   vendorApi,
   saveMockData,

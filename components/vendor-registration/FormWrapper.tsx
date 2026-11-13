@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check } from '@/components/ui/platform-icons';
 
 interface Props {
   children: React.ReactNode;

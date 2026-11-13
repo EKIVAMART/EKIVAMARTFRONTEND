@@ -7,7 +7,7 @@ import {
   DialogTitle,
   Description,
 } from '@headlessui/react';
-import { X } from 'lucide-react';
+import { X } from '@/components/ui/platform-icons';
 
 type Confirmation = {
   message: string;

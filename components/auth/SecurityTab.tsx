@@ -9,7 +9,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { authApi } from '@/lib/api';
 import { PasswordStrength } from './PasswordStrength';
 

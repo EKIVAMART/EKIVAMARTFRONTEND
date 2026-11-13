@@ -6,7 +6,7 @@ import {
   Sun,
   Workflow,
   type LucideIcon,
-} from "lucide-react";
+} from '@/components/ui/platform-icons';
 
 type CoreValue = {
   title: string;

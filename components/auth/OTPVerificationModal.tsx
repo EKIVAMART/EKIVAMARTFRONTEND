@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Mail, ArrowLeft, RefreshCw } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
@@ -27,7 +27,7 @@ export const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
   const [isResending, setIsResending] = useState(false);
 
   const handleVerify = async () => {
-    if (otp.length !== 6) {
+    if (!/^\d{6}$/.test(otp)) {
       toast.error('Please enter a valid 6-digit code');
       return;
     }
@@ -77,7 +77,7 @@ export const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
       footer={
         <button
           onClick={onBack}
-          className="flex items-center justify-center gap-1.5 w-full text-sm font-semibold text-gray-600 hover:text-purple-600 transition-colors"
+          className="flex items-center justify-center gap-1.5 w-full text-sm font-semibold text-gray-600 hover:text-green-800 transition-colors"
         >
           <ArrowLeft size={16} />
           Back to forgot password
@@ -85,8 +85,8 @@ export const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
       }
     >
       <div className="flex flex-col items-center text-center mb-6 pt-2">
-        <div className="w-14 h-14 bg-gradient-to-r from-[#228b22] to-[#1c711c] rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
-          <Mail className="w-7 h-7 text-white stroke-[2.5]" />
+        <div className="flex items-center justify-center mb-4">
+          <Mail className="w-8 h-8 text-green-800 stroke-[1.6]" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           Check your email
@@ -114,7 +114,7 @@ export const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
           size="lg"
           className="w-full"
           loading={isVerifying}
-          disabled={otp.length !== 6 || isVerifying}
+          disabled={!/^\d{6}$/.test(otp) || isVerifying}
         >
           Verify Code
         </Button>
@@ -126,7 +126,7 @@ export const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
               type="button"
               onClick={handleResend}
               disabled={isResending}
-              className="font-semibold text-purple-600 hover:text-purple-500 transition-colors inline-flex items-center gap-1"
+              className="font-semibold text-green-800 hover:text-green-700 transition-colors inline-flex items-center gap-1"
             >
               {isResending ? (
                 <>

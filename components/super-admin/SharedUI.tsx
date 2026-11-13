@@ -1,5 +1,5 @@
 import type React from 'react';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle } from '@/components/ui/platform-icons';
 
 export const SidebarLink = ({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void }) => (
   <button type="button" aria-current={active ? 'page' : undefined} onClick={onClick}

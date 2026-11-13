@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notificationApi } from '@/lib/api/notifications';
 import { useNotifications } from '@/context/NotificationContext';
-import { Megaphone, X, AlertTriangle, Send, Loader2, CheckCircle2 } from 'lucide-react';
+import { Megaphone, X, AlertTriangle, Send, Loader2, CheckCircle2 } from '@/components/ui/platform-icons';
 import { toast } from 'react-hot-toast';
 
 interface AdminBroadcastModalProps {

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, XCircle, Loader2, ShoppingBag, ArrowRight, Truck } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ShoppingBag, ArrowRight, Truck } from '@/components/ui/platform-icons';
 import { useAppDispatch } from '@/lib/hooks';
 import { fetchCart, fetchCartCount, fetchCartSummary } from '@/lib/features/cart/cartSlice';
 import { ordersApi, ExpectedDelivery } from '@/lib/api';

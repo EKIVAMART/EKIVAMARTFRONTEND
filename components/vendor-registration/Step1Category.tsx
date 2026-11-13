@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Gamepad2,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 
 export default function Step1Category({ onNext }: { onNext: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);

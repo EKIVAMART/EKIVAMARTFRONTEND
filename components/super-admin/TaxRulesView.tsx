@@ -2,7 +2,7 @@
 import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useState, useEffect } from 'react';
-import { Percent, Plus, Trash2, Edit2, ShieldAlert, CheckCircle2, XCircle, RefreshCw, Globe } from 'lucide-react';
+import { Percent, Plus, Trash2, Edit2, ShieldAlert, CheckCircle2, XCircle, RefreshCw, Globe } from '@/components/ui/platform-icons';
 import { taxRuleApi, TaxRuleData } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';

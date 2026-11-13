@@ -1,11 +1,12 @@
 'use client';
+import { AlertTriangle as PlatformAlertTriangle } from '@/components/ui/platform-icons';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
-import { Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2 } from '@/components/ui/platform-icons';
 import { authApi, ApiError } from '@/lib/api';
 
 type InvitationStep = 'validating' | 'form' | 'success' | 'error';
@@ -145,9 +146,7 @@ export default function AdminInvitationPage() {
         <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-md border border-red-100">
-              <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <PlatformAlertTriangle className="w-12 h-12 text-red-500" aria-hidden="true" />
             </div>
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Invitation Error</h2>

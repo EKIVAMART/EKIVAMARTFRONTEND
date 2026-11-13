@@ -1,0 +1,32 @@
+.purposeCard {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(28px, 3.5vw, 44px);
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.vision { background: #173e2a; color: #fff; }
+.vision::after { content: ''; position: absolute; width: 240px; height: 240px; border: 1px solid #ffffff14; border-radius: 50%; right: -140px; top: -110px; box-shadow: 0 0 0 30px #ffffff06, 0 0 0 60px #ffffff04; pointer-events: none; }
+.mission { background: #fff; border: 1px solid #cbdccf; color: #173e2a; box-shadow: 0 12px 35px #173e2a08; }
+.purposeLabel { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.vision .purposeLabel { color: #b8df9e; }
+.purposeCard h3 { margin: 28px 0 18px; font-size: clamp(26px, 3vw, 37px); line-height: 1.14; letter-spacing: -.04em; font-weight: 500; }
+.purposeCard p { margin: 0 0 30px; font-size: 15px; line-height: 1.8; max-width: 46ch; }
+.vision p { color: #dae6de; }
+.mission p { color: #526258; }
+.signature { width: 100%; margin-top: auto; padding-top: 20px; border-top: 1px solid #ffffff30; font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+.mission .signature { border-color: #dfe9e2; }
+.valuesIntro { color: #647168; font-size: 15px; line-height: 1.7; margin: 12px auto 30px; max-width: 450px; }
+.valueCard { padding: 28px; background: #fff; border: 1px solid #e1e9e3; border-radius: 18px; box-shadow: 0 6px 20px #173e2a05; }
+.valueTop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+.valueIcon { display: inline-flex; align-items: center; color: #27633c; }
+.valueNumber { font-size: 12px; font-weight: 600; color: #829087; letter-spacing: .08em; }
+.valueCard h3 { margin: 0 0 12px; font-size: 20px; line-height: 1.3; letter-spacing: -.025em; color: #1c3525; font-weight: 600; }
+.valueCard p { margin: 0; font-size: 14px; line-height: 1.8; color: #5b685f; }
+@media (max-width: 767px) {
+  :global(.ek-about-purpose), :global(.ek-about-values) { grid-template-columns: 1fr; }
+  .purposeCard { padding: 28px; }
+  .valueCard { padding: 24px; }
+}

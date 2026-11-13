@@ -1,0 +1,14 @@
+.card { display: flex; flex-direction: column; pointer-events: none; }
+.card :is(.image, .price, .rating, .action, span) { background: #e9ede6 !important; border-radius: 3px; animation: breathe 1.8s ease-in-out infinite; }
+.image { aspect-ratio: 1; margin-bottom: 14px; }
+.name { height: 52px; margin-bottom: 4px; padding-top: 2px; }
+.name span { display: block; height: 12px; width: 92%; }
+.name span + span { margin-top: 8px; width: 66%; }
+.price { width: 48%; height: 24px; margin-bottom: 4px; }
+.rating { width: 64%; height: 14px; margin-bottom: 4px; }
+.details { display: grid; gap: 4px; margin-bottom: 12px; }
+.details span { height: 16px; width: 78%; }
+.details span + span { width: 50%; }
+.action { height: 32px; margin-top: auto; }
+@keyframes breathe { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .card :is(.image, .price, .rating, .action, span) { animation: none; } }

@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Filter,
   RefreshCw,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import type { AppNotification } from '@/types/notification';
 
 export default function NotificationsView() {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail } from 'lucide-react';
+import { Mail } from '@/components/ui/platform-icons';
 import Image from 'next/image';
 
 export default function HeroSubscribe() {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Upload, CheckCircle, AlertCircle } from '@/components/ui/platform-icons';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import { categoryApi, ApiError, requestUploadUrls, uploadFileToStorage } from '@/lib/api';

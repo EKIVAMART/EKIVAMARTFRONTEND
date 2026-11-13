@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Mail, AlertCircle, RefreshCw } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authApi } from '@/lib/api';
@@ -72,7 +72,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
 
   // Auto-submit when OTP is complete
   const handleVerify = useCallback(async () => {
-    if (otp.length !== 6) return;
+    if (!/^\d{6}$/.test(otp)) return;
 
     setLoading(true);
     setError('');
@@ -102,7 +102,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   }, [otp, email, onVerified]);
 
   useEffect(() => {
-    if (otp.length === 6 && !loading) {
+    if (/^\d{6}$/.test(otp) && !loading) {
       handleVerify();
     }
   }, [otp, loading, handleVerify]);
@@ -150,21 +150,8 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       size="md"
     >
       <div className="space-y-6">
-        {/* Email Icon */}
-        <div className="flex justify-center">
-          <div className="relative">
-            <div className="w-20 h-20 gradient-brand rounded-3xl flex items-center justify-center shadow-brand">
-              <Mail className="w-10 h-10 text-white" />
-            </div>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center border-4 border-white shadow-lg"
-            >
-              <CheckCircle2 className="w-4 h-4 text-white" />
-            </motion.div>
-          </div>
+        <div className="flex justify-center" aria-hidden="true">
+          <Mail className="h-8 w-8 text-green-800" strokeWidth={1.6} />
         </div>
 
         {/* Instructions */}
@@ -191,7 +178,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl"
+              className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg"
             >
               <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
               <p className="text-sm font-semibold text-red-800">{error}</p>
@@ -205,10 +192,10 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
           <div className="flex items-center justify-center gap-2">
             {expiresIn > 0 ? (
               <>
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-green-700" />
                 <p className="text-sm text-gray-600">
                   Code expires in{' '}
-                  <span className="font-bold text-purple-600">
+                  <span className="font-bold text-green-800">
                     {formatTime(expiresIn)}
                   </span>
                 </p>
@@ -228,7 +215,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
             {resendCooldown > 0 ? (
               <p className="text-sm text-gray-500">
                 Resend code in{' '}
-                <span className="font-bold text-purple-600">
+                <span className="font-bold text-green-800">
                   {resendCooldown}s
                 </span>
               </p>
@@ -254,7 +241,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
             <button
               onClick={handleResendOTP}
               disabled={resendCooldown > 0 || resendLoading}
-              className="text-purple-600 font-semibold hover:text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-green-800 font-semibold hover:text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               click here to resend
             </button>

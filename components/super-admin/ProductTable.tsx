@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import RecordActions from '@/components/admin/RecordActions';
 import Image, { StaticImageData } from 'next/image';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@/components/ui/platform-icons';
 
 export interface Product {
   id: string;

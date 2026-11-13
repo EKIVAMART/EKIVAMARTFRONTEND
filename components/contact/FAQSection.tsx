@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, LifeBuoy, Truck, Store, MessageSquare, Briefcase, ArrowRight } from 'lucide-react';
+import { ChevronDown, LifeBuoy, Truck, Store, MessageSquare, Briefcase, ArrowRight } from '@/components/ui/platform-icons';
 import FadeInSection from '@/components/FadeInSection';
 import { faqs } from './shared/types';
 

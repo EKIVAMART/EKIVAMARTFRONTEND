@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Edit3, Trash2, Mail, ExternalLink, ArrowUpDown, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Edit3, Trash2, Mail, ExternalLink, ArrowUpDown, ChevronLeft, ChevronRight, Filter } from '@/components/ui/platform-icons';
 
 interface Vendor {
   id: number;

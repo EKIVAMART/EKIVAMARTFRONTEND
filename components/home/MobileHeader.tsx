@@ -3,7 +3,7 @@
 import ShoppingNavLink from './ShoppingNavLink';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useAppSelector, useCartCount } from '@/lib/hooks';
-import { Menu, Search, UserRound, X } from 'lucide-react';
+import { Menu, Search, UserRound, X } from '@/components/ui/platform-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';

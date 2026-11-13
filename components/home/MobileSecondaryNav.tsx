@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutGrid, Store } from 'lucide-react';
+import { LayoutGrid, Store } from '@/components/ui/platform-icons';
 import Link from 'next/link';
 
 export default function MobileSecondaryNav({ onOpenCategories }: { onOpenCategories: () => void }) {

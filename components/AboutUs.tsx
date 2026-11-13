@@ -1,33 +1,27 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { UserRound } from 'lucide-react';
+import { UserRound } from '@/components/ui/platform-icons';
+import { BinocularsIcon, StorefrontIcon, HandHeartIcon, SealCheckIcon, UsersThreeIcon, ShieldCheckIcon, PlantIcon, ArrowsClockwiseIcon } from '@phosphor-icons/react/ssr';
+import styles from './AboutUs.module.css';
 import shoppingPhoto from '@/assets/imgapt.jpg';
 
 const values = [
-  { title: 'Put customers first', text: 'We listen to shoppers and sellers and use what we learn to make EkivaMart easier to use.' },
-  { title: 'Work hard', text: 'We pay attention to the details that make shopping and selling easier.' },
-  { title: 'Work together', text: 'We share what we know and help each other solve problems for our customers.' },
-  { title: 'Act with integrity', text: 'We communicate clearly and take responsibility when something goes wrong.' },
-  { title: 'Care about the work', text: 'We take pride in helping independent businesses find customers and grow.' },
-  { title: 'Keep improving', text: 'We stay curious and adapt as the needs of our marketplace change.' },
-];
-
-const stats = [
-  { value: '100+', label: 'Vendor partners' },
-  { value: '3 min', label: 'Store setup time' },
-  { value: '₦0', label: 'Setup cost' },
-  { value: '24/7', label: 'Online ordering' },
+  { icon: HandHeartIcon, title: 'Start with people', text: 'Every decision starts with the people using EkivaMart. We listen to shoppers and sellers to understand what would make their day easier.' },
+  { icon: SealCheckIcon, title: 'Make the details count', text: 'From finding a product to managing an order, small details matter. We put care into making each step clear and useful.' },
+  { icon: UsersThreeIcon, title: 'Build together', text: 'A marketplace grows through its community. We share ideas, learn from our sellers and work together to solve real problems.' },
+  { icon: ShieldCheckIcon, title: 'Earn trust every day', text: 'We believe in clear communication and taking responsibility. When something goes wrong, we focus on understanding it and putting it right.' },
+  { icon: PlantIcon, title: 'Champion local ambition', text: 'Behind every independent store is someone building a future. We want to help their products reach more people, beyond their usual neighbourhood.' },
+  { icon: ArrowsClockwiseIcon, title: 'Keep getting better', text: 'Good ideas can come from anywhere. We welcome feedback, question what could work better and keep improving as our community grows.' },
 ];
 
 const team = [
-  { name: 'Oghenefego Oghenekohworo', role: 'Co-founder' },
-  { name: 'Ebikebuna Rufus', role: 'Co-founder' },
-  { name: 'Seigha Rufus', role: 'CTO' },
-  { name: 'Mustapha Adekunle', role: 'Backend developer' },
-  { name: 'Team member' },
-  { name: 'Team member' },
-  { name: 'Team member' },
-  { name: 'Team member' },
+  { name: 'Oghenefego Oghenekohworo', role: 'Chief Executive Officer', image: '/images/ceo.png', position: '72% 65%' },
+  { name: 'Adekunle Mustapha Akintola', role: 'Software Developer Lead', image: '/images/adekunle-mustapha-akintola.png', position: '50% 45%' },
+  { name: 'Donald Emma-Ogbame', role: 'Software Developer', image: '/images/donald-emma-ogbame.png', position: '50% 50%' },
+  { name: 'Uchenna Raphael', role: 'Technical Support Engineer', image: '/images/uchenna-raphael.png', position: '50% 30%' },
+  { name: 'Asoya Somtochukwu Victoria', role: 'Social Media and Content', image: '/images/asoya-somtochukwu-victoria.png', position: '50% 55%' },
+  { name: 'David Adewale', role: 'Lead Product Designer and Branding', image: '/images/david-adewale.png', position: '50% 40%' },
+  { name: 'Okonkwo Emmanuel Ogorchukwu', role: 'Customer Support', image: '/images/okonkwo-emmanuel-ogorchukwu.png', position: '50% 60%' },
 ];
 
 export default function AboutUs() {
@@ -51,13 +45,17 @@ export default function AboutUs() {
           <h2 id="about-purpose">Make it easier to trade across Africa</h2>
         </div>
         <div className="ek-about-purpose">
-          <article className="ek-about-card">
-            <h3>Our vision</h3>
-            <p>Make commerce across Africa more accessible to independent businesses and the people who shop with them.</p>
+          <article className={`${styles.purposeCard} ${styles.vision}`}>
+            <div className={styles.purposeLabel}><BinocularsIcon size={32} weight="duotone" aria-hidden="true" /><span>Our vision</span></div>
+            <h3>Local ambition.<br />Limitless possibility.</h3>
+            <p>We imagine an Africa where a business’s location never limits its potential. Where independent stores can reach beyond their neighbourhoods, and shoppers can discover the talent and products around them.</p>
+            <div className={styles.signature}>Rooted locally. Looking further.</div>
           </article>
-          <article className="ek-about-card">
-            <h3>Our mission</h3>
-            <p>Give shoppers one place to discover independent stores, and give sellers the tools to open a shop, manage orders, and grow online.</p>
+          <article className={`${styles.purposeCard} ${styles.mission}`}>
+            <div className={styles.purposeLabel}><StorefrontIcon size={32} weight="duotone" aria-hidden="true" /><span>Our mission</span></div>
+            <h3>Bring great stores<br />closer to everyone.</h3>
+            <p>We’re building a marketplace that connects shoppers with independent businesses, starting in Nigeria. One place to discover products, and practical tools for sellers to open a store, manage orders and grow online.</p>
+            <div className={styles.signature}>Discover. Connect. Grow.</div>
           </article>
         </div>
       </section>
@@ -65,11 +63,13 @@ export default function AboutUs() {
       <section className="ek-about-section" aria-labelledby="about-values">
         <div className="ek-about-heading">
           <span className="ek-about-kicker">Our values</span>
-          <h2 id="about-values">How we work</h2>
+          <h2 id="about-values">What we stand for</h2>
+          <p className={styles.valuesIntro}>The principles behind the decisions we make and the marketplace we’re building.</p>
         </div>
         <div className="ek-about-values">
-          {values.map(({ title, text }) => (
-            <article className="ek-about-card" key={title}>
+          {values.map(({ icon: Icon, title, text }, index) => (
+            <article className={styles.valueCard} key={title}>
+              <div className={styles.valueTop}><span className={styles.valueIcon}><Icon size={48} weight="duotone" aria-hidden="true" /></span><span className={styles.valueNumber} aria-hidden="true">0{index + 1}</span></div>
               <h3>{title}</h3>
               <p>{text}</p>
             </article>
@@ -83,11 +83,7 @@ export default function AboutUs() {
           <h2 id="about-sellers">Make room for your business online</h2>
           <Link href="/become-a-vendor">Sell on EkivaMart</Link>
         </div>
-        <dl>
-          {stats.map(({ value, label }) => (
-            <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
-          ))}
-        </dl>
+<p>Build your storefront, publish your products and manage orders from your vendor dashboard.</p>
       </section>
 
       <section className="ek-about-section" aria-labelledby="about-team">
@@ -96,9 +92,13 @@ export default function AboutUs() {
           <h2 id="about-team">Meet the team</h2>
         </div>
         <ul className="ek-about-team">
-          {team.map(({ name, role }, index) => (
-            <li className="ek-about-card ek-about-person" key={index}>
-              <div className="ek-about-portrait" aria-hidden="true"><UserRound size={42} strokeWidth={1.4} /></div>
+          {team.map(({ name, role, image, position }) => (
+            <li className="ek-about-card ek-about-person" key={name}>
+              <div className="ek-about-portrait">
+                {image ? (
+                  <Image src={image} alt={name} fill sizes="(max-width: 767px) 45vw, 270px" style={{ objectFit: 'cover', objectPosition: position }} />
+                ) : <UserRound size={42} strokeWidth={1.4} aria-hidden="true" />}
+              </div>
               <h3>{name}</h3>
               {role && <p>{role}</p>}
             </li>

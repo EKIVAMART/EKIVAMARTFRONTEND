@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Store } from 'lucide-react';
+import { ArrowRight, Store } from '@/components/ui/platform-icons';
 import { useMarketplaceCatalog, type CatalogItem } from '@/lib/use-marketplace-catalog';
 
 const formatPrice = (price: number) =>

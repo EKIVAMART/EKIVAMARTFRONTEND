@@ -1,6 +1,7 @@
+'use client';
+import { ChevronLeft as PlatformChevronLeft, ChevronRight as PlatformChevronRight } from '@/components/ui/platform-icons';
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
 
 import {
   useRef,
@@ -10,7 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 import Link from 'next/link';
-import { Package, Sparkles } from 'lucide-react';
+import { Package, Sparkles } from '@/components/ui/platform-icons';
 import { productApi, categoryApi } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
@@ -405,18 +406,7 @@ export default function ProductCarousel({
               : 'opacity-0 pointer-events-none',
           ].join(' ')}
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <PlatformChevronLeft size={22} aria-hidden="true" />
         </button>
 
         <div
@@ -452,18 +442,7 @@ export default function ProductCarousel({
               : 'opacity-0 pointer-events-none',
           ].join(' ')}
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <PlatformChevronRight size={22} aria-hidden="true" />
         </button>
       </div>
 

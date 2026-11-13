@@ -22,7 +22,7 @@ import {
   XCircle,
   HelpCircle,
   TrendingUp,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   deliveryRoutesApi,

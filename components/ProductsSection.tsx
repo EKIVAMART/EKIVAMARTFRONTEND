@@ -5,7 +5,7 @@ import ProductCard from './ProductCard';
 import { productApi, categoryApi } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchWishlist } from '@/lib/features/wishlist/wishlistSlice';
-import { Package, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Sparkles, ChevronLeft, ChevronRight } from '@/components/ui/platform-icons';
 
 interface Rating {
   id: string;

@@ -20,7 +20,7 @@ import {
   Smartphone,
   LayoutDashboard,
   Scale,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { popularArticles } from '../../app/support/data/supportData';
 import FadeInSection from '../FadeInSection';
 

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Lock, ArrowLeft, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowLeft, KeyRound, } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@/components/ui/Button';
 import { PasswordStrength } from '@/components/auth/PasswordStrength';
 
@@ -45,8 +45,6 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
   onBack,
   onSuccess,
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -115,53 +113,27 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
         className="space-y-4"
       >
         <div className="space-y-2">
-          <Input
+          <PasswordInput
             {...register('password')}
-            type={showPassword ? 'text' : 'password'}
             label="New password"
             placeholder="••••••••"
             icon={Lock}
             error={errors.password?.message}
             disabled={isSubmitting}
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="p-0.5 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 hover:text-purple-600 transition-colors" />
-                ) : (
-                  <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 hover:text-purple-600 transition-colors" />
-                )}
-              </button>
-            }
+            autoComplete="new-password"
           />
           <PasswordStrength password={password} />
         </div>
 
-        <Input
-          {...register('confirmPassword')}
-          type={showConfirmPassword ? 'text' : 'password'}
-          label="Confirm password"
-          placeholder="••••••••"
-          icon={Lock}
-          error={errors.confirmPassword?.message}
-          disabled={isSubmitting}
-          rightIcon={
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="p-0.5 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 hover:text-purple-600 transition-colors" />
-              ) : (
-                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 hover:text-purple-600 transition-colors" />
-              )}
-            </button>
-          }
-        />
+        <PasswordInput
+            {...register('confirmPassword')}
+            label="Confirm password"
+            placeholder="••••••••"
+            icon={Lock}
+            error={errors.confirmPassword?.message}
+            disabled={isSubmitting}
+            autoComplete="new-password"
+          />
 
         <Button
           type="submit"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@/components/ui/platform-icons';
 import Link from 'next/link';
 
 interface MarketplaceRailProps {
@@ -13,11 +13,12 @@ interface MarketplaceRailProps {
   caption?: ReactNode;
   id?: string;
   loopCards?: ReactNode;
+  loading?: boolean;
 }
 
 export default function MarketplaceRail({
   children, title = 'Shop by category', href = '/categories/shop',
-  linkLabel = 'Shop all products', products = false, caption, id, loopCards,
+  linkLabel = 'Shop all products', products = false, caption, id, loopCards, loading = false,
 }: MarketplaceRailProps) {
   const uniqueId = useId();
   const titleId = products ? uniqueId + '-title' : 'categories-title';
@@ -43,7 +44,7 @@ export default function MarketplaceRail({
       observer.disconnect();
       row.removeEventListener('scroll', update);
     };
-  }, [loops]);
+  }, [loops, loading]);
 
   useEffect(() => {
     const row = track.current;
@@ -104,12 +105,12 @@ export default function MarketplaceRail({
   }
 
   return (
-    <section className="ek-section" id={id} aria-labelledby={titleId}>
+    <section className="ek-section" id={id} aria-labelledby={titleId} aria-busy={loading || undefined}>
       <div className="ek-section-heading ek-rail-heading">
         <h2 id={titleId}>{title}</h2>
         <div className="ek-rail-actions">
           <Link href={href}>{linkLabel}</Link>
-          {!loops && (
+          {!loops && !loading && (
             <>
               <button hidden={atStart && atEnd} aria-label={products ? 'Previous products' : 'Previous categories'} aria-controls={trackId} disabled={atStart} onClick={() => slide(-1)}><ChevronLeft size={18} /></button>
               <button hidden={atStart && atEnd} aria-label={products ? 'Next products' : 'Next categories'} aria-controls={trackId} disabled={atEnd} onClick={() => slide(1)}><ChevronRight size={18} /></button>
@@ -118,6 +119,7 @@ export default function MarketplaceRail({
         </div>
       </div>
       {caption}
+      {loading && <span className="sr-only" role="status">Loading {title.toLowerCase()} products</span>}
       <div id={trackId} className={`ek-category-track${products ? ' ek-merch-track' : ''}${loops ? ' ek-category-loop' : ''}`} ref={track}>
         {children}
         {loopCards}

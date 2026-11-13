@@ -6,7 +6,7 @@ import {
   Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Check, X, Ban,
   Award, Shield, FileText, Settings, UserCheck, DollarSign, Clock, AlertTriangle,
   HelpCircle, MoreVertical, RefreshCw, Trash2, ShieldAlert, BookOpen, AlertCircle, Briefcase
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { toast } from 'react-hot-toast';
 import { adminVendorApi, AdminVendorProfile, AdminVendorDocument, AdminVendorBankAccount, AdminVendorAuditLogEntry, AdminWithdrawal, AdminFlaggedReview, AdminCommissionConfig } from '@/lib/api-vendor';
 import { authApi, categoryApi } from '@/lib/api';

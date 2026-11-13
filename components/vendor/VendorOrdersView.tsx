@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ShoppingCart, Search, RefreshCw, Eye, Clock, CheckCircle2, AlertCircle,
   Truck, X, ChevronLeft, ChevronRight, MapPin, User, Package, Calendar
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { vendorOrdersApi } from '@/lib/api';
 import { toast } from 'react-hot-toast';

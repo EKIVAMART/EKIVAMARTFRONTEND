@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen, Truck, CircleHelp } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, ShoppingCart, X, UserCircle, Clock, LogOut, Bell, BookOpen, Truck, CircleHelp } from '@/components/ui/platform-icons';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';

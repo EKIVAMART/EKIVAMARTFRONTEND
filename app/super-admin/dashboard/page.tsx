@@ -1,4 +1,5 @@
 'use client';
+import { AlertTriangle as PlatformAlertTriangle, Lock as PlatformLock } from '@/components/ui/platform-icons';
 import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
@@ -33,7 +34,7 @@ import BlogManagementView from '@/components/admin/BlogManagementView';
 import EngagementSettingsView from '@/components/super-admin/EngagementSettingsView';
 import VendorSpecialistsView from '@/components/super-admin/VendorSpecialistsView';
 import DeliveryRoutesManagement from '@/components/super-admin/DeliveryRoutesManagement';
-import { Plus, Search, Menu } from 'lucide-react';
+import { Plus, Search, Menu } from '@/components/ui/platform-icons';
 import {
   ApiError,
   CreateProductDto,
@@ -1822,9 +1823,7 @@ function AdminPageContent() {
         <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-red-50 p-4 rounded-md border border-red-100">
-              <svg className="w-12 h-12 text-slate-500 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <PlatformAlertTriangle className="w-12 h-12 text-slate-500" aria-hidden="true" />
             </div>
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Session Expired</h2>
@@ -1849,9 +1848,7 @@ function AdminPageContent() {
         <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-slate-100 p-8 text-center relative z-10 animate-in zoom-in-95 duration-200">
           <div className="flex justify-center mb-6">
             <div className="bg-brand-50 p-4 rounded-md border border-brand-100">
-              <svg className="w-12 h-12 text-[#228b22]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <PlatformLock className="w-12 h-12 text-[#228b22]" aria-hidden="true" />
             </div>
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Unauthorized Access</h2>

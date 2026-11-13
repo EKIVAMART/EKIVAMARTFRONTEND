@@ -1,0 +1,18 @@
+.filters { display: flex; flex-direction: column; gap: 22px; color: #202820; }
+.group { padding: 0; min-width: 0; border: 0; }
+.group > label, .group legend { display: block; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.select { position: relative; }
+.select select { width: 100%; appearance: none; color-scheme: light; background: white; color: #202820; min-height: 44px; padding: 10px 38px 10px 12px; border: 1px solid #cbd5ca; border-radius: 6px; font-size: 13px; }
+.select svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #657065; }
+.stock { display: flex; gap: 10px; align-items: center; min-height: 44px; font-size: 13px; border-bottom: 1px solid #e2e7e1; padding-bottom: 16px; }
+.stock input { width: 18px; height: 18px; accent-color: #22643e; }
+.prices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.prices label { font-size: 12px; color: #657065; }
+.prices input { display: block; width: 100%; min-width: 0; margin-top: 6px; min-height: 44px; border: 1px solid #cbd5ca; border-radius: 6px; padding: 8px 10px; font-size: 14px; color: #202820; background: white; }
+.group > .range { margin-top: 14px; margin-bottom: 0; font-size: 12px; font-weight: 400; color: #657065; }
+.range input { display: block; width: 100%; height: 24px; margin: 4px 0; accent-color: #22643e; }
+.ratings { display: flex; flex-wrap: wrap; gap: 6px; }
+.ratings button { min-width: 48px; min-height: 44px; display: flex; justify-content: center; align-items: center; gap: 4px; border: 1px solid #dce3dc; border-radius: 6px; font-size: 13px; }
+.ratings button[aria-pressed='true'] { color: #22643e; border-color: #22643e; background: #f2f7f1; }
+.clear { font-size: 12px; color: #22643e; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; }
+.filters :is(select, input[type='number']):focus-visible { outline: 2px solid #22643e; outline-offset: 0; border-color: transparent; box-shadow: none; }

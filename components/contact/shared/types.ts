@@ -9,7 +9,7 @@ import {
   MessageSquare,
   Mail,
   Phone
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { FaInstagram, FaLinkedinIn, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 
 /* ─── TYPES ─── */

@@ -8,7 +8,7 @@ import {
   Settings, Send, Mail, AlertCircle, X, Check, Loader2, Info,
   Upload, ImageIcon, Star, Trash2, Plus, Wand2, Bold, Italic,
   Heading, Link, FileText, Eye
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { waitlistApi, WaitlistStats, WaitlistSubscriber, LaunchConfig } from '@/lib/api';
 import { uploadBroadcastImage } from '@/lib/api/broadcast-image-uploader';
 import { sendBroadcast } from '@/lib/api/send-broadcast';

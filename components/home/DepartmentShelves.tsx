@@ -6,6 +6,7 @@ import type { CatalogShelf } from '@/lib/use-home-shelves';
 import { departmentSlug, homepageDepartments } from '@/lib/data/departments';
 import CategoryRail from './CategoryRail';
 import ProductCard from './ProductCard';
+import ProductRowSkeleton from './ProductRowSkeleton';
 
 export default function DepartmentShelves({
   shelves,
@@ -23,6 +24,7 @@ export default function DepartmentShelves({
             key={slug}
             title={name}
             products
+            loading={state === 'loading' && !products.length}
             href={href}
             linkLabel="View all"
             caption={
@@ -41,16 +43,14 @@ export default function DepartmentShelves({
               products.map((item) => (
                 <ProductCard key={item.id} product={item} />
               ))
+            ) : state === 'loading' ? (
+              <ProductRowSkeleton />
             ) : (
               <p role="status">
-                {state === 'loading'
-                  ? 'Loading products…'
-                  : state === 'error'
+                {state === 'error'
                     ? 'Products are temporarily unavailable. '
                     : 'New products are on their way. '}
-                {state !== 'loading' && (
-                  <Link href={href}>Explore {name.toLowerCase()}</Link>
-                )}
+                <Link href={href}>Explore {name.toLowerCase()}</Link>
               </p>
             )}
           </CategoryRail>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Package, ArrowLeft, MapPin } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight, ShoppingCart, Star, HelpCircle, Package, ArrowLeft, MapPin } from '@/components/ui/platform-icons';
 import { useAppDispatch, useWishlist, useAppSelector } from '@/lib/hooks';
 // import { openNoteModal } from '@/lib/features/cart/cartSlice';
 // NEW - import addItemToCartApi

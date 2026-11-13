@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Edit, Trash2, Check } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Check } from '@/components/ui/platform-icons';
 import { categoryApi, ApiError } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import { Category } from './CategoriesModal';

@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/features/auth/authSlice';
 import { authApi } from '@/lib/api';
-import { LayoutGrid, LogOut, User } from 'lucide-react';
+import { LayoutGrid, LogOut, User } from '@/components/ui/platform-icons';
 
 interface MobileCategorySidebarProps {
   categories: any[];

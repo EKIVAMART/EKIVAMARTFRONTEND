@@ -1,6 +1,6 @@
 import DirectoryHero from '@/components/home/DirectoryHero';
 import Link from 'next/link';
-import { ArrowRight, Compass, Headphones, PackageCheck, SearchCheck, ShieldCheck, ShoppingCart, Store } from 'lucide-react';
+import { ArrowRight, Compass, Headphones, PackageCheck, SearchCheck, ShieldCheck, ShoppingCart, Store } from '@/components/ui/platform-icons';
 
 export const metadata = {
   title: 'Why shop with EkivaMart? | EkivaMart',

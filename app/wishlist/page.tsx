@@ -1,18 +1,5 @@
-import Footer from '@/components/Footer'
-import HeroSubscribe from '@/components/HeroSubscribe'
-import Navbar from '@/components/Navbar'
-import WishlistPage from '@/components/WishList'
-import React from 'react'
+import PageContent from '@/components/WishList';
 
-const page = () => {
-  return (
-    <div>
-        {/* <Navbar/> */}
-        <WishlistPage/>
-        <HeroSubscribe/>
-        {/* <Footer/> */}
-    </div>
-  )
+export default function Page() {
+  return <PageContent />;
 }
-
-export default page

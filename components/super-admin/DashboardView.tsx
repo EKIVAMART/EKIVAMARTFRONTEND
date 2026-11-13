@@ -1,4 +1,5 @@
 'use client';
+import { CurrencyNgn as PlatformCurrencyNgn } from '@/components/ui/platform-icons';
 import RecordStatus from "@/components/admin/RecordStatus";
 import { Metric, OrderBreakdown } from '@/components/admin/OverviewPrimitives';
 import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
@@ -11,25 +12,12 @@ import {
   TrendingUp, ShoppingBag, Package, Users, Store, ArrowUpRight, ChevronRight,
   Zap, FileText, Clock, CheckCircle2, AlertCircle, Activity, RefreshCw,
   Search, Filter, DollarSign, Award, Shield, Layers, CreditCard, ChevronLeft
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { superAdminDashboardApi, superAdminPayoutsApi, categoryApi } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
 export const NairaIcon = (props: any) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={props.className}
-    width={props.size || 20}
-    height={props.size || 20}
-    {...props}
-  >
-    <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
-  </svg>
+  <PlatformCurrencyNgn {...props} size={props.size || 20} aria-hidden="true" />
 );
 
 const fmtNGN = (n?: number) =>

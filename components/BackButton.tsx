@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from '@/components/ui/platform-icons';
 
 export function BackButton() {
   return (

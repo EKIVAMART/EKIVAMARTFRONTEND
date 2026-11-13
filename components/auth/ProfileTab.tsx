@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { User, Mail, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Loader2, CheckCircle2 } from '@/components/ui/platform-icons';
 import { useAppSelector, useAppDispatch } from '../../lib/hooks';
 import { setUser } from '@/lib/features/auth/authSlice';
 import { authApi } from '@/lib/api';

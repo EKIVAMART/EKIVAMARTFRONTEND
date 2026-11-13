@@ -1,7 +1,7 @@
 import RecordActions from "@/components/admin/RecordActions";
 import RecordStatus from "@/components/admin/RecordStatus";
 import React, { useState, useMemo } from 'react';
-import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Mail, Phone, Clock, AlertCircle, CheckCircle, XCircle, Eye, Trash2, Power, PowerOff, User, Ban } from 'lucide-react';
+import { Calendar, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Mail, Phone, Clock, AlertCircle, CheckCircle, XCircle, Eye, Trash2, Power, PowerOff, User, Ban } from '@/components/ui/platform-icons';
 
 export interface AdminUser {
   id: string;

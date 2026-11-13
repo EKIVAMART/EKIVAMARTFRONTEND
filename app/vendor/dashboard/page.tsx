@@ -44,7 +44,7 @@ import {
   Star,
   Package,
   AlertCircle,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────

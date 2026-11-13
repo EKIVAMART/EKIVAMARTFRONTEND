@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X } from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ModalProps {

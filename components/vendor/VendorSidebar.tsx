@@ -1,6 +1,7 @@
 'use client';
+import { CurrencyNgn as PlatformCurrencyNgn } from '@/components/ui/platform-icons';
 
-import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart, Bell, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Package, X, LogOut, Store, ChevronRight, ShoppingCart, Bell, DollarSign } from '@/components/ui/platform-icons';
 import { SidebarLink } from '@/components/super-admin/SharedUI';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -50,19 +51,7 @@ export default function VendorSidebar({ activeTab, setActiveTab, isOpen, onClose
   };
 
 const NairaIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    width={size}
-    height={size}
-  >
-    <path d="M6 3v18M18 3v18M6 3l12 18M4 9h16M4 14h16" />
-  </svg>
+  <PlatformCurrencyNgn className={className} size={size} aria-hidden="true" />
 );
 
   const navItems: { icon: React.ReactNode; label: string; tab: VendorTab }[] = [

@@ -7,7 +7,7 @@ import {
   X, Mail, Phone, User, Shield, ShieldCheck, ShieldOff,
   Calendar, Clock, LogIn, Lock, Award, CheckCircle2, XCircle,
   Ban, Key
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import type { AppUser } from './UserTable';
 
 interface ViewUserModalProps {

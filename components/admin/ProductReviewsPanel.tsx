@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Loader2, MessageSquare, Send, Star } from 'lucide-react';
+import { Loader2, MessageSquare, Send, Star } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { reviewsApi } from '@/lib/api';
 

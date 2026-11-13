@@ -7,7 +7,7 @@ import {
   ShoppingBag, Calendar, ArrowRight, Star, MessageSquare, Edit3,
   Trash2, RefreshCw, AlertCircle, CheckCircle2, Truck, Check, HelpCircle,
   ChevronLeft, ChevronRight
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { ordersApi, reviewsApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
 import toast from 'react-hot-toast';

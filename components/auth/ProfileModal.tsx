@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   AlertCircle,
   MapPin,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { logout } from '../../lib/features/auth/authSlice';
 import { authApi } from '@/lib/api';

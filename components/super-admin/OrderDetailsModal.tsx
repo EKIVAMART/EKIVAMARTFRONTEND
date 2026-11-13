@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, MapPin, CreditCard, Package, Calendar, User, Printer, Tag, Store,
   MessageSquare, Plus, CheckCircle2, RotateCcw, AlertTriangle, ShieldCheck, FileText, Truck, ChevronDown
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { ordersApi } from '@/lib/api';
 import { useAppSelector } from '@/lib/hooks';
 import toast from 'react-hot-toast';

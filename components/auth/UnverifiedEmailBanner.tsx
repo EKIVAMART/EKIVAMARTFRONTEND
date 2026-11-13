@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle, X } from 'lucide-react';
+import { AlertCircle, X } from '@/components/ui/platform-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAppSelector } from '../../lib/hooks';

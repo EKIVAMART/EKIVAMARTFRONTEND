@@ -50,7 +50,7 @@ import {
   Package,
   Store,
   GlassWater,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { categoryApi } from '@/lib/api';
 
 const categoryIconMap: Record<string, any> = {

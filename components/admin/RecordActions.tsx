@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Award, CircleSlash, CreditCard, Eye, EyeOff, MessageSquare, MoreHorizontal, Pencil, RotateCcw, Send, Settings2, Trash2, UserRoundCheck } from 'lucide-react';
+import { Award, CircleSlash, CreditCard, Eye, EyeOff, MessageSquare, MoreHorizontal, Pencil, RotateCcw, Send, Settings2, Trash2, UserRoundCheck } from '@/components/ui/platform-icons';
 
 export interface RecordAction {
   label: string;

@@ -28,7 +28,7 @@ import {
   Copy,
   Check,
   CornerLeftDown,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { blogApi } from '@/lib/api-blog';
 import { toast } from 'react-hot-toast';
 

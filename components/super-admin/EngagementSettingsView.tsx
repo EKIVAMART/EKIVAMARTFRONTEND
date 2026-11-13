@@ -26,7 +26,7 @@ import {
   Link as LinkIcon,
   Sparkles,
   User as UserIcon,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import {
   engagementApi,
   authApi,

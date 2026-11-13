@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, Check, ImageIcon } from 'lucide-react';
+import { X, Upload, Check, ImageIcon } from '@/components/ui/platform-icons';
 
 interface ImageUploadModalProps {
   isOpen: boolean;

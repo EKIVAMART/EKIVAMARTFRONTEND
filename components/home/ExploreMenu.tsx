@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown, Compass } from 'lucide-react';
+import { ChevronDown, Compass } from '@/components/ui/platform-icons';
 import { useEffect, useRef } from 'react';
 
 export default function ExploreMenu() {
@@ -27,6 +27,7 @@ export default function ExploreMenu() {
     <div className="ek-explore-links">
       <Link href="/stores" onClick={() => { if (menu.current) menu.current.open = false; }}>Featured stores</Link>
       <Link href="/why-ekivamart" onClick={() => { if (menu.current) menu.current.open = false; }}>Why shop with EkivaMart?</Link>
+      <Link href="/blog" onClick={() => { if (menu.current) menu.current.open = false; }}>Blog</Link>
     </div>
   </details>;
 }

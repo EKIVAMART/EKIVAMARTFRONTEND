@@ -94,6 +94,7 @@ button,input,select,textarea{font:inherit}button,a,input,select,textarea{outline
 .ek-app-launch img { width:clamp(110px,18vw,190px); height:auto; align-self:flex-end; margin-bottom:-72px; }
 .ek-app-launch strong { display:block; font-size:14px; margin-top:16px; }
 .ek-newsletter { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:28px; padding:36px 0; border-top:1px solid #deded7; }
+.ek-newsletter > * { min-width:0; }
 .ek-newsletter p,.ek-newsletter label { color:#51554c; font-size:.9rem; }
 .ek-newsletter form>div { display:flex; gap:8px; margin-top:6px; }
 .ek-newsletter input { flex:1; min-width:0; border:1px solid #aaa; border-radius:4px; padding:10px; }
@@ -388,7 +389,7 @@ button,input,select,textarea{font:inherit}button,a,input,select,textarea{outline
 .ek-about-card p, .ek-about-contact p { color:#555951; line-height:1.6; }
 .ek-about-person { display:flex; flex-direction:column; padding:12px 12px 17px; }
 .ek-about-person h3, .ek-about-person p { padding-inline:6px; }
-.ek-about-portrait { display:grid; place-items:center; aspect-ratio:4/3; margin-bottom:14px; border-radius:10px; background:#e8eee5; color:#52725b; }
+.ek-about-portrait { position:relative; overflow:hidden; display:grid; place-items:center; aspect-ratio:4/5; margin-bottom:14px; border-radius:10px; background:#e8eee5; color:#52725b; }
 .ek-about-sellers, .ek-about-contact { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:22px; padding:clamp(22px,4vw,44px); border-radius:18px; }
 .ek-about-sellers { background:#edf3e8; }
 .ek-about-sellers dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }

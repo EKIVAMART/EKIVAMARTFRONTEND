@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Clock, LogOut, RefreshCw, ShieldAlert } from '@/components/ui/platform-icons';
 import { useAppDispatch } from '@/lib/hooks';
 import { logout, setTokens } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';

@@ -9,7 +9,7 @@ import {
   User,
   Globe,
   ExternalLink,
-} from 'lucide-react';
+} from '@/components/ui/platform-icons';
 import { AdminBlogPost } from '@/types/blog';
 import { decodeHtmlEntities } from '@/lib/api-blog';
 import Link from 'next/link';

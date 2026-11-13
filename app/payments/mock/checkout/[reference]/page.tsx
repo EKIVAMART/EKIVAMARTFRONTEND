@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, ArrowLeft } from 'lucide-react';
+import { CreditCard, ArrowLeft } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 
 interface MockCheckoutPageProps {

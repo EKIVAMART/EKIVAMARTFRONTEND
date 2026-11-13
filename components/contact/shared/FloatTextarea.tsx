@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '@/components/ui/platform-icons';
 
 interface FloatTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;

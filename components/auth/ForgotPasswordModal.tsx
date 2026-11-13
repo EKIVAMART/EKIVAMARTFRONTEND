@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Mail, AlertCircle, ArrowLeft } from '@/components/ui/platform-icons';
 import toast from 'react-hot-toast';
 import { authApi, type ApiError } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';

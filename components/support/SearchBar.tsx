@@ -1,211 +1,119 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import {
-  Search,
-  ArrowRight,
-  User,
-  Store,
-  Package,
-  CreditCard,
-  RotateCw,
-  Truck,
-  HelpCircle,
-  X,
-  BookOpen,
-  UserCog,
-  ShieldCheck,
-  Smartphone,
-  LayoutDashboard,
-  Scale,
-} from 'lucide-react';
-import React, { useState, useRef, useEffect, } from 'react';
-import { fafloraSupportData } from '../../app/support/data/supportData';
+import { Search, ArrowRight, X } from '@/components/ui/platform-icons';
+import { useEffect, useRef, useState } from 'react';
+import { fafloraSupportData } from '@/app/support/data/supportData';
+import styles from '@/app/support/support.module.css';
 
-/* ─── TYPES ─── */
-interface PopularArticle {
-  title: string;
-  topicSlug: string;
-  slug: string;
-}
-
-const allArticles: PopularArticle[] = fafloraSupportData.flatMap(topic =>
-  topic.articles.map(article => ({
-    title: article.title,
-    slug: article.slug,
-    topicSlug: topic.slug
+const articles = fafloraSupportData.flatMap((topic) =>
+  topic.articles.map((article) => ({
+    title: article.title.replace(/Faflora/g, 'EkivaMart'),
+    href: `/support/topics/${topic.slug}/${article.slug}`,
   }))
 );
 
-/* ─── HELPERS ─── */
-const getArticleIcon = (topicSlug: string): React.ReactNode => {
-  const icons: Record<string, React.ReactNode> = {
-    'account-creation-verification': <User size={15} />,
-    'buyer-account-management': <UserCog size={15} />,
-    'becoming-a-vendor': <Store size={15} />,
-    'browsing-purchasing': <Search size={15} />,
-    'orders-tracking': <Package size={15} />,
-    'payments-refunds-withdrawals': <CreditCard size={15} />,
-    'delivery-shipping': <Truck size={15} />,
-    'returns-refunds-disputes': <RotateCw size={15} />,
-    'security-fraud-privacy': <ShieldCheck size={15} />,
-    'app-technical-issues': <Smartphone size={15} />,
-    'vendor-tools-dashboard': <LayoutDashboard size={15} />,
-    'policies-legal': <Scale size={15} />,
-  };
-  return icons[topicSlug] ?? <HelpCircle size={15} />;
-};
-
-/* ─── SEARCH BAR WITH DROPDOWN ─── */
-/**
- * - Left search icon (decorative)
- * - Live dropdown of up to 5 matching article rows
- * - No-match state with redirect link to /contact-us
- * - Closes on outside click or Escape
- */
 export default function SearchBar() {
-  const router = useRouter();
   const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const results = query.trim()
-    ? allArticles
-      .filter((a) => a.title.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, 5)
+  const [open, setOpen] = useState(false);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const term = query.trim().toLowerCase();
+  const matches = term
+    ? articles.filter((article) => article.title.toLowerCase().includes(term))
     : [];
+  const visible = open && term.length > 0;
 
-  const hasQuery = query.trim().length > 0;
-  const noMatch = hasQuery && results.length === 0;
-  const showDropdown = focused && hasQuery;
-
-  /* Close on outside click */
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setFocused(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    function close(event: PointerEvent) {
+      if (!wrapper.current?.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
   }, []);
 
-  const handleSearch = () => {
-    if (noMatch) router.push('/contact-us');
-    /* else navigate to a search results page if desired */
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearch();
-    if (e.key === 'Escape') setFocused(false);
-  };
-
   return (
-    <div ref={wrapperRef} className="relative w-full max-w-2xl">
-      {/* Input row */}
-      <div
-        className={`flex items-center bg-white rounded-2xl shadow-[0_8px_40px_rgba(152,29,135,0.12)] border transition-all duration-300 overflow-hidden ${focused
-            ? 'border-[#228b22] shadow-[0_8px_40px_rgba(152,29,135,0.22)]'
-            : 'border-[#e8b8e4]'
-          }`}
-      >
-        {/* Search icon */}
-        <div className="flex-shrink-0 md:pl-5 md:pr-3 pl-2 pr-1 text-[#1c711c]">
-          <Search size={20} />
-        </div>
-
+    <div
+      ref={wrapper}
+      className={styles.search}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          input.current?.focus();
+          setOpen(false);
+        }
+      }}
+    >
+      <div className={styles.searchField}>
+        <Search size={19} aria-hidden="true" />
         <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onKeyDown={handleKeyDown}
-          placeholder="Search articles… e.g. track order, refund, vendor"
-          className="flex-1 py-4 px-2 text-[15px] text-[#1a0018] placeholder:text-gray-400 bg-transparent focus:outline-none"
-          style={{ fontFamily: "'Palatino Linotype', Georgia, serif" }}
+          ref={input}
+          type="search"
           aria-label="Search support articles"
-          aria-autocomplete="list"
-          aria-expanded={showDropdown}
+          aria-controls={visible ? 'support-results' : undefined}
+          placeholder="Search help articles"
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowDown' || event.key === 'Enter') {
+              const first =
+                wrapper.current?.querySelector<HTMLAnchorElement>(
+                  '#support-results a'
+                );
+              if (first) {
+                event.preventDefault();
+                first.focus();
+              }
+            }
+          }}
         />
-
-        {/* Clear */}
-        {hasQuery && (
+        {query && (
           <button
-            onClick={() => { setQuery(''); setFocused(true); }}
-            className="flex-shrink-0 px-3 text-gray-400 hover:text-[#228b22] transition-colors"
+            type="button"
             aria-label="Clear search"
+            onClick={() => {
+              setQuery('');
+              input.current?.focus();
+            }}
           >
-            <X size={16} />
+            <X size={17} />
           </button>
         )}
-
-        {/* Search button
-        <button
-          onClick={handleSearch}
-          className="flex-shrink-0 m-2 px-4 md:px-6 py-3 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white text-sm font-extrabold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-md whitespace-nowrap"
-        >
-          <span className="hidden sm:inline">Search</span>
-          <span className="sm:hidden">
-            <Search size={16} />
-          </span>
-        </button>*/}
       </div>
-
-      {/* Dropdown */}
-      {showDropdown && (
-        <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-white border border-[#e8b8e4] rounded-2xl shadow-[0_16px_48px_rgba(152,29,135,0.16)] overflow-hidden">
-          {noMatch ? (
-            <div className="px-6 py-8 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#fdf3fc] border border-[#e8b8e4] flex items-center justify-center mx-auto mb-4">
-                <Search size={20} className="text-[#1c711c]" />
-              </div>
-              <p className="text-sm font-bold text-[#1a0018] mb-1">
-                No articles found for &ldquo;{query}&rdquo;
-              </p>
-              <p className="text-xs text-gray-500 mb-5 leading-relaxed">
-                We couldn&rsquo;t find a match. Our support team can help you directly.
-              </p>
-              <Link
-                href="/contact-us"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white text-xs font-extrabold px-5 py-2.5 rounded-full hover:opacity-90 transition"
-              >
-                Contact Support <ArrowRight size={13} />
+      {visible && (
+        <div id="support-results" className={styles.results}>
+          {matches.length ? (
+            <>
+              <span className="sr-only" role="status">
+                {matches.length} matching articles. Showing up to five.
+              </span>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {matches.slice(0, 5).map((article) => (
+                  <li key={article.href}>
+                    <Link href={article.href} onClick={() => setOpen(false)}>
+                      {article.title}
+                      <ArrowRight size={16} aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div className={styles.noResults}>
+              <p role="status">No matching articles. Try another word.</p>
+              <Link href="/contact-us">
+                Contact support <ArrowRight size={15} aria-hidden="true" />
               </Link>
             </div>
-          ) : (
-            <ul role="listbox">
-              {results.map((item, i) => (
-                <li key={i} role="option">
-                  <Link
-                    href={`/support/topics/${item.topicSlug}/${item.slug}`}
-                    onClick={() => setFocused(false)}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-[#fdf3fc] transition-colors border-b border-[#f5e8f5] last:border-b-0 group"
-                  >
-                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white shadow-sm">
-                      {getArticleIcon(item.topicSlug)}
-                    </div>
-                    <p className="flex-1 text-sm text-gray-700 group-hover:text-[#228b22] transition-colors leading-snug">
-                      {item.title}
-                    </p>
-                    <ArrowRight
-                      size={14}
-                      className="flex-shrink-0 text-[#1c711c] opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  </Link>
-                </li>
-              ))}
-              {/* Footer hint */}
-              <li className="px-5 py-3 bg-[#fdf8ff] border-t border-[#f0e0ef]">
-                <p className="text-[11px] text-gray-400 flex items-center gap-1.5">
-                  <BookOpen size={11} />
-                  Showing {results.length} of {allArticles.length} articles · Click to Open
-                </p>
-              </li>
-            </ul>
           )}
         </div>
       )}
     </div>
   );
-};
+}

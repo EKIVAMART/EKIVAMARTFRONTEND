@@ -36,3 +36,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 
+
+### Component credits
+
+The support orb, notification bell, verification-code input, policy navigation rail, and password eye use [Rare UI](https://rareui.com) by Swami Malode, adapted for EkivaMart. Password feedback and toast styling also draw on its patterns. Source notices and [license terms](THIRD_PARTY_NOTICES/rare-ui-LICENSE.txt) are included in this project.
