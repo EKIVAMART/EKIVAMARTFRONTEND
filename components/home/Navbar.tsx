@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { categoryApi, authApi } from '@/lib/api';
+import { getCategories, cachedRequest } from '@/lib/catalog-cache';
 import { fetchWishlistCount } from '@/lib/features/wishlist/wishlistSlice';
 import { fetchCartCount, fetchCart } from '@/lib/features/cart/cartSlice';
 import { setUser } from '@/lib/features/auth/authSlice';
@@ -77,13 +78,7 @@ export default function Navbar() {
     let isMounted = true;
     const loadCategories = async () => {
       try {
-        const res = await categoryApi.getCategories({ limit: 100 });
-        let data: any[] = [];
-        if (res?.data && Array.isArray(res.data)) data = res.data;
-        else if (res?.data?.data && Array.isArray(res.data.data)) data = res.data.data;
-        else if (res?.data?.categories && Array.isArray(res.data.categories)) data = res.data.categories;
-        else if (res?.data?.docs && Array.isArray(res.data.docs)) data = res.data.docs;
-        else if (Array.isArray(res)) data = res;
+        const data = await getCategories();
 
         const published = data.filter((item: any) =>
           Boolean(item.isActive ?? item.is_active ?? (item.status === 'published' || item.status === 'active'))
@@ -95,7 +90,7 @@ export default function Navbar() {
             const parentId = String(parent.id || parent._id || parent.categoryId || parent.uuid);
             let subData: any[] = [];
             try {
-              const subRes = await categoryApi.getSubcategories(parentId);
+              const subRes = await cachedRequest(`subcategories:${parentId}`, () => categoryApi.getSubcategories(parentId));
               if (subRes?.data && Array.isArray(subRes.data)) subData = subRes.data;
               else if (subRes?.data?.data && Array.isArray(subRes.data.data)) subData = subRes.data.data;
               else if (subRes?.data?.categories && Array.isArray(subRes.data.categories)) subData = subRes.data.categories;

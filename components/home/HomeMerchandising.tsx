@@ -1,5 +1,6 @@
 'use client';
 
+import type { RawCatalogProduct } from '@/lib/catalog-product';
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   useMarketplaceCatalog,
@@ -82,19 +83,21 @@ function SaleClock({ end }: { end: number }) {
 }
 
 export default function HomeMerchandising({
-  children,
+  children, initial, enabled = true,
 }: {
   children: ReactNode;
+  initial?: { products?: RawCatalogProduct[]; offers?: RawCatalogProduct[] };
+  enabled?: boolean;
 }) {
   const saved = useAppSelector((state) => state.wishlist.items);
   const signedIn = useAppSelector((state) => state.auth.isAuthenticated);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (signedIn) dispatch(fetchWishlist());
-  }, [signedIn, dispatch]);
-  const { items, state } = useMarketplaceCatalog();
-  const { offers: offerCatalog, departments: departmentShelves } =
-    useHomeShelves();
+    if (enabled && signedIn) dispatch(fetchWishlist());
+  }, [signedIn, dispatch, enabled]);
+  const { items, state } = useMarketplaceCatalog(initial?.products, enabled);
+  const { offers: offerCatalog, departments: departmentShelves, loadDepartment } =
+    useHomeShelves(initial?.offers, enabled);
   const [saleTime, setSaleTime] = useState(Date.now);
   useEffect(() => {
     const nextEnd = Math.min(
@@ -217,7 +220,7 @@ export default function HomeMerchandising({
           />
         );
       })}
-      <DepartmentShelves shelves={departmentShelves} />
+      <DepartmentShelves shelves={departmentShelves} loadDepartment={loadDepartment} enabled={enabled} />
       <Shelf
         title="New arrivals"
         loading={state === 'loading'}

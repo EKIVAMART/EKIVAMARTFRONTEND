@@ -3,10 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import AppScreenPreview from '@/components/home/AppScreenPreview';
 import CategoryRail from '@/components/home/CategoryRail';
-import HomeMerchandising from '@/components/home/HomeMerchandising';
+import HomeProducts from '@/components/home/HomeProducts';
 import Newsletter from '@/components/home/Newsletter';
 
 import { departments, departmentSlug } from '@/lib/data/departments';
+
+export const revalidate = 60;
 
 export default function Home(){return <div className="ek-home">
   <HeroRotation>
@@ -25,7 +27,7 @@ export default function Home(){return <div className="ek-home">
   <CategoryRail loopCards={renderCategoryCards(true)}>
     {renderCategoryCards()}
   </CategoryRail>
-  <HomeMerchandising>
+  <HomeProducts>
   <section className="ek-promo" aria-label="Explore collections">
     {[
       {slug: 'electronics', label: 'Electronics', title: 'Sound in focus', image: 'audio'},
@@ -37,7 +39,7 @@ export default function Home(){return <div className="ek-home">
       </Link>
     ))}
   </section>
-  </HomeMerchandising>
+  </HomeProducts>
   <section className="ek-pocket" aria-labelledby="app-title">
     <div className="ek-pocket-copy"><span className="ek-kicker">The EkivaMart app</span>
       <h2 id="app-title">Shop<br/>EkivaMart<br/>on mobile.</h2>
