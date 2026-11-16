@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import type { RootState } from '@/lib/store';
+import { getVendorPricingFields } from '@/lib/vendor-product-pricing';
 import { setUser } from '@/lib/features/auth/authSlice';
 import {
   productApi,
@@ -252,12 +253,6 @@ const toNonNegativeInteger = (value: unknown) => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 };
 
-const clampPercentage = (value: unknown) => {
-  const n = Number(value);
-  if (!Number.isFinite(n) || n <= 0) return undefined;
-  return Math.min(99, n);
-};
-
 const getStockQuantity = (stock: ProductRecord['stock'], quantity?: number) => {
   if (isRecord(stock)) return toNonNegativeInteger((stock as any).quantity);
   return toNonNegativeInteger(stock ?? quantity);
@@ -332,7 +327,7 @@ const normalizeProduct = (product: unknown): VendorProduct | null => {
     },
     tags: record.tags || [],
     metadata,
-    discount: record.discount ?? record.discountPercentage ?? 0,
+    discount: record.discountPercentage ?? 0,
     currency: 'NGN',
     subCategoryId: record.subCategoryId || '',
     subCategory: getCategoryName(record.subCategory),
@@ -412,7 +407,7 @@ const buildProductPayload = (formData: ProductFormData, categoryOptions: Product
     name: formData.name,
     preview: formData.preview,
     description: formData.description,
-    compareAtPrice: Math.max(0, Number(formData.compareAtPrice) || 0),
+    ...getVendorPricingFields(formData),
     stock: toNonNegativeInteger(formData.stock),
     metadata: customMetadata,
     origin: formData.origin || 'Nigeria',
@@ -443,9 +438,6 @@ const buildProductPayload = (formData: ProductFormData, categoryOptions: Product
   }
   const costPerItem = getOptionalNumber(formData.costPerItem);
   if (costPerItem !== undefined) payload.costPerItem = costPerItem;
-  const discount = clampPercentage(formData.discount);
-  if (discount !== undefined) payload.discount = discount;
-
   if (includesWeightAndDimensions) {
     const weight = getOptionalNumber(formData.weight);
     if (weight !== undefined) customMetadata.weight = weight;
@@ -1266,7 +1258,6 @@ function VendorDashboardContent() {
           brand: editingProduct.brand,
           sku: editingProduct.sku,
           price: editingProduct.price,
-          compareAtPrice: editingProduct.compareAtPrice,
           costPerItem: editingProduct.costPerItem,
           currency: editingProduct.currency || 'NGN',
           condition: editingProduct.condition,
@@ -1289,7 +1280,6 @@ function VendorDashboardContent() {
           warrantyDetails: editingProduct.warrantyDetails || '',
           status: editingProduct.status || 'draft',
           images: editingProduct.images,
-          discount: editingProduct.discount,
         } : undefined}
         categories={categories}
         isLoadingCategories={isLoadingCategories}

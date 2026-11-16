@@ -1332,15 +1332,8 @@ export interface DeliveryBreakdown {
 export interface CartSummaryResponse {
   subtotal: number;
   shipping: number;
-  tax: number;
-  taxRate?: number;
-  taxPercentage?: number;
-  commissionAmount?: number;
-  region?: string | null;
-  country?: string;
   total: number;
   currency: string;
-  formattedRate?: string;
   deliveryFee?: number;
   deliveryFeeCalculated?: boolean;
   deliveryState?: string;
@@ -1358,9 +1351,6 @@ export interface OrderQuote {
   deliveryFee: number;
   deliveryState: string;
   deliveryBreakdown: DeliveryBreakdown;
-  taxRate: number;
-  taxAmount: number;
-  commissionAmount: number;
   discountAmount: number;
   total: number;
   items: {
@@ -1370,7 +1360,6 @@ export interface OrderQuote {
     unitPrice: number;
     quantity: number;
     subtotal: number;
-    commissionAmount: number;
   }[];
   expectedDelivery?: ExpectedDelivery;
 }
@@ -2256,7 +2245,7 @@ export const ordersApi = {
     notes?: string;
   }) {
     try {
-      const response = await axiosInstance.post<ApiResponse<any>>('/orders/quote', body);
+      const response = await axiosInstance.post<ApiResponse<OrderQuote>>('/orders/quote', body);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -2563,7 +2552,6 @@ export interface OrderItem {
   unitPrice: { amount: number; currency: string; formatted?: string };
   quantity: number;
   subtotal: { amount: number; currency: string; formatted?: string };
-  commissionAmount?: { amount: number; currency: string; formatted?: string };
 }
 
 export interface OrderData {
@@ -2586,7 +2574,6 @@ export interface OrderData {
   subtotal: { amount: number; currency: string; formatted?: string };
   shippingCost: { amount: number; currency: string; formatted?: string };
   taxAmount: { amount: number; currency: string; formatted?: string };
-  commissionAmount?: { amount: number; currency: string; formatted?: string };
   discountAmount?: { amount: number; currency: string; formatted?: string };
   totalAmount: { amount: number; currency: string; formatted?: string };
   status: string;

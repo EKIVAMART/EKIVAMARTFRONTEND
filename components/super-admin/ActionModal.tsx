@@ -319,6 +319,7 @@ export default function ActionModal({
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [stagedImages, setStagedImages] = useState<ProductImage[]>([]);
   const totalSteps = 4;
+  const isVendorProductEdit = isVendorRole && Boolean(editingItem);
 
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
@@ -639,9 +640,11 @@ export default function ActionModal({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
+          <label className="text-xs font-bold text-gray-600 mb-1.5 block">{isVendorRole ? 'Vendor price' : 'Price'} (₦) <span className="text-[#228b22] ml-1">*</span></label>
           <input
             type="number"
+            min={isVendorRole ? '0.01' : undefined}
+            step={isVendorRole ? '0.01' : undefined}
             value={formData.compareAtPrice || ''}
             onChange={(e) => updateField('compareAtPrice', Number(e.target.value))}
             className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold"
@@ -1028,7 +1031,7 @@ export default function ActionModal({
           description: editingItem.description || '',
           sku: editingItem.sku || '',
           price: editingItem.price || 0,
-          compareAtPrice: editingItem.compareAtPrice || 0,
+          compareAtPrice: isVendorProductEdit ? 0 : editingItem.compareAtPrice || 0,
           costPerItem: editingItem.costPerItem || 0,
           currency: editingItem.currency || 'NGN',
           condition: editingItem.condition || 'new',
@@ -1056,7 +1059,7 @@ export default function ActionModal({
           dimensionsUnit: editingItem.dimensionsUnit || 'cm',
         });
 
-        if (editingItem.discount !== undefined) {
+        if (!isVendorProductEdit && editingItem.discount !== undefined) {
           setDiscountPercent(editingItem.discount);
         } else {
           setDiscountPercent(0);
@@ -1135,7 +1138,7 @@ export default function ActionModal({
       }
     }
     return () => { isMounted = false; };
-  }, [isOpen, editingItem, currentUserId]);
+  }, [isOpen, editingItem, currentUserId, isVendorProductEdit]);
 
   useEffect(() => {
     if (!isOpen || isVendorRole || editingItem || isLoadingStores) return;
@@ -1150,12 +1153,13 @@ export default function ActionModal({
   }, [isOpen, isVendorRole, editingItem, isLoadingStores, stores, currentUserId]);
 
   useEffect(() => {
+    if (isVendorRole) return;
     if (formData.compareAtPrice >= 0 && discountPercent >= 0) {
       const discountAmount = (formData.compareAtPrice * discountPercent) / 100;
       const calculated = Math.max(0, Math.round(formData.compareAtPrice - discountAmount));
       updateField('price', calculated);
     }
-  }, [formData.compareAtPrice, discountPercent]);
+  }, [formData.compareAtPrice, discountPercent, isVendorRole]);
 
   const applyFormat = (formatType: 'bold' | 'italic' | 'underline' | 'bullet' | 'number') => {
     const textarea = descriptionRef.current;
@@ -1197,7 +1201,9 @@ export default function ActionModal({
       if (!formData.location?.state?.trim()) errors.push('State is required.');
       if (!formData.location?.lga?.trim()) errors.push('LGA (Local Government Area) is required.');
     } else if (step === 2) {
-      if (!formData.compareAtPrice || formData.compareAtPrice <= 0) errors.push('Original price is required.');
+      if (formData.compareAtPrice <= 0 && (!isVendorProductEdit || formData.compareAtPrice < 0)) {
+        errors.push(isVendorRole ? 'Enter a positive vendor price.' : 'Original price is required.');
+      }
       if (formData.stock === undefined || formData.stock < 0) errors.push('Stock is required.');
     }
     return errors;
@@ -1740,20 +1746,36 @@ export default function ActionModal({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                         <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Compare at / Original Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
-                          <input type="number" value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold" required />
+                          <label htmlFor="product-base-price" className="text-xs font-bold text-gray-600 mb-1.5 block">
+                            {isVendorProductEdit ? 'New vendor price (₦)' : isVendorRole ? 'Vendor price (₦)' : 'Compare at / Original Price (₦)'}
+                            {!isVendorProductEdit && <span className="text-[#228b22] ml-1">*</span>}
+                          </label>
+                          <input id="product-base-price" type="number" min={isVendorRole ? '0.01' : undefined} step={isVendorRole ? '0.01' : undefined} value={formData.compareAtPrice || ''} onChange={e => updateField('compareAtPrice', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm font-bold" required={!isVendorProductEdit} />
+                          {isVendorRole && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              {isVendorProductEdit ? 'Leave blank to keep the current price and discount.' : 'Enter the amount you want to earn before any discount.'}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Discount (%)</label>
-                          <input type="number" min="0" max="99" value={discountPercent || ''} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" />
+                          <input type="number" min="0" max="99" value={isVendorProductEdit && !formData.compareAtPrice ? '' : discountPercent || ''} disabled={isVendorProductEdit && !formData.compareAtPrice} onChange={e => setDiscountPercent(clampDiscount(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm disabled:bg-gray-100" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                        <div>
-                          <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
-                          <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-md border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#228b22]" required />
-                        </div>
+                        {isVendorProductEdit ? (
+                          <div>
+                            <p className="text-xs font-bold text-gray-600 mb-1.5">Current customer price</p>
+                            <p className="text-sm font-bold text-gray-900">₦{formData.price.toLocaleString('en-NG')}</p>
+                            <p className="mt-1 text-xs text-gray-500">Includes platform commission.</p>
+                          </div>
+                        ) : !isVendorRole && (
+                          <div>
+                            <label className="text-xs font-bold text-gray-600 mb-1.5 block">Selling Price (₦) <span className="text-[#228b22] ml-1">*</span></label>
+                            <input type="number" value={formData.price || ''} readOnly className="w-full p-3.5 rounded-md border bg-gray-100 cursor-not-allowed outline-none text-sm font-black text-[#228b22]" required />
+                          </div>
+                        )}
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Cost per Item (₦)</label>
                           <input type="number" value={formData.costPerItem || ''} onChange={e => updateField('costPerItem', Number(e.target.value))} onKeyDown={e => { if (e.key === 'e' || e.key === 'E' || e.key === '+') e.preventDefault(); }} className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm" />

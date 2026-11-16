@@ -79,8 +79,8 @@ export default function ViewProductModal({ product, isOpen, onClose }: ViewProdu
     : (product.location || '');
 
   const compulsoryInfo = [
-    { label: 'Final price', value: `₦${Number(product.price || 0).toLocaleString('en-NG')}`, icon: Tag },
-    { label: 'Original price', value: product.compareAtPrice ? `₦${Number(product.compareAtPrice).toLocaleString('en-NG')}` : 'Not set', icon: RefreshCcw },
+    { label: 'Customer price', value: `₦${Number(product.price || 0).toLocaleString('en-NG')}`, icon: Tag },
+    { label: 'Customer compare-at price', value: product.compareAtPrice ? `₦${Number(product.compareAtPrice).toLocaleString('en-NG')}` : 'Not set', icon: RefreshCcw },
     { label: 'Discount', value: product.discount ? `${product.discount}%` : 'None', icon: Tag },
     { label: 'Stock', value: `${product.stock ?? 0} items`, icon: Package },
     { label: 'SKU', value: product.sku || 'Not set', icon: Box },

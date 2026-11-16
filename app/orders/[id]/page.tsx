@@ -501,16 +501,10 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   <span>Shipping Cost</span>
                   <span className="text-slate-800 font-bold">{order.shippingCost?.formatted || `₦${order.shippingCost?.amount?.toLocaleString()}`}</span>
                 </div>
-                <div className="flex justify-between font-medium text-gray-500">
-                  <span>Tax Amount</span>
-                  <span className="text-slate-800 font-bold">{order.taxAmount?.formatted || `₦${order.taxAmount?.amount?.toLocaleString()}`}</span>
-                </div>
-                {((typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount) || 0) > 0 && (
+                {(order.taxAmount?.amount ?? 0) > 0 && (
                   <div className="flex justify-between font-medium text-gray-500">
-                    <span>Service fee</span>
-                    <span className="text-slate-800 font-bold">
-                      {order.commissionAmount?.formatted || `₦${(typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount)?.toLocaleString()}`}
-                    </span>
+                    <span>Tax Amount</span>
+                    <span className="text-slate-800 font-bold">{order.taxAmount.formatted || `₦${order.taxAmount.amount.toLocaleString()}`}</span>
                   </div>
                 )}
                 {order.discountAmount?.amount > 0 && (

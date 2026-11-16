@@ -47,7 +47,6 @@ import {
   orderApi,
   ordersApi,
   userAddressApi,
-  taxRulesApi,
   deliveryRoutesApi,
   SavedAddressItem,
   AvailableState,
@@ -143,7 +142,6 @@ export default function CartPage() {
           const defaultAddr = stillValid || list.find((a) => a.isDefault) || list[0];
           setSelectedSavedAddressId(defaultAddr.id);
           setUseSavedAddress(true);
-          // Recalculate regional tax for selected saved address
           dispatch(fetchCartSummary({ country: defaultAddr.country || 'NG', state: defaultAddr.state }));
         } else {
           setUseSavedAddress(false);
@@ -442,42 +440,7 @@ export default function CartPage() {
         return;
       }
 
-      toast.loading('Fetching applicable tax rate...', { id: validateToast });
-
-      // Determine country/state from the selected saved address or default
-      let taxCountry = 'NG';
-      let taxState: string | undefined;
-      if (useSavedAddress && selectedSavedAddressId) {
-        const sel = savedAddresses.find((a) => a.id === selectedSavedAddressId);
-        if (sel) {
-          taxCountry = sel.country || 'NG';
-          taxState = sel.state || undefined;
-        }
-      } else if (!useSavedAddress && shippingAddress.state) {
-        taxCountry = shippingAddress.country || 'NG';
-        taxState = shippingAddress.state || undefined;
-      }
-
-      // Explicitly query the official tax rate from the backend (GET /tax-rules/applicable)
-      // No client-supplied tax is ever accepted — this always reflects what Super Admins configured.
-      const cartSubtotal = summary?.subtotal;
-      const taxRes = await taxRulesApi.getApplicable({
-        country: taxCountry,
-        state: taxState,
-        subtotal: cartSubtotal,
-      });
-
-      // Re-fetch cart summary with the resolved region to reflect correct tax in the UI
-      dispatch(fetchCartSummary({ country: taxCountry, state: taxState }));
-
-      if (taxRes?.data) {
-        const source = taxRes.data.source ?? 'unknown';
-        const rate = taxRes.data.formattedRate ?? `${taxRes.data.percentage ?? 7.5}%`;
-        const sourceLabel = source === 'state_rule' ? 'state rule' : source === 'country_default' ? 'country default' : 'platform default';
-        toast.success(`Tax verified: ${rate} (${sourceLabel})`, { id: validateToast });
-      } else {
-        toast.success('Stock verified successfully!', { id: validateToast });
-      }
+      toast.success('Stock verified successfully!', { id: validateToast });
 
       setIsProcessing(false);
       // Always re-fetch saved addresses fresh when entering checkout
@@ -1022,29 +985,6 @@ export default function CartPage() {
                         </div>
                       )}
 
-                      {/* Tax line */}
-                      <div className="flex justify-between text-gray-600 text-sm font-medium">
-                        <span>
-                          Tax {summary?.formattedRate ? `(${summary.formattedRate})` : (summary?.taxPercentage !== undefined ? `(${summary.taxPercentage}%)` : '(7.5%)')}
-                        </span>
-                        <span className="font-bold text-slate-800">
-                          ₦{summary.tax.toLocaleString()}
-                        </span>
-                      </div>
-
-                      {/* Service fee */}
-                      {(summary.commissionAmount !== undefined && summary.commissionAmount > 0) && (
-                        <div className="flex justify-between text-gray-600 text-sm font-medium items-center">
-                          <span className="flex items-center gap-1.5" title="Platform fee added to your order">
-                            <ShieldCheck size={15} className="text-[#228b22]" />
-                            Service fee
-                          </span>
-                          <span className="font-bold text-slate-800">
-                            ₦{summary.commissionAmount.toLocaleString()}
-                          </span>
-                        </div>
-                      )}
-
                       {/* Total */}
                       <div className="border-t border-dashed pt-3.5 flex justify-between items-center">
                         <span className="font-bold text-slate-800">
@@ -1401,7 +1341,7 @@ export default function CartPage() {
                     {loadingQuote && (
                       <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 flex items-center gap-2 text-xs text-purple-700 font-semibold">
                         <Loader2 size={14} className="animate-spin text-purple-600" />
-                        Calculating live delivery fee & taxes...
+                        Calculating live delivery fee...
                       </div>
                     )}
 
@@ -1461,7 +1401,7 @@ export default function CartPage() {
                         </span>
                         <span className="font-bold text-slate-800">
                           {quoteData ? (
-                            `₦${quoteData.shippingCost.toLocaleString()}`
+                            `₦${quoteData.deliveryFee.toLocaleString()}`
                           ) : summary?.deliveryFeeCalculated ? (
                             `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
                           ) : (
@@ -1469,31 +1409,6 @@ export default function CartPage() {
                           )}
                         </span>
                       </div>
-                      <div className="flex justify-between text-gray-600 font-medium">
-                        <span>
-                          Tax ({quoteData?.taxRate ? `${(quoteData.taxRate * 100).toFixed(1)}%` : summary?.formattedRate || '7.5%'}):
-                        </span>
-                        <span className="font-bold text-slate-800">
-                          ₦{(quoteData?.taxAmount ?? summary?.tax ?? 0).toLocaleString()}
-                        </span>
-                      </div>
-                      {((quoteData?.commissionAmount ?? summary?.commissionAmount ?? 0) > 0) && (
-                        <div className="flex justify-between text-gray-600 font-medium items-center">
-                          <span className="flex items-center gap-1" title="Platform fee added to your order">
-                            <ShieldCheck size={13} className="text-[#228b22]" />
-                            Service fee:
-                          </span>
-                          <span className="font-bold text-slate-800">
-                            ₦{(quoteData?.commissionAmount ?? summary?.commissionAmount ?? 0).toLocaleString()}
-                          </span>
-                        </div>
-                      )}
-                      {((quoteData?.discountAmount ?? 0) > 0) && (
-                        <div className="flex justify-between font-medium text-emerald-600">
-                          <span>Discount:</span>
-                          <span className="font-bold">-₦{quoteData!.discountAmount.toLocaleString()}</span>
-                        </div>
-                      )}
                       <div className="border-t border-dashed pt-3 flex justify-between items-center text-sm font-bold text-slate-800">
                         <span>Total:</span>
                         <span className="text-xl font-extrabold text-[#228b22]">

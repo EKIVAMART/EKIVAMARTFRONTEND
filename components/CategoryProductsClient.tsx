@@ -8,6 +8,8 @@ type SimpleProduct = {
   name: string;
   price: number;
   mrp?: number;
+  compareAtPrice?: number;
+  discountPercentage?: number;
   image?: string;
   category?: string;
   rating?: number;
@@ -161,7 +163,8 @@ export default function CategoryProductsClient({ initialProducts, categories, ac
                       category={p.category}
                       title={p.name}
                       price={p.price}
-                      originalPrice={p.mrp}
+                      originalPrice={p.compareAtPrice ?? p.mrp}
+                      discountPercentage={p.discountPercentage}
                       rating={p.rating}
                       author={p.store}
                       storeName={p.storeName || p.store || 'EkivaMart Store'}

@@ -20,6 +20,7 @@ type ProductCardProps = {
   storeSlug: string;
   price: number | { amount: number; currency?: string };
   originalPrice?: number | { amount: number; currency?: string };
+  discountPercentage?: number;
   currency?: string;
   href?: string;
   location?: string | { town?: string; state?: string; lga?: string };
@@ -37,6 +38,7 @@ export default function ProductCard({
   storeSlug,
   price,
   originalPrice,
+  discountPercentage: discount = 0,
   currency = '₦',
   href = '#',
   location = 'Lagos',
@@ -62,10 +64,6 @@ export default function ProductCard({
   const priceVal = typeof price === 'object' && price !== null ? (price as any).amount : (price ?? 0);
   const originalPriceVal = typeof originalPrice === 'object' && originalPrice !== null ? (originalPrice as any).amount : originalPrice;
 
-  const discount = originalPriceVal
-    ? Math.round(((originalPriceVal - priceVal) / originalPriceVal) * 100)
-    : 0;
-
   return (
     <div className="pc-card">
       <Link href={href} className="pc-card-link-wrapper block">
@@ -80,6 +78,12 @@ export default function ProductCard({
               style={{ objectFit: 'contain' }}
             />
           </div>
+          {discount > 0 && (
+            <div className="pc-discount-badge">
+              <span className="pc-discount-text">{discount}%</span>
+              <span className="pc-discount-label">OFF</span>
+            </div>
+          )}
         </div>
       </Link>
 

@@ -26,7 +26,7 @@ interface Product {
   price: number;
   compareAtPrice?: number;
   mrp?: number;
-  discount?: number;
+  discountPercentage?: number;
   preview?: string;
   description?: string;
   images?: Array<{ url: string; altText: string; isPrimary: boolean; order: number }>;
@@ -256,7 +256,8 @@ const FeaturedProducts = () => {
                         storeSlug={storeSlug}
                         location={product.location || 'Lagos'}
                         price={product.price}
-                        originalPrice={product.compareAtPrice || product.mrp}
+                        originalPrice={product.compareAtPrice ?? product.mrp}
+                        discountPercentage={product.discountPercentage}
                         href={`/products/${product.id}`}
                       />
                     </div>
