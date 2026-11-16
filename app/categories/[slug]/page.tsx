@@ -30,7 +30,7 @@ interface Product {
   price: number;
   compareAtPrice?: number;
   mrp?: number;
-  discount?: number;
+  discountPercentage?: number;
   preview?: string;
   description?: string;
   images?: Array<{ url: string; altText: string; isPrimary: boolean; order: number }>;
@@ -702,7 +702,6 @@ export default function CategoryPage() {
 
                     const priceVal = typeof p.price === 'object' && p.price !== null ? (p.price as any).amount : (p.price ?? 0);
                     const compareAt = p.compareAtPrice ?? p.mrp;
-                    const discountPct = p.discount ?? (compareAt && compareAt > priceVal ? Math.round(((compareAt - priceVal) / compareAt) * 100) : undefined);
 
                     const locObj = p.location;
                     const locationStr =
@@ -716,7 +715,7 @@ export default function CategoryPage() {
                       image: coverImage,
                       price: priceVal,
                       compareAtPrice: compareAt,
-                      discountPercent: discountPct,
+                      discountPercent: p.discountPercentage,
                       rating: ratingVal,
                       reviewCount: Array.isArray(p.rating) ? p.rating.length : 0,
                       location: locationStr,

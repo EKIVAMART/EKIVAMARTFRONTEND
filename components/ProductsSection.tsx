@@ -23,7 +23,7 @@ interface Product {
   price: number;
   compareAtPrice?: number;
   mrp?: number;
-  discount?: number;
+  discountPercentage?: number;
   preview?: string;
   description?: string;
   images?: Array<{ url: string; altText: string; isPrimary: boolean; order: number }>;
@@ -495,7 +495,8 @@ export default function ProductsSection() {
                   category={prodCat}
                   title={product.name}
                   price={product.price}
-                  originalPrice={product.compareAtPrice || product.mrp}
+                  originalPrice={product.compareAtPrice ?? product.mrp}
+                  discountPercentage={product.discountPercentage}
                   rating={calculateAverageRating(product.rating)}
                   author={storeName}
                   storeName={storeName}

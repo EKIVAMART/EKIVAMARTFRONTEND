@@ -30,7 +30,7 @@ interface Product {
   name: string;
   price: number;
   compareAtPrice: number;
-  discount?: number;
+  discountPercentage?: number;
   preview?: string;
   description: string;
   origin?: string;
@@ -256,7 +256,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
   const priceVal = typeof product.price === 'object' && product.price !== null ? (product.price as any).amount : (product.price ?? 0);
   const mrpVal = typeof product.compareAtPrice === 'object' && product.compareAtPrice !== null ? (product.compareAtPrice as any).amount : (product.compareAtPrice ?? priceVal);
-  const discount = mrpVal > priceVal ? Math.round(((mrpVal - priceVal) / mrpVal) * 100) : 0;
+  const discount = product.discountPercentage ?? 0;
 
   // Calculate average rating
   const avgRating = product.rating?.length
@@ -452,9 +452,9 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                     <span className="pd-original-price">
                       ₦ {mrpVal.toLocaleString()}
                     </span>
-                    <span className="pd-discount-percent">
-                      Save {discount}%
-                    </span>
+                    {discount > 0 && (
+                      <span className="pd-discount-percent">Save {discount}%</span>
+                    )}
                   </>
                 )}
               </div>

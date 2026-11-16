@@ -235,7 +235,7 @@ export default function ProductTable({
                 Product
               </th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">
-                Price
+                Customer price
               </th>
               <th className="p-4 text-xs font-semibold text-gray-400 uppercase text-center">
                 Stock

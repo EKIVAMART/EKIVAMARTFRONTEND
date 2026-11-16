@@ -341,16 +341,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                           <span>Shipping Cost</span>
                           <span className="text-slate-800 font-bold">{order.shippingCost?.formatted}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600 font-semibold">
-                          <span>Tax Amount</span>
-                          <span className="text-slate-800 font-bold">{order.taxAmount?.formatted}</span>
-                        </div>
-                        {((typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount) || 0) > 0 && (
+                        {(order.taxAmount?.amount ?? 0) > 0 && (
                           <div className="flex justify-between text-gray-600 font-semibold">
-                            <span>Service fee</span>
-                            <span className="text-slate-800 font-bold">
-                              {order.commissionAmount?.formatted || `₦${(typeof order.commissionAmount === 'object' ? order.commissionAmount?.amount : order.commissionAmount)?.toLocaleString()}`}
-                            </span>
+                            <span>Tax Amount</span>
+                            <span className="text-slate-800 font-bold">{order.taxAmount.formatted || `₦${order.taxAmount.amount.toLocaleString()}`}</span>
                           </div>
                         )}
                         {order.discountAmount?.amount > 0 && (

@@ -305,9 +305,9 @@ export default function VendorPage({ params }: VendorPageProps) {
             ) : (
               <div className="vp-product-grid">
                 {products.map((product) => {
-                  const price = typeof product.price === 'object' ? product.price.amount : (Number(product.price) || 0);
-                  const compareAtPrice = typeof product.compareAtPrice === 'object' ? product.compareAtPrice.amount : (Number(product.compareAtPrice) || 0);
-                  const discount = compareAtPrice > price ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) : 0;
+                  const price = Number(product.price?.amount ?? product.price ?? 0);
+                  const compareAtPrice = Number(product.compareAtPrice?.amount ?? product.compareAtPrice ?? 0);
+                  const discount = product.discountPercentage ?? 0;
                   const imageUrl = product.images?.[0]?.url || product.preview || product.image || '/placeholder.png';
                   const isWishlisted = wishlistItems.includes(product.id);
 
@@ -332,7 +332,7 @@ export default function VendorPage({ params }: VendorPageProps) {
                         </div>
                         <div className="vp-product-price-row">
                           {discount > 0 && <span className="vp-discount">-{discount}%</span>}
-                          <span className="vp-price">₦{price.toLocaleString()}</span><span className="vp-price-decimals">.00</span>
+                          <span className="vp-price">₦{price.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
                         </div>
                         {compareAtPrice > price && (
                           <div className="vp-list-price">List Price: ₦{compareAtPrice.toLocaleString()}</div>

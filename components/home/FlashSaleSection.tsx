@@ -82,11 +82,7 @@ function mapProduct(raw: any): LandingProduct {
 
   const priceVal = raw.price?.amount ?? raw.price ?? 0;
   const compareAt = raw.compareAtPrice?.amount ?? raw.compareAtPrice ?? raw.mrp;
-  const discountPct =
-    raw.discount ??
-    (compareAt && compareAt > priceVal
-      ? Math.round(((compareAt - priceVal) / compareAt) * 100)
-      : undefined);
+  const discountPct = raw.discountPercentage;
 
   const locObj = raw.location;
   const locationStr =
