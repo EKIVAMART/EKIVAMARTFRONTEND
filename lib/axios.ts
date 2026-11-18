@@ -97,6 +97,8 @@ axiosInstance.interceptors.response.use(
     // If error is 401 and we haven't retried yet
     if (
       error.response?.status === 401 &&
+      originalRequest &&
+      !['/auth/login', '/auth/register', '/auth/refresh'].includes(originalRequest.url) &&
       !originalRequest._retry &&
       error.response
     ) {
@@ -127,6 +129,8 @@ axiosInstance.interceptors.response.use(
           : null);
 
       if (!refreshToken) {
+        isRefreshing = false;
+        processQueue(error, null);
         if (storeInstance) {
           storeInstance.dispatch(logout());
         }

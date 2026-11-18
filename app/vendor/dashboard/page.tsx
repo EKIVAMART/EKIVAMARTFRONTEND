@@ -1108,7 +1108,7 @@ function VendorDashboardContent() {
                   {authUser?.firstName || 'Vendor'} {authUser?.lastName || ''}
                 </p>
                 <p className="text-[10px] text-gray-400 font-medium truncate max-w-[140px]">
-                  {authUser?.email || 'vendor@faflora.com'}
+                  {authUser?.email || 'vendor@ekivamart.com'}
                 </p>
               </div>
             </div>
@@ -1147,7 +1147,7 @@ function VendorDashboardContent() {
         </header>
 
         {/* Search bar */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
           <Search size={18} className="text-gray-400" />
           <input
             type="text"

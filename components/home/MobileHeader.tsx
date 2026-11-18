@@ -72,11 +72,12 @@ export default function MobileHeader({ onOpenLogin, onOpenProfile }: MobileHeade
               {menuOpen ? <X size={24} strokeWidth={1.8} aria-hidden="true" /> : <Menu size={24} strokeWidth={1.8} aria-hidden="true" />}
             </button>
             {menuOpen && (
-              <nav id="mobile-main-menu" aria-label="More navigation" className="ek-mobile-menu absolute right-0 top-full z-50 w-[min(290px,calc(100vw-20px))] rounded-b-xl border border-neutral-100 bg-white p-2 shadow-xl">
+              <nav id="mobile-main-menu" aria-label="More navigation" className="ek-mobile-menu absolute right-0 top-full z-50 max-h-[calc(100dvh-80px)] overflow-y-auto w-[min(290px,calc(100vw-20px))] rounded-b-xl border border-neutral-100 bg-white p-2 shadow-xl">
                 <button type="button" onClick={() => { setMenuOpen(false); if (isAuthenticated) onOpenProfile(); else onOpenLogin(); }} className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-stone-800 hover:bg-green-50">
                   <UserRound size={20} strokeWidth={1.8} aria-hidden="true" /> {isAuthenticated ? 'My account' : 'Sign in / Account'}
                 </button>
                 <Link href="/categories/shop" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Shop all products</Link>
+                <Link href="/blog" onClick={() => setMenuOpen(false)} aria-current={pathname === '/blog' || pathname.startsWith('/blog/') ? 'page' : undefined} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Our journal</Link>
                 <Link href="/stores" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Featured stores</Link>
                 <Link href="/why-ekivamart" onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center rounded-lg px-3 text-sm text-stone-800 hover:bg-green-50">Why shop with EkivaMart?</Link>
                 {isAuthenticated && <div className="flex min-h-11 items-center gap-3 border-t border-neutral-100 px-3 text-sm text-stone-800"><span>Notifications</span><NotificationBell /></div>}

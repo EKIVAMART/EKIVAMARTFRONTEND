@@ -256,7 +256,7 @@ const ChipSelector = ({
   return (
     <div className="space-y-2">
       <label className="text-xs font-bold text-gray-600 block">{label}</label>
-      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-md border bg-white focus-within:ring-2 focus-within:ring-[#228b22]/20 focus-within:border-[#228b22] transition-all">
+      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-md border bg-white ek-field-group focus-within:border-[#228b22] transition-all">
         {selectedValues.map((val, idx) => (
           <span key={`${val}-${idx}`} className="bg-[#e3ebdf] text-[#1c711c] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
@@ -681,7 +681,7 @@ export default function ActionModal({
 
       <div>
         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
-        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
+        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white ek-field-group transition-all">
           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
               <button type="button" onClick={() => applyFormat('bold')} className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"><b>B</b></button>
@@ -1534,7 +1534,7 @@ export default function ActionModal({
 
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
-                        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
+                        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white ek-field-group transition-all">
                           {/* Editor Header Toolbar */}
                           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-1.5">
@@ -1624,7 +1624,7 @@ export default function ActionModal({
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                          <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white focus-within:ring-2 focus-within:border-[#228b22] focus-within:ring-[#228b22]/20 ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
+                          <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white ek-field-group focus-within:border-[#228b22] ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
                               <span key={`tag-${t}-${idx}`} className="bg-[#e3ebdf] text-[#228b22] text-xs font-bold px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
                                 {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-slate-900 transition" onClick={() => removeTag(t)} />

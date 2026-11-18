@@ -102,13 +102,13 @@ export default function ProductCard({
           <div className="pc-stars-container">
             <div className="pc-stars" aria-label={`Rating ${rating} out of 5`}>
               {Array.from({ length: fullStars }).map((_, i) => (
-                <PlatformStar key={'f' + i} className="star star-filled" weight="fill" aria-hidden="true" />
+                <PlatformStar key={'f' + i} className="star star-filled" fill="currentColor" aria-hidden="true" />
               ))}
               {halfStar && (
-                <PlatformStarHalf className="star star-half" weight="fill" aria-hidden="true" />
+                <PlatformStarHalf className="star star-half" fill="currentColor" aria-hidden="true" />
               )}
               {Array.from({ length: emptyStars }).map((_, i) => (
-                <PlatformStar key={'e' + i} className="star star-empty" weight="regular" aria-hidden="true" />
+                <PlatformStar key={'e' + i} className="star star-empty" fill="none" aria-hidden="true" />
               ))}
             </div>
             <span className="pc-rating-num">({rating})</span>

@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from './axios';
 
-export interface ApiError {
-  message: string;
-  statusCode?: number;
-  retryAfter?: number;
-  errors?: Record<string, string[]> | Array<{ field: string; message: string }>;
-}
+import { normalizeApiError } from './api-error';
+export type { ApiError } from './api-error';
+import type { ApiError } from './api-error';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -199,36 +196,8 @@ const extractSessions = (payload: unknown): AuthSessionRecord[] => {
 
 // Handle API errors
 function handleApiError(error: unknown): never {
-  // Check if this is an axios error by checking for response property
-  if (error && typeof error === 'object' && 'response' in error) {
-    const axiError = error as any;
-    const apiError: ApiError = {
-      message:
-        axiError.response?.data?.message ||
-        axiError.message ||
-        'An error occurred',
-      statusCode: axiError.response?.status,
-    };
-
-    // Handle rate limiting
-    if (axiError.response?.status === 429) {
-      const retryAfter = axiError.response.headers['retry-after'];
-      apiError.retryAfter = retryAfter ? parseInt(retryAfter as string) : 900;
-    }
-
-    // Handle validation errors
-    if (axiError.response?.data?.errors) {
-      apiError.errors = axiError.response?.data?.errors;
-    }
-
-    throw apiError;
-  }
-
-  throw {
-    message: 'An unexpected error occurred',
-    statusCode: 500,
-  } as ApiError;
-};
+  throw normalizeApiError(error, typeof navigator !== 'undefined' && !navigator.onLine);
+}
 
 // Auth API
 export const authApi = {

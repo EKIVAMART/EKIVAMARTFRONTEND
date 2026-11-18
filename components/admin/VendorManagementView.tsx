@@ -877,7 +877,7 @@ export default function VendorManagementView({ isSuperAdmin, currentUserId }: Ve
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input (For relevant sections) */}
             {(activeSection === 'applications' || activeSection === 'withdrawals') && (
-              <div className="relative flex items-center bg-white border border-gray-200 rounded-md px-3 py-2 text-sm max-w-xs focus-within:border-brand-400 focus-within:ring-2 ring-brand-100 transition-all">
+              <div className="relative flex items-center bg-white border border-gray-200 rounded-md px-3 py-2 text-sm max-w-xs focus-within:border-brand-400 ek-field-group ring-brand-100 transition-all">
                 <Search size={16} className="text-gray-400 mr-2" />
                 <input
                   type="text"

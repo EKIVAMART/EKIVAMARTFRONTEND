@@ -9,7 +9,7 @@ import { Mail, Lock, Phone, User } from '@/components/ui/platform-icons';
 import PhoneInput from 'react-phone-number-input';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import toast from 'react-hot-toast';
-import { authApi } from '@/lib/api';
+import { authApi, type ApiError } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -79,6 +79,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({
 }) => {
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [registrationError, setRegistrationError] = useState<ApiError | null>(null);
   const [socialSubmitting, setSocialSubmitting] =
     useState<SocialProvider | null>(null);
 
@@ -104,6 +105,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({
   const password = watch('password');
 
   const onSubmit = async (data: SignupFormData) => {
+    setRegistrationError(null);
     try {
       await authApi.register({
         firstName: data.firstName,
@@ -117,7 +119,13 @@ export const SignupModal: React.FC<SignupModalProps> = ({
       setRegisteredEmail(data.email);
       setVerificationModalOpen(true);
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Registration failed'));
+      const details = error && typeof error === 'object' ? error as ApiError : undefined;
+      setRegistrationError({
+        message: getErrorMessage(error, 'Registration failed before a diagnostic response was received.'),
+        code: details?.code,
+        statusCode: details?.statusCode,
+        requestId: details?.requestId,
+      });
     }
   };
 
@@ -146,11 +154,13 @@ export const SignupModal: React.FC<SignupModalProps> = ({
   };
 
   const handleSwitchToLogin = () => {
+    setRegistrationError(null);
     reset();
     onSwitchToLogin();
   };
 
   const handleCloseSignup = () => {
+    setRegistrationError(null);
     reset();
     onClose();
   };
@@ -176,6 +186,16 @@ export const SignupModal: React.FC<SignupModalProps> = ({
         }
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {registrationError && (
+              <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <p>{registrationError.message}</p>
+                {(registrationError.code || registrationError.statusCode || registrationError.requestId) && (
+                  <p className="mt-2 text-xs">
+                    {[registrationError.statusCode && `HTTP ${registrationError.statusCode}`, registrationError.code, registrationError.requestId && `Reference: ${registrationError.requestId}`].filter(Boolean).join(' · ')}
+                  </p>
+                )}
+              </div>
+            )}
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -247,15 +267,16 @@ export const SignupModal: React.FC<SignupModalProps> = ({
                 </label>
                 <PhoneInput
                   {...field}
+                  aria-invalid={fieldState.invalid}
                   defaultCountry="NG"
                   international
                   countryCallingCodeEditable={false}
                   disabled={isSubmitting}
                   placeholder="Enter your phone number"
-                  className={`phone-number-input rounded-lg sm:rounded-xl border bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base transition-all duration-200 focus-within:ring-2 ${
+                  className={`phone-number-input rounded-lg sm:rounded-xl border bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base transition-all duration-200 ek-field-group ${
                     fieldState.error
-                      ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20'
-                      : 'border-gray-200 focus-within:border-purple-600 focus-within:ring-purple-500/20'
+                      ? 'border-red-300 focus-within:border-red-500'
+                      : 'border-gray-200 focus-within:border-purple-600'
                   }`}
                 />
                 {fieldState.error && (

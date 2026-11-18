@@ -1936,7 +1936,7 @@ function AdminPageContent() {
               </div>
             </header>
 
-            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -1992,7 +1992,7 @@ function AdminPageContent() {
               </button>
             </header>
 
-            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -2051,7 +2051,7 @@ function AdminPageContent() {
             )}
 
             {activeTab === 'products' && (
-              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition-all">
+              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] ek-field-group transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
                   type="text"

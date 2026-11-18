@@ -2,7 +2,6 @@
 import { CurrencyNgn as PlatformCurrencyNgn } from '@/components/ui/platform-icons';
 import RecordStatus from "@/components/admin/RecordStatus";
 import { Metric, OrderBreakdown } from '@/components/admin/OverviewPrimitives';
-import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
 import DashboardRevenueChart from '@/components/admin/DashboardRevenueChart';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
@@ -367,7 +366,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
 
         <OrderBreakdown total={ordersBarData?.totalOrdersCount ?? 0} value={ordersBarData?.totalOrdersRevenue ?? 0} loading={loadingOrdersBar} error={errorOrdersBar} onRetry={fetchOrdersBarChart} onOpen={()=>onNavigate?.('orders')} rows={ordersBarData?.breakdown ?? (ordersBarData ? ['ordered','processing','delivered'].map(key=>({status:key === 'ordered' ? 'pending / confirmed' : key === 'processing' ? 'processing / shipped' : key,count:ordersBarData[key]?.count ?? 0,totalRevenue:ordersBarData[key]?.revenue ?? 0,percentage:ordersBarData[key]?.percentage ?? 0})) : [])}/>
       </div>
-      <NewsletterSubscriberCount />
+
       {!errorKpi && !loadingKpi && <div className="overview-context"><span>{kpiData?.activeVendorsCount ?? '—'} active vendors</span><span>{kpiData?.totalOrdersCount ?? '—'} eligible orders</span><span>{fmtNGN(kpiData?.withdrawnTotal?.totalAllTime)} withdrawn · lifetime</span></div>}
 
       {/* ── 4. TOP PRODUCTS & 3. RECENT ACTIVITIES FEEDS ── */}

@@ -2,7 +2,6 @@
 import DashboardRevenueChart from './DashboardRevenueChart';
 import { Metric, OrderBreakdown } from './OverviewPrimitives';
 import RecordStatus from "@/components/admin/RecordStatus";
-import NewsletterSubscriberCount from '@/components/admin/NewsletterSubscriberCount';
 
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -268,7 +267,7 @@ export default function AdminDashboardView({ onNavigate }: AdminDashboardViewPro
         </section>
         <OrderBreakdown rows={breakdownList} total={orderAnalytics?.totalOrdersCount ?? 0} value={orderAnalytics?.totalOrdersRevenue ?? 0} loading={loadingAnalytics} error={errorAnalytics} onRetry={fetchOrderAnalytics} onOpen={()=>onNavigate?.('orders')}/>
       </div>
-      <NewsletterSubscriberCount />
+
 
       {/* ── 3.3 Top Products & Recent Orders Grid ──────────────────────── */}
       <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">

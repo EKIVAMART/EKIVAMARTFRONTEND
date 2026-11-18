@@ -584,7 +584,7 @@ export default function VendorSpecialistsView() {
       {/* Filters row */}
       <div className="bg-white rounded-md border shadow-xs p-4 space-y-3">
         {/* Search */}
-        <div className="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2.5 focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition bg-slate-50">
+        <div className="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2.5 focus-within:border-[#228b22] ek-field-group transition bg-slate-50">
           <Search size={16} className="text-gray-400 shrink-0" />
           <input
             type="text"
