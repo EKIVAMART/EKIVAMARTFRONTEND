@@ -115,7 +115,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
             isWishlisted ? 'text-brand-600 border-brand-400' : 'text-neutral-500 hover:text-brand-600'
           }`}
         >
-          <ProductHeart size={14} weight={isWishlisted ? "fill" : "duotone"} className="transition-colors duration-200" aria-hidden="true" />
+          <ProductHeart size={14} fill={isWishlisted ? "currentColor" : "none"} className="transition-colors duration-200" aria-hidden="true" />
         </button>
       </div>
 
@@ -137,7 +137,7 @@ export default function ProductCard({ product, isMobile = false }: ProductCardPr
       {/* Rating (5 Stars) */}
       <div className="mb-1 flex items-center gap-0.5 text-xs text-amber-500">
         {Array.from({ length: 5 }).map((_, i) => (
-          <ProductStar key={i} className="w-3.5 h-3.5" weight="fill" aria-hidden="true" />
+          <ProductStar key={i} className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true" />
         ))}
         <span className="text-neutral-500 font-medium ml-1">
           {product.rating} ({product.reviewCount})

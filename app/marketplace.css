@@ -1,7 +1,7 @@
-:root{--ek-green:#228b22;--ek-dark:#183d27;--ek-lime:#95c11f;--ek-ink:#202820;--ek-muted:#657065;--ek-border:#e2e7e1}
+:root{--ek-surface:#f6f7f3;--ek-soft:#dfead5;--ek-deep:#102b1b;--ek-green:#228b22;--ek-dark:#183d27;--ek-lime:#95c11f;--ek-ink:#202820;--ek-muted:#657065;--ek-border:#e2e7e1}
 body{background:#fff;color:var(--ek-ink);font-family:var(--font-dm-sans),Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5}
 h1,h2,h3,h4{font-family:inherit;letter-spacing:-.025em;line-height:1.2}
-button,input,select,textarea{font:inherit}button,a,input,select,textarea{outline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ek-green)}
+button,input,select,textarea{font:inherit}
 [class*="rounded-2xl"],[class*="rounded-3xl"]{border-radius:6px}button[class*="rounded-full"],a[class*="rounded-full"],input[class*="rounded-full"]{border-radius:4px}
 [class*="shadow-lg"],[class*="shadow-xl"],[class*="shadow-2xl"]{box-shadow:0 3px 16px #18291d0a}
 [class*="font-black"],[class*="font-extrabold"]{font-weight:650}[class*="tracking-widest"],[class*="tracking-wider"]{letter-spacing:.035em}

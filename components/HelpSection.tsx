@@ -49,8 +49,8 @@ const contacts: ContactItem[] = [
   {
     id: "email",
     label: "Email Support",
-    value: "vendors@faflora.com",
-    href: "mailto:vendors@faflora.com",
+    value: "vendors@ekivamart.com",
+    href: "mailto:vendors@ekivamart.com",
     icon: <MailIcon />,
   },
 ];

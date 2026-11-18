@@ -97,11 +97,11 @@ const RowSkeleton = () => (
 );
 
 const PauseIcon = () => (
-  <PlatformPause className="w-4 h-4" weight="fill" aria-hidden="true" />
+  <PlatformPause className="w-4 h-4" fill="currentColor" aria-hidden="true" />
 );
 
 const PlayIcon = () => (
-  <PlatformPlay className="w-4 h-4" weight="fill" aria-hidden="true" />
+  <PlatformPlay className="w-4 h-4" fill="currentColor" aria-hidden="true" />
 );
 
 const FeaturedCategories = () => {

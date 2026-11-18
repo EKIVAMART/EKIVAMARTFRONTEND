@@ -67,7 +67,7 @@ const contactInfo = [
   },
   {
     icon: FiMail,
-    text: 'Email: faflora@outlook.com',
+    text: 'Email: support@ekivamart.com',
   },
   {
     icon: FiClock,
@@ -101,7 +101,7 @@ const Listfoot = () => {
           {/* BRAND & CONTACT */}
           <div className="lg:col-span-2 space-y-6">
             <Link href="/">
-              <Image src="/fa_logo_brand.png" alt="Faflora" width={160} height={45} className="object-contain" />
+              <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={160} height={45} className="object-contain" />
             </Link>
 
             <p className="text-gray-500 text-sm max-w-sm">
@@ -178,7 +178,7 @@ const Listfoot = () => {
       {/* BOTTOM SECTION */}
       <div>
         <div className="w-[90%] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">© 2026, Faflora</p>
+          <p className="text-sm text-gray-500">© 2026, EkivaMart</p>
 
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-gray-700">Follow Us</span>

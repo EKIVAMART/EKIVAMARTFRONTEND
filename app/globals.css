@@ -365,17 +365,43 @@ button {
   box-shadow: var(--shadow-brand-lg);
 }
 
-/* Button Focus Styles — 3:1+ contrast ring for WCAG 2.1 AA */
-button:focus-visible,
-a:focus-visible {
-  @apply outline-none ring-2 ring-purple-700 ring-offset-2;
+:is(button, a, input, textarea, select, summary, [tabindex], [contenteditable='true']):focus {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-inset-ring-shadow: 0 0 #0000;
 }
 
-/* Input Focus Styles */
-input:focus,
-textarea:focus,
-select:focus {
-  @apply outline-none ring-2 ring-purple-500/30 border-purple-600;
+:is(button, a, summary, [tabindex], [contenteditable='true']):focus-visible {
+  outline: 2px solid #22643e;
+  outline-offset: 2px;
+}
+
+:is(input, textarea, select):focus {
+  outline: 2px solid #22643e;
+  outline-offset: -1px;
+}
+
+:is(input, textarea, select)[aria-invalid='true']:focus {
+  outline-color: #b42318;
+}
+
+.ek-field-group {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
+.ek-field-group:has(:is(input, textarea, select, [contenteditable='true']):focus) {
+  outline: 2px solid #22643e;
+  outline-offset: -1px;
+}
+
+.ek-field-group:has([aria-invalid='true']:focus) {
+  outline-color: #b42318;
+}
+
+.ek-field-group :is(input, textarea, select, [contenteditable='true']):focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .phone-number-input .PhoneInputInput {

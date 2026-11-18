@@ -38,8 +38,8 @@ export const CONTACT_REASONS = [
 ] as const;
 
 export const SOCIALS = [
-  { label: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/faflora_ng', handle: '@faflora_ng' },
-  { label: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@faflora_ng', handle: '@faflora_ng' },
+  { label: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/faflora_ng', handle: 'EkivaMart' },
+  { label: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@faflora_ng', handle: 'EkivaMart' },
   { label: 'LinkedIn', icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/faflora', handle: 'EkivaMart' },
 ];
 
@@ -59,8 +59,8 @@ export const faqs = [
     a: "First, check your order tracking from your account dashboard. If it's been more than 3 business days past the expected date, contact us with your Order ID and we'll investigate right away.",
   },
   {
-    q: 'How do I become a vendor on Faflora?',
-    a: 'Please reach out to our vendor team through this contact form or email vendors@faflora.com, and our vendor onboarding team will assist you directly.',
+    q: 'How do I become a vendor on EkivaMart?',
+    a: 'Please reach out to our vendor team through this contact form or email vendors@ekivamart.com, and our vendor onboarding team will assist you directly.',
   },
   {
     q: 'Can I request a refund through this form?',

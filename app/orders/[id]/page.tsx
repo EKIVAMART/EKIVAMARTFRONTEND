@@ -300,7 +300,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                         : 'Package successfully delivered'}
                     </h3>
                     <p className="text-xs text-emerald-800 font-semibold mt-0.5">
-                      Your items have arrived safely. Thank you for shopping with Faflories!
+                      Your items have arrived safely. Thank you for shopping with EkivaMart!
                     </p>
                   </div>
                 </div>

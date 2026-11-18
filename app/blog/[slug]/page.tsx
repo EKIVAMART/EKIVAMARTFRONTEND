@@ -92,9 +92,9 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
             const publicPostsRes = await blogApi.getPublicPosts({ page: 1, limit: 6 });
             if (publicPostsRes?.posts) {
               const gradients = [
-                'from-[#8b0d7a] via-[#5c0060] to-[#1a0016]',
-                'from-[#ff7043] via-[#e65100] to-[#1a0016]',
-                'from-[#00b8d9] via-[#005f73] to-[#1a0016]',
+                'from-[var(--ek-green)] via-[var(--ek-dark)] to-[var(--ek-deep)]',
+                'from-[var(--ek-lime)] via-[var(--ek-green)] to-[var(--ek-deep)]',
+                'from-[var(--ek-green)] via-[var(--ek-dark)] to-[var(--ek-deep)]',
               ];
               const filtered = publicPostsRes.posts
                 .filter((p) => p.slug !== live!.slug && p.id !== live!.id)
@@ -128,12 +128,12 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
 
   if (!post && !loading) {
     return (
-      <div className="font-sans bg-[#fdf8ff] min-h-screen flex items-center justify-center py-20 px-6">
-        <div className="max-w-md w-full text-center bg-white border border-[#e8b8e4] rounded-3xl p-8 shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center mx-auto mb-5">
-            <BookOpen size={28} className="text-[#67a652]" />
+      <div className="font-sans bg-[var(--ek-surface)] min-h-screen flex items-center justify-center py-20 px-6">
+        <div className="max-w-md w-full text-center bg-white border border-[var(--ek-border)] rounded-3xl p-8 shadow-xl">
+          <div className="w-16 h-16 rounded-full bg-[var(--ek-surface)] border border-[var(--ek-border)] flex items-center justify-center mx-auto mb-5">
+            <BookOpen size={28} className="text-[var(--ek-green)]" />
           </div>
-          <h1 className="text-2xl font-black text-[#1a0018] mb-3" style={{ fontFamily: "'Georgia', serif" }}>
+          <h1 className="text-2xl font-black text-[var(--ek-ink)] mb-3" style={{ fontFamily: "'Georgia', serif" }}>
             Article Not Found
           </h1>
           <p className="text-gray-500 text-sm mb-6 leading-relaxed">
@@ -141,7 +141,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           </p>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#228b22] to-[#1c711c] hover:from-[#1c711c] hover:to-[#56154e] text-white font-bold text-sm px-6 py-3.5 rounded-full transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--ek-green)] to-[var(--ek-dark)] hover:from-[var(--ek-dark)] hover:to-[var(--ek-dark)] text-white font-bold text-sm px-6 py-3.5 rounded-full transition-all shadow-md"
           >
             <ArrowLeft size={16} /> Back to Blog
           </Link>
@@ -152,10 +152,10 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
 
   if (loading && !post) {
     return (
-      <div className="font-sans bg-[#1a0016] min-h-screen flex items-center justify-center py-20 px-6 text-white">
+      <div className="font-sans bg-[var(--ek-deep)] min-h-screen flex items-center justify-center py-20 px-6 text-white">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border-4 border-[#67a652]/20 border-t-[#67a652] rounded-full animate-spin" />
-          <span className="text-sm font-bold text-purple-200">Loading article...</span>
+          <div className="w-8 h-8 border-4 border-[var(--ek-green)]/20 border-t-[var(--ek-green)] rounded-full animate-spin" />
+          <span className="text-sm font-bold text-[var(--ek-soft)]">Loading article...</span>
         </div>
       </div>
     );
@@ -165,7 +165,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
 
   return (
     <div
-      className="font-sans bg-[#fdf8ff] min-h-screen overflow-x-hidden"
+      className="font-sans bg-[var(--ek-surface)] min-h-screen overflow-x-hidden"
       style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', 'Georgia', serif" }}
     >
       {/* ══ HERO ══ */}
@@ -178,26 +178,25 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               alt={post.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#140026] via-[#1a0016]/85 to-[#1a0016]/90 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--ek-deep)] via-[var(--ek-deep)]/85 to-[var(--ek-deep)]/90 backdrop-blur-[1px]" />
           </div>
         ) : (
           <>
-            {/* Deep plum background fallback */}
-            <div className="absolute inset-0 bg-[#1a0016]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1a0016] via-[#2d002a] to-[#140026]/90" />
+            <div className="absolute inset-0 bg-[var(--ek-deep)]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--ek-deep)] via-[var(--ek-dark)] to-[var(--ek-deep)]/90" />
           </>
         )}
 
         {/* Ambient glow orbs */}
-        <div className="absolute top-[-10%] left-[-8%] w-[45vw] h-[45vw] rounded-full bg-[#8b0d7a] opacity-[0.20] blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[#5c0060] opacity-[0.25] blur-[100px] pointer-events-none" />
-        <div className="absolute top-[10%] right-[10%] w-[25vw] h-[25vw] rounded-full bg-[#67a652] opacity-[0.10] blur-[80px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-8%] w-[45vw] h-[45vw] rounded-full bg-[var(--ek-green)] opacity-[0.20] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[var(--ek-dark)] opacity-[0.25] blur-[100px] pointer-events-none" />
+        <div className="absolute top-[10%] right-[10%] w-[25vw] h-[25vw] rounded-full bg-[var(--ek-green)] opacity-[0.10] blur-[80px] pointer-events-none" />
 
         {/* Grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.02] pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, #67a652 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, var(--ek-green) 1px, transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -212,7 +211,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               <ArrowLeft size={14} /> Back to Journal
             </Link>
             <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 text-white/90 text-[10px] font-black uppercase tracking-[3px] px-3.5 py-1.5 rounded-full">
-              <Tag size={10} className="text-[#f0c8ec]" />
+              <Tag size={10} className="text-[var(--ek-soft)]" />
               {post.category}
             </div>
           </div>
@@ -234,7 +233,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <FadeInSection type="fadeUp" delay={0.2}>
             <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/15">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#228b22] to-[#1c711c] flex items-center justify-center text-white font-black text-sm border-2 border-white/20 shadow-md">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--ek-green)] to-[var(--ek-dark)] flex items-center justify-center text-white font-black text-sm border-2 border-white/20 shadow-md">
                   {post.author.avatar}
                 </div>
                 <div>
@@ -262,7 +261,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
       {/* ══ MAIN BODY CONTENT ══ */}
       <section className="relative py-16">
         <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-white border border-[#e8e4f0] rounded-3xl p-8 md:p-12 shadow-sm">
+          <div className="bg-white border border-[var(--ek-border)] rounded-3xl p-8 md:p-12 shadow-sm">
             {/* Article Content */}
             {htmlContent ? (
               <div
@@ -278,7 +277,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           <div className="mt-8 flex items-center justify-between border-t border-gray-200/60 pt-6 px-4">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-1 text-[#67a652] hover:text-[#1c711c] font-bold text-sm transition-colors"
+              className="inline-flex items-center gap-1 text-[var(--ek-green)] hover:text-[var(--ek-dark)] font-bold text-sm transition-colors"
             >
               <ArrowLeft size={15} /> Back to Journal
             </Link>
@@ -291,7 +290,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           {relatedPosts.length > 0 && (
             <div className="mt-16">
               <h3
-                className="text-xl md:text-2xl font-black text-[#1a0018] mb-6 border-l-4 border-[#67a652] pl-3"
+                className="text-xl md:text-2xl font-black text-[var(--ek-ink)] mb-6 border-l-4 border-[var(--ek-green)] pl-3"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
                 Keep Reading
@@ -299,7 +298,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 {relatedPosts.map((relPost) => (
                   <Link href={`/blog/${relPost.slug}`} key={relPost.slug} className="group block">
-                    <div className="bg-white border border-[#e8e4f0] rounded-2xl overflow-hidden hover:border-[#67a652] hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                    <div className="bg-white border border-[var(--ek-border)] rounded-2xl overflow-hidden hover:border-[var(--ek-green)] hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                       <div
                         className={`relative h-28 bg-gradient-to-br ${relPost.gradient} p-4 flex items-start justify-between flex-shrink-0 overflow-hidden`}
                       >
@@ -319,12 +318,12 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
                       </div>
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         <h4
-                          className="font-extrabold text-sm text-[#1a0018] group-hover:text-[#67a652] transition-colors leading-snug mb-2 line-clamp-2"
+                          className="font-extrabold text-sm text-[var(--ek-ink)] group-hover:text-[var(--ek-green)] transition-colors leading-snug mb-2 line-clamp-2"
                           style={{ fontFamily: "'Georgia', serif" }}
                         >
                           {relPost.title}
                         </h4>
-                        <span className="text-[10px] text-[#1c711c] font-bold flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                        <span className="text-[10px] text-[var(--ek-dark)] font-bold flex items-center gap-1 group-hover:gap-1.5 transition-all">
                           Read Post <ArrowRight size={12} />
                         </span>
                       </div>
@@ -336,26 +335,26 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           )}
 
           {/* ─── SUPPORT CTA ─── */}
-          <div className="relative overflow-hidden rounded-3xl border border-[#e8b8e4] mt-16">
+          <div className="relative overflow-hidden rounded-3xl border border-[var(--ek-border)] mt-16">
             <div
               className="absolute inset-0"
               style={{
-                background: 'linear-gradient(135deg, #120010 0%, #1a0016 40%, #2b0129 70%, #40003b 100%)',
+                background: 'linear-gradient(135deg, var(--ek-deep), var(--ek-dark))',
               }}
             />
-            <div className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-[#ff69e0] opacity-[0.12] blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[#1c711c] opacity-[0.06] blur-[60px] pointer-events-none" />
+            <div className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-[var(--ek-lime)] opacity-[0.12] blur-[80px] pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[var(--ek-dark)] opacity-[0.06] blur-[60px] pointer-events-none" />
 
             <div className="relative flex flex-col sm:flex-row items-center gap-6 px-8 py-8">
               <div className="flex-1 text-center sm:text-left">
                 <h4 className="text-white font-extrabold text-lg">Have more questions?</h4>
-                <p className="mt-1 text-white/50 text-xs">
+                <p className="mt-1 text-white/80 text-xs">
                   Our Support Center is packed with step-by-step guides for buyers and vendors.
                 </p>
               </div>
               <Link
                 href="/support"
-                className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-[#981d87] font-extrabold text-xs px-5 py-3 rounded-full hover:bg-[#f9eaf8] hover:scale-105 transition-all shadow-md"
+                className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-[var(--ek-dark)] font-extrabold text-xs px-5 py-3 rounded-full hover:bg-[var(--ek-soft)] hover:scale-105 transition-all shadow-md"
               >
                 Support Center <ArrowRight size={13} />
               </Link>

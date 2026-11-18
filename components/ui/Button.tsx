@@ -21,19 +21,19 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 whitespace-nowrap';
+    'inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg sm:rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 whitespace-nowrap';
 
   const variants = {
     primary:
-      'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 focus:ring-purple-500 shadow-sm hover:shadow-md',
+      'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-sm hover:shadow-md',
     secondary:
-      'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300 focus:ring-gray-500',
+      'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
     outline:
-      'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 active:bg-purple-100 focus:ring-purple-500',
+      'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 active:bg-purple-100',
     ghost:
-      'text-purple-600 hover:bg-purple-50 active:bg-purple-100 focus:ring-purple-500',
+      'text-purple-600 hover:bg-purple-50 active:bg-purple-100',
     danger:
-      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500 shadow-sm hover:shadow-md',
+      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm hover:shadow-md',
   };
 
   const sizes = {

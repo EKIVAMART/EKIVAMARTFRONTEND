@@ -325,7 +325,7 @@ const Subnavbar = (): JSX.Element => {
             {/* Logo */}
             <div className="flex-1 flex justify-center">
               <Link href="/">
-                <Image src="/fa_logo_brand.png" alt="Faflora" width={120} height={32} className="object-contain" />
+                <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={120} height={32} className="object-contain" />
               </Link>
             </div>
 
@@ -402,7 +402,7 @@ const Subnavbar = (): JSX.Element => {
             href="/"
             className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
           >
-            <Image src="/fa_logo_brand.png" alt="Faflora" width={160} height={45} className="object-contain" />
+            <Image src="/brand/ekivamart-logo.svg" alt="EkivaMart" width={160} height={45} className="object-contain" />
           </Link>
 
           {/* Search Bar - Takes up more space */}

@@ -133,7 +133,7 @@ export default function VendorPage({ params }: VendorPageProps) {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <PlatformStar key={i} className={`w-3.5 h-3.5 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`} weight="fill" aria-hidden="true" />
+      <PlatformStar key={i} className={`w-3.5 h-3.5 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" aria-hidden="true" />
     ));
   };
 

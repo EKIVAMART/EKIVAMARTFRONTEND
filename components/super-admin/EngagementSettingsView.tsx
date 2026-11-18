@@ -62,7 +62,7 @@ const TYPE_META: Record<
     variables: [
       { tag: '{{firstName}}', label: 'Customer Name', sample: 'Sarah' },
       { tag: '{{daysSinceLastOrder}}', label: 'Inactivity Days', sample: '30' },
-      { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://faflora.com' },
+      { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://ekivamart.com' },
       { tag: '{{appName}}', label: 'App Name', sample: 'EkivaMart' },
     ],
   },
@@ -77,7 +77,7 @@ const TYPE_META: Record<
       { tag: '{{firstName}}', label: 'Vendor Name', sample: 'Alex' },
       { tag: '{{storeName}}', label: 'Store Name', sample: 'Flora Elegance' },
       { tag: '{{daysSinceStarted}}', label: 'Days Pending', sample: '3' },
-      { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://faflora.com' },
+      { tag: '{{frontendUrl}}', label: 'Store URL', sample: 'https://ekivamart.com' },
       { tag: '{{appName}}', label: 'App Name', sample: 'EkivaMart' },
     ],
   },
@@ -596,7 +596,7 @@ function SettingCard({ setting, userNamesMap, onSaved }: SettingCardProps) {
                       {/* Fake Email Header */}
                       <div className="bg-slate-50 border-b border-slate-200 p-4 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span className="font-extrabold text-slate-700">From: EkivaMart Notifications &lt;no-reply@faflora.com&gt;</span>
+                          <span className="font-extrabold text-slate-700">From: EkivaMart Notifications &lt;no-reply@ekivamart.com&gt;</span>
                           <span className="text-[10px] bg-emerald-50 text-slate-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Simulated Email</span>
                         </div>
                         <div className="text-xs text-slate-600">
