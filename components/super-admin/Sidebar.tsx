@@ -142,7 +142,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
           />
           <SidebarLink
             icon={<Truck size={20} />}
-            label="Delivery routes"
+            label="Delivery"
             active={activeTab === 'deliveryRoutes'}
             onClick={() => { setActiveTab('deliveryRoutes'); onClose?.(); }}
           />

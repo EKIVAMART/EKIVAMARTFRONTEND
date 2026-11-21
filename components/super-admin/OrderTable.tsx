@@ -1,3 +1,4 @@
+import { formatDeliveryAddress } from '@/lib/utils/delivery';
 import RecordStatus from "@/components/admin/RecordStatus";
 import RecordActions from '@/components/admin/RecordActions';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -218,7 +219,7 @@ export default function OrderTable({ data: initialData = [], searchQuery: global
         const totalNum = typeof rawAmount === 'number' ? rawAmount : parseFloat(String(rawAmount)) || 0;
 
         const rawAddr =
-          order.shippingAddress?.addressLine1 ||
+          formatDeliveryAddress(order.shippingAddress) ||
           order.shippingAddress?.address ||
           order.deliveryAddress ||
           order.address ||

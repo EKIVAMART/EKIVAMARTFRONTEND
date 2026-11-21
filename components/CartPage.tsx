@@ -1,7 +1,7 @@
 'use client';
 import { Check as PlatformCheck } from '@/components/ui/platform-icons';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Trash2,
@@ -47,13 +47,15 @@ import {
   orderApi,
   ordersApi,
   userAddressApi,
-  deliveryRoutesApi,
+  CartSummaryResponse,
   SavedAddressItem,
-  AvailableState,
   OrderQuote,
   ExpectedDelivery,
 } from '@/lib/api';
 import { deliveryCopy, daysUntil, formatNaira } from '@/lib/utils/delivery';
+import { DeliveryLocationPicker, LocationRequest } from '@/components/DeliveryLocationPicker';
+import { AddressesTab } from '@/components/auth/AddressesTab';
+import { locationError, refreshCoverage } from '@/lib/delivery-coverage';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
@@ -65,7 +67,7 @@ export default function CartPage() {
   const savedItems = useAppSelector((state) => state.cart.savedItems);
   const activeCount = useAppSelector((state) => state.cart.activeCount);
   const savedCount = useAppSelector((state) => state.cart.savedCount);
-  const summary = useAppSelector((state) => state.cart.summary);
+
   const loading = useAppSelector((state) => state.cart.loading);
 
   // Local state
@@ -74,10 +76,6 @@ export default function CartPage() {
   const [showClearAllModal, setShowClearAllModal] = useState(false);
   const [showClearSelectedModal, setShowClearSelectedModal] = useState(false);
 
-  // Deliverable states from GET /api/v1/delivery-routes/available
-  const [availableStates, setAvailableStates] = useState<AvailableState[]>([]);
-  const [loadingStates, setLoadingStates] = useState<boolean>(false);
-  const [cartSelectedState, setCartSelectedState] = useState<string>('');
   const [isBreakdownExpanded, setIsBreakdownExpanded] = useState<boolean>(false);
 
   // Checkout flow state & Live Quote
@@ -94,20 +92,66 @@ export default function CartPage() {
   const [useSavedAddress, setUseSavedAddress] = useState<boolean>(false);
   const [saveAddressToProfile, setSaveAddressToProfile] = useState<boolean>(false);
   const [loadingAddresses, setLoadingAddresses] = useState<boolean>(false);
-  // Tracks whether addresses have been fetched at least once (avoids double-fetch on mount)
-  const addressesFetchedRef = useRef<boolean>(false);
 
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine1: '',
     addressLine2: '',
-    city: '',
+    lga: '',
+    town: '',
     state: '',
     postalCode: '',
     country: 'Nigeria',
     phoneNumber: '',
   });
+  const [guestRequest, setGuestRequest] = useState(false);
   const [checkoutNotes, setCheckoutNotes] = useState('');
+  const selectedAddress = savedAddresses.find((address) => address.id === selectedSavedAddressId);
+  const [editingAddress, setEditingAddress] = useState<SavedAddressItem | null>(null);
+  const destination = (useSavedAddress && selectedAddress) || shippingAddress;
+  const { state, lga = '', town = '' } = destination;
+  const cartKey = JSON.stringify(activeItems.map(item => [item.productId, item.quantity, item.isSelected, item.product?.price]));
+  const summaryKey = JSON.stringify([state, lga, town, cartKey]);
+  const [priced, setPriced] = useState<{ key: string; data?: CartSummaryResponse; error?: string } | null>(null);
+  const summary = priced?.key === summaryKey ? priced.data : undefined;
+  const coverageError = (priced?.key === summaryKey && priced.error) || summary?.deliveryError ||
+    (useSavedAddress && (!lga || !town) ? 'Please update your saved delivery location.' : null);
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let current = true;
+    const params = state && lga && town ? { state, lga, town } : {};
+    cartApi.getCartSummary(params).then(result => {
+      if (!current) return;
+      setPriced({ key: summaryKey, data: result.data });
+      if (town && result.data?.deliveryError && locationError(result.data.deliveryError)) refreshCoverage();
+    }).catch(error => {
+      if (!current) return;
+      if (town && locationError(error.message || '')) refreshCoverage();
+      setPriced({ key: summaryKey, error: error.message || 'Could not calculate delivery.' });
+    });
+    return () => { current = false; };
+  }, [state, lga, town, summaryKey, isAuthenticated]);
+
+  const invalidateRejectedLocation = (message: string) => {
+    if (!locationError(message)) return;
+    setQuoteData(null);
+    setQuoteError(message);
+    refreshCoverage();
+  };
+
+  const orderAddress = () => {
+    if ((useSavedAddress && !selectedAddress) || !state || !lga || !town ||
+      !destination.fullName?.trim() || !destination.phoneNumber?.trim() || !destination.country?.trim()) return null;
+    return {
+      state, lga, town,
+      fullName: destination.fullName.trim(),
+      phoneNumber: destination.phoneNumber.trim(),
+      country: destination.country.trim(),
+      addressLine1: destination.addressLine1?.trim() || undefined,
+      addressLine2: destination.addressLine2?.trim() || undefined,
+      postalCode: destination.postalCode?.trim() || undefined,
+    };
+  };
 
   // Order success modal state with recalculated delivery date
   const [showOrderSuccessModal, setShowOrderSuccessModal] = useState(false);
@@ -118,7 +162,7 @@ export default function CartPage() {
     setMounted(true);
   }, []);
 
-  const loadSavedAddresses = async (silent = false) => {
+  const loadSavedAddresses = async (silent = false, preferredId = selectedSavedAddressId) => {
     if (!silent) setLoadingAddresses(true);
     try {
       const res = await userAddressApi.list();
@@ -135,14 +179,13 @@ export default function CartPage() {
         }
 
         setSavedAddresses(list);
-        addressesFetchedRef.current = true;
         if (list.length > 0) {
           // Preserve currently selected address if still valid, else pick default
-          const stillValid = list.find((a) => a.id === selectedSavedAddressId);
+          const stillValid = list.find((a) => a.id === preferredId);
           const defaultAddr = stillValid || list.find((a) => a.isDefault) || list[0];
           setSelectedSavedAddressId(defaultAddr.id);
           setUseSavedAddress(true);
-          dispatch(fetchCartSummary({ country: defaultAddr.country || 'NG', state: defaultAddr.state }));
+
         } else {
           setUseSavedAddress(false);
           setSelectedSavedAddressId(null);
@@ -154,29 +197,6 @@ export default function CartPage() {
       setLoadingAddresses(false);
     }
   };
-
-  // Fetch deliverable states and cart details on mount / auth state change
-  useEffect(() => {
-    let isSubscribed = true;
-    const loadAvailableStates = async () => {
-      setLoadingStates(true);
-      try {
-        const res = await deliveryRoutesApi.getAvailableStates();
-        if (isSubscribed && res?.success && Array.isArray(res.data)) {
-          setAvailableStates(res.data);
-        }
-      } catch (err) {
-        console.error('Failed to load deliverable states', err);
-      } finally {
-        if (isSubscribed) setLoadingStates(false);
-      }
-    };
-
-    loadAvailableStates();
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
 
   // Fetch cart details on mount / auth state change
   useEffect(() => {
@@ -196,34 +216,8 @@ export default function CartPage() {
       return;
     }
 
-    let destState = '';
-    let savedAddrId: string | undefined;
-    let customAddr: any;
-
-    if (useSavedAddress && selectedSavedAddressId) {
-      const addr = savedAddresses.find((a) => a.id === selectedSavedAddressId);
-      if (addr) {
-        destState = addr.state || '';
-        savedAddrId = addr.id;
-      }
-    } else if (!useSavedAddress && shippingAddress.state) {
-      destState = shippingAddress.state;
-      customAddr = {
-        fullName: shippingAddress.fullName,
-        addressLine1: shippingAddress.addressLine1,
-        addressLine2: shippingAddress.addressLine2,
-        city: shippingAddress.city,
-        state: shippingAddress.state,
-        postalCode: shippingAddress.postalCode,
-        country: shippingAddress.country || 'Nigeria',
-        phoneNumber: shippingAddress.phoneNumber,
-      };
-    }
-
-    if (!destState || (!savedAddrId && [
-      shippingAddress.fullName, shippingAddress.addressLine1, shippingAddress.city,
-      shippingAddress.postalCode, shippingAddress.country, shippingAddress.phoneNumber,
-    ].some((value) => !value.trim()))) {
+    const address = orderAddress();
+    if (!summary?.deliveryFeeCalculated || coverageError || !address) {
       setQuoteData(null);
       return;
     }
@@ -234,8 +228,7 @@ export default function CartPage() {
     try {
       const res = await ordersApi.getQuote({
         items: selected.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        shippingAddress: savedAddrId ? undefined : customAddr,
-        savedAddressId: savedAddrId,
+        shippingAddress: address,
       });
 
       if (!isCurrent()) return;
@@ -251,6 +244,7 @@ export default function CartPage() {
       const backendMsg =
         err?.response?.data?.message || err?.message || 'Delivery route is not configured for this state';
       setQuoteError(backendMsg);
+      if (locationError(backendMsg)) refreshCoverage();
     } finally {
       if (isCurrent()) setLoadingQuote(false);
     }
@@ -279,6 +273,8 @@ export default function CartPage() {
     savedAddresses,
     shippingAddress,
     activeItems,
+    coverageError,
+    summary,
   ]);
 
   if (!mounted) {
@@ -300,6 +296,8 @@ export default function CartPage() {
         <p className="mb-6 text-stone-600">Sign in to see your items and continue to checkout.</p>
         <button type="button" className="ek-action" onClick={() => window.dispatchEvent(new Event('ekivamart:sign-in'))}>Sign in</button>
         <Link href="/categories/shop" className="mt-4 underline underline-offset-4">Continue shopping</Link>
+        <button type="button" className="mt-4 text-sm underline" onClick={() => setGuestRequest(true)}>Request delivery to my area</button>
+        {guestRequest && <LocationRequest close={() => setGuestRequest(false)}/>}
       </section>
     );
   }
@@ -443,8 +441,7 @@ export default function CartPage() {
       toast.success('Stock verified successfully!', { id: validateToast });
 
       setIsProcessing(false);
-      // Always re-fetch saved addresses fresh when entering checkout
-      void loadSavedAddresses(false);
+
       setIsCheckingOut(true);
     } catch (err: any) {
       setIsProcessing(false);
@@ -455,7 +452,7 @@ export default function CartPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (loadingAddresses || loadingQuote || !quoteData || quoteError || isProcessing) {
+    if (!summary?.deliveryFeeCalculated || loadingAddresses || loadingQuote || !quoteData || quoteError || coverageError || isProcessing) {
       toast.error('Please complete your address and wait for a valid delivery quote.');
       return;
     }
@@ -465,53 +462,25 @@ export default function CartPage() {
       return;
     }
 
-    let checkoutPayload: any;
-
-    if (useSavedAddress && selectedSavedAddressId) {
-      // Option 2: Use saved address ID — preferred path when a saved address is selected
-      checkoutPayload = {
-        savedAddressId: selectedSavedAddressId,
-        notes: checkoutNotes,
-      };
-    } else if (useSavedAddress && !selectedSavedAddressId) {
-      // User selected "use saved address" but none is actually selected
-      toast.error('Please select a saved address or switch to entering a new address.');
+    const address = orderAddress();
+    if (!address) {
+      toast.error('Please complete your delivery address.');
       return;
-    } else {
-      // Option 1: Custom shipping address
-      if (
-        !shippingAddress.fullName ||
-        !shippingAddress.addressLine1 ||
-        !shippingAddress.city ||
-        !shippingAddress.state ||
-        !shippingAddress.phoneNumber
-      ) {
-        toast.error('Please fill in all required shipping address fields.');
-        return;
-      }
-
-      if (saveAddressToProfile) {
-        try {
-          await userAddressApi.create(shippingAddress);
-        } catch (err) {
-          console.error('Failed to save address to profile:', err);
-        }
-      }
-
-      checkoutPayload = {
-        shippingAddress,
-        notes: checkoutNotes,
-      };
     }
 
     setIsProcessing(true);
     const checkoutToast = toast.loading('Creating order & connecting to payment gateway...');
-
     try {
-      const res = await cartApi.checkout(checkoutPayload);
+      if (!useSavedAddress && saveAddressToProfile) {
+        await userAddressApi.create(address);
+        setSaveAddressToProfile(false);
+      }
+      const res = await cartApi.checkout({ shippingAddress: address, notes: checkoutNotes });
+
 
       if (!res?.success || !res?.data) {
         setIsProcessing(false);
+        invalidateRejectedLocation(res?.message || '');
         toast.error(res?.message || 'Checkout failed. Please try again.', { id: checkoutToast });
         return;
       }
@@ -568,6 +537,7 @@ export default function CartPage() {
       }
     } catch (err: any) {
       setIsProcessing(false);
+      invalidateRejectedLocation(err?.message || '');
       toast.error(err?.message || 'Failed to place order and process payment.', { id: checkoutToast });
     }
   };
@@ -582,6 +552,12 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
+      {editingAddress && <div className="fixed inset-0 z-[100] grid place-items-center bg-black/50 p-4">
+        <section role="dialog" aria-label="Update saved address" className="max-h-[90vh] overflow-auto rounded-xl bg-white p-5">
+          <button type="button" onClick={() => setEditingAddress(null)} className="mb-2 underline">Close</button>
+          <AddressesTab initialAddress={editingAddress} onCancel={() => setEditingAddress(null)} onSaved={() => { setEditingAddress(null); void loadSavedAddresses(false, editingAddress.id); }}/>
+        </section>
+      </div>}
       {/* 1. BREADCRUMBS */}
       <div className="border-b py-4 bg-white shadow-xs">
         <div className="mx-auto w-[95%] flex items-center gap-2 text-sm">
@@ -853,40 +829,19 @@ export default function CartPage() {
 
                   {/* Destination State Picker */}
                   <div className="mb-5 bg-purple-50/50 p-3.5 rounded-2xl border border-purple-100">
-                    <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <MapPin size={14} className="text-[#228b22]" />
-                        Delivery State *
-                      </span>
-                      {loadingStates && <Loader2 size={12} className="animate-spin text-purple-600" />}
-                    </label>
-                    <select
-                      value={cartSelectedState || summary?.deliveryState || ''}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setCartSelectedState(val);
-                        if (val) {
-                          dispatch(fetchCartSummary({ state: val }));
-                        }
-                      }}
-                      className="w-full px-3.5 py-2.5 text-xs font-semibold border border-purple-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 bg-white text-slate-800 transition shadow-xs"
-                    >
-                      <option value="">Select your delivery state</option>
-                      {availableStates.map((s) => (
-                        <option key={s.state} value={s.state}>
-                          {s.state}
-                        </option>
-                      ))}
-                    </select>
-
+                    <DeliveryLocationPicker preserveSaved={useSavedAddress} value={{ state, lga, town }} onChange={next => {
+                      setUseSavedAddress(false);
+                      setShippingAddress(prev => ({ ...prev, ...next }));
+                    }}/>
+                    {useSavedAddress && selectedAddress && (!lga || !town || coverageError) && <button type="button" className="mt-2 underline" onClick={() => setEditingAddress(selectedAddress)}>Please update saved address</button>}
                     {/* Delivery Route Error Banner */}
-                    {summary?.deliveryError && (
+                    {coverageError && (
                       <div className="mt-2.5 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
                         <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-bold">{summary.deliveryError}</p>
+                          <p className="font-bold">{coverageError}</p>
                           <p className="text-[11px] text-amber-700 mt-0.5">
-                            Some items in your cart cannot be delivered to this state. Please select a different state or adjust items.
+                            If a delivery route is missing, please contact support.
                           </p>
                         </div>
                       </div>
@@ -947,39 +902,9 @@ export default function CartPage() {
                                   </span>
                                 </div>
                               )}
-                              {summary.deliveryBreakdown.primaryOrigin && (
-                                <div className="bg-white/80 p-2 rounded-lg border border-purple-100/70 space-y-0.5">
-                                  <div className="font-bold text-purple-900 flex justify-between">
-                                    <span>Primary leg: {summary.deliveryBreakdown.primaryOrigin.state}</span>
-                                    <span>₦{summary.deliveryBreakdown.primaryOrigin.fee.toLocaleString()}</span>
-                                  </div>
-                                  <div className="flex justify-between text-[10px] text-gray-500">
-                                    <span>Route fee: ₦{summary.deliveryBreakdown.primaryOrigin.routeFee.toLocaleString()}</span>
-                                    <span>Qty charge: ₦{summary.deliveryBreakdown.primaryOrigin.quantityCharge.toLocaleString()}</span>
-                                  </div>
-                                </div>
-                              )}
-                              {summary.deliveryBreakdown.secondaryOrigins?.map((sec, idx) => (
-                                <div key={idx} className="bg-white/80 p-2 rounded-lg border border-purple-100/70 flex justify-between text-[10px]">
-                                  <span className="font-medium text-slate-700">
-                                    Additional pickup: {sec.state} ({sec.quantity} items)
-                                  </span>
-                                  <span className="font-bold text-slate-800">₦{sec.fee.toLocaleString()}</span>
-                                </div>
-                              ))}
-                              {summary.deliveryBreakdown.baseLastMileFee > 0 && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">Within-state fee:</span>
-                                  <span className="font-semibold text-slate-800">
-                                    ₦{summary.deliveryBreakdown.baseLastMileFee.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {summary.deliveryBreakdown.localQuantity > 0 && (
-                                <p className="text-[10px] text-gray-500 italic">
-                                  {summary.deliveryBreakdown.localQuantity} local items added no extra fee.
-                                </p>
-                              )}
+                              <p className="flex justify-between"><span>Shipping from other states {summary.deliveryBreakdown.externalOrigin && `(${summary.deliveryBreakdown.externalOrigin})`}</span>{formatNaira(summary.deliveryBreakdown.externalFee)}</p>
+                              <p className="flex justify-between"><span>Delivery to {summary.deliveryBreakdown.customerTown}</span>{formatNaira(summary.deliveryBreakdown.internalFee)}</p>
+                              {summary.deliveryBreakdown.quantityCharge > 0 && <p className="flex justify-between"><span>Extra items ({summary.deliveryBreakdown.extraQuantity})</span>{formatNaira(summary.deliveryBreakdown.quantityCharge)}</p>}
                             </div>
                           )}
                         </div>
@@ -1028,7 +953,7 @@ export default function CartPage() {
 
                   <button
                     onClick={handleProceedToCheckout}
-                    disabled={selectedCount === 0 || isProcessing || Boolean(summary?.deliveryError)}
+                    disabled={selectedCount === 0 || isProcessing || !summary?.deliveryFeeCalculated || Boolean(coverageError)}
                     className="w-full bg-gradient-to-r from-[#228b22] to-[#1c711c] text-white font-bold py-4 rounded-xl mt-6 hover:from-[#1c711c] hover:to-[#185b1a] transition shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed group active:scale-95"
                   >
                     <span>Proceed To Checkout</span>
@@ -1081,7 +1006,7 @@ export default function CartPage() {
                                   setUseSavedAddress(true);
                                   const sel = savedAddresses.find((a) => a.id === selectedSavedAddressId) || savedAddresses[0];
                                   setSelectedSavedAddressId(sel.id);
-                                  dispatch(fetchCartSummary({ country: sel.country || 'NG', state: sel.state }));
+                                  if (!sel.lga || !sel.town) setEditingAddress(sel);
                                 }}
                                 className={`py-2 px-3 text-xs font-bold rounded-xl transition border text-center flex items-center justify-center gap-1.5 ${
                                   useSavedAddress
@@ -1115,14 +1040,14 @@ export default function CartPage() {
                               {savedAddresses.map((addr) => {
                                 const isSelected = selectedSavedAddressId === addr.id;
                                 const name = addr.fullName || (addr as any).name || 'Address';
-                                const line1 = addr.addressLine1 || (addr as any).street || (addr as any).address || [addr.city, addr.state].filter(Boolean).join(', ');
+                                const line1 = addr.addressLine1 || (addr as any).street || (addr as any).address || '';
                                 const phone = addr.phoneNumber || (addr as any).phone || (addr as any).phoneNumber;
                                 return (
                                   <div
                                     key={addr.id}
                                     onClick={() => {
                                       setSelectedSavedAddressId(addr.id);
-                                      dispatch(fetchCartSummary({ country: addr.country || 'NG', state: addr.state }));
+                                      if (!addr.lga || !addr.town) setEditingAddress(addr);
                                     }}
                                     className={`p-3 rounded-2xl border cursor-pointer transition-all ${
                                       isSelected
@@ -1134,6 +1059,7 @@ export default function CartPage() {
                                       <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2 flex-wrap">
                                           <span className="font-bold text-xs text-slate-800">{name}</span>
+                                          {(!addr.lga || !addr.town) && <button type="button" className="text-amber-800 underline" onClick={() => setEditingAddress(addr)}>Please update</button>}
                                           {addr.isDefault && (
                                             <span className="text-[9px] bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded font-bold">Default</span>
                                           )}
@@ -1142,7 +1068,7 @@ export default function CartPage() {
                                           {line1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
                                         </p>
                                         <p className="text-[11px] text-gray-500">
-                                          {addr.city}{addr.city && addr.state ? ', ' : ''}{addr.state}
+                                          {[addr.town || addr.city, addr.lga, addr.state].filter(Boolean).join(', ')}
                                           {addr.country ? ` • ${addr.country}` : ''}
                                           {phone ? ` • ${phone}` : ''}
                                         </p>
@@ -1185,18 +1111,8 @@ export default function CartPage() {
                               />
                             </div>
 
-                            <div>
-                              <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 1 *</label>
-                              <input
-                                type="text"
-                                required
-                                value={shippingAddress.addressLine1}
-                                onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
-                                placeholder="123 Flower Street"
-                                className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition-all bg-slate-50/50"
-                              />
-                            </div>
-
+                            <DeliveryLocationPicker value={shippingAddress} onChange={next => setShippingAddress(prev => ({ ...prev, ...next }))}
+                              street={shippingAddress.addressLine1} onStreet={addressLine1 => setShippingAddress(prev => ({ ...prev, addressLine1 }))}/>
                             <div>
                               <label className="text-xs font-bold text-slate-600 block mb-1">Address Line 2 (Optional)</label>
                               <input
@@ -1206,42 +1122,6 @@ export default function CartPage() {
                                 placeholder="Apartment 4B"
                                 className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition-all bg-slate-50/50"
                               />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                              <div>
-                                <label className="text-xs font-bold text-slate-600 block mb-1">City *</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={shippingAddress.city}
-                                  onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                                  placeholder="Warri"
-                                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition-all bg-slate-50/50"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-bold text-slate-600 block mb-1">State *</label>
-                                <select
-                                  required
-                                  value={shippingAddress.state}
-                                  onChange={(e) => {
-                                    const newState = e.target.value;
-                                    setShippingAddress({ ...shippingAddress, state: newState });
-                                    if (newState) {
-                                      dispatch(fetchCartSummary({ country: shippingAddress.country, state: newState }));
-                                    }
-                                  }}
-                                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#228b22] focus:ring-2 focus:ring-[#228b22]/20 transition-all bg-slate-50/50 text-slate-800"
-                                >
-                                  <option value="">Select State</option>
-                                  {availableStates.map((s) => (
-                                    <option key={s.state} value={s.state}>
-                                      {s.state}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
@@ -1346,14 +1226,15 @@ export default function CartPage() {
                     )}
 
                     {/* Route or Quote Error Alert */}
-                    {quoteError && (
+                    {(quoteError || coverageError) && (
                       <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 flex items-start gap-2.5">
                         <AlertTriangle size={16} className="text-red-500 shrink-0 mt-0.5" />
                         <div>
                           <p className="font-bold">Delivery Unavailable</p>
-                          <p className="mt-0.5 leading-relaxed">{quoteError}</p>
+                          {useSavedAddress && selectedAddress && <button type="button" className="underline" onClick={() => setEditingAddress(selectedAddress)}>Update saved address</button>}
+                          <p className="mt-0.5 leading-relaxed">{coverageError || quoteError}</p>
                           <p className="text-[11px] text-red-600 mt-1 font-semibold">
-                            Please choose a different delivery address or adjust items in your cart.
+                            For a missing route, please contact support. Otherwise, choose a listed delivery town.
                           </p>
                         </div>
                       </div>
@@ -1401,7 +1282,7 @@ export default function CartPage() {
                         </span>
                         <span className="font-bold text-slate-800">
                           {quoteData ? (
-                            `₦${quoteData.deliveryFee.toLocaleString()}`
+                            `₦${(quoteData.deliveryFee ?? quoteData.shippingCost).toLocaleString()}`
                           ) : summary?.deliveryFeeCalculated ? (
                             `₦${(summary.deliveryFee ?? summary.shipping).toLocaleString()}`
                           ) : (
@@ -1419,7 +1300,7 @@ export default function CartPage() {
 
                     <button
                       type="submit"
-                      disabled={isProcessing || loadingAddresses || loadingQuote || !quoteData || Boolean(quoteError)}
+                      disabled={!summary?.deliveryFeeCalculated || isProcessing || loadingAddresses || loadingQuote || !quoteData || Boolean(quoteError || coverageError)}
                       className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-4 rounded-xl mt-6 hover:from-emerald-600 hover:to-green-700 transition shadow-lg shadow-emerald-50 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingBag size={18} />

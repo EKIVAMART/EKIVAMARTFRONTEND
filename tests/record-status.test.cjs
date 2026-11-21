@@ -26,11 +26,11 @@ test('missing and blank status values render without throwing', () => {
   for (const value of [undefined, '', '   ']) assert.match(render(value), />—<\/span>/);
 });
 
-test('existing roles, status labels and status colors remain intact', () => {
+test('roles and status labels render with the neutral dashboard palette', () => {
   assert.match(render('customer'), />Customer<\/span>/);
   assert.match(render('vendor'), />Vendor<\/span>/);
-  assert.match(render('pending_payment'), /text-amber-800.*>Pending payment<\/span>/);
-  assert.match(render('payment-failed'), /text-red-700.*>Payment failed<\/span>/);
+  assert.match(render('pending_payment'), /text-slate-800.*>Pending payment<\/span>/);
+  assert.match(render('payment-failed'), /text-slate-700.*>Payment failed<\/span>/);
   assert.match(render('active'), /text-slate-700.*>Active<\/span>/);
   assert.match(render(null, 'Not provided'), />Not provided<\/span>/);
 });

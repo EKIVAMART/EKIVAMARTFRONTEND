@@ -1,4 +1,5 @@
 'use client';
+import { formatDeliveryAddress } from '@/lib/utils/delivery';
 import { AlertTriangle as PlatformAlertTriangle, Lock as PlatformLock } from '@/components/ui/platform-icons';
 
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
@@ -1176,7 +1177,7 @@ function AdminPageContent() {
       : order.itemCount ?? order.totalItems ?? order.items?.length ?? 0;
 
     const address =
-      order.shippingAddress?.addressLine1 ||
+      formatDeliveryAddress(order.shippingAddress) ||
       order.shippingAddress?.address ||
       order.deliveryAddress ||
       order.address ||

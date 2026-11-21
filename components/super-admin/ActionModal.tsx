@@ -1,4 +1,6 @@
 'use client';
+import { ProductStateSelect } from '@/components/DeliveryLocationPicker';
+import { deliveryStates, refreshCoverage } from '@/lib/delivery-coverage';
 import { Loader2 as PlatformLoader2 } from '@/components/ui/platform-icons';
 
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
@@ -449,6 +451,7 @@ export default function ActionModal({
     setSaveErrors([]);
 
     try {
+      if (!(await deliveryStates.get()).includes(formData.location?.state || '')) throw new Error('Choose a supported pickup state.');
       if (!isVendorRole && (isLoadingStores || !stores.some(store => store.id === formData.vendorProfileId))) {
         throw new Error(isLoadingStores ? 'Please wait for stores to load.' : 'Please select an available store for this product.');
       }
@@ -539,7 +542,12 @@ export default function ActionModal({
       toast.success(editingItem ? 'Product updated successfully!' : 'Product created successfully!');
       closeModalAndReset();
     } catch (error: any) {
-      setSaveErrors(formatSaveError(error));
+      const messages = formatSaveError(error);
+      if (messages.some(message => /state|do not support products/i.test(message))) {
+        refreshCoverage();
+        setCurrentStep(1);
+      }
+      setSaveErrors(messages);
     } finally {
       setIsSaving(false);
       setLoadingMessage('');
@@ -752,14 +760,8 @@ export default function ActionModal({
                 className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                 required
               />
-              <input
-                type="text"
-                value={formData.location?.state || ''}
-                onChange={e => updateLocation('state', e.target.value)}
-                placeholder="State *"
-                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
-                required
-              />
+              <ProductStateSelect value={formData.location?.state || ''} onChange={state => updateLocation('state', state)}
+                error={saveErrors.find(message => /state|do not support products/i.test(message))}/>
               <input
                 type="text"
                 value={formData.location?.lga || ''}
@@ -1702,14 +1704,8 @@ export default function ActionModal({
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
                                 State <span className="text-[#228b22] ml-1">*</span>
                               </label>
-                              <input
-                                type="text"
-                                value={formData.location?.state || ''}
-                                onChange={e => updateLocation('state', e.target.value)}
-                                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
-                                required
-                                placeholder="e.g. Lagos"
-                              />
+                              <ProductStateSelect value={formData.location?.state || ''} onChange={state => updateLocation('state', state)}
+                error={saveErrors.find(message => /state|do not support products/i.test(message))}/>
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
