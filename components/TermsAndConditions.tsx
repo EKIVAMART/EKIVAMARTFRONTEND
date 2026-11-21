@@ -176,7 +176,7 @@ export default function TermsAndConditions() {
           balances fairness for buyers with protection for honest vendors.
         </p>
         <div className="mt-6 grid gap-3">
-          <BulletItem text="Customers may initiate returns/refunds for defective, damaged, incorrect, or non-delivered items — typically within 7–14 days of receipt (exact window displayed per order; always check current faflora.com policy)." />
+          <BulletItem text="Customers may initiate returns/refunds for defective, damaged, incorrect, or non-delivered items — typically within 7–14 days of receipt (exact window displayed per order; always check current ekivamart.com policy)." />
           <BulletItem text="For vendor errors (wrong item, poor quality), you may cover return shipping, and approved refunds deduct from your escrow or future payouts." />
           <BulletItem text="Valid refunds process back to the original payment method, often within 5–10 business days." />
           <BulletItem text="Change-of-mind returns depend on your individual store policy — some vendors offer them for a competitive edge." />

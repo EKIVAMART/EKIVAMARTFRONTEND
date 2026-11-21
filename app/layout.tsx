@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import './globals.css';
 import './marketplace.css';
 import './workspace.css';
@@ -8,6 +9,17 @@ import StoreProvider from './StoreProvider';
 import LayoutWrapper from '@/components/LayoutWrapper';
 import SupportLauncher from '@/components/SupportLauncher';
 import TawkWidget from '@/components/TawkWidget';
+
+export const metadata: Metadata = {
+  title: 'EkivaMart | Shop local, discover more',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48', type: 'image/x-icon' },
+      { url: '/brand/ekivamart-mark.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/brand/ekivamart-apple.png',
+  },
+};
 
 export default function RootLayout({
   children,

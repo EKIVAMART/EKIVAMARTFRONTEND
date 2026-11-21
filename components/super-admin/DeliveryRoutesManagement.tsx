@@ -27,10 +27,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   deliveryRoutesApi,
   DeliveryRoute,
-  AvailableState,
+
   CreateRouteDto,
   PatchRouteDto,
 } from '@/lib/api';
+import { deliveryStates } from '@/lib/delivery-coverage';
 import toast from 'react-hot-toast';
 
 interface DeliveryRoutesManagementProps {
@@ -39,7 +40,7 @@ interface DeliveryRoutesManagementProps {
 
 export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: DeliveryRoutesManagementProps) {
   const [routes, setRoutes] = useState<DeliveryRoute[]>([]);
-  const [availableStates, setAvailableStates] = useState<AvailableState[]>([]);
+  const [availableStates, setAvailableStates] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'matrix'>('table');
@@ -61,7 +62,6 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   const [modalOrigin, setModalOrigin] = useState<string>('');
   const [modalDestination, setModalDestination] = useState<string>('');
   const [modalFee, setModalFee] = useState<string>('');
-  const [isWithinState, setIsWithinState] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   // Inline edit state
@@ -87,12 +87,11 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
           destinationState: searchDestination || undefined,
           activeOnly: activeOnly ? true : undefined,
         }),
-        deliveryRoutesApi.getAvailableStates(),
+        deliveryStates.get(),
       ]);
 
-      if (statesResult.status === 'fulfilled' && statesResult.value?.success && Array.isArray(statesResult.value.data)) {
-        setAvailableStates(statesResult.value.data);
-      }
+      if (statesResult.status === 'rejected') throw statesResult.reason;
+      setAvailableStates(statesResult.value);
       if (routesResult.status === 'rejected') {
         throw routesResult.reason;
       }
@@ -116,7 +115,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   // Derived set of all unique states for matrix view & dropdown suggestions
   const allKnownStates = useMemo(() => {
     const set = new Set<string>();
-    availableStates.forEach((s) => set.add(s.state));
+    availableStates.forEach((s) => set.add(s));
     routes.forEach((r) => {
       if (r.originState) set.add(r.originState);
       if (r.destinationState) set.add(r.destinationState);
@@ -138,10 +137,8 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   // KPI stats
   const stats = useMemo(() => {
     const total = routes.length;
-    const withinState = routes.filter((r) => r.isInternal).length;
-    const interState = routes.filter((r) => !r.isInternal).length;
     const active = routes.filter((r) => r.isActive).length;
-    return { total, withinState, interState, active };
+    return { total, active };
   }, [routes]);
 
   // Filtered routes list for table view
@@ -152,7 +149,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       return (
         r.originState.toLowerCase().includes(q) ||
         r.destinationState.toLowerCase().includes(q) ||
-        String(r.fee).includes(q)
+        String(r.cost).includes(q)
       );
     });
   }, [routes, searchGeneral]);
@@ -161,8 +158,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   const handleOpenAddModal = (prefillOrigin = '', prefillDest = '') => {
     setEditingRoute(null);
     setModalOrigin(prefillOrigin);
-    setModalDestination(prefillDest || prefillOrigin);
-    setIsWithinState(Boolean(prefillOrigin && prefillDest && prefillOrigin === prefillDest));
+    setModalDestination(prefillDest);
     setModalFee('');
     setIsAddModalOpen(true);
   };
@@ -172,8 +168,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
     setEditingRoute(route);
     setModalOrigin(route.originState);
     setModalDestination(route.destinationState);
-    setIsWithinState(route.isInternal);
-    setModalFee(String(route.fee));
+    setModalFee(String(route.cost));
     setIsAddModalOpen(true);
   };
 
@@ -181,15 +176,23 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   const handleSubmitRoute = async (e: React.FormEvent) => {
     e.preventDefault();
     const origin = modalOrigin.trim();
-    const destination = isWithinState ? origin : modalDestination.trim();
+    const destination = modalDestination.trim();
     const feeNum = Number(modalFee);
 
+    if (!editingRoute && (origin === destination || !availableStates.includes(origin) || !availableStates.includes(destination))) {
+      toast.error('Choose two different supported states.');
+      return;
+    }
+    if (!editingRoute && routes.some(r => [origin, destination].includes(r.originState) && [origin, destination].includes(r.destinationState))) {
+      toast.error('A route already covers these states in both directions.');
+      return;
+    }
     if (!origin || !destination) {
       toast.error('Origin and Destination states are required');
       return;
     }
 
-    if (isNaN(feeNum) || feeNum < 0 || feeNum > 10000000) {
+    if (!modalFee.trim() || isNaN(feeNum) || feeNum < 0 || feeNum > 10000000) {
       toast.error('Fee must be a valid amount between ₦0 and ₦10,000,000');
       return;
     }
@@ -198,7 +201,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
     try {
       if (editingRoute) {
         // Updating existing route fee
-        const res = await deliveryRoutesApi.updateRoute(editingRoute.id, { fee: feeNum });
+        const res = await deliveryRoutesApi.updateRoute(editingRoute.id, { cost: feeNum });
         if (res?.success) {
           toast.success(`Updated route fee to ₦${feeNum.toLocaleString()}`);
           setIsAddModalOpen(false);
@@ -211,15 +214,11 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
         const res = await deliveryRoutesApi.createRoute({
           originState: origin,
           destinationState: destination,
-          fee: feeNum,
+          cost: feeNum,
         });
 
         if (res?.success) {
-          toast.success(
-            origin.toLowerCase() === destination.toLowerCase()
-              ? `Configured within-state fee for ${origin}: ₦${feeNum.toLocaleString()}`
-              : `Added route ${origin} → ${destination}: ₦${feeNum.toLocaleString()}`
-          );
+          toast.success(`Added route ${origin} ↔ ${destination}: ₦${feeNum.toLocaleString()}`);
           setIsAddModalOpen(false);
           await loadData();
         } else {
@@ -229,7 +228,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
     } catch (err: any) {
       if (err?.statusCode === 409 || err?.message?.includes('already exists')) {
         // 409 pair already exists -> Offer to edit
-        toast.error('A delivery route already exists between these states.');
+        toast.error(err.message || 'A delivery route already exists between these states.');
         const existing = routes.find(
           (r) =>
             r.originState.toLowerCase() === origin.toLowerCase() &&
@@ -249,17 +248,17 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   // Inline fee update
   const handleSaveInlineFee = async (id: string) => {
     const feeNum = Number(inlineFeeValue);
-    if (isNaN(feeNum) || feeNum < 0 || feeNum > 10000000) {
+    if (!inlineFeeValue.trim() || isNaN(feeNum) || feeNum < 0 || feeNum > 10000000) {
       toast.error('Fee must be between ₦0 and ₦10,000,000');
       return;
     }
     const updateToast = toast.loading('Saving fee...');
     try {
-      const res = await deliveryRoutesApi.updateRoute(id, { fee: feeNum });
+      const res = await deliveryRoutesApi.updateRoute(id, { cost: feeNum });
       if (res?.success) {
         toast.success('Fee updated successfully', { id: updateToast });
         setInlineEditingId(null);
-        setRoutes((prev) => prev.map((r) => (r.id === id ? { ...r, fee: feeNum } : r)));
+        setRoutes((prev) => prev.map((r) => (r.id === id ? { ...r, cost: feeNum } : r)));
       } else {
         toast.error(res?.message || 'Failed to update fee', { id: updateToast });
       }
@@ -331,7 +330,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-slate-900">Delivery routes</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">External routes</h1>
         <button type="button" onClick={() => handleOpenAddModal()}
           className="inline-flex min-h-10 items-center gap-2 bg-[#176a35] px-4 text-sm font-medium text-white hover:bg-[#12582b]">
           <Plus size={16} aria-hidden="true" /> Add route
@@ -341,8 +340,6 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
       {!loading && !loadError && <div className="flex flex-wrap gap-x-7 gap-y-2 text-xs text-slate-600">
         <span><strong className="font-semibold text-slate-900">{stats.total}</strong> routes</span>
         <span><strong className="font-semibold text-slate-900">{stats.active}</strong> active</span>
-        <span><strong className="font-semibold text-slate-900">{stats.withinState}</strong> within state</span>
-        <span><strong className="font-semibold text-slate-900">{stats.interState}</strong> between states</span>
       </div>}
 
             {/* ── Toolbar: Search & View Toggle ── */}
@@ -478,15 +475,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                         </td>
 
                         <td className="py-3.5 px-4">
-                          {route.isInternal ? (
-                            <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-                              <MapPin size={10} /> Within State
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-                              <Truck size={10} /> Inter-State Route
-                            </span>
-                          )}
+                          <span className="text-xs text-slate-600">External route</span>
                         </td>
 
                         {/* Inline fee editing */}
@@ -518,12 +507,12 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                           ) : (
                             <div className="flex items-center gap-2 group">
                               <span className="font-extrabold text-[#228b22] text-sm">
-                                ₦{route.fee.toLocaleString()}
+                                ₦{route.cost.toLocaleString()}
                               </span>
                               <button
                                 onClick={() => {
                                   setInlineEditingId(route.id);
-                                  setInlineFeeValue(String(route.fee));
+                                  setInlineFeeValue(String(route.cost));
                                 }}
                                 className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-brand-600 transition"
                                 title="Click to quick-edit fee"
@@ -586,7 +575,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               </h3>
               <p className="text-[11px] text-gray-500 mt-0.5">
                 Rows represent origin states (where vendor items ship from). Columns represent customer destination states.
-                A single entry A → B covers B → A unless set separately (&quot;uses reverse&quot;).
+                One route sets the cost in both directions.
               </p>
             </div>
           </div>
@@ -620,6 +609,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                       const direct = matrixData.get(directKey);
                       const reverse = !direct && !isSame ? matrixData.get(reverseKey) : null;
 
+                      if (isSame) return <td key={dest} className="text-center">—</td>;
                       if (direct) {
                         return (
                           <td
@@ -631,7 +621,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                             title={`Click to edit fee for ${orig} → ${dest}`}
                           >
                             <span className="font-extrabold text-slate-800 block">
-                              ₦{direct.fee.toLocaleString()}
+                              ₦{direct.cost.toLocaleString()}
                             </span>
                             <span className="text-[9px] text-gray-500 font-semibold block mt-0.5">
                               {isSame ? 'Internal' : direct.isActive ? 'Active' : 'Disabled'}
@@ -644,12 +634,12 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
                         return (
                           <td
                             key={`cell-${orig}-${dest}`}
-                            onClick={() => handleOpenAddModal(orig, dest)}
+                            onClick={() => handleOpenEditModal(reverse)}
                             className="p-2 cursor-pointer bg-slate-50/90 hover:bg-slate-100 transition-colors border-r"
-                            title={`Pricing uses reverse (${dest} → ${orig}). Click to set distinct rate.`}
+                            title={`Pricing uses reverse (${dest} → ${orig}). Click to edit this shared rate.`}
                           >
                             <span className="font-bold text-slate-600 block">
-                              ₦{reverse.fee.toLocaleString()}
+                              ₦{reverse.cost.toLocaleString()}
                             </span>
                             <span className="text-[9px] text-slate-600 font-bold block mt-0.5">
                               uses reverse
@@ -710,103 +700,13 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               </div>
 
               <form onSubmit={handleSubmitRoute} className="space-y-4">
-                {/* Same State Switch */}
-                {!editingRoute && (
-                  <div className="bg-brand-50/60 p-3 rounded-md border border-brand-100 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-brand-900">Within-State Rate</p>
-                      <p className="text-[10px] text-brand-700">Set base last-mile fee for delivery within the same state</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isWithinState}
-                        onChange={(e) => {
-                          const val = e.target.checked;
-                          setIsWithinState(val);
-                          if (val && modalOrigin) {
-                            setModalDestination(modalOrigin);
-                          }
-                        }}
-                        className="sr-only peer"
-                      />
-                      <div className="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-md peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-md after:h-3 after:w-3 after:transition-all peer-checked:bg-[#228b22]" />
-                    </label>
-                  </div>
-                )}
-
-                {/* Origin State */}
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Origin State (Ships From) *
-                  </label>
-                  {editingRoute ? (
-                    <input
-                      type="text"
-                      disabled
-                      value={editingRoute.originState}
-                      className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-xs font-bold text-gray-500"
-                    />
-                  ) : (
-                    <div>
-                      <input
-                        type="text"
-                        required
-                        list="origin-states-list"
-                        placeholder="e.g. Lagos, Abuja, Abia..."
-                        value={modalOrigin}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setModalOrigin(val);
-                          if (isWithinState) setModalDestination(val);
-                        }}
-                        className="w-full px-3 py-2.5 text-xs font-semibold border border-gray-200 rounded-md focus:outline-none focus:border-brand-500 bg-slate-50/50"
-                      />
-                      <datalist id="origin-states-list">
-                        {allKnownStates.map((st) => (
-                          <option key={st} value={st} />
-                        ))}
-                      </datalist>
-                      <p className="text-[10px] text-gray-400 mt-1">
-                        Select an existing state or type a new state name.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Destination State */}
-                {!isWithinState && (
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Destination State (Delivered To) *
-                    </label>
-                    {editingRoute ? (
-                      <input
-                        type="text"
-                        disabled
-                        value={editingRoute.destinationState}
-                        className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-xs font-bold text-gray-500"
-                      />
-                    ) : (
-                      <div>
-                        <input
-                          type="text"
-                          required
-                          list="dest-states-list"
-                          placeholder="e.g. Enugu, Rivers, Kano..."
-                          value={modalDestination}
-                          onChange={(e) => setModalDestination(e.target.value)}
-                          className="w-full px-3 py-2.5 text-xs font-semibold border border-gray-200 rounded-md focus:outline-none focus:border-brand-500 bg-slate-50/50"
-                        />
-                        <datalist id="dest-states-list">
-                          {allKnownStates.map((st) => (
-                            <option key={st} value={st} />
-                          ))}
-                        </datalist>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {([['Origin state', modalOrigin, setModalOrigin], ['Destination state', modalDestination, setModalDestination]] as const).map(([label, value, change]) =>
+                  <label key={label} className="block text-xs font-semibold">{label} *
+                    <select required disabled={Boolean(editingRoute)} className="mt-1 w-full rounded border p-2" value={value} onChange={e => change(e.target.value)}>
+                      <option value="">Choose state</option>
+                      {(editingRoute ? [value] : availableStates.filter(s => label === 'Origin state' || s !== modalOrigin)).map(s => <option key={s}>{s}</option>)}
+                    </select>
+                  </label>)}
 
                 {/* Fee */}
                 <div>
@@ -895,7 +795,7 @@ export default function DeliveryRoutesManagement({ externalSearchQuery = '' }: D
               </div>
 
               <p className="text-xs text-gray-500 mb-5">
-                Current fee: <span className="font-bold">₦{confirmAction.route.fee.toLocaleString()}</span>.
+                Current fee: <span className="font-bold">₦{confirmAction.route.cost.toLocaleString()}</span>.
               </p>
 
               <div className="flex gap-2">

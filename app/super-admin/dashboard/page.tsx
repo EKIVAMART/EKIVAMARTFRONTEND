@@ -1,4 +1,5 @@
 'use client';
+import { formatDeliveryAddress } from '@/lib/utils/delivery';
 import { AlertTriangle as PlatformAlertTriangle, Lock as PlatformLock } from '@/components/ui/platform-icons';
 import { useDashboardConfirmation } from '@/components/admin/useDashboardConfirmation';
 
@@ -33,7 +34,7 @@ import TaxRulesManagement from '@/components/admin/TaxRulesManagement';
 import BlogManagementView from '@/components/admin/BlogManagementView';
 import EngagementSettingsView from '@/components/super-admin/EngagementSettingsView';
 import VendorSpecialistsView from '@/components/super-admin/VendorSpecialistsView';
-import DeliveryRoutesManagement from '@/components/super-admin/DeliveryRoutesManagement';
+import DeliveryManagement from '@/components/super-admin/DeliveryManagement';
 import { Plus, Search, Menu } from '@/components/ui/platform-icons';
 import {
   ApiError,
@@ -1194,7 +1195,7 @@ function AdminPageContent() {
       : order.itemCount ?? order.totalItems ?? order.items?.length ?? 0;
 
     const address =
-      order.shippingAddress?.addressLine1 ||
+      formatDeliveryAddress(order.shippingAddress) ||
       order.shippingAddress?.address ||
       order.deliveryAddress ||
       order.address ||
@@ -1936,7 +1937,7 @@ function AdminPageContent() {
               </div>
             </header>
 
-            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -1992,7 +1993,7 @@ function AdminPageContent() {
               </button>
             </header>
 
-            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -2051,7 +2052,7 @@ function AdminPageContent() {
             )}
 
             {activeTab === 'products' && (
-              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition-all">
+              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] ek-field-group transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
                   type="text"
@@ -2167,8 +2168,8 @@ function AdminPageContent() {
             {activeTab === 'taxes' && (
               <TaxRulesManagement />
             )}
-            {activeTab === 'deliveryRoutes' && (
-              <DeliveryRoutesManagement />
+            {activeTab === 'deliveryRoutes' && hasSuperAdminRole && (
+              <DeliveryManagement />
             )}
             {activeTab === 'blog' && (
               <BlogManagementView />

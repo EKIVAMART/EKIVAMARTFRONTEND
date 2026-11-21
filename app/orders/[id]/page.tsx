@@ -180,7 +180,9 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
       }
     } catch (err: any) {
       toast.dismiss(loadingToast);
-      toast.error(err.response?.data?.message || 'Failed to process reorder');
+      const message = err.response?.data?.message || err.message || 'Failed to process reorder';
+      toast.error(message);
+      if (/lga|town/i.test(message)) router.push('/cart');
     }
   };
 
@@ -300,7 +302,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                         : 'Package successfully delivered'}
                     </h3>
                     <p className="text-xs text-emerald-800 font-semibold mt-0.5">
-                      Your items have arrived safely. Thank you for shopping with Faflories!
+                      Your items have arrived safely. Thank you for shopping with EkivaMart!
                     </p>
                   </div>
                 </div>
@@ -537,7 +539,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                 <p className="text-slate-850 font-black">{order.shippingAddress?.fullName}</p>
                 <p className="mt-1">{order.shippingAddress?.addressLine1}</p>
                 {order.shippingAddress?.addressLine2 && <p>{order.shippingAddress?.addressLine2}</p>}
-                <p>{order.shippingAddress?.city}, {order.shippingAddress?.state}</p>
+                <p>{[order.shippingAddress?.town || order.shippingAddress?.city, order.shippingAddress?.lga, order.shippingAddress?.state].filter(Boolean).join(', ')}</p>
                 <p>{order.shippingAddress?.country} {order.shippingAddress?.postalCode}</p>
                 <p className="mt-2 text-slate-800">Phone: {order.shippingAddress?.phoneNumber}</p>
               </div>

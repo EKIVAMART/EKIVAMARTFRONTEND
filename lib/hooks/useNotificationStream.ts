@@ -9,7 +9,6 @@ interface UseNotificationStreamOptions {
   accessToken: string | null;
   isAuthenticated: boolean;
   onNotificationReceived?: (notification: AppNotification) => void;
-  onRefreshToken?: () => Promise<string | null>;
 }
 
 export type ConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
@@ -18,7 +17,6 @@ export function useNotificationStream({
   accessToken,
   isAuthenticated,
   onNotificationReceived,
-  onRefreshToken,
 }: UseNotificationStreamOptions) {
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -31,11 +29,6 @@ export function useNotificationStream({
   useEffect(() => {
     callbackRef.current = onNotificationReceived;
   }, [onNotificationReceived]);
-
-  const refreshRef = useRef(onRefreshToken);
-  useEffect(() => {
-    refreshRef.current = onRefreshToken;
-  }, [onRefreshToken]);
 
   const cleanup = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -96,8 +89,8 @@ export function useNotificationStream({
         }
       });
 
-      es.onerror = async () => {
-        if (!isComponentMounted.current) return;
+      es.onerror = () => {
+        if (eventSourceRef.current !== es) return;
 
         es.close();
         eventSourceRef.current = null;
@@ -110,27 +103,12 @@ export function useNotificationStream({
         );
         retryCountRef.current += 1;
 
-        reconnectTimeoutRef.current = setTimeout(async () => {
-          if (!isComponentMounted.current || !isAuthenticated) return;
-
-          // Attempt token refresh on auth disconnect
-          let activeToken = tokenToUse;
-          if (refreshRef.current) {
-            try {
-              const newToken = await refreshRef.current();
-              if (newToken) activeToken = newToken;
-            } catch (err) {
-              console.warn('[SSE] Token refresh failed during reconnect:', err);
-            }
-          }
-
-          if (activeToken) {
-            connect(activeToken);
-          }
+        reconnectTimeoutRef.current = setTimeout(() => {
+          if (isComponentMounted.current) connect(tokenToUse);
         }, delay);
       };
     },
-    [cleanup, isAuthenticated]
+    [cleanup]
   );
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight } from '@/components/ui/platform-icons';
-import { fafloraSupportData, popularArticles } from './data/supportData';
+import { ekivaMartSupportData, popularArticles } from './data/supportData';
 import SearchBar from '@/components/support/SearchBar';
 import SupportIdentity from '@/components/support/SupportIdentity';
 import SupportContact from '@/components/support/SupportContact';
@@ -24,14 +24,14 @@ export default function SupportHome() {
       <section className={styles.section} aria-labelledby="support-topics">
         <h2 id="support-topics">Browse by topic</h2>
         <div className={styles.topics}>
-          {fafloraSupportData.map((topic) => (
+          {ekivaMartSupportData.map((topic) => (
             <Link
               href={`/support/topics/${topic.slug}`}
               key={topic.id}
               className={styles.topic}
             >
               <h3>{topic.title}</h3>
-              <p>{topic.description.replace(/Faflora/g, 'EkivaMart')}</p>
+              <p>{topic.description}</p>
               <span>
                 {topic.articles.length} articles{' '}
                 <ArrowRight size={17} aria-hidden="true" />
@@ -48,7 +48,7 @@ export default function SupportHome() {
               <Link
                 href={`/support/topics/${article.topicSlug}/${article.slug}`}
               >
-                {article.title.replace(/Faflora/g, 'EkivaMart')}
+                {article.title}
                 <ArrowRight size={17} aria-hidden="true" />
               </Link>
             </li>

@@ -1,4 +1,5 @@
 'use client';
+import { formatDeliveryAddress } from '@/lib/utils/delivery';
 import { AlertTriangle as PlatformAlertTriangle, Lock as PlatformLock } from '@/components/ui/platform-icons';
 
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from 'react';
@@ -1176,7 +1177,7 @@ function AdminPageContent() {
       : order.itemCount ?? order.totalItems ?? order.items?.length ?? 0;
 
     const address =
-      order.shippingAddress?.addressLine1 ||
+      formatDeliveryAddress(order.shippingAddress) ||
       order.shippingAddress?.address ||
       order.deliveryAddress ||
       order.address ||
@@ -1640,7 +1641,7 @@ function AdminPageContent() {
               </div>
             </header>
 
-            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+            <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-brand-400 ek-field-group transition-all">
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
@@ -1706,7 +1707,7 @@ function AdminPageContent() {
             </header>
 
             {activeTab === 'products' && (
-              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] focus-within:ring-2 focus-within:ring-[#228b22]/20 transition-all">
+              <div className="bg-white p-4 rounded-md border border-gray-200 mb-6 flex items-center gap-3 shadow-sm focus-within:border-[#228b22] ek-field-group transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
                   type="text"

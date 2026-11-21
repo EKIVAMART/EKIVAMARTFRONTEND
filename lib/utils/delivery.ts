@@ -1,4 +1,4 @@
-import { ExpectedDelivery, DeliveryBreakdown } from '@/lib/api';
+import type { ExpectedDelivery } from '@/lib/api';
 
 export type Phase = 'quote' | 'unpaid' | 'paid';
 
@@ -44,4 +44,16 @@ export interface DeliveryTimelineStep {
   sublabel?: string;
   status: 'completed' | 'active' | 'upcoming';
   dateLabel?: string;
+}
+
+export function formatDeliveryAddress(address?: {
+  addressLine1?: string;
+  state?: string;
+  lga?: string;
+  town?: string;
+  city?: string;
+}) {
+  if (!address) return '';
+  return [address.addressLine1, address.town || address.city, address.lga, address.state]
+    .filter(Boolean).join(', ');
 }

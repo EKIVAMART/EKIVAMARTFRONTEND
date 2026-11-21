@@ -310,7 +310,7 @@ const sections: SectionData[] = [
           please reach out to us:
         </p>
         <a
-          href="mailto:support@faflora.com"
+          href="mailto:support@ekivamart.com"
           className="inline-flex items-center gap-3 group"
         >
           <div className="w-12 h-12 rounded-lg flex items-center justify-center text-[#22643e] group-hover:scale-110 transition-transform">
@@ -321,7 +321,7 @@ const sections: SectionData[] = [
               Email
             </p>
             <p className="text-[#228b22] font-bold text-base group-hover:underline">
-              support@faflora.com
+              support@ekivamart.com
             </p>
           </div>
         </a>

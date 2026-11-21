@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from './axios';
 
-export interface ApiError {
-  message: string;
-  statusCode?: number;
-  retryAfter?: number;
-  errors?: Record<string, string[]> | Array<{ field: string; message: string }>;
-}
+import { normalizeApiError } from './api-error';
+export type { ApiError } from './api-error';
+import type { ApiError } from './api-error';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -199,36 +196,8 @@ const extractSessions = (payload: unknown): AuthSessionRecord[] => {
 
 // Handle API errors
 function handleApiError(error: unknown): never {
-  // Check if this is an axios error by checking for response property
-  if (error && typeof error === 'object' && 'response' in error) {
-    const axiError = error as any;
-    const apiError: ApiError = {
-      message:
-        axiError.response?.data?.message ||
-        axiError.message ||
-        'An error occurred',
-      statusCode: axiError.response?.status,
-    };
-
-    // Handle rate limiting
-    if (axiError.response?.status === 429) {
-      const retryAfter = axiError.response.headers['retry-after'];
-      apiError.retryAfter = retryAfter ? parseInt(retryAfter as string) : 900;
-    }
-
-    // Handle validation errors
-    if (axiError.response?.data?.errors) {
-      apiError.errors = axiError.response?.data?.errors;
-    }
-
-    throw apiError;
-  }
-
-  throw {
-    message: 'An unexpected error occurred',
-    statusCode: 500,
-  } as ApiError;
-};
+  throw normalizeApiError(error, typeof navigator !== 'undefined' && !navigator.onLine);
+}
 
 // Auth API
 export const authApi = {
@@ -1311,21 +1280,17 @@ export interface ExpectedDelivery {
   expectedDeliveryLabel: string; // "Mon, 12 Oct 2026" ready to display
 }
 
-export interface DeliveryOriginCharge {
-  state: string;
-  quantity: number;
-  routeFee: number;
-  quantityCharge: number;
-  fee: number;
-}
-
 export interface DeliveryBreakdown {
   customerState: string;
+  customerLga: string;
+  customerTown: string;
   originStates: string[];
-  baseLastMileFee: number;
-  primaryOrigin: DeliveryOriginCharge | null;
-  secondaryOrigins: DeliveryOriginCharge[];
-  localQuantity: number;
+  externalFee: number;
+  externalOrigin?: string | null;
+  internalFee: number;
+  totalQuantity: number;
+  extraQuantity: number;
+  quantityCharge: number;
   totalDeliveryFee: number;
 }
 
@@ -1368,26 +1333,20 @@ export interface DeliveryRoute {
   id: string;
   originState: string;
   destinationState: string;
-  isInternal: boolean;
-  fee: number;
+  cost: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface AvailableState {
-  state: string;
-  internalFee: number | null;
-}
-
 export interface CreateRouteDto {
   originState: string;
   destinationState: string;
-  fee: number;
+  cost: number;
 }
 
 export interface PatchRouteDto {
-  fee?: number;
+  cost?: number;
   isActive?: boolean;
 }
 
@@ -1433,11 +1392,13 @@ export const cartApi = {
     }
   },
 
-  async getCartSummary(params: { country?: string; state?: string } = {}): Promise<ApiResponse<CartSummaryResponse>> {
+  async getCartSummary(params: { country?: string; state?: string; lga?: string; town?: string } = {}): Promise<ApiResponse<CartSummaryResponse>> {
     try {
       const queryParams = new URLSearchParams();
       if (params.country) queryParams.set('country', params.country);
       if (params.state) queryParams.set('state', params.state);
+      if (params.lga) queryParams.set('lga', params.lga);
+      if (params.town) queryParams.set('town', params.town);
       const queryStr = queryParams.toString();
       const url = queryStr ? `/cart/summary?${queryStr}` : '/cart/summary';
       const response = await axiosInstance.get<ApiResponse<CartSummaryResponse>>(url);
@@ -1540,28 +1501,10 @@ export const cartApi = {
   },
 
   async checkout(payload: {
-    shippingAddress?: {
-      fullName: string;
-      addressLine1: string;
-      addressLine2?: string;
-      city: string;
-      state: string;
-      postalCode?: string;
-      country: string;
-      phoneNumber: string;
-    };
+    shippingAddress?: SavedAddressPayload;
     savedAddressId?: string;
     notes?: string;
-  } | {
-    fullName: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    postalCode?: string;
-    country: string;
-    phoneNumber: string;
-  }, notes?: string): Promise<ApiResponse<any>> {
+  } | SavedAddressPayload, notes?: string): Promise<ApiResponse<any>> {
     try {
       // Support legacy (shippingAddress, notes) signature as well as payload object
       let body: any;
@@ -2263,18 +2206,6 @@ export const ordersApi = {
 };
 
 export const deliveryRoutesApi = {
-  async getAvailableStates(): Promise<ApiResponse<AvailableState[]>> {
-    try {
-      const response = await axiosInstance.get<ApiResponse<AvailableState[]>>(
-        '/delivery-routes/available',
-        { skipAuth: true } as any
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
   async getRoutes(params?: {
     originState?: string;
     destinationState?: string;
@@ -2287,7 +2218,7 @@ export const deliveryRoutesApi = {
       if (params?.activeOnly !== undefined) queryParams.set('activeOnly', String(params.activeOnly));
       const qs = queryParams.toString();
       const response = await axiosInstance.get<ApiResponse<DeliveryRoute[]>>(
-        `/delivery-routes${qs ? `?${qs}` : ''}`
+        `/external-delivery-routes${qs ? `?${qs}` : ''}`
       );
       return response.data;
     } catch (error) {
@@ -2297,7 +2228,7 @@ export const deliveryRoutesApi = {
 
   async getRouteById(id: string): Promise<ApiResponse<DeliveryRoute>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<DeliveryRoute>>(`/delivery-routes/${id}`);
+      const response = await axiosInstance.get<ApiResponse<DeliveryRoute>>(`/external-delivery-routes/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -2306,7 +2237,7 @@ export const deliveryRoutesApi = {
 
   async createRoute(dto: CreateRouteDto): Promise<ApiResponse<DeliveryRoute>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<DeliveryRoute>>('/delivery-routes', dto);
+      const response = await axiosInstance.post<ApiResponse<DeliveryRoute>>('/external-delivery-routes', dto);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -2315,7 +2246,7 @@ export const deliveryRoutesApi = {
 
   async updateRoute(id: string, dto: PatchRouteDto): Promise<ApiResponse<DeliveryRoute>> {
     try {
-      const response = await axiosInstance.patch<ApiResponse<DeliveryRoute>>(`/delivery-routes/${id}`, dto);
+      const response = await axiosInstance.patch<ApiResponse<DeliveryRoute>>(`/external-delivery-routes/${id}`, dto);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -2324,7 +2255,7 @@ export const deliveryRoutesApi = {
 
   async deleteRoute(id: string): Promise<ApiResponse<null>> {
     try {
-      const response = await axiosInstance.delete<ApiResponse<null>>(`/delivery-routes/${id}`);
+      const response = await axiosInstance.delete<ApiResponse<null>>(`/external-delivery-routes/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -2389,17 +2320,21 @@ export const taxRulesApi = {
 };
 
 export interface SavedAddressPayload {
+  lga: string;
+  town: string;
   fullName: string;
-  addressLine1: string;
+  addressLine1?: string;
   addressLine2?: string;
-  city: string;
   state: string;
   postalCode?: string;
   country: string;
   phoneNumber: string;
 }
 
-export interface SavedAddressItem extends SavedAddressPayload {
+export interface SavedAddressItem extends Omit<SavedAddressPayload, 'lga' | 'town'> {
+  city?: string;
+  lga?: string;
+  town?: string;
   id: string;
   userId?: string;
   isDefault?: boolean;
@@ -2562,9 +2497,11 @@ export interface OrderData {
   itemCount: number;
   shippingAddress: {
     fullName: string;
-    addressLine1: string;
+    addressLine1?: string;
     addressLine2?: string;
-    city: string;
+    city?: string;
+    lga?: string;
+    town?: string;
     state: string;
     postalCode?: string;
     country: string;

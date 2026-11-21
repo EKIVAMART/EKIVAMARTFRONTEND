@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { Search, ArrowRight, X } from '@/components/ui/platform-icons';
 import { useEffect, useRef, useState } from 'react';
-import { fafloraSupportData } from '@/app/support/data/supportData';
+import { ekivaMartSupportData } from '@/app/support/data/supportData';
 import styles from '@/app/support/support.module.css';
 
-const articles = fafloraSupportData.flatMap((topic) =>
+const articles = ekivaMartSupportData.flatMap((topic) =>
   topic.articles.map((article) => ({
-    title: article.title.replace(/Faflora/g, 'EkivaMart'),
+    title: article.title,
     href: `/support/topics/${topic.slug}/${article.slug}`,
   }))
 );

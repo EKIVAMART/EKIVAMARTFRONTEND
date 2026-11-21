@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
-import { fafloraSupportData } from '../../../data/supportData';
+import { ekivaMartSupportData } from '../../../data/supportData';
 import SupportContact from '@/components/support/SupportContact';
 import styles from '../../../support.module.css';
 
@@ -11,15 +11,20 @@ export default async function ArticlePage({
   params: Promise<{ topicSlug: string; articleSlug: string }>;
 }) {
   const { topicSlug, articleSlug } = await params;
-  const topic = fafloraSupportData.find((item) => item.slug === topicSlug);
+  const topic = ekivaMartSupportData.find((item) => item.slug === topicSlug);
   const article = topic?.articles.find((item) => item.slug === articleSlug);
+  if (topic && !article && articleSlug.includes('faflora')) {
+    const updatedSlug = articleSlug.replaceAll('faflora', 'ekivamart');
+    if (topic.articles.some((item) => item.slug === updatedSlug)) {
+      permanentRedirect(`/support/topics/${topic.slug}/${updatedSlug}`);
+    }
+  }
   if (!topic || !article) notFound();
   const index = topic.articles.indexOf(article);
   const previous = topic.articles[index - 1];
   const next = topic.articles[index + 1];
   const content = article.content
-    .replace(/^# .*(?:\r?\n|$)/, '')
-    .replace(/\bFaflora\b/g, 'EkivaMart');
+    .replace(/^# .*(?:\r?\n|$)/, '');
   return (
     <main className={`ek-home ${styles.page}`}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -28,7 +33,7 @@ export default async function ArticlePage({
         <Link href={`/support/topics/${topic.slug}`}>{topic.title}</Link>
       </nav>
       <header className={styles.heading}>
-        <h1>{article.title.replace(/Faflora/g, 'EkivaMart')}</h1>
+        <h1>{article.title}</h1>
         <p>Updated {article.lastUpdated}</p>
       </header>
       <div className={styles.articleLayout}>
@@ -40,13 +45,13 @@ export default async function ArticlePage({
             {previous && (
               <Link href={`/support/topics/${topic.slug}/${previous.slug}`}>
                 <small>Previous article</small>
-                {previous.title.replace(/Faflora/g, 'EkivaMart')}
+                {previous.title}
               </Link>
             )}
             {next && (
               <Link href={`/support/topics/${topic.slug}/${next.slug}`}>
                 <small>Next article</small>
-                {next.title.replace(/Faflora/g, 'EkivaMart')}
+                {next.title}
               </Link>
             )}
           </nav>
@@ -59,7 +64,7 @@ export default async function ArticlePage({
               href={`/support/topics/${topic.slug}/${item.slug}`}
               aria-current={item.slug === articleSlug ? 'page' : undefined}
             >
-              {item.title.replace(/Faflora/g, 'EkivaMart')}
+              {item.title}
             </Link>
           ))}
         </aside>

@@ -3,15 +3,12 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { useAppSelector, useAppDispatch } from '@/lib/hooks';
-import { setTokens, logout } from '@/lib/features/auth/authSlice';
+import { useAppSelector } from '@/lib/hooks';
 import { notificationApi } from '@/lib/api/notifications';
 import { useNotificationStream, ConnectionStatus } from '@/lib/hooks/useNotificationStream';
 import { playNotificationSound } from '@/lib/utils/audio';
 import { getNotificationRoute } from '@/lib/utils/notification-routes';
 import type { AppNotification, Pagination } from '@/types/notification';
-import axios from 'axios';
-import { API_BASE_URL } from '@/lib/axios';
 
 interface NotificationContextValue {
   notifications: AppNotification[];
@@ -38,11 +35,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [soundEnabled, setSoundEnabledState] = useState<boolean>(true);
 
-  const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const user = useAppSelector((state) => state.auth.user);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
-  const refreshToken = useAppSelector((state) => state.auth.refreshToken);
 
   // Load sound setting preference from localStorage on mount
   useEffect(() => {
@@ -60,33 +55,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       localStorage.setItem('faflora_notification_sound', String(enabled));
     }
   };
-
-  // Token refresh callback for SSE auth auto-recovery
-  const handleRefreshToken = useCallback(async (): Promise<string | null> => {
-    if (!refreshToken) return null;
-    try {
-      const baseUrl = API_BASE_URL;
-
-      const res = await axios.post<{ data?: { accessToken?: string; refreshToken?: string } }>(
-        `${baseUrl}/auth/refresh`,
-        { refreshToken }
-      );
-      const data = res.data?.data;
-
-      if (data?.accessToken) {
-        dispatch(
-          setTokens({
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken || refreshToken,
-          })
-        );
-        return data.accessToken;
-      }
-    } catch {
-      dispatch(logout());
-    }
-    return null;
-  }, [refreshToken, dispatch]);
 
   // Fetch notifications inbox
   const fetchNotifications = useCallback(
@@ -169,7 +137,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     accessToken,
     isAuthenticated,
     onNotificationReceived: handleNewRealtimeNotification,
-    onRefreshToken: handleRefreshToken,
   });
 
   // Initial load on authentication

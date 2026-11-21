@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { MapPin, Plus, Trash2, Edit3, Check, Loader2, Home } from '@/components/ui/platform-icons';
-import { userAddressApi, deliveryRoutesApi, SavedAddressItem, SavedAddressPayload, AvailableState } from '@/lib/api';
+import { userAddressApi, SavedAddressItem, SavedAddressPayload } from '@/lib/api';
 import toast from 'react-hot-toast';
 
-export const AddressesTab: React.FC = () => {
+import { DeliveryLocationPicker } from '@/components/DeliveryLocationPicker';
+import { refreshCoverage, locationError } from '@/lib/delivery-coverage';
+
+export const AddressesTab = ({ initialAddress, onSaved, onCancel }: { initialAddress?: SavedAddressItem; onSaved?(): void; onCancel?(): void } = {}) => {
   const [addresses, setAddresses] = useState<SavedAddressItem[]>([]);
-  const [availableStates, setAvailableStates] = useState<AvailableState[]>([]);
-  const [loadingStates, setLoadingStates] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [editingAddress, setEditingAddress] = useState<SavedAddressItem | null>(null);
@@ -18,26 +19,13 @@ export const AddressesTab: React.FC = () => {
     fullName: '',
     addressLine1: '',
     addressLine2: '',
-    city: '',
+    lga: '',
+    town: '',
     state: '',
     postalCode: '',
     country: 'Nigeria',
     phoneNumber: '',
   });
-
-  const loadDeliverableStates = async () => {
-    setLoadingStates(true);
-    try {
-      const res = await deliveryRoutesApi.getAvailableStates();
-      if (res?.success && Array.isArray(res.data)) {
-        setAvailableStates(res.data);
-      }
-    } catch (err) {
-      console.error('Failed to load available states', err);
-    } finally {
-      setLoadingStates(false);
-    }
-  };
 
   const loadAddresses = async () => {
     setLoading(true);
@@ -65,8 +53,8 @@ export const AddressesTab: React.FC = () => {
 
   useEffect(() => {
     void loadAddresses();
-    void loadDeliverableStates();
-  }, []);
+    if (initialAddress) handleOpenEdit(initialAddress);
+  }, [initialAddress]);
 
   const handleOpenAdd = () => {
     setEditingAddress(null);
@@ -74,7 +62,8 @@ export const AddressesTab: React.FC = () => {
       fullName: '',
       addressLine1: '',
       addressLine2: '',
-      city: '',
+      lga: '',
+      town: '',
       state: '',
       postalCode: '',
       country: 'Nigeria',
@@ -89,7 +78,8 @@ export const AddressesTab: React.FC = () => {
       fullName: addr.fullName || (addr as any).name || '',
       addressLine1: addr.addressLine1 || (addr as any).street || (addr as any).address || '',
       addressLine2: addr.addressLine2 || '',
-      city: addr.city || '',
+      lga: addr.lga ?? '',
+      town: addr.town || '',
       state: addr.state || '',
       postalCode: addr.postalCode || (addr as any).zip || (addr as any).zipCode || '',
       country: addr.country || 'Nigeria',
@@ -116,35 +106,39 @@ export const AddressesTab: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.addressLine1 || !formData.city || !formData.state || !formData.phoneNumber) {
+    if (!formData.fullName || !formData.lga?.trim() || !formData.town?.trim() || !formData.state || !formData.phoneNumber) {
       toast.error('Please fill in all required address fields.');
       return;
     }
 
+    const payload = { ...formData, addressLine1: formData.addressLine1?.trim() || undefined, postalCode: formData.postalCode?.trim() || undefined, town: formData.town.trim(), lga: formData.lga.trim() };
     setSaving(true);
     const saveToast = toast.loading(editingAddress ? 'Updating address...' : 'Saving address...');
 
     try {
       if (editingAddress) {
-        const res = await userAddressApi.update(editingAddress.id, formData);
+        const res = await userAddressApi.update(editingAddress.id, payload);
         if (res?.success) {
           toast.success('Address updated successfully', { id: saveToast });
           setIsAdding(false);
           await loadAddresses();
+          onSaved?.();
         } else {
           toast.error(res?.message || 'Failed to update address', { id: saveToast });
         }
       } else {
-        const res = await userAddressApi.create(formData);
+        const res = await userAddressApi.create(payload);
         if (res?.success) {
           toast.success('Address saved to profile', { id: saveToast });
           setIsAdding(false);
           await loadAddresses();
+          onSaved?.();
         } else {
           toast.error(res?.message || 'Failed to save address', { id: saveToast });
         }
       }
     } catch (err: any) {
+      if (locationError(err?.message || '')) refreshCoverage();
       toast.error(err?.message || 'Error saving address', { id: saveToast });
     } finally {
       setSaving(false);
@@ -179,7 +173,7 @@ export const AddressesTab: React.FC = () => {
             </span>
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
+              onClick={() => { setIsAdding(false); onCancel?.(); }}
               className="text-xs text-gray-400 hover:text-gray-600 font-semibold"
             >
               Cancel
@@ -211,18 +205,8 @@ export const AddressesTab: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Address Line 1 *</label>
-            <input
-              type="text"
-              required
-              value={formData.addressLine1}
-              onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
-              placeholder="Plot 12, Admiralty Way"
-              className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500"
-            />
-          </div>
-
+          <DeliveryLocationPicker value={formData} onChange={location => setFormData(prev => ({ ...prev, ...location }))}
+            street={formData.addressLine1} onStreet={addressLine1 => setFormData(prev => ({ ...prev, addressLine1 }))}/>
           <div>
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Address Line 2 (Optional)</label>
             <input
@@ -234,55 +218,13 @@ export const AddressesTab: React.FC = () => {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <label className="text-[11px] font-bold text-gray-600 block mb-1">City *</label>
-              <input
-                type="text"
-                required
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Lekki"
-                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500"
-              />
-            </div>
-            <div>
-              <label className="text-[11px] font-bold text-gray-600 block mb-1">
-                State * {loadingStates && <span className="text-[10px] text-purple-500 font-normal">(loading...)</span>}
-              </label>
-              <select
-                required
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white"
-              >
-                <option value="">Select deliverable state</option>
-                {availableStates.map((st) => (
-                  <option key={st.state} value={st.state}>
-                    {st.state}
-                  </option>
-                ))}
-                {formData.state && !availableStates.some((st) => st.state.toLowerCase() === formData.state.toLowerCase()) && (
-                  <option value={formData.state}>{formData.state}</option>
-                )}
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-bold text-gray-600 block mb-1">Postal Code (optional)</label>
-              <input
-                type="text"
-                value={formData.postalCode}
-                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                placeholder="105102"
-                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-purple-500"
-              />
-            </div>
-          </div>
-
+          <label className="block text-xs font-semibold text-slate-700">Postal code (optional)
+            <input className="mt-1 block w-full rounded-lg border px-3 py-2" value={formData.postalCode ?? ''} onChange={e => setFormData({ ...formData, postalCode: e.target.value })}/>
+          </label>
           <div className="pt-2 flex justify-end gap-2">
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
+              onClick={() => { setIsAdding(false); onCancel?.(); }}
               className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-50"
             >
               Cancel
@@ -315,7 +257,7 @@ export const AddressesTab: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {addresses.map((addr) => {
-            const line1 = addr.addressLine1 || (addr as any).street || (addr as any).address || [addr.city, addr.state].filter(Boolean).join(', ');
+            const line1 = addr.addressLine1 || (addr as any).street || (addr as any).address || '';
             const phone = addr.phoneNumber || (addr as any).phone || (addr as any).phoneNumber;
             return (
               <div
@@ -325,6 +267,7 @@ export const AddressesTab: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-bold text-xs text-gray-800">{addr.fullName || (addr as any).name || 'Address'}</span>
+                    {(!addr.lga || !addr.town) && <span className="rounded bg-amber-100 px-2 text-xs">Please update</span>}
                     {addr.isDefault && (
                       <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">
                         Default
@@ -334,7 +277,7 @@ export const AddressesTab: React.FC = () => {
                   <p className="text-xs text-gray-600 font-medium">{line1}</p>
                   {addr.addressLine2 && <p className="text-xs text-gray-500">{addr.addressLine2}</p>}
                   <p className="text-xs text-gray-500">
-                    {addr.city}{addr.city && addr.state ? ', ' : ''}{addr.state} {addr.postalCode || ''}
+                    {[addr.town || addr.city, addr.lga, addr.state].filter(Boolean).join(', ')} {addr.postalCode || ''}
                   </p>
                   <p className="text-xs text-gray-500">{addr.country}</p>
                   {phone && <p className="text-xs text-purple-600 font-semibold mt-1">📞 {phone}</p>}

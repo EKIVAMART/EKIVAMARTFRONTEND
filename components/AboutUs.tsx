@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { UserRound } from '@/components/ui/platform-icons';
-import { BinocularsIcon, StorefrontIcon, HandHeartIcon, SealCheckIcon, UsersThreeIcon, ShieldCheckIcon, PlantIcon, ArrowsClockwiseIcon } from '@phosphor-icons/react/ssr';
+import { Binoculars as BinocularsIcon, Store as StorefrontIcon, HandHeart as HandHeartIcon, BadgeCheck as SealCheckIcon, Users as UsersThreeIcon, ShieldCheck as ShieldCheckIcon, Sprout as PlantIcon, RefreshCw as ArrowsClockwiseIcon } from 'lucide-react';
 import styles from './AboutUs.module.css';
 import shoppingPhoto from '@/assets/imgapt.jpg';
 
@@ -46,13 +46,13 @@ export default function AboutUs() {
         </div>
         <div className="ek-about-purpose">
           <article className={`${styles.purposeCard} ${styles.vision}`}>
-            <div className={styles.purposeLabel}><BinocularsIcon size={32} weight="duotone" aria-hidden="true" /><span>Our vision</span></div>
+            <div className={styles.purposeLabel}><BinocularsIcon size={32} fill="none" aria-hidden="true" /><span>Our vision</span></div>
             <h3>Local ambition.<br />Limitless possibility.</h3>
             <p>We imagine an Africa where a business’s location never limits its potential. Where independent stores can reach beyond their neighbourhoods, and shoppers can discover the talent and products around them.</p>
             <div className={styles.signature}>Rooted locally. Looking further.</div>
           </article>
           <article className={`${styles.purposeCard} ${styles.mission}`}>
-            <div className={styles.purposeLabel}><StorefrontIcon size={32} weight="duotone" aria-hidden="true" /><span>Our mission</span></div>
+            <div className={styles.purposeLabel}><StorefrontIcon size={32} fill="none" aria-hidden="true" /><span>Our mission</span></div>
             <h3>Bring great stores<br />closer to everyone.</h3>
             <p>We’re building a marketplace that connects shoppers with independent businesses, starting in Nigeria. One place to discover products, and practical tools for sellers to open a store, manage orders and grow online.</p>
             <div className={styles.signature}>Discover. Connect. Grow.</div>
@@ -69,7 +69,7 @@ export default function AboutUs() {
         <div className="ek-about-values">
           {values.map(({ icon: Icon, title, text }, index) => (
             <article className={styles.valueCard} key={title}>
-              <div className={styles.valueTop}><span className={styles.valueIcon}><Icon size={48} weight="duotone" aria-hidden="true" /></span><span className={styles.valueNumber} aria-hidden="true">0{index + 1}</span></div>
+              <div className={styles.valueTop}><span className={styles.valueIcon}><Icon size={48} fill="none" aria-hidden="true" /></span><span className={styles.valueNumber} aria-hidden="true">0{index + 1}</span></div>
               <h3>{title}</h3>
               <p>{text}</p>
             </article>

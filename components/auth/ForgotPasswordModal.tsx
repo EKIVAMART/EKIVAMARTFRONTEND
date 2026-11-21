@@ -38,15 +38,14 @@ interface ForgotPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
-  onSuccess: (email: string) => void;
 }
 
 export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   isOpen,
   onClose,
   onSwitchToLogin,
-  onSuccess,
 }) => {
+  const [sentTo, setSentTo] = useState('');
   const [rateLimitInfo, setRateLimitInfo] = useState<{
     blocked: boolean;
     retryAfter?: number;
@@ -63,16 +62,8 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
-      // Use authApi.forgotPassword if available, otherwise mock it.
-      if (authApi.forgotPassword) {
-        await authApi.forgotPassword(data.email);
-      } else {
-        // Simulation delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      }
-
-      toast.success('Invitation sent. The link expires in 15 minutes.');
-      onSuccess(data.email);
+      await authApi.forgotPassword(data.email);
+      setSentTo(data.email);
     } catch (error: unknown) {
       if (isApiError(error) && error.statusCode === 429) {
         const retryAfter = error.retryAfter || 900;
@@ -121,17 +112,20 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <Mail className="w-7 h-7 text-white stroke-[2.5]" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Reset your password
+          {sentTo ? 'Check your email' : 'Reset your password'}
         </h2>
         <p className="text-sm text-gray-600">
-          Enter your email and we'll send you a reset link.
+          {sentTo
+            ? `If an account exists for ${sentTo}, we’ve sent a password reset link to that address. Open the link to choose a new password.`
+            : "Enter your email and we’ll send you a reset link."}
         </p>
       </div>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      {!sentTo && (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+        >
           {rateLimitInfo.blocked && (
             <div className="flex gap-2 p-2.5 sm:p-3 bg-red-50 border border-red-200 rounded-lg sm:rounded-xl">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0 mt-0.5" />
@@ -169,6 +163,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             Send Reset Link
           </Button>
         </form>
+      )}
     </Modal>
   );
 };

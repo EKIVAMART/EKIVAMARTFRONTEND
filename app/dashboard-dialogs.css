@@ -220,12 +220,6 @@ body:has(.ek-admin-workspace) .dashboard-dialog-overlay > .absolute.inset-0 {
   background: transparent;
   backdrop-filter: none;
 }
-body:has(.ek-admin-workspace) .dashboard-dialog
-  :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
-  outline: none;
-  border-color: #176a35;
-  box-shadow: 0 0 0 1px #176a35;
-}
 body:has(.ek-admin-workspace) .dashboard-dialog select:not(.appearance-none):not([multiple]) {
   appearance: none;
   padding-right: 36px;

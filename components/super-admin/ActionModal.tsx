@@ -1,4 +1,6 @@
 'use client';
+import { ProductStateSelect } from '@/components/DeliveryLocationPicker';
+import { deliveryStates, refreshCoverage } from '@/lib/delivery-coverage';
 import { Loader2 as PlatformLoader2 } from '@/components/ui/platform-icons';
 
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
@@ -256,7 +258,7 @@ const ChipSelector = ({
   return (
     <div className="space-y-2">
       <label className="text-xs font-bold text-gray-600 block">{label}</label>
-      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-md border bg-white focus-within:ring-2 focus-within:ring-[#228b22]/20 focus-within:border-[#228b22] transition-all">
+      <div className="flex flex-wrap gap-1.5 min-h-[44px] p-2 rounded-md border bg-white ek-field-group focus-within:border-[#228b22] transition-all">
         {selectedValues.map((val, idx) => (
           <span key={`${val}-${idx}`} className="bg-[#e3ebdf] text-[#1c711c] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 animate-in zoom-in-95 duration-100">
             {val}
@@ -449,6 +451,7 @@ export default function ActionModal({
     setSaveErrors([]);
 
     try {
+      if (!(await deliveryStates.get()).includes(formData.location?.state || '')) throw new Error('Choose a supported pickup state.');
       if (!isVendorRole && (isLoadingStores || !stores.some(store => store.id === formData.vendorProfileId))) {
         throw new Error(isLoadingStores ? 'Please wait for stores to load.' : 'Please select an available store for this product.');
       }
@@ -539,7 +542,12 @@ export default function ActionModal({
       toast.success(editingItem ? 'Product updated successfully!' : 'Product created successfully!');
       closeModalAndReset();
     } catch (error: any) {
-      setSaveErrors(formatSaveError(error));
+      const messages = formatSaveError(error);
+      if (messages.some(message => /state|do not support products/i.test(message))) {
+        refreshCoverage();
+        setCurrentStep(1);
+      }
+      setSaveErrors(messages);
     } finally {
       setIsSaving(false);
       setLoadingMessage('');
@@ -681,7 +689,7 @@ export default function ActionModal({
 
       <div>
         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
-        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
+        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white ek-field-group transition-all">
           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
               <button type="button" onClick={() => applyFormat('bold')} className="px-3 py-1.5 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition"><b>B</b></button>
@@ -752,14 +760,8 @@ export default function ActionModal({
                 className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
                 required
               />
-              <input
-                type="text"
-                value={formData.location?.state || ''}
-                onChange={e => updateLocation('state', e.target.value)}
-                placeholder="State *"
-                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
-                required
-              />
+              <ProductStateSelect value={formData.location?.state || ''} onChange={state => updateLocation('state', state)}
+                error={saveErrors.find(message => /state|do not support products/i.test(message))}/>
               <input
                 type="text"
                 value={formData.location?.lga || ''}
@@ -1534,7 +1536,7 @@ export default function ActionModal({
 
                       <div>
                         <label className="text-xs font-bold text-gray-600 mb-1.5 block">Full Description <span className="text-[#228b22] ml-1">*</span></label>
-                        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-200 transition-all">
+                        <div className="border rounded-md overflow-hidden bg-white focus-within:bg-white ek-field-group transition-all">
                           {/* Editor Header Toolbar */}
                           <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-1.5">
@@ -1624,7 +1626,7 @@ export default function ActionModal({
                         </div>
                         <div>
                           <label className="text-xs font-bold text-gray-600 mb-1.5 block">Tags (Press Enter to add)</label>
-                          <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white focus-within:ring-2 focus-within:border-[#228b22] focus-within:ring-[#228b22]/20 ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
+                          <div className="w-full p-2.5 rounded-md border bg-white focus-within:bg-white ek-field-group focus-within:border-[#228b22] ring-slate-200 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {formData.tags.map((t, idx) => (
                               <span key={`tag-${t}-${idx}`} className="bg-[#e3ebdf] text-[#228b22] text-xs font-bold px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
                                 {t} <X size={12} className="cursor-pointer text-[#228b22] hover:text-slate-900 transition" onClick={() => removeTag(t)} />
@@ -1702,14 +1704,8 @@ export default function ActionModal({
                               <label className="text-xs font-bold text-gray-500 mb-1 block">
                                 State <span className="text-[#228b22] ml-1">*</span>
                               </label>
-                              <input
-                                type="text"
-                                value={formData.location?.state || ''}
-                                onChange={e => updateLocation('state', e.target.value)}
-                                className="w-full p-3.5 rounded-md border bg-white focus:bg-white focus:ring-2 ring-slate-200 outline-none text-sm"
-                                required
-                                placeholder="e.g. Lagos"
-                              />
+                              <ProductStateSelect value={formData.location?.state || ''} onChange={state => updateLocation('state', state)}
+                error={saveErrors.find(message => /state|do not support products/i.test(message))}/>
                             </div>
                             <div>
                               <label className="text-xs font-bold text-gray-500 mb-1 block">

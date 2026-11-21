@@ -460,7 +460,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order: basicOrder, 
                         </h3>
                         <p className="text-xs text-gray-600 font-semibold leading-relaxed">
                           {order.shippingAddress?.addressLine1}<br />
-                          {order.shippingAddress?.city}, {order.shippingAddress?.state}<br />
+                          {[order.shippingAddress?.town || order.shippingAddress?.city, order.shippingAddress?.lga, order.shippingAddress?.state].filter(Boolean).join(', ')}<br />
                           {order.shippingAddress?.country}
                         </p>
                       </div>

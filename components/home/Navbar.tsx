@@ -18,8 +18,6 @@ import { LoginModal } from '@/components/auth/LoginModal';
 import { SignupModal } from '@/components/auth/SignupModal';
 import { ProfileModal } from '@/components/auth/ProfileModal';
 import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
-import { OTPVerificationModal } from '@/components/auth/OTPVerificationModal';
-import { ResetPasswordModal } from '@/components/auth/ResetPasswordModal';
 
 const navigationDepartments = departments.map(name => {
   const slug = departmentSlug(name);
@@ -34,10 +32,6 @@ export default function Navbar() {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isOTPVerificationModalOpen, setIsOTPVerificationModalOpen] = useState(false);
-  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetOtp, setResetOtp] = useState('');
 
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
@@ -168,27 +162,13 @@ export default function Navbar() {
         onSwitchToSignup={() => { setIsLoginModalOpen(false); setIsSignupModalOpen(true); }}
         onSwitchToForgotPassword={() => { setIsLoginModalOpen(false); setIsForgotPasswordModalOpen(true); }}
       />
-      <ForgotPasswordModal
-        isOpen={isForgotPasswordModalOpen}
-        onClose={() => setIsForgotPasswordModalOpen(false)}
-        onSwitchToLogin={() => { setIsForgotPasswordModalOpen(false); setIsLoginModalOpen(true); }}
-        onSuccess={(email) => { setResetEmail(email); setIsForgotPasswordModalOpen(false); setIsOTPVerificationModalOpen(true); }}
-      />
-      <OTPVerificationModal
-        isOpen={isOTPVerificationModalOpen}
-        email={resetEmail}
-        onClose={() => setIsOTPVerificationModalOpen(false)}
-        onBack={() => { setIsOTPVerificationModalOpen(false); setIsForgotPasswordModalOpen(true); }}
-        onSuccess={(otp) => { setResetOtp(otp); setIsOTPVerificationModalOpen(false); setIsResetPasswordModalOpen(true); }}
-      />
-      <ResetPasswordModal
-        isOpen={isResetPasswordModalOpen}
-        email={resetEmail}
-        otp={resetOtp}
-        onClose={() => setIsResetPasswordModalOpen(false)}
-        onBack={() => { setIsResetPasswordModalOpen(false); setIsOTPVerificationModalOpen(true); }}
-        onSuccess={() => { setIsResetPasswordModalOpen(false); setIsLoginModalOpen(true); }}
-      />
+      {isForgotPasswordModalOpen && (
+        <ForgotPasswordModal
+          isOpen
+          onClose={() => setIsForgotPasswordModalOpen(false)}
+          onSwitchToLogin={() => { setIsForgotPasswordModalOpen(false); setIsLoginModalOpen(true); }}
+        />
+      )}
       <SignupModal
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
