@@ -4,15 +4,15 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, LogOut, RefreshCw, ShieldAlert } from '@/components/ui/platform-icons';
 import { useAppDispatch } from '@/lib/hooks';
-import { logout, setTokens } from '@/lib/features/auth/authSlice';
+import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
+import { authApi } from '@/lib/api';
+import { refreshSession } from '@/lib/axios';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const TOKEN_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 const WARNING_BEFORE_MS = 15 * 1000;      // Show warning 15 seconds before expiry
 const COUNTDOWN_SECONDS = 15;
-
-import { API_BASE_URL } from '@/lib/axios';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -70,21 +70,9 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
     clearTimer();
     setIsLoggingOut(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ sessionId: null }),
-        }).catch(() => { /* fire-and-forget */ });
-      }
+      await authApi.logoutCurrentSession().catch(() => {});
     } finally {
       dispatch(logout());
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       router.replace(loginPath);
     }
   }, [clearTimer, dispatch, loginPath, router]);
@@ -96,35 +84,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
     setIsExtending(true);
 
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        await performLogout();
-        return;
-      }
-
-      const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (!res.ok) {
-        await performLogout();
-        return;
-      }
-
-      const data = await res.json();
-      const accessToken: string = data?.data?.accessToken ?? data?.accessToken;
-      const newRefreshToken: string = data?.data?.refreshToken ?? data?.refreshToken ?? refreshToken;
-
-      if (!accessToken) {
-        await performLogout();
-        return;
-      }
-
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', newRefreshToken);
-      dispatch(setTokens({ accessToken, refreshToken: newRefreshToken }));
+      await refreshSession();
 
       // Dismiss modal and restart the check loop
       setShowModal(false);
@@ -135,7 +95,7 @@ export default function SessionTimeoutModal({ loginPath }: SessionTimeoutModalPr
       extendInProgress.current = false;
       setIsExtending(false);
     }
-  }, [dispatch, performLogout]);
+  }, [performLogout]);
 
   // ── Main ticker loop ─────────────────────────────────────────────────────────
   const startChecking = useCallback(() => {

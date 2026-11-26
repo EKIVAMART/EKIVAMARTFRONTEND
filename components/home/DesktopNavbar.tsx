@@ -10,6 +10,7 @@ import { useAppSelector, useCartCount } from '@/lib/hooks';
 import CategoryDropdown from './CategoryDropdown';
 import MarketplaceNav from './MarketplaceNav';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import CategoryIcon from '@/components/ui/CategoryIcon';
 
 interface DesktopNavbarProps {
   categories: any[];
@@ -152,14 +153,15 @@ export default function DesktopNavbar({ categories, onOpenLogin, onOpenProfile }
           </div>
 
           {/* Scrollable category name strip */}
-          <div className="flex flex-1 gap-7 overflow-x-auto scrollbar-hide py-1 min-w-0">
+          <div className="flex flex-1 gap-4 overflow-x-auto scrollbar-hide py-1 min-w-0 lg:gap-5 xl:gap-7">
             {categories.map((category) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="shrink-0 font-medium text-neutral-600 hover:text-brand-600 transition-colors whitespace-nowrap"
+                className="inline-flex shrink-0 items-center gap-1.5 font-medium text-neutral-600 hover:text-brand-600 transition-colors whitespace-nowrap"
               >
-                {category.name}
+                <CategoryIcon name={category.name} size={16} strokeWidth={1.75} className="shrink-0" />
+                <span>{category.name}</span>
               </Link>
             ))}
           </div>

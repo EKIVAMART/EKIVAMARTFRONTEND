@@ -138,7 +138,7 @@ export function NotificationBell() {
         onClick={handleToggle}
         aria-expanded={isOpen}
         aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
-        className="cursor-pointer hover:text-[#22643e]"
+        className="cursor-pointer [&_svg]:size-[22px] lg:[&_svg]:size-6"
       />
 
       {/* Popover Dropdown Panel — rendered via fixed positioning calculated from the button rect */}

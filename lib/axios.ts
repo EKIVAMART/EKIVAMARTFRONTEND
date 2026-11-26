@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
+import { logout, setTokens } from '@/lib/features/auth/authSlice';
 
-import { setCredentials, logout, setTokens } from '@/lib/features/auth/authSlice';
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    requireAuth?: boolean;
+  }
+}
 
 let storeInstance: any = null;
 
@@ -9,7 +14,7 @@ export const injectStore = (s: any) => {
   storeInstance = s;
 };
 
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "https://faflora-staging.onrender.com/api/v1").replace(/\/$/, "");
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://faflora-staging.onrender.com/api/v1').replace(/\/$/, '');
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -20,165 +25,107 @@ export const axiosInstance = axios.create({
   timeout: 30000,
 });
 
-axiosInstance.interceptors.request.use(
-  (config: any) => {
-    if (config.skipAuth || config.headers?.skipAuth || config.headers?.noAuth) {
-      if (config.headers?.skipAuth) delete config.headers.skipAuth;
-      if (config.headers?.noAuth) delete config.headers.noAuth;
-      return config;
-    }
-    try {
-      // Primary: read from localStorage — shared across all store instances
-      let token: string | null = null;
+const getToken = (key: 'accessToken' | 'refreshToken'): string | null =>
+  (typeof window !== 'undefined' ? localStorage.getItem(key) : null) ||
+  storeInstance?.getState()?.auth?.[key] ||
+  null;
 
-      if (typeof window !== 'undefined') {
-        token = localStorage.getItem('accessToken');
-      }
+interface SessionTokens {
+  accessToken: string;
+  refreshToken: string;
+}
 
-      // Fallback: read from the module-level store singleton
-      if (!token && storeInstance) {
-        const state = storeInstance.getState();
-        token = state?.auth?.accessToken ?? null;
-      }
+let pendingRefresh: Promise<SessionTokens> | undefined;
 
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch {
-      // If store isn't ready, try localStorage directly
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('accessToken');
-        if (token && config.headers) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-      }
-    }
+export async function refreshSession(): Promise<SessionTokens> {
+  if (pendingRefresh) return pendingRefresh;
 
-    // For FormData requests, remove Content-Type so browser sets it with boundary
-    if (
-      typeof FormData !== 'undefined' &&
-      config.data instanceof FormData &&
-      config.headers
-    ) {
-      delete config.headers['Content-Type'];
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+  const refreshToken = getToken('refreshToken');
+  if (!refreshToken) {
+    throw new Error('Your session has expired. Please sign in again.');
   }
-);
 
-// Response interceptor - Handle token refresh
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (value?: unknown) => void;
-  reject: (reason?: unknown) => void;
-}> = [];
+  pendingRefresh = axios
+    .post<{ data: SessionTokens }>(
+      `${API_BASE_URL}/auth/refresh`,
+      { refreshToken },
+      { timeout: axiosInstance.defaults.timeout }
+    )
+    .then(({ data }) => {
+      if (!data?.data?.accessToken || !data.data.refreshToken) {
+        throw new Error('The server did not return refreshed session tokens.');
+      }
+      if (getToken('refreshToken') !== refreshToken) {
+        throw new Error('The session changed while refreshing.');
+      }
+      storeInstance?.dispatch(setTokens(data.data));
+      return data.data;
+    })
+    .catch((error: unknown) => {
+      if (getToken('refreshToken') === refreshToken) {
+        storeInstance?.dispatch(logout());
+      }
+      throw error;
+    })
+    .finally(() => {
+      pendingRefresh = undefined;
+    });
 
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
+  return pendingRefresh;
+}
 
-  failedQueue = [];
-};
+export async function getRefreshTokenForLogout(): Promise<string | null> {
+  await pendingRefresh?.catch(() => undefined);
+  return getToken('refreshToken');
+}
+
+axiosInstance.interceptors.request.use(async (config: any) => {
+  if (config.skipAuth || config.headers?.skipAuth || config.headers?.noAuth) {
+    if (config.headers?.skipAuth) delete config.headers.skipAuth;
+    if (config.headers?.noAuth) delete config.headers.noAuth;
+    return config;
+  }
+
+  let token = getToken('accessToken');
+  if (!token && config.requireAuth) {
+    token = (await refreshSession()).accessToken;
+    config._retry = true;
+  }
+
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData && config.headers) {
+    delete config.headers['Content-Type'];
+  }
+
+  return config;
+});
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: any) => {
-    const originalRequest = error.config as any;
-
-    // If error is 401 and we haven't retried yet
+    const request = error.config;
     if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !['/auth/login', '/auth/register', '/auth/refresh'].includes(originalRequest.url) &&
-      !originalRequest._retry &&
-      error.response
+      error.response?.status !== 401 ||
+      !request ||
+      request._retry ||
+      ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'].includes(request.url)
     ) {
-      if (isRefreshing) {
-        // If already refreshing, queue this request
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
-            return axiosInstance(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      const state = storeInstance?.getState();
-      const refreshToken =
-        state?.auth?.refreshToken ||
-        (typeof window !== 'undefined'
-          ? localStorage.getItem('refreshToken')
-          : null);
-
-      if (!refreshToken) {
-        isRefreshing = false;
-        processQueue(error, null);
-        if (storeInstance) {
-          storeInstance.dispatch(logout());
-        }
-        return Promise.reject(error);
-      }
-
-      try {
-        // Call refresh token endpoint
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refreshToken,
-        });
-
-        const tokenData = response.data as {
-          data: { accessToken: string; refreshToken: string };
-        };
-        const { accessToken, refreshToken: newRefreshToken } = tokenData.data;
-
-        // Update tokens in store
-        if (storeInstance) {
-          storeInstance.dispatch(
-            setTokens({
-              accessToken,
-              refreshToken: newRefreshToken,
-            })
-          );
-        }
-
-        // Update authorization header
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        processQueue(null, accessToken);
-
-        // Retry original request
-        return axiosInstance(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        if (storeInstance) {
-          storeInstance.dispatch(logout());
-        }
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+      throw error;
     }
 
-    return Promise.reject(error);
+    request._retry = true;
+    if (!getToken('refreshToken')) {
+      storeInstance?.dispatch(logout());
+      throw error;
+    }
+
+    const { accessToken } = await refreshSession();
+    request.headers.Authorization = `Bearer ${accessToken}`;
+
+    return axiosInstance(request);
   }
 );
 
