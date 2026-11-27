@@ -1994,7 +1994,10 @@ export const adminVendorApi = {
       }
     });
 
-    const res = await axiosInstance.get<ApiResponse<any>>(`/admin/vendors?${query.toString()}`);
+    const res = await axiosInstance.get<ApiResponse<any>>(
+      `/admin/vendors?${query.toString()}`,
+      { requireAuth: true }
+    );
     return res.data;
   },
 

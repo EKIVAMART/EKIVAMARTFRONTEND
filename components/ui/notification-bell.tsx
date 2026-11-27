@@ -17,9 +17,10 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Bell } from "@/components/ui/platform-icons";
 
 const SURFACE = "bg-transparent";
-const GLYPH = "text-[#526152]";
+const GLYPH = "text-stone-700 hover:text-brand-600";
 
 const COLORS = {
   red: "bg-[#FF3B30] dark:bg-[#FF453A]",
@@ -43,7 +44,6 @@ const SWING_SPRING = {
   mass: 1,
   restDelta: 0.01,
 } as const;
-const CLAPPER_SPRING = { stiffness: 300, damping: 14, mass: 1 };
 const COLUMN_SPRING = { stiffness: 400, damping: 30, mass: 0.9 };
 const ENTER_SPRING = { type: "spring", stiffness: 600, damping: 20 } as const;
 const FADE = { duration: 0.15 } as const;
@@ -51,8 +51,6 @@ const FADE = { duration: 0.15 } as const;
 const IMPULSE = 500;
 const MAX_VELOCITY = 900;
 const BURST = 5;
-const CLAPPER_SWEEP = 13;
-const CLAPPER_VELOCITY = 450;
 
 const WINDOW = 3;
 const LAG = 2;
@@ -75,14 +73,6 @@ function badgeMetrics(size: number, dot: boolean) {
 
 function useBellRing(total: number, reduced: boolean) {
   const swing = useMotionValue(0);
-  const swingVelocity = useVelocity(swing);
-  const clapperLag = useTransform(
-    swingVelocity,
-    [-CLAPPER_VELOCITY, 0, CLAPPER_VELOCITY],
-    [CLAPPER_SWEEP, 0, -CLAPPER_SWEEP],
-    { clamp: true },
-  );
-  const clapper = useSpring(clapperLag, CLAPPER_SPRING);
   const previous = useRef(total);
   const ringing = useRef<AnimationPlaybackControls | null>(null);
 
@@ -103,42 +93,14 @@ function useBellRing(total: number, reduced: boolean) {
 
   useEffect(() => () => ringing.current?.stop(), []);
 
-  return { swing, clapper };
+  return swing;
 }
 
-function BellIcon({
-  side,
-  swing,
-  clapper,
-}: {
-  side: number;
-  swing: MotionValue<number>;
-  clapper: MotionValue<number>;
-}) {
+function BellIcon({ side, swing }: { side: number; swing: MotionValue<number> }) {
   return (
-    <motion.svg
-      viewBox="0 0 18 18"
-      fill="currentColor"
-      aria-hidden
-      width={side}
-      height={side}
-      style={{ rotate: swing, transformOrigin: "50% 12%" }}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        fillOpacity={0.55}
-        d="M3.5 6.5C3.5 3.46279 5.96279 1 9 1C12.0372 1 14.5 3.46279 14.5 6.5V10.75C14.5 11.4408 15.0592 12 15.75 12C16.1642 12 16.5 12.3358 16.5 12.75C16.5 13.1642 16.1642 13.5 15.75 13.5H2.25C1.83579 13.5 1.5 13.1642 1.5 12.75C1.5 12.3358 1.83579 12 2.25 12C2.94079 12 3.5 11.4408 3.5 10.75V6.5Z"
-      />
-      <motion.path
-        style={{
-          rotate: clapper,
-          transformBox: "fill-box",
-          transformOrigin: "50% 0%",
-        }}
-        d="M10.2 15H7.80099C7.64999 15 7.50799 15.068 7.41299 15.185C7.31799 15.302 7.28099 15.456 7.31199 15.603C7.48499 16.425 8.17999 17 9.00099 17C9.82199 17 10.517 16.425 10.69 15.603C10.721 15.456 10.684 15.302 10.589 15.185C10.494 15.068 10.351 15 10.2 15Z"
-      />
-    </motion.svg>
+    <motion.span className="inline-flex" style={{ rotate: swing, transformOrigin: "50% 12%" }}>
+      <Bell aria-hidden="true" size={side} strokeWidth={1.75} />
+    </motion.span>
   );
 }
 
@@ -281,7 +243,7 @@ export function NotificationBell({
 }: NotificationBellProps) {
   const reduced = useReducedMotion() ?? false;
   const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-  const { swing, clapper } = useBellRing(total, reduced);
+  const swing = useBellRing(total, reduced);
 
   const badge = (
     <CountBadge
@@ -306,7 +268,7 @@ export function NotificationBell({
       type="button"
       data-slot="notification-bell"
       className={cn(
-        "relative grid place-items-center rounded-full outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22643e] motion-reduce:active:scale-100",
+        "relative grid place-items-center rounded-full outline-none transition-[color,transform] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22643e] motion-reduce:active:scale-100",
         SURFACE,
         GLYPH,
         className,
@@ -315,7 +277,7 @@ export function NotificationBell({
       {...props}
     >
       {label}
-      <BellIcon side={size * ICON} swing={swing} clapper={clapper} />
+      <BellIcon side={size * ICON} swing={swing} />
       {badge}
     </button>
   );

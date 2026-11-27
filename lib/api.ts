@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axiosInstance from './axios';
+import axiosInstance, { getRefreshTokenForLogout } from './axios';
 
 import { normalizeApiError } from './api-error';
 export type { ApiError } from './api-error';
@@ -231,11 +231,12 @@ export const authApi = {
     }
   },
 
-  async logout(sessionId?: string) {
+  async logout() {
     try {
-      const response = await axiosInstance.post<ApiResponse<any>>(
+      const refreshToken = await getRefreshTokenForLogout();
+      const response = await axiosInstance.post<ApiResponse<null>>(
         '/auth/logout',
-        { sessionId: sessionId ?? null }
+        refreshToken ? { refreshToken } : {}
       );
       return response.data;
     } catch (error) {
@@ -297,31 +298,8 @@ export const authApi = {
     }
   },
 
-  async logoutCurrentSession() {
-    try {
-      const sessionsResponse =
-        await axiosInstance.get<ApiResponse<AuthSessionRecord[]>>(
-          '/auth/sessions'
-        );
-      const sessionId = findCurrentSessionId(
-        extractSessions(sessionsResponse.data)
-      );
-
-      if (!sessionId) {
-        throw {
-          message: 'Could not determine the current session id for logout.',
-          statusCode: 400,
-        } as ApiError;
-      }
-
-      const response = await axiosInstance.post<ApiResponse<any>>(
-        '/auth/logout',
-        { sessionId }
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
+  logoutCurrentSession() {
+    return authApi.logout();
   },
 
   async logoutAllSessions() {

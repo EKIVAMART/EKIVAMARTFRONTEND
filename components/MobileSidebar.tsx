@@ -14,96 +14,12 @@ import {
   ChevronRight,
   ChevronDown,
   LogOut,
-  ShoppingBag,
-  Smartphone,
-  Backpack,
-  Footprints,
-  Sparkles,
-  Heart,
-  Gem,
   Home,
   Search,
   User,
-  Tv,
-  Camera,
-  Gamepad,
-  Music,
-  Headphones,
-  Blend,
-  CookingPot,
-  Lamp,
-  Sofa,
-  ShoppingBasket,
-  Scissors,
-  Bath,
-  HeartPulse,
-  Dumbbell,
-  Puzzle,
-  Baby,
-  PawPrint,
-  Car,
-  Book,
-  Wrench,
-  Leaf,
-  Briefcase,
-  Bolt,
-  Package,
-  Store,
-  GlassWater,
 } from '@/components/ui/platform-icons';
 import { categoryApi } from '@/lib/api';
-
-const categoryIconMap: Record<string, any> = {
-  'fashion': ShoppingBag,
-  'footwear': Footprints,
-  'bags & luggage': Backpack,
-  'bags': Backpack,
-  'jewelry & fashion accessories': Gem,
-  'jewelry': Gem,
-  'jewellery': Gem,
-  'mobile phones & accessories': Smartphone,
-  'computers & accessories': LaptopIconPlaceholder(),
-  'electronics': Tv,
-  'photography & video': Camera,
-  'gaming': Gamepad,
-  'musical instruments': Music,
-  'audio equipment': Headphones,
-  'home appliances': Blend,
-  'home & kitchen': CookingPot,
-  'home decor': Lamp,
-  'furniture': Sofa,
-  'groceries': ShoppingBasket,
-  'local market': Store,
-  'drinks': GlassWater,
-  'beauty & cosmetics': Sparkles,
-  'beauty': Sparkles,
-  'hair care & extensions': Scissors,
-  'personal care': Bath,
-  'health & wellness': HeartPulse,
-  'wellness': Heart,
-  'sports & fitness': Dumbbell,
-  'sports': Dumbbell,
-  'toys & games': Puzzle,
-  'toys': Puzzle,
-  'baby products': Baby,
-  'pet supplies': PawPrint,
-  'automotive': Car,
-  'books & stationery': Book,
-  'tools & home improvement': Wrench,
-  'garden & outdoor': Leaf,
-  'office & school supplies': Briefcase,
-  'solar & electrical': Bolt,
-};
-
-function LaptopIconPlaceholder() {
-  return Smartphone;
-}
-
-const getCategoryIcon = (name: string) => {
-  const norm = name.toLowerCase().trim();
-  const IconComponent = categoryIconMap[norm] || categoryIconMap[norm.replace(/&/g, 'and')] || Package;
-  return <IconComponent size={20} />;
-};
+import CategoryIcon from '@/components/ui/CategoryIcon';
 
 const allLocations = [
   'All',
@@ -281,10 +197,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const handleLogout = async () => {
     try {
       await authApi.logoutCurrentSession();
-      dispatch(logout());
-      onClose();
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      dispatch(logout());
+      onClose();
     }
   };
 
@@ -431,7 +348,6 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <div>
                 {categories.length > 0 ? (
                   categories.map((category) => {
-                    const iconNode = getCategoryIcon(category.name);
                     return (
                       <div key={category.id}>
                         {/* Category Button */}
@@ -441,7 +357,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                         >
                           <div className="flex items-center gap-3">
                             <div className="text-gray-500 group-hover:text-[#228b22] transition">
-                              {iconNode}
+                              <CategoryIcon name={category.name} size={20} />
                             </div>
                             <span className="font-semibold text-sm text-gray-800">
                               {category.name}

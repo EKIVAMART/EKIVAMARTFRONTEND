@@ -6,7 +6,7 @@ import { useAppDispatch } from '@/lib/hooks';
 import { useState } from 'react';
 import { logout } from '@/lib/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
-import { API_BASE_URL } from '@/lib/axios';
+import { authApi } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export type SuperAdminTab = 'dashboard' | 'products' | 'vendors' | 'orders' | 'admins' | 'users' | 'waitlist' | 'taxes' | 'notifications' | 'blog' | 'engagement' | 'specialists' | 'deliveryRoutes';
@@ -26,21 +26,9 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: Si
   const handleLogout = async () => {
     setShowLogoutConfirm(false);
     try {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ sessionId: null })
-        }).catch(() => {});
-      }
+      await authApi.logoutCurrentSession().catch(() => {});
     } finally {
       dispatch(logout());
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       router.replace('/super-admin/login');
     }
   };

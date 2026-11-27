@@ -33,10 +33,11 @@ export default function MobileCategorySidebar({
   const handleLogout = async () => {
     try {
       await authApi.logoutCurrentSession();
-      dispatch(logout());
-      onClose();
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      dispatch(logout());
+      onClose();
     }
   };
 

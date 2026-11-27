@@ -1,7 +1,20 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import {
+  Description,
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from '@headlessui/react';
+import {
+  Check,
+  ChevronDown,
+  Loader2,
+  MapPin,
+  Send,
+} from '@/components/ui/platform-icons';
 import axios from '@/lib/axios';
 import {
   DeliveryArea,
@@ -11,8 +24,9 @@ import {
   reconcileLocation,
 } from '@/lib/delivery-coverage';
 
-const field =
-  'block w-full mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900';
+const fieldBase =
+  'block w-full rounded-lg border border-gray-300 bg-white py-2 text-sm text-slate-900';
+const field = `${fieldBase} mt-1 px-3`;
 const label = 'block text-xs font-semibold text-slate-700';
 export function deliveryMessage(error: unknown) {
   const e = error as {
@@ -100,114 +114,266 @@ export function ProductStateSelect({
   );
 }
 
-export function LocationRequest({ close }: { close(): void }) {
+export function LocationRequest({
+  close,
+  location,
+}: {
+  close(): void;
+  location?: LocationChoice;
+}) {
   const { items: states } = useList(deliveryStates);
-  const [status, setStatus] = useState('');
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+  const [receivedLocation, setReceivedLocation] = useState('');
   const [busy, setBusy] = useState(false);
+  const submitting = useRef(false);
+  const confirmationHeading = useRef<HTMLHeadingElement>(null);
   const suggestions = useId();
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[200] grid place-items-center bg-black/50 p-4"
-      onClick={(e) => e.stopPropagation()}
+
+  useEffect(() => {
+    if (receivedLocation) confirmationHeading.current?.focus();
+  }, [receivedLocation]);
+
+  async function submitRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (submitting.current) return;
+
+    const form = event.currentTarget;
+    const body = Object.fromEntries(
+      [...new FormData(form)]
+        .map(([key, value]) => [key, String(value).trim()])
+        .filter(([, value]) => value)
+    );
+    const invalidField = (name: string, message: string) => {
+      setError(message);
+      const input = form.elements.namedItem(name);
+      if (input instanceof HTMLInputElement) input.focus();
+    };
+    if (!body.state || body.state.length < 2) {
+      invalidField('state', 'Enter a state name with at least two characters.');
+      return;
+    }
+    if (body.contactPhone) {
+      body.contactPhone = body.contactPhone.replace(/[\s().-]/g, '');
+      if (!/^\+?[1-9]\d{1,14}$/.test(body.contactPhone)) {
+        invalidField(
+          'contactPhone',
+          'Enter a phone number with its country code, such as +234.'
+        );
+        return;
+      }
+    }
+
+    submitting.current = true;
+    setBusy(true);
+    setError('');
+    try {
+      const { data } = await axios.post<{
+        success?: boolean;
+        message?: string;
+      }>('/delivery/location-requests', body);
+      if (data?.success !== true) {
+        setError(
+          data?.message ||
+            'We couldn’t confirm your request was received. Please try again.'
+        );
+        return;
+      }
+      setReceivedLocation(
+        [body.town, body.lga, body.state].filter(Boolean).join(', ')
+      );
+    } catch (err) {
+      const failure = err as { response?: { status: number } };
+      if (failure.response?.status === 429) {
+        setError('Too many requests. Please wait and try again later.');
+      } else if (!failure.response) {
+        setError(
+          'We couldn’t confirm your request was received. Check your connection and try again.'
+        );
+      } else if (failure.response.status >= 500) {
+        setError('We couldn’t send your request right now. Please try again.');
+      } else {
+        setError(deliveryMessage(err));
+      }
+    } finally {
+      submitting.current = false;
+      setBusy(false);
+    }
+  }
+
+  const primaryAction =
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-800 disabled:cursor-wait disabled:opacity-60';
+
+  return (
+    <Dialog
+      open
+      onClose={() => {
+        if (!submitting.current) close();
+      }}
+      className="relative z-[200]"
     >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-label="Request a delivery location"
-        className="w-full max-w-md max-h-[90vh] overflow-auto rounded-xl bg-white p-6"
-      >
-        <h3 className="mb-4 text-lg font-bold">Request a delivery location</h3>
-        {sent ? (
-          <p role="status">Thank you for requesting delivery to your area.</p>
-        ) : (
-          <form
-            className="space-y-3"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const body = Object.fromEntries(
-                [...new FormData(e.currentTarget)]
-                  .map(([key, value]) => [key, String(value).trim()])
-                  .filter(([, value]) => value)
-              );
-              if (busy) return;
-              if (!body.state || body.state.length < 2) {
-                setStatus('Enter your state.');
-                return;
-              }
-              setBusy(true);
-              setStatus('');
-              try {
-                await axios.post('/delivery/location-requests', body);
-                setSent(true);
-              } catch (err) {
-                setStatus(
-                  (err as { response?: { status: number } }).response
-                    ?.status === 429
-                    ? 'Too many requests. Please try again later.'
-                    : deliveryMessage(err)
-                );
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {(
-              [
-                ['state', 'State', 100],
-                ['lga', 'LGA', 100],
-                ['town', 'Town', 100],
-                ['contactEmail', 'Contact email', 255],
-                ['contactPhone', 'Contact phone', 20],
-                ['note', 'Note', 500],
-              ] as const
-            ).map(([name, title, maxLength]) => (
-              <label key={name} className={label}>
-                {title}
-                {name === 'state' ? ' *' : ' (optional)'}
-                <input
-                  className={field}
-                  name={name}
-                  required={name === 'state'}
-                  minLength={name === 'state' ? 2 : undefined}
-                  maxLength={maxLength}
-                  disabled={busy}
-                  type={
-                    name === 'contactEmail'
-                      ? 'email'
-                      : name === 'contactPhone'
-                        ? 'tel'
-                        : 'text'
-                  }
-                  list={name === 'state' ? suggestions : undefined}
+      <DialogBackdrop className="fixed inset-0 bg-black/50" />
+      <div className="fixed inset-0 grid place-items-center p-4">
+        <DialogPanel className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:p-6">
+          {receivedLocation ? (
+            <div className="text-center">
+              <div className="mx-auto grid size-14 place-items-center rounded-full bg-brand-100 text-brand-800">
+                <Check size={28} strokeWidth={2} aria-hidden="true" />
+              </div>
+              <DialogTitle
+                as="h2"
+                ref={confirmationHeading}
+                tabIndex={-1}
+                className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 focus:outline-none"
+              >
+                Request received
+              </DialogTitle>
+              <Description className="mt-2 text-sm leading-6 text-slate-600">
+                We’ll use your request to help decide where to expand delivery.
+              </Description>
+              <div className="mt-5 flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-left">
+                <MapPin
+                  size={19}
+                  aria-hidden="true"
+                  className="mt-0.5 shrink-0 text-brand-800"
                 />
-              </label>
-            ))}
-            <datalist id={suggestions}>
-              {states?.map((s) => (
-                <option key={s} value={s} />
-              ))}
-            </datalist>
-            {status && <p role="alert">{status}</p>}
-            <button
-              disabled={busy}
-              className="rounded-lg bg-green-800 px-4 py-2 text-white"
-            >
-              Send request
-            </button>
-          </form>
-        )}
-        <button
-          type="button"
-          onClick={close}
-          className="mt-3 text-sm underline"
-        >
-          Close
-        </button>
-      </section>
-    </div>,
-    document.body
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-600">
+                    Requested location
+                  </p>
+                  <p className="mt-0.5 text-sm font-semibold break-words text-slate-900">
+                    {receivedLocation}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`${primaryAction} mt-5 w-full`}
+                onClick={close}
+              >
+                Done
+              </button>
+            </div>
+          ) : (
+            <>
+              <DialogTitle
+                as="h2"
+                className="text-xl font-semibold tracking-tight text-slate-900"
+              >
+                Request a delivery location
+              </DialogTitle>
+              <form
+                className="mt-5"
+                onSubmit={submitRequest}
+                onChange={() => {
+                  if (error) setError('');
+                }}
+                aria-busy={busy}
+              >
+                <fieldset disabled={busy} className="space-y-3">
+                  <legend className="sr-only">
+                    Delivery location and contact details
+                  </legend>
+                  {(
+                    [
+                      ['state', 'State', 100],
+                      ['lga', 'LGA', 100],
+                      ['town', 'Town', 100],
+                      ['contactEmail', 'Contact email', 255],
+                      ['contactPhone', 'Contact phone', 20],
+                      ['note', 'Note', 500],
+                    ] as const
+                  ).map(([name, title, maxLength]) => (
+                    <label key={name} className={label}>
+                      {title}
+                      {name === 'state' ? ' *' : ' (optional)'}
+                      <input
+                        className={field}
+                        name={name}
+                        required={name === 'state'}
+                        minLength={
+                          ['state', 'lga', 'town'].includes(name)
+                            ? 2
+                            : undefined
+                        }
+                        maxLength={maxLength}
+                        type={
+                          name === 'contactEmail'
+                            ? 'email'
+                            : name === 'contactPhone'
+                              ? 'tel'
+                              : 'text'
+                        }
+                        autoComplete={
+                          name === 'contactEmail'
+                            ? 'section-delivery-request email'
+                            : name === 'contactPhone'
+                              ? 'section-delivery-request tel'
+                              : 'off'
+                        }
+                        defaultValue={
+                          name === 'state'
+                            ? location?.state
+                            : name === 'lga'
+                              ? location?.lga
+                              : undefined
+                        }
+                        list={name === 'state' ? suggestions : undefined}
+                        data-autofocus={name === 'state'}
+                      />
+                    </label>
+                  ))}
+                  <datalist id={suggestions}>
+                    {states?.map((state) => (
+                      <option key={state} value={state} />
+                    ))}
+                  </datalist>
+                </fieldset>
+                {error && (
+                  <p
+                    role="alert"
+                    className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800"
+                  >
+                    {error}
+                  </p>
+                )}
+                <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={close}
+                    className="min-h-11 rounded-lg px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className={primaryAction}
+                  >
+                    {busy ? (
+                      <>
+                        <Loader2
+                          size={16}
+                          className="motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
+                        Sending request…
+                      </>
+                    ) : (
+                      <>
+                        <Send size={16} aria-hidden="true" />
+                        Send request
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+        </DialogPanel>
+      </div>
+    </Dialog>
   );
 }
 
@@ -256,26 +422,33 @@ export function DeliveryLocationPicker({
         ).map(([key, title, options]) => (
           <label key={key} className={label}>
             {title} *
-            <select
-              aria-label={title}
-              required
-              disabled={!options?.length}
-              className={field}
-              value={value[key]}
-              onChange={(e) =>
-                onChange({
-                  state: value.state,
-                  lga: key === 'state' ? '' : value.lga,
-                  town: '',
-                  [key]: e.target.value,
-                })
-              }
-            >
-              <option value="">Select {title}</option>
-              {options?.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
+            <span className="relative mt-1 block">
+              <select
+                aria-label={title}
+                required
+                disabled={!options?.length}
+                className={`${fieldBase} appearance-none pl-3 pr-8`}
+                value={value[key]}
+                onChange={(e) =>
+                  onChange({
+                    state: value.state,
+                    lga: key === 'state' ? '' : value.lga,
+                    town: '',
+                    [key]: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select {title}</option>
+                {options?.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                size={16}
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-900"
+              />
+            </span>
           </label>
         ))}
       </div>
@@ -312,7 +485,9 @@ export function DeliveryLocationPicker({
           />
         </label>
       )}
-      {request && <LocationRequest close={() => setRequest(false)} />}
+      {request && (
+        <LocationRequest close={() => setRequest(false)} location={value} />
+      )}
     </div>
   );
 }

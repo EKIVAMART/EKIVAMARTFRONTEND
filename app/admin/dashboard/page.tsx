@@ -996,7 +996,8 @@ function AdminPageContent() {
           }))
           .filter((store) => Boolean(store.value));
 
-        if (isMounted && mappedStores.length > 0) {
+        if (!isMounted) return;
+        if (mappedStores.length > 0) {
           setFilterVendors(mappedStores);
           return;
         }
